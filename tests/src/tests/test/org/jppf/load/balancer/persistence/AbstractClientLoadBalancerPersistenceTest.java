@@ -270,7 +270,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       pool.setSize(2);
       pool.awaitWorkingConnections(Operator.EQUAL, 2);
       final JobManagerClient jmc = (JobManagerClient) client.getJobManager();
-      while (jmc.getTaskQueueChecker().getNbIdleChannels() < 2) Thread.sleep(10L);
+      while (jmc.nbAvailableConnections() < 2) Thread.sleep(10L);
       final String algo = "proportional";
       final int nbTasks = 100;
       client.setLoadBalancerSettings(algo, lbi.getParameters());

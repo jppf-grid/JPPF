@@ -24,9 +24,11 @@ import java.util.concurrent.*;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.JPPFContext;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.*;
+import org.jppf.node.policy.*;
 import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.nio.nodeserver.*;
+import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.concurrent.*;
@@ -99,6 +101,10 @@ abstract class AbstractAsyncJobScheduler extends ThreadSynchronization implement
    * Whether bias towards local node is enabled.
    */
   final boolean localNodeBiasEnabled;
+  /**
+   * Selects the node according to a node selector.
+   */
+  final NodeSelectionHelper selectionHelper;
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -117,6 +123,7 @@ abstract class AbstractAsyncJobScheduler extends ThreadSynchronization implement
     this.driverInfo = server.getDriver().getSystemInformation();
     this.peerLoadBalanceThreshold = server.getDriver().getInitializer().getPeerConnectionPoolHandler().getLoadBalanceThreshold();
     this.localNodeBiasEnabled = server.getDriver().getConfiguration().get(JPPFProperties.LOCAL_NODE_BIAS);
+    this.selectionHelper = new NodeSelectionHelper(server.getDriver());
   }
 
   /**
@@ -219,5 +226,36 @@ abstract class AbstractAsyncJobScheduler extends ThreadSynchronization implement
     synchronized (idleChannels) {
       idleChannels.clear();
     }
+  }
+
+  /**
+   * Set the parameters needed as bounded variables for scripted execution policies.
+   * @param policy the root policy to explore.
+   * @param job the job containing the sla and metadata.
+   * @param stats the server statistics.
+   * @param nbJobNodes the number of nodes the job is already dispatched to.
+   */
+  public static void preparePolicy(final ExecutionPolicy policy, final ServerJob job, final JPPFStatistics stats, final int nbJobNodes) {
+    if (policy == null) return;
+    if (job == null) policy.setContext(null, null, null, nbJobNodes, stats);
+    else policy.setContext(job.getSLA(), null, job.getMetadata(), nbJobNodes, stats);
+  }
+
+  /**
+   * Filter the idle nodes according to the specified job's preference policy.
+   * @param job the job whose preference policy to evaluate.
+   * @return a set of nodes that matched the highest possibly child policy of the preference. Possibly empty but never null;
+   */
+  Set<BaseNodeContext> filterPreferredNodes(final ServerJob job) {
+    final Preference preferencePolicy = job.getSLA().getPreferencePolicy();
+    final Set<BaseNodeContext> result = new HashSet<>();
+    for (final ExecutionPolicy policy: preferencePolicy.getChildren()) {
+      preparePolicy(policy, job, stats, job.getNbChannels());
+      for (final BaseNodeContext node: idleChannels) {
+        if (policy.evaluate(node.getSystemInformation())) result.add(node);
+      }
+      if (!result.isEmpty()) return result;
+    }
+    return Collections.emptySet();
   }
 }

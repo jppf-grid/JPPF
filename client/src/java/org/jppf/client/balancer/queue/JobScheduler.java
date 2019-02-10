@@ -27,6 +27,7 @@ import org.jppf.client.balancer.*;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
+import org.jppf.node.policy.*;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.*;
@@ -35,11 +36,11 @@ import org.slf4j.*;
 /**
  * This class ensures that idle nodes get assigned pending tasks from the job queue.
  */
-public class TaskQueueChecker extends ThreadSynchronization implements Runnable {
+public class JobScheduler extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(TaskQueueChecker.class);
+  private static final Logger log = LoggerFactory.getLogger(JobScheduler.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -95,7 +96,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * @param queue the job queue to use.
    * @param bundlerFactory the load-balancer factory.
    */
-  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFBundlerFactory bundlerFactory) {
+  public JobScheduler(final JPPFPriorityQueue queue, final JPPFBundlerFactory bundlerFactory) {
     this.queue = queue;
     this.bundlerFactory = bundlerFactory;
     this.jppfContext = new JPPFContextClient(queue);
@@ -284,8 +285,10 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
     final int idleChannelsSize = idleChannels.size();
     final List<ChannelWrapper> acceptableChannels = new ArrayList<>(idleChannelsSize);
     final int highestPriority = getHighestPriority();
-    final Collection<ChannelWrapper> channels = idleChannels.getValues(highestPriority);
+    Collection<ChannelWrapper> channels = idleChannels.getValues(highestPriority);
     if (channels == null) return null;
+    channels = filterPreferredChannels(channels, job);
+    if (channels.isEmpty()) return null;
     for (final ChannelWrapper ch: channels) {
       if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE) {
         if (debugEnabled) log.debug("channel is not opened, removing it: {}", ch);
@@ -344,5 +347,26 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
     if (channel.getBundler() instanceof JobAwareness) {
       ((JobAwareness) channel.getBundler()).setJob(job);
     }
+  }
+
+  /**
+   * Extract eligble channels according to the job's client-side preference policy.
+   * @param idleChannels the idle channels to check against.
+   * @param job the job that holds the preference policy.
+   * @return a list of channels that matched the highest possible child policy of the preference. Possibly empty but never {@code null};
+   */
+  private static Collection<ChannelWrapper> filterPreferredChannels(final Collection<ChannelWrapper> idleChannels, final ClientJob job) {
+    if ((idleChannels == null) ||  idleChannels.isEmpty()) return Collections.emptyList();
+    final Preference preference = job.getClientSLA().getPreferencePolicy();
+    if (preference == null) return idleChannels;
+    final List<ChannelWrapper> result = new ArrayList<>(idleChannels.size());
+    for (final ExecutionPolicy policy: preference.getChildren()) {
+      for (final ChannelWrapper channel: idleChannels) {
+        job.preparePolicy(policy);
+        if (policy.accepts(channel.getSystemInformation())) result.add(channel);
+      }
+      if (!result.isEmpty()) break;
+    }
+    return result;
   }
 }

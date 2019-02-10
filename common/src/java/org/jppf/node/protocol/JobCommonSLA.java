@@ -20,7 +20,7 @@ package org.jppf.node.protocol;
 
 import java.io.Serializable;
 
-import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.policy.*;
 import org.jppf.scheduling.JPPFSchedule;
 
 /**
@@ -59,6 +59,10 @@ public class JobCommonSLA<T extends JobCommonSLA<T>> implements Serializable {
    * Whether to allow multiple concurrent dispatches of the job to the same channel.
    */
   boolean allowMultipleDispatchesToSameChannel = true;
+  /**
+   * The preference policy.
+   */
+  Preference preferencePolicy;
 
   /**
    * Default constructor.
@@ -77,7 +81,7 @@ public class JobCommonSLA<T extends JobCommonSLA<T>> implements Serializable {
 
   /**
    * Set the tasks execution policy.
-   * @param executionPolicy an <code>ExecutionPolicy</code> instance.
+   * @param executionPolicy an {@link ExecutionPolicy} instance.
    * @return this SLA, for method call chaining.
    */
   public T setExecutionPolicy(final ExecutionPolicy executionPolicy) {
@@ -87,7 +91,7 @@ public class JobCommonSLA<T extends JobCommonSLA<T>> implements Serializable {
 
   /**
    * Get the job schedule.
-   * @return a <code>JPPFSchedule</code> instance.
+   * @return a {@link JPPFSchedule} instance.
    */
   public JPPFSchedule getJobSchedule() {
     return jobSchedule;
@@ -95,7 +99,7 @@ public class JobCommonSLA<T extends JobCommonSLA<T>> implements Serializable {
 
   /**
    * Set the job schedule.
-   * @param jobSchedule a <code>JPPFSchedule</code> instance.
+   * @param jobSchedule a {@link JPPFSchedule} instance.
    * @return this SLA, for method call chaining.
    */
   public T setJobSchedule(final JPPFSchedule jobSchedule) {
@@ -173,6 +177,25 @@ public class JobCommonSLA<T extends JobCommonSLA<T>> implements Serializable {
    */
   public T setAllowMultipleDispatchesToSameChannel(final boolean allowMultipleDispatchesToSameChannel) {
     this.allowMultipleDispatchesToSameChannel = allowMultipleDispatchesToSameChannel;
+    return (T) this;
+  }
+
+  /**
+   * Get the preference policy.for this job SLA.
+   * @return a {@link Preference} policy instance, or {@code null} if it was not {@link #setPreferencePolicy(Preference) set}.
+   */
+  public Preference getPreferencePolicy() {
+    return preferencePolicy;
+  }
+
+  /**
+   * Set the preference policy for this job SLA.
+   * @param preferencePolicy a {@link Preference} policy instance, which may be {@code null}
+   * @return this SLA, for method call chaining.
+   * @since 6.1
+   */
+  public T setPreferencePolicy(final Preference preferencePolicy) {
+    this.preferencePolicy = preferencePolicy;
     return (T) this;
   }
 }

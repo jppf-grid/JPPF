@@ -311,4 +311,27 @@ public class BaseTest {
     //if (!op.evaluate(actual, expected)) Assert.fail(String.format("expected <%d> to be '%s' <%d>", actual, op, expected));
     if (!op.evaluate(actual, expected)) Assert.fail(String.format("expected: <%s %d> but was: <%d>", op, expected, actual));
   }
+
+  /**
+   * Assert that an {@code ExceptionRunnable} throws an expected {@code Throwable}.
+   * @param expectedClass the class of the expected throwable.
+   * @param runnable the {@code Callable} to check.
+   */
+  public static void assertThrows(final Class<? extends Throwable> expectedClass, final ExceptionRunnable runnable) {
+    try {
+      runnable.run();
+      Assert.fail(String.format("Expected <%s> to be thrown, but got no exception", expectedClass.getName()));
+    } catch (final Throwable e) {
+      final Class<? extends Throwable> actualClass = e.getClass();
+      Assert.assertTrue(String.format("Expected <%s> to be thrown, but got <%S>", expectedClass.getName(), actualClass.getName()), expectedClass.isAssignableFrom(actualClass));
+    }
+  }
+
+  /** */
+  public static interface ExceptionRunnable {
+    /**
+     * @throws Exception if any error occurs.
+     */
+    void run() throws Exception;
+  }
 }

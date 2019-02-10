@@ -423,7 +423,7 @@ public abstract class AbstractClientJob {
    * Currently this method only accepts a single remote channel, and it has to always be the same for the same job.
    * See {@link #remoteChannel}.
    * @param channel the channel to check for acceptance.
-   * @return <code>true</code> if the channel is accepted, <code>false</code> otherwise.
+   * @return {@code true} if the channel is accepted, {@code false} otherwise.
    */
   public boolean acceptsChannel(final ExecutorChannel<?> channel) {
     final int channelCount = getChannelCount();
@@ -450,7 +450,7 @@ public abstract class AbstractClientJob {
    * Set the parameters needed as bounded variables fro scripted execution policies. 
    * @param policy the root policy to explore.
    */
-  private void preparePolicy(final ExecutionPolicy policy) {
+  public void preparePolicy(final ExecutionPolicy policy) {
     if (policy == null) return;
     policy.setContext(sla, clientSla, metadata, dispatchCount.get(), null);
   }

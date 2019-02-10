@@ -71,7 +71,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   /**
    * Task that dispatches queued jobs to available nodes.
    */
-  private final TaskQueueChecker taskQueueChecker;
+  private final JobScheduler jobScheduler;
   /**
    * Mapping client connections to channel wrapper.
    */
@@ -80,19 +80,12 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * A list of all the connections.
    */
   private final CollectionSortedMap<Integer, ChannelWrapper> allConnections = new LinkedListSortedMap<>(new DescendingIntegerComparator());
-  //private final List<ChannelWrapper> allConnections = new ArrayList<>();
   /**
    * Listener used for monitoring state changes.
    */
-  private final ClientConnectionStatusListener statusListener = new ClientConnectionStatusListener() {
-    @Override
-    public void statusChanged(final ClientConnectionStatusEvent event) {
-      if (event.getSource() instanceof JPPFClientConnection) {
-        updateConnectionStatus(((JPPFClientConnection) event.getSource()), event.getOldStatus());
-      } else if (event.getSource() instanceof ChannelWrapperLocal) {
-        updateConnectionStatus((ChannelWrapper) event.getSource(), event.getOldStatus());
-      }
-    }
+  private final ClientConnectionStatusListener statusListener = event -> {
+    if (event.getSource() instanceof JPPFClientConnection) updateConnectionStatus(((JPPFClientConnection) event.getSource()), event.getOldStatus());
+    else if (event.getSource() instanceof ChannelWrapperLocal) updateConnectionStatus((ChannelWrapper) event.getSource(), event.getOldStatus());
   };
   /**
    * Determines whether local execution is enabled on this client.
@@ -106,7 +99,6 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * Holds the current connections with ACTIVE or EXECUTING status.
    */
   private final CollectionSortedMap<Integer, ChannelWrapper> workingConnections = new LinkedListSortedMap<>(new DescendingIntegerComparator());
-  //private final ConcurrentHashMap<String, ChannelWrapper> workingConnections = new ConcurrentHashMap<>();
   /**
    * Determines whether this job manager has been closed.
    */
@@ -129,14 +121,14 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     this.queue = new JPPFPriorityQueue(this);
     this.bundlerFactory = bundlerFactory;
     currentLoadBalancingInformation = bundlerFactory.getCurrentInfo();
-    taskQueueChecker = new TaskQueueChecker(queue, bundlerFactory);
+    jobScheduler = new JobScheduler(queue, bundlerFactory);
     this.queue.addQueueListener(new QueueListenerAdapter<ClientJob, ClientJob, ClientTaskBundle>() {
       @Override
       public void bundleAdded(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event) {
-        taskQueueChecker.wakeUp();
+        jobScheduler.wakeUp();
       }
     });
-    ThreadUtils.startDaemonThread(taskQueueChecker, "TaskQueueChecker");
+    ThreadUtils.startDaemonThread(jobScheduler, "JobScheduler");
     this.queue.addQueueListener(client);
     client.addConnectionPoolListener(new ConnectionPoolListenerAdapter() {
       @Override
@@ -332,21 +324,21 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (bNew && !bOld) {
       synchronized(workingConnections) {
         workingConnections.putValue(wrapper.getPriority(), wrapper);
-        taskQueueChecker.setHighestPriority(workingConnections.firstKey());
+        jobScheduler.setHighestPriority(workingConnections.firstKey());
       }
     } else if (!bNew && bOld) {
       synchronized(workingConnections) {
         workingConnections.removeValue(wrapper.getPriority(), wrapper);
-        if (!workingConnections.isEmpty()) taskQueueChecker.setHighestPriority(workingConnections.firstKey());
+        if (!workingConnections.isEmpty()) jobScheduler.setHighestPriority(workingConnections.firstKey());
       }
     }
     if (newStatus == JPPFClientConnectionStatus.ACTIVE) {
       if (debugEnabled) log.debug("processing active status for {}", wrapper);
       wrapper.initChannelID();
       if (debugEnabled) log.debug("about to add idle channel {}", wrapper);
-      taskQueueChecker.addIdleChannel(wrapper);
+      jobScheduler.addIdleChannel(wrapper);
     } else {
-      taskQueueChecker.removeIdleChannel(wrapper);
+      jobScheduler.removeIdleChannel(wrapper);
       if (newStatus.isTerminatedStatus() || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
     }
   }
@@ -388,7 +380,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     synchronized(this) {
       localConnectionavailable = (wrapperLocal != null) && (wrapperLocal.getStatus() == JPPFClientConnectionStatus.ACTIVE);
     }
-    return taskQueueChecker.hasIdleChannel() || localConnectionavailable;
+    return jobScheduler.hasIdleChannel() || localConnectionavailable;
   }
 
   @Override
@@ -429,12 +421,12 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @return the number of available connections.
    */
   public int nbAvailableConnections() {
-    return taskQueueChecker.getNbIdleChannels();
+    return jobScheduler.getNbIdleChannels();
   }
 
   @Override
   public Vector<JPPFClientConnection> getAvailableConnections() {
-    final List<ChannelWrapper> idleChannels = taskQueueChecker.getIdleChannels();
+    final List<ChannelWrapper> idleChannels = jobScheduler.getIdleChannels();
     final Vector<JPPFClientConnection> availableConnections = new Vector<>(idleChannels.size());
     for (final ChannelWrapper idleChannel : idleChannels) {
       if (idleChannel instanceof AbstractChannelWrapperRemote) {
@@ -458,7 +450,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         channel.close();
       }
       allConnections.clear();
-      if (taskQueueChecker != null) taskQueueChecker.clearChannels();
+      if (jobScheduler != null) jobScheduler.clearChannels();
     }
   }
 
@@ -468,9 +460,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     closed.set(true);
     setStopped(true);
     wakeUp();
-    if (taskQueueChecker != null) {
-      taskQueueChecker.setStopped(true);
-      taskQueueChecker.wakeUp();
+    if (jobScheduler != null) {
+      jobScheduler.setStopped(true);
+      jobScheduler.wakeUp();
     }
     queue.close();
     synchronized(allConnections) {
@@ -499,12 +491,5 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       final LoadBalancingInformation lbi = new LoadBalancingInformation(algorithm, props, currentLoadBalancingInformation.getAlgorithmNames());
       currentLoadBalancingInformation = bundlerFactory.setAndGetCurrentInfo(lbi);
     }
-  }
-
-  /**
-   * @return the job dispatcher.
-   */
-  public TaskQueueChecker getTaskQueueChecker() {
-    return taskQueueChecker;
   }
 }

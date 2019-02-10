@@ -33,7 +33,7 @@ public class Preference extends LogicalRule {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Initialize this policy with the specified array of children polices.
+   * Initialize this policy with the specified array of children policies.
    * @param policies the polcies in order of preference.
    */
   public Preference(final ExecutionPolicy... policies) {
@@ -42,7 +42,7 @@ public class Preference extends LogicalRule {
   }
 
   /**
-   * Initialize this policy with the specified array of children polices.
+   * Initialize this policy with the specified array of children policies.
    * @param policies the polcies in order of preference.
    */
   public Preference(final List<ExecutionPolicy> policies) {
@@ -52,10 +52,7 @@ public class Preference extends LogicalRule {
 
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
-    for (ExecutionPolicy policy: children) {
-      if ((policy == null) || policy.evaluate(info)) return true;
-    }
-    return false;
+    return true;
   }
 
   @Override

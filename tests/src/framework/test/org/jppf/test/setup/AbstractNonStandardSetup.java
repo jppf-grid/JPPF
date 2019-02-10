@@ -50,7 +50,7 @@ public class AbstractNonStandardSetup extends BaseTest {
   /** */
   protected static final NodeSelector PEER_SELECTOR = new ExecutionPolicySelector(PEER_POLICY);
   /** */
-  protected static TestConfiguration testConfig = null;
+  protected static TestConfiguration testConfig;
 
   /**
    * Create the drivers and nodes configuration.

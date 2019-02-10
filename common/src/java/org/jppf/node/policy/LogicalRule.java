@@ -63,7 +63,7 @@ public abstract class LogicalRule extends ExecutionPolicy {
       if (result.size() == 1) result.add(result.get(0));
       if (result.size() > 0) return result.toArray(new ExecutionPolicy[result.size()]);
     }
-    final String message = String.format("the execution policy rule '%s' must have at lest one non-null argument", getClass().getSimpleName());
+    final String message = String.format("a '%s' execution policy must have at lest one non-null argument", getClass().getSimpleName());
     throw new JPPFRuntimeException(message);
   }
 }

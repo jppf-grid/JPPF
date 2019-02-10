@@ -188,7 +188,13 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
     final TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
     List<BaseNodeContext> acceptableChannels = new ArrayList<>(idleChannels.size());
     final List<BaseNodeContext> toRemove = new LinkedList<>();
-    final Iterator<BaseNodeContext> nodeIterator = idleChannels.iterator();
+    Iterator<BaseNodeContext> nodeIterator = null;
+    if (sla.getPreferencePolicy() != null) {
+      final Set<BaseNodeContext> preferedChannels = filterPreferredNodes(job);
+      if (preferedChannels.isEmpty()) return null;
+      nodeIterator = preferedChannels.iterator();
+    }
+    else nodeIterator = idleChannels.iterator();
     while (nodeIterator.hasNext()) {
       final AsyncNodeContext channel = (AsyncNodeContext) nodeIterator.next();
       synchronized(channel.getMonitor()) {
@@ -316,19 +322,6 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
       }
       if (debugEnabled) log.debug("rule execution is *{}* for job [name={}, uuid={}] on channel {}", b, job.getName(), job.getUuid(), channel);
       return b;
-  }
-
-  /**
-   * Set the parameters needed as bounded variables for scripted execution policies.
-   * @param policy the root policy to explore.
-   * @param job the job containing the sla and metadata.
-   * @param stats the server statistics.
-   * @param nbJobNodes the number of nodes the job is already dispatched to.
-   */
-  public static void preparePolicy(final ExecutionPolicy policy, final ServerJob job, final JPPFStatistics stats, final int nbJobNodes) {
-    if (policy == null) return;
-    if (job == null) policy.setContext(null, null, null, nbJobNodes, stats);
-    else policy.setContext(job.getSLA(), null, job.getMetadata(), nbJobNodes, stats);
   }
 
   /**
