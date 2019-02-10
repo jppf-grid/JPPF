@@ -67,7 +67,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
   /**
    * Path to the JPPF configuration file.
    */
-  protected String jppfConfig = null;
+  protected String jppfConfig;
   /**
    * The program arguments.
    */
@@ -75,11 +75,11 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
   /**
    * Path to the log4j configuration file.
    */
-  protected String log4j = null;
+  protected String log4j;
   /**
    * Path to the JDK logging configuration file.
    */
-  protected String logging = null;
+  protected String logging;
   /**
    * Directory in which the program is started.
    */
@@ -87,19 +87,19 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
   /**
    * The process started by this process launcher.
    */
-  protected Process process = null;
+  protected Process process;
   /**
    * Wrapper around the process.
    */
-  protected ProcessWrapper wrapper = null;
+  protected ProcessWrapper wrapper;
   /**
    * Fully qualified name of the main class.
    */
-  protected String mainClass = null;
+  protected String mainClass;
   /**
    * The server socket the driver listens to.
    */
-  protected ServerSocket processServer = null;
+  protected ServerSocket processServer;
   /**
    * The port number the server socket listens to.
    */
@@ -111,11 +111,11 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
   /**
    * The driver or node number.
    */
-  protected int n = 0;
+  protected int n;
   /**
    * 
    */
-  protected SocketWrapper socketClient = null;
+  protected SocketWrapper socketClient;
   /**
    * Used to format timestamps in the std and err outputs.
    */

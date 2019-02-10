@@ -112,7 +112,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * The system information associated with the node at the time of the initial connection.
    */
-  private transient JPPFSystemInformation systemInfo = null;
+  private transient JPPFSystemInformation systemInfo;
   /**
    * Determines whether the node is active or inactive.
    */

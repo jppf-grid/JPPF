@@ -21,7 +21,7 @@ package test.org.jppf.classloader;
 import static org.junit.Assert.*;
 
 import java.net.URL;
-import java.util.List;
+import java.util.*;
 
 import org.jppf.node.protocol.*;
 import org.jppf.utils.ReflectionUtils;
@@ -75,7 +75,7 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
      */
     private static final long serialVersionUID = 1L;
     /** */
-    public String driverResource1 = null, driverResource2 = null, clientResource1 = null, clientResource2 = null;
+    public String driverResource1, driverResource2, clientResource1, clientResource2;
 
     @Override
     public void run() {

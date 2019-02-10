@@ -36,7 +36,7 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
   /**
    * The underlying map to which operations are delegated.
    */
-  protected Map<K, Collection<V>> map = null;
+  protected Map<K, Collection<V>> map;
 
   /**
    * Default constructor.

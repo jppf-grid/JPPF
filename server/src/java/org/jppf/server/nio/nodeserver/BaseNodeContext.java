@@ -49,7 +49,7 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
-  private  Bundler<?> bundler;
+  private Bundler<?> bundler;
   /**
    * Represents the node system information.
    */
@@ -190,7 +190,7 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
     if (update && debugEnabled) log.debug("updating node information for {}", systemInfo);
     this.systemInfo = systemInfo;
     systemInfo.getJppf().setProperty("jppf.channel.local", String.valueOf(isLocal()));
-    if (update && managementInfo != null) managementInfo.setSystemInfo(systemInfo);
+    if (managementInfo != null) managementInfo.setSystemInfo(systemInfo);
   }
 
   @Override
@@ -206,7 +206,6 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
     if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
     this.managementInfo = managementInfo;
     if ((managementInfo.getIpAddress() != null) && (managementInfo.getPort() >= 0)) initializeJmxConnection();
-    this.managementInfo = managementInfo;
   }
 
   /**

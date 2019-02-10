@@ -81,10 +81,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * 
    */
   private final Map<String, Condition> jobRemovalConditions = new HashMap<>();
-  /**
-   * 
-   */
-  private final boolean testJobRemoval;
 
   /**
    * Initialize this queue.
@@ -96,7 +92,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     this.jobManager = jobManager;
     broadcastManager = new BroadcastManager(this);
     this.persistenceHandler = new PersistenceHandler(this);
-    this.testJobRemoval = driver.getConfiguration().getBoolean("jppf.test.job.removal", false);
   }
 
   @Override
@@ -264,15 +259,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    */
   public ServerJob removeBundle(final ServerJob serverJob, final boolean removeFromJobMap) {
     if (serverJob == null) throw new IllegalArgumentException("serverJob is null");
-    // TODO: remove start
-    if (testJobRemoval) {
-      try {
-        Thread.sleep(10L);
-      } catch (final Exception e) {
-        log.error(e.getMessage(), e);
-      }
-    }
-    // TODO: remove end
     lock.lock();
     try {
       if (removeFromJobMap) {
