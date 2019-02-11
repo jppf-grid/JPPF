@@ -18,27 +18,17 @@
 
 package org.jppf.node.policy;
 
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.utils.PropertiesCollection;
 import org.jppf.utils.configuration.JPPFProperties;
 
 /**
- * An execution policy predicates that determines whether a node is a master node.
+ * An execution policy predicate which determines whether a node is a slave node.
  * @author Laurent Cohen
  */
-public class IsSlaveNode extends ExecutionPolicy {
-  @Override
-  public boolean accepts(final PropertiesCollection<String> info) {
-    return ((JPPFSystemInformation) info).getJppf().get(JPPFProperties.PROVISIONING_SLAVE);
-  }
-
-  @Override
-  public String toString(final int n) {
-    return new StringBuilder(indent(n)).append("<IsSlaveNode/>\n").toString();
-  }
-
-  @Override
-  public String toXML() {
-    return super.toXML();
+public class IsSlaveNode extends NoArgRule {
+  /**
+   * 
+   */
+  public IsSlaveNode() {
+    super(JPPFProperties.PROVISIONING_SLAVE);
   }
 }

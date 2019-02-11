@@ -36,9 +36,9 @@ public class PolicyParser {
   /**
    * List of possible rule names.
    */
-  private static final List<String> RULE_NAMES = Arrays.asList("NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan",
-      "BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule", "Script", "Preference",
-      "IsInIPv4Subnet", "IsInIPv6Subnet", NodesMatching.XML_TAG, AcceptAll.XML_TAG, RejectAll.XML_TAG, "IsMasterNode", "IsSlaveNode");
+  private static final List<String> RULE_NAMES = Arrays.asList("NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan", "BetweenII",
+    "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule", "Script", "Preference", "IsInIPv4Subnet", "IsInIPv6Subnet",
+    NodesMatching.XML_TAG, AcceptAll.XML_TAG, RejectAll.XML_TAG, "IsMasterNode", "IsSlaveNode", "IsLocalChannel", "IsPeerDriver");
   /**
    * The set of policy rules that take no argument.
    */

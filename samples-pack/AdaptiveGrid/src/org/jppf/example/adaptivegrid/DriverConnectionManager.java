@@ -71,7 +71,7 @@ public class DriverConnectionManager {
     final JMXDriverConnectionWrapper jmx = connectionPool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     this.forwarder = jmx.getNodeForwarder();
     // create a node selector that only selects master nodes
-    final ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
+    final ExecutionPolicy masterPolicy = new IsMasterNode();
     this.masterSelector = new ExecutionPolicySelector(masterPolicy);
     this.maxAllowedNodes = maxAllowedNodes;
     this.maxAllowedPoolSize = maxAllowedPoolSize;

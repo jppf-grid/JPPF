@@ -61,8 +61,10 @@ class PolicyBuilder {
       case "NodesMatching": return buildNodesMatchingPolicy(desc);
       case "AcceptAll": 
       case "RejectAll": return buildAcceptOrRejectAll(desc.type, desc);
-      case "IsMasterNode": 
-      case "IsSlaveNode": return buildIsMasterOrSlavePolicy(desc.type, desc);
+      case "IsMasterNode": return new IsMasterNode();
+      case "IsSlaveNode": return new IsSlaveNode();
+      case "IsLocalChannel": return new IsLocalChannel();
+      case "IsPeerDriver": return new IsPeerDriver();
     }
     return null;
   }
@@ -359,17 +361,6 @@ class PolicyBuilder {
     final ExecutionPolicy child = (desc.children != null) && (desc.children.size() > 0) ? buildPolicy(desc.children.get(0)) : null;
     if ("AcceptAll".equals(name)) return (child == null) ? new AcceptAll() : new AcceptAll(child);
     return (child == null) ? new RejectAll() : new RejectAll(child);
-  }
-
-  /**
-   * Build {@link IsMasterNode} or {@link IsSlaveNode} policy.
-   * @param name the name of the execution policy rule to build.
-   * @param desc the descriptor to use.
-   * @return an {@code ExecutionPolicy} instance.
-   * @throws Exception if an error occurs while generating the policy object.
-   */
-  private static ExecutionPolicy buildIsMasterOrSlavePolicy(final String name, final PolicyDescriptor desc)  throws Exception {
-    return "IsMasterNode".equals(name) ? new IsMasterNode() : new IsSlaveNode();
   }
 
   /** */

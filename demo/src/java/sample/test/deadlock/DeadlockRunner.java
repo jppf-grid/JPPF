@@ -26,7 +26,7 @@ import org.jppf.client.utils.AbstractJPPFJobStream;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.policy.Equal;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
@@ -172,7 +172,7 @@ public class DeadlockRunner {
     final JMXDriverConnectionWrapper jmx = getJmxConnection(client);
     if (jmx.nbNodes() == nbSlaves + 1) return;
     final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
-    final NodeSelector masterSelector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
+    final NodeSelector masterSelector = new ExecutionPolicySelector(new IsMasterNode());
     // request that <nbSlaves> slave nodes be provisioned
     final TimeMarker marker = new TimeMarker().start();
     forwarder.provisionSlaveNodes(masterSelector, nbSlaves, null);
@@ -189,7 +189,7 @@ public class DeadlockRunner {
   private static void requestNodeShutdown(final JPPFClient client) throws Exception {
     print("requesting node shutdown ...");
     final JMXDriverConnectionWrapper jmx = getJmxConnection(client);
-    final NodeSelector selector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
+    final NodeSelector selector = new ExecutionPolicySelector(new IsMasterNode());
     jmx.getNodeForwarder().shutdown(selector, false);
   }
 

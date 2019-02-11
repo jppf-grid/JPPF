@@ -26,8 +26,7 @@ import javax.management.*;
 
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.policy.Equal;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.node.policy.IsMasterNode;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -64,7 +63,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
     while (driver.nbIdleNodes() < 1) Thread.sleep(10L);
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
     final JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
-    final NodeSelector selector = new ExecutionPolicySelector(new Equal(JPPFProperties.PROVISIONING_MASTER.getName(), true));
+    final NodeSelector selector = new ExecutionPolicySelector(new IsMasterNode());
     forwarder.provisionSlaveNodes(selector, nbSlaves);
     print(false, false, "waiting for %d slave nodes", nbSlaves);
     while (driver.nbIdleNodes() < nbSlaves + 1) Thread.sleep(10L);

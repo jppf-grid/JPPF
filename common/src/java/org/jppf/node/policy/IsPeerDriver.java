@@ -18,17 +18,15 @@
 
 package org.jppf.node.policy;
 
-import org.jppf.utils.configuration.JPPFProperties;
-
 /**
- * An execution policy predicate which determines whether a node is a master node.
+ * An execution policy predicate that determines whether a node connection is actually a peer driver.
  * @author Laurent Cohen
  */
-public class IsMasterNode extends NoArgRule {
+public class IsPeerDriver extends NoArgRule {
   /**
    * 
    */
-  public IsMasterNode() {
-    super(JPPFProperties.PROVISIONING_MASTER);
+  public IsPeerDriver() {
+    super("jppf.peer.driver", false);
   }
 }

@@ -18,17 +18,15 @@
 
 package org.jppf.node.policy;
 
-import org.jppf.utils.configuration.JPPFProperties;
-
 /**
- * An execution policy predicate which determines whether a node is a master node.
+ * An execution policy predicate which determines whether a a connection endpoint is a local executor (on the client side) or a local node (on the server side).
  * @author Laurent Cohen
  */
-public class IsMasterNode extends NoArgRule {
+public class IsLocalChannel extends NoArgRule {
   /**
    * 
    */
-  public IsMasterNode() {
-    super(JPPFProperties.PROVISIONING_MASTER);
+  public IsLocalChannel() {
+    super("jppf.channel.local", false);
   }
 }

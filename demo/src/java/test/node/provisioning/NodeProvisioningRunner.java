@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.policy.Equal;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.Operator;
@@ -39,7 +39,7 @@ public class NodeProvisioningRunner {
   /**
    * 
    */
-  private static NodeSelector masterSelector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
+  private static NodeSelector masterSelector = new ExecutionPolicySelector(new IsMasterNode());
 
   /**
    * Entry point ofr this application.

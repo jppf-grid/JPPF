@@ -53,6 +53,8 @@
       <element name="RejectAll" type="jppf:ZeroOrOneRuleType"/>
       <element name="IsMasterNode" type="jppf:ZeroRuleType"/>
       <element name="IsSlaveNode" type="jppf:ZeroRuleType"/>
+      <element name="IsLocalChannel" type="jppf:ZeroRuleType"/>
+      <element name="IsPeerDriver" type="jppf:ZeroRuleType"/>
       <element name="NodesMatching" type="jppf:GlobalType"/>
     </choice>
   </group>
