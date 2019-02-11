@@ -30,7 +30,7 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage {
   /**
    * The latest bundle that was sent or received.
    */
-  protected TaskBundle bundle = null;
+  protected TaskBundle bundle;
 
   /**
    * Initialize this nio message with the specified context.
