@@ -181,7 +181,6 @@ public class ServerTaskBundleClient {
     if (source == null) throw new IllegalArgumentException("source is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
     final int size = taskList.size();
-    //job = source.getJob().copy(size);
     this.job = source.getJob().copy();
     this.job.setTaskCount(size);
     this.job.setInitialTaskCount(source.getJob().getInitialTaskCount());
@@ -234,23 +233,22 @@ public class ServerTaskBundleClient {
    * Called to notify that the contained task received result.
    * @param results the tasks for which results were received.
    */
-  public void resultReceived(final Collection<ServerTask> results) {
+  public synchronized void resultReceived(final Collection<ServerTask> results) {
     List<ServerTask> completedTasks = null;
-    synchronized (this) {
-      if (isCancelled()) return;
-      if (debugEnabled) log.debug("received " + results.size() + " tasks for " + this);
-      final List<ServerTask> tasks = new ArrayList<>(results.size());
-      for (final ServerTask task: results) {
-        if (task.getState() != TaskState.PENDING) {
-          tasks.add(task);
-          tasksToSendList.add(task);
-          pendingTasksCount.decrementAndGet();
-        }
+    if (isCancelled()) return;
+    if (debugEnabled) log.debug("received {} tasks for {}", results.size(), this);
+    final List<ServerTask> tasks = new ArrayList<>(results.size());
+    for (final ServerTask task: results) {
+      if (task.getState() != TaskState.PENDING) {
+        tasks.add(task);
+        tasksToSendList.add(task);
+        pendingTasksCount.decrementAndGet();
       }
-      done = pendingTasksCount.get() <= 0;
-      final boolean shouldFire = done || strategy.sendResults(this, tasks);
-      if (shouldFire) completedTasks = getAndClearCompletedTasks();
     }
+    done = pendingTasksCount.get() <= 0;
+    final boolean shouldFire = done || strategy.sendResults(this, tasks);
+    if (shouldFire) completedTasks = getAndClearCompletedTasks();
+    if (debugEnabled) log.debug("processed {} tasks, completedTasks={}, done={}, tasksToSend={}", tasks.size(), (completedTasks == null ? 0 : completedTasks.size()), done, tasksToSendList.size());
     if (completedTasks != null) fireTasksCompleted(completedTasks);
   }
 
@@ -261,23 +259,21 @@ public class ServerTaskBundleClient {
    */
   public synchronized void resultReceived(final Collection<ServerTask> tasks, final Throwable exception) {
     List<ServerTask> completedTasks = null;
-    synchronized (this) {
-      if (isCancelled()) return;
-      if (debugEnabled) log.debug("received exception [" + ExceptionUtils.getMessage(exception) + "] for " + this);
-      int count = 0;
-      for (final ServerTask task: tasks) {
-        if (task.getState() != TaskState.PENDING) {
-          tasksToSendList.add(task);
-          count++;
-          //pendingTasksCount.decrementAndGet();
-        }
-        if (count > 0) pendingTasksCount.addAndGet(-count);
-        task.resultReceived(exception);
+    if (isCancelled()) return;
+    if (debugEnabled) log.debug("received exception [{}] for {}", ExceptionUtils.getMessage(exception), this);
+    int count = 0;
+    for (final ServerTask task: tasks) {
+      if (task.getState() != TaskState.PENDING) {
+        tasksToSendList.add(task);
+        count++;
       }
-      done = pendingTasksCount.get() <= 0;
-      final boolean shouldFire = done || strategy.sendResults(this, tasks);
-      if (shouldFire) completedTasks = getAndClearCompletedTasks();
+      if (count > 0) pendingTasksCount.addAndGet(-count);
+      task.resultReceived(exception);
     }
+    done = pendingTasksCount.get() <= 0;
+    final boolean shouldFire = done || strategy.sendResults(this, tasks);
+    if (shouldFire) completedTasks = getAndClearCompletedTasks();
+    if (debugEnabled) log.debug("processed {} tasks, completedTasks={}, done={}, tasksToSend={}", tasks.size(), (completedTasks == null ? 0 : completedTasks.size()), done, tasksToSendList.size());
     if (completedTasks != null) fireTasksCompleted(completedTasks);
   }
 
