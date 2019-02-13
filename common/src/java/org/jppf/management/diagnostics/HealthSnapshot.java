@@ -19,6 +19,9 @@
 package org.jppf.management.diagnostics;
 
 import java.io.Serializable;
+import java.time.*;
+import java.time.format.*;
+import java.time.temporal.ChronoField;
 import java.util.Map;
 
 import org.jppf.management.diagnostics.provider.MonitoringConstants;
@@ -33,6 +36,10 @@ public class HealthSnapshot implements Serializable {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * Formatter for durations in millis.
+   */
+  private static final DateTimeFormatter durationFormatter = createDurationFormatter();
   /**
    * Contains the attributes of this snapshot with their values.
    */
@@ -112,6 +119,17 @@ public class HealthSnapshot implements Serializable {
    */
   public String getString(final String name) {
     return properties.getString(name);
+  }
+
+  /**
+   * Get the value of a property as a String.
+   * @param name the name of the property to lookup.
+   * @return the value of the property.
+   */
+  public String getDurationString(final String name) {
+    final long duration = properties.getLong(name);
+    final int nanos = (int) (duration % 1000L) * 1_000_000;
+    return durationFormatter.format(LocalDateTime.ofEpochSecond(duration / 1000L, nanos, ZoneOffset.ofHours(0)));
   }
 
   /**
@@ -217,5 +235,19 @@ public class HealthSnapshot implements Serializable {
       }
     }
     return sb.append(']').toString();
+  }
+
+  /**
+   * 
+   * @return aformatter for durations expressed in milliseconds.
+   */
+  private static DateTimeFormatter createDurationFormatter() {
+    return new DateTimeFormatterBuilder()
+      .appendValue(ChronoField.EPOCH_DAY).appendLiteral('d')
+      .appendValue(ChronoField.CLOCK_HOUR_OF_DAY).appendLiteral('h')
+      .appendValue(ChronoField.MINUTE_OF_HOUR).appendLiteral('m')
+      .appendValue(ChronoField.SECOND_OF_MINUTE).appendLiteral('.')
+      .appendValue(ChronoField.MILLI_OF_SECOND, 3, 3, SignStyle.NEVER)
+      .toFormatter();
   }
 }

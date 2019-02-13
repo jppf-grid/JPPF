@@ -52,6 +52,14 @@ public class MonitoringConstants {
    */
   public static final String LIVE_THREADS_COUNT = "liveThreads";
   /**
+   * Constant for the name of the peak threads count property.
+   */
+  public static final String PEAK_THREADS_COUNT = "peakThreads";
+  /**
+   * Constant for the name of the total started threads property.
+   */
+  public static final String STARTED_THREADS_COUNT = "startedThreads";
+  /**
    * Constant for the name of the current process cpu load in % property.
    */
   public static final String PROCESS_CPU_LOAD = "processCpuLoad";
@@ -91,5 +99,8 @@ public class MonitoringConstants {
    * Constant for the name of the process virtual size property.
    */
   public static final String PROCESS_VIRTUAL_SIZE = "vsz";
-  
+  /**
+   * Constant for the name JVM uptime property.
+   */
+  public static final String JVM_UPTIME = "jvmUptime";
 }

@@ -50,6 +50,10 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
    */
   private static final ThreadMXBean threadsMXBean = ManagementFactory.getThreadMXBean();
   /**
+   * Reference to the platform's {@link RuntimeMXBean} instance.
+   */
+  private static final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+  /**
    * Whether the full operating system MXBean features are available or not.
    */
   private static boolean osMXBeanAvailable = true;
@@ -89,6 +93,8 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     setDoubleProperty(NON_HEAP_USAGE_MB, -1d);
     setBooleanProperty(DEADLOCKED, false);
     setIntProperty(LIVE_THREADS_COUNT, -1);
+    setIntProperty(PEAK_THREADS_COUNT, -1);
+    setLongProperty(STARTED_THREADS_COUNT, -1L);
     setDoubleProperty(PROCESS_CPU_LOAD, -1d);
     setDoubleProperty(SYSTEM_CPU_LOAD, -1d);
     setDoubleProperty(PROCESS_RESIDENT_SET_SIZE, -1d);
@@ -101,6 +107,7 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     setStringProperty(OS_NAME, "n/a");
     setDoubleProperty(PROCESS_RESIDENT_SET_SIZE, -1d);
     setDoubleProperty(PROCESS_VIRTUAL_SIZE, -1d);
+    setLongProperty(JVM_UPTIME, -1L);
   }
 
   @Override
@@ -121,8 +128,11 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     final long[] ids = threadsMXBean.findDeadlockedThreads();
     props.setBoolean(DEADLOCKED, (ids != null) && (ids.length > 0));
     props.setInt(LIVE_THREADS_COUNT, threadsMXBean.getThreadCount());
+    props.setInt(PEAK_THREADS_COUNT, threadsMXBean.getPeakThreadCount());
+    props.setLong(STARTED_THREADS_COUNT, threadsMXBean.getTotalStartedThreadCount());
     props.setDouble(PROCESS_CPU_LOAD, 100d * osMXBeanDoubleValue("ProcessCpuLoad"));
     props.setDouble(SYSTEM_CPU_LOAD, 100d * osMXBeanDoubleValue("SystemCpuLoad"));
+    props.setLong(JVM_UPTIME, runtimeMXBean.getUptime());
     return props;
   }
 

@@ -24,7 +24,9 @@ import javax.swing.tree.*;
 
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.management.diagnostics.*;
+import org.jppf.management.diagnostics.provider.MonitoringConstants;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
+import org.jppf.utils.StringUtils;
 import org.jppf.utils.configuration.*;
 
 /**
@@ -72,13 +74,15 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
         if (column == URL) res = info.toString();
         else {
           final JPPFProperty<?> prop = properties.get(column - 1);
+          final String name = prop.getName();
+          if (MonitoringConstants.JVM_UPTIME.equals(name)) return StringUtils.toStringDuration(health.getLong(name));
           if ((prop instanceof FloatProperty) || (prop instanceof DoubleProperty)) {
-            final double d = health.getDouble(prop.getName());
+            final double d = health.getDouble(name);
             res = d < 0d ? NA : nfDec.format(d);
           } else if ((prop instanceof IntProperty) || (prop instanceof LongProperty)) {
-            final long l = health.getLong(prop.getName());
+            final long l = health.getLong(name);
             res = l < 0L ? NA : nfInt.format(l);
-          } else res = health.getString(prop.getName());
+          } else res = health.getString(name);
         }
       } else if (column == 0) res = defNode.getUserObject().toString();
     }
