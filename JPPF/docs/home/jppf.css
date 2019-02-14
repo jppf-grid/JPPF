@@ -393,7 +393,7 @@ div#bodyContent div h2 {
   margin-top: 0.6em;
 }
 
-.wiki_note, .wiki_note_margin {
+.wiki_note, .wiki_note_bottom, .wiki_note_margin, .wiki_note_nomargin {
   background-color: #FFFD94;
   border: solid 1px #8D98D6;
   padding: 3px 2px;
@@ -405,11 +405,15 @@ div#bodyContent div h2 {
   width: 100%;
 }
 
-.wiki_note p, .wiki_note_margin p {
-  margin: 0px;
+.wiki_note_bottom {
+  margin-bottom: 0px;
 }
 
-.wiki_note_margin {
-  margin-top: 10px;
-  margin-bottom: 10px;
+.wiki_note_nomargin {
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+.wiki_note p, .wiki_note_margin p {
+  margin: 0px;
 }
