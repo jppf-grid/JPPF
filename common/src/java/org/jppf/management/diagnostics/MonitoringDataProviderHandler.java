@@ -20,7 +20,7 @@ package org.jppf.management.diagnostics;
 
 import java.util.*;
 
-import org.jppf.management.diagnostics.provider.MonitoringDataProvider;
+import org.jppf.management.diagnostics.provider.*;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
@@ -29,6 +29,7 @@ import org.slf4j.*;
  * This class provides methods to find, load and access {@link MonitoringDataProvider}s.
  * It is implemented as a singleton.
  * @author Laurent Cohen
+ * @exclude
  */
 public final class MonitoringDataProviderHandler {
   /**
@@ -43,6 +44,10 @@ public final class MonitoringDataProviderHandler {
    * The list of properties of all providers.
    */
   private static List<JPPFProperty<?>> propertyList;
+  /**
+   * Mapping of the property names to an optionally associated value converter.
+   */
+  private static final Map<String, MonitoringValueConverter> converters = new LinkedHashMap<>();
   /**
    * Whether the providers have already been loaded.
    */
@@ -100,24 +105,39 @@ public final class MonitoringDataProviderHandler {
    * @return the list of properties of all providers.
    */
   public static synchronized List<JPPFProperty<?>> getAllProperties() {
-    if (!defined) {
-      defined = true;
-      final List<MonitoringDataProvider> providers = getProviders();
-      int size = 0;
-      for (final MonitoringDataProvider provider: providers) {
-        try {
-          provider.defineProperties();
-          size += provider.getProperties().size();
-        } catch (final Exception e) {
-          log.error("error defining properties for provider {}\n{}", provider, ExceptionUtils.getStackTrace(e));
-        }
-      }
-      final List<JPPFProperty<?>> list = new ArrayList<>(size);
-      for (final MonitoringDataProvider provider: providers) {
-        for (final JPPFProperty<?> property: provider.getProperties()) list.add(property);
-      }
-      propertyList = Collections.unmodifiableList(list);
-    }
+    if (!defined) define();
     return propertyList;
+  }
+
+  /**
+   * Get the mappings of property names to their associted converter, if any.
+   * @return a {@link Map} of string property names to their associated {@code MonitoringValueConverter}.
+   */
+  public static synchronized Map<String, MonitoringValueConverter> getConverters() {
+    if (!defined) define();
+    return converters;
+  }
+
+  /**
+   * Retrieve and define all properties and associated value converters.
+   */
+  private static void define() {
+    defined = true;
+    final List<MonitoringDataProvider> providers = getProviders();
+    int size = 0;
+    for (final MonitoringDataProvider provider: providers) {
+      try {
+        provider.defineProperties();
+        size += provider.getProperties().size();
+        converters.putAll(provider.getConverters());
+      } catch (final Exception e) {
+        log.error("error defining properties for provider {}\n{}", provider, ExceptionUtils.getStackTrace(e));
+      }
+    }
+    final List<JPPFProperty<?>> list = new ArrayList<>(size);
+    for (final MonitoringDataProvider provider: providers) {
+      for (final JPPFProperty<?> property: provider.getProperties()) list.add(property);
+    }
+    propertyList = Collections.unmodifiableList(list);
   }
 }

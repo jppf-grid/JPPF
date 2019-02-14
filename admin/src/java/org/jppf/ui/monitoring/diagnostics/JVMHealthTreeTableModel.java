@@ -24,9 +24,8 @@ import javax.swing.tree.*;
 
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.management.diagnostics.*;
-import org.jppf.management.diagnostics.provider.MonitoringConstants;
+import org.jppf.management.diagnostics.provider.MonitoringValueConverter;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
-import org.jppf.utils.StringUtils;
 import org.jppf.utils.configuration.*;
 
 /**
@@ -45,6 +44,10 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
    * Properties representing the columns definitions.
    */
   private final List<JPPFProperty<?>> properties;
+  /**
+   * Mapping of the property names to an optionally associated value converter.
+   */
+  private final Map<String, MonitoringValueConverter> converters;
 
   /**
    * Initialize this model with the specified tree and locale.
@@ -55,6 +58,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
     super(node, locale);
     i18nBase = "org.jppf.ui.i18n.NodeDataPage";
     properties = MonitoringDataProviderHandler.getAllProperties();
+    converters = new HashMap<>(MonitoringDataProviderHandler.getConverters());
   }
 
   @Override
@@ -64,7 +68,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
 
   @Override
   public Object getValueAt(final Object node, final int column) {
-    Object res = "";
+    String res = "";
     if (node instanceof DefaultMutableTreeNode) {
       final DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
       if (defNode.getUserObject() instanceof AbstractTopologyComponent) {
@@ -75,8 +79,9 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
         else {
           final JPPFProperty<?> prop = properties.get(column - 1);
           final String name = prop.getName();
-          if (MonitoringConstants.JVM_UPTIME.equals(name)) return StringUtils.toStringDuration(health.getLong(name));
-          if ((prop instanceof FloatProperty) || (prop instanceof DoubleProperty)) {
+          final MonitoringValueConverter converter = converters.get(name);
+          if (converter != null) res = converter.convert(health.getString(name));
+          else if ((prop instanceof FloatProperty) || (prop instanceof DoubleProperty)) {
             final double d = health.getDouble(name);
             res = d < 0d ? NA : nfDec.format(d);
           } else if ((prop instanceof IntProperty) || (prop instanceof LongProperty)) {

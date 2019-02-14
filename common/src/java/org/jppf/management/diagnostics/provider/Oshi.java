@@ -47,7 +47,7 @@ public class Oshi {
   /**
    * Sensors include hardwore sensors to monitor temperature, fan speed, and other information.
    */
-  private Sensors sensors;
+  Sensors sensors;
   /**
    * Global memory.
    */
@@ -77,6 +77,7 @@ public class Oshi {
   TypedProperties getValues() {
     final TypedProperties props = new TypedProperties();
     props.setDouble(CPU_TEMPERATURE, sensors.getCpuTemperature());
+    props.setDouble(CPU_TEMPERATURE, 0d);
     props.setString(OS_NAME, os.getFamily() + " " + os.getVersion().getVersion());
     double total = memory.getTotal();
     final double available = memory.getAvailable();

@@ -21,10 +21,12 @@ package org.jppf.management.diagnostics.provider;
 import static org.jppf.management.diagnostics.provider.MonitoringConstants.*;
 
 import java.lang.management.*;
+import java.util.*;
 
 import javax.management.*;
 
 import org.jppf.management.diagnostics.*;
+import org.jppf.management.diagnostics.provider.MonitoringValueConverter.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -60,7 +62,7 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
   /**
    * The object name of the operating system MXBean.
    */
-  private static ObjectName osMXBeanName = null;
+  private static ObjectName osMXBeanName;
   /**
    * The platform MBean server.
    */
@@ -80,6 +82,10 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     if (threadsMXBean.isThreadContentionMonitoringSupported()) threadsMXBean.setThreadContentionMonitoringEnabled(true);
   }
   /**
+   * Double converter with 2 fractional digits.
+   */
+  private static final MonitoringValueConverter FRACTION_2_CONVERTER = new DoubleConverterWithFractionDigits(2);
+  /**
    * Object that holds all references to Oshi API objects.
    * This allows using this built-in provider on the console side without needing OShi classes in the classpath.
    */
@@ -87,27 +93,27 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
 
   @Override
   public void defineProperties() {
-    setDoubleProperty(HEAP_USAGE_RATIO, -1d);
-    setDoubleProperty(HEAP_USAGE_MB, -1d);
-    setDoubleProperty(NON_HEAP_USAGE_RATIO, -1d);
-    setDoubleProperty(NON_HEAP_USAGE_MB, -1d);
+    setDoubleProperty(HEAP_USAGE_RATIO, -1d).setConverter(HEAP_USAGE_RATIO, FRACTION_2_CONVERTER);
+    setDoubleProperty(HEAP_USAGE_MB, -1d).setConverter(HEAP_USAGE_MB, FRACTION_2_CONVERTER);
+    setDoubleProperty(NON_HEAP_USAGE_RATIO, -1d).setConverter(NON_HEAP_USAGE_RATIO, FRACTION_2_CONVERTER);
+    setDoubleProperty(NON_HEAP_USAGE_MB, -1d).setConverter(NON_HEAP_USAGE_MB, FRACTION_2_CONVERTER);
     setBooleanProperty(DEADLOCKED, false);
     setIntProperty(LIVE_THREADS_COUNT, -1);
     setIntProperty(PEAK_THREADS_COUNT, -1);
     setLongProperty(STARTED_THREADS_COUNT, -1L);
-    setDoubleProperty(PROCESS_CPU_LOAD, -1d);
-    setDoubleProperty(SYSTEM_CPU_LOAD, -1d);
-    setDoubleProperty(PROCESS_RESIDENT_SET_SIZE, -1d);
-    setDoubleProperty(PROCESS_VIRTUAL_SIZE, -1d);
-    setDoubleProperty(RAM_USAGE_RATIO, -1d);
-    setDoubleProperty(RAM_USAGE_MB, -1d);
-    setDoubleProperty(SWAP_USAGE_RATIO, -1d);
-    setDoubleProperty(SWAP_USAGE_MB, -1d);
+    setDoubleProperty(PROCESS_CPU_LOAD, -1d).setConverter(PROCESS_CPU_LOAD, FRACTION_2_CONVERTER);
+    setDoubleProperty(SYSTEM_CPU_LOAD, -1d).setConverter(SYSTEM_CPU_LOAD, FRACTION_2_CONVERTER);
+    setDoubleProperty(PROCESS_RESIDENT_SET_SIZE, -1d).setConverter(PROCESS_RESIDENT_SET_SIZE, FRACTION_2_CONVERTER);
+    setDoubleProperty(PROCESS_VIRTUAL_SIZE, -1d).setConverter(PROCESS_VIRTUAL_SIZE, FRACTION_2_CONVERTER);
+    setDoubleProperty(RAM_USAGE_RATIO, -1d).setConverter(RAM_USAGE_RATIO, FRACTION_2_CONVERTER);
+    setDoubleProperty(RAM_USAGE_MB, -1d).setConverter(RAM_USAGE_MB, FRACTION_2_CONVERTER);
+    setDoubleProperty(SWAP_USAGE_RATIO, -1d).setConverter(SWAP_USAGE_RATIO, FRACTION_2_CONVERTER);
+    setDoubleProperty(SWAP_USAGE_MB, -1d).setConverter(SWAP_USAGE_MB, FRACTION_2_CONVERTER);
     setDoubleProperty(CPU_TEMPERATURE, -1d);
     setStringProperty(OS_NAME, "n/a");
-    setDoubleProperty(PROCESS_RESIDENT_SET_SIZE, -1d);
-    setDoubleProperty(PROCESS_VIRTUAL_SIZE, -1d);
-    setLongProperty(JVM_UPTIME, -1L);
+    setDoubleProperty(PROCESS_RESIDENT_SET_SIZE, -1d).setConverter(PROCESS_RESIDENT_SET_SIZE, FRACTION_2_CONVERTER);
+    setDoubleProperty(PROCESS_VIRTUAL_SIZE, -1d).setConverter(PROCESS_VIRTUAL_SIZE, FRACTION_2_CONVERTER);
+    setLongProperty(JVM_UPTIME, -1L).setConverter(JVM_UPTIME, (LongConverter) StringUtils::toStringDuration);
   }
 
   @Override
@@ -127,11 +133,13 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     props.setDouble(NON_HEAP_USAGE_MB, (double) mem.getUsed() / MB);
     final long[] ids = threadsMXBean.findDeadlockedThreads();
     props.setBoolean(DEADLOCKED, (ids != null) && (ids.length > 0));
-    props.setInt(LIVE_THREADS_COUNT, threadsMXBean.getThreadCount());
-    props.setInt(PEAK_THREADS_COUNT, threadsMXBean.getPeakThreadCount());
-    props.setLong(STARTED_THREADS_COUNT, threadsMXBean.getTotalStartedThreadCount());
-    props.setDouble(PROCESS_CPU_LOAD, 100d * osMXBeanDoubleValue("ProcessCpuLoad"));
-    props.setDouble(SYSTEM_CPU_LOAD, 100d * osMXBeanDoubleValue("SystemCpuLoad"));
+    double[] values = mxBeanDoubleValues(threadsMXBean.getObjectName(), "ThreadCount", "PeakThreadCount", "TotalStartedThreadCount");
+    props.setInt(LIVE_THREADS_COUNT, (int) values[0]);
+    props.setInt(PEAK_THREADS_COUNT, (int) values[1]);
+    props.setLong(STARTED_THREADS_COUNT, (int) values[2]);
+    values = mxBeanDoubleValues(osMXBeanName, "ProcessCpuLoad", "SystemCpuLoad");
+    props.setDouble(PROCESS_CPU_LOAD, 100d * values[0]);
+    props.setDouble(SYSTEM_CPU_LOAD, 100d * values[1]);
     props.setLong(JVM_UPTIME, runtimeMXBean.getUptime());
     return props;
   }
@@ -151,17 +159,48 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
 
   /**
    * Get the value of a double attribute from the OS mxbean.
+   * @param mbeanName the object name of the MXBean.
    * @param attribute the name of the attribute to get the value from.
    * @return the attribute value as a double.
    */
-  private static double osMXBeanDoubleValue(final String attribute) {
+  static double osMXBeanDoubleValue(final ObjectName mbeanName, final String attribute) {
     if (osMXBeanAvailable) {
       try {
-        return ((Number) mbeanServer.getAttribute(osMXBeanName, attribute)).doubleValue();
+        return ((Number) mbeanServer.getAttribute(mbeanName, attribute)).doubleValue();
       } catch (final Exception e) {
         if (debugEnabled) log.debug("error getting attribute '{}': {}", attribute, ExceptionUtils.getMessage(e));
       }
     }
     return -1d;
+  }
+
+  /**
+   * Get the value of a double attribute from the OS mxbean.
+   * @param mbeanName the object name of the MXBean.
+   * @param attributes the name of the attributes to get the value from.
+   * @return the attribute value as a double.
+   */
+  private static double[] mxBeanDoubleValues(final ObjectName mbeanName, final String...attributes) {
+    if (osMXBeanAvailable) {
+      try {
+        final Map<String, Double> values = new HashMap<>();
+        final AttributeList attrs = mbeanServer.getAttributes(mbeanName, attributes);
+        if (attrs != null) {
+          final List<Attribute> attrList = attrs.asList();
+          for (final Attribute attr: attrList) {
+            values.put(attr.getName(), ((Number) attr.getValue()).doubleValue());
+          }
+        }
+        final double[] result = new double[attributes.length];
+        for (int i=0; i<attributes.length; i++) {
+          final Double d = values.get(attributes[i]);
+          result[i] = (d == null) ? -1d : d;
+        }
+        return result;
+      } catch (final Exception e) {
+        if (debugEnabled) log.debug("error getting attributes '{}': {}", Arrays.toString(attributes), ExceptionUtils.getMessage(e));
+      }
+    }
+    return new double[attributes.length];
   }
 }

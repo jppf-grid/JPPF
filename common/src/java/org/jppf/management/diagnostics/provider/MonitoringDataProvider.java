@@ -33,6 +33,10 @@ public abstract class MonitoringDataProvider {
    * Mapping of the properties to their names.
    */
   private final Map<String, JPPFProperty<?>> properties = new LinkedHashMap<>();
+  /**
+   * Mapping of the property names to an optionally associated value converter.
+   */
+  private final Map<String, MonitoringValueConverter> converters = new LinkedHashMap<>();
 
   /**
    * Perform the definition of the properties supplied by this provider.
@@ -219,5 +223,25 @@ public abstract class MonitoringDataProvider {
     prop.setI18nBase(getLocalizationBase());
     properties.put(prop.getName(), prop);
     return this;
+  }
+
+  /**
+   * Associate a value converter to the specified property.
+   * If either the property name or the converter is {@code null}, then this method has no effect. 
+   * @param name the name of the property to remove.
+   * @param converter the value converter to associate with the property.
+   * @return this provider, for method call chaining.
+   */
+  public MonitoringDataProvider setConverter(final String name, final MonitoringValueConverter converter) {
+    if ((name != null) && (converter != null)) converters.put(name, converter);
+    return this;
+  }
+
+  /**
+   * Get the mappings of property names to their associted converter, if any.
+   * @return a {@link Map} of string property names to their associated {@code MonitoringValueConverter}.
+   */
+  public Map<String, MonitoringValueConverter> getConverters() {
+    return converters;
   }
 }
