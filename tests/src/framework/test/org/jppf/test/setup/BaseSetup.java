@@ -45,9 +45,13 @@ public class BaseSetup {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(BaseSetup.class);
+  private static final Logger log = LoggerFactory.getLogger(BaseSetup.class);
   /** */
-  private static AtomicBoolean detectorStarted = new AtomicBoolean(false);
+  private static final AtomicBoolean detectorStarted = new AtomicBoolean(false);
+  /**
+   * Current version of SLF4J.
+   */
+  public static final String SLF4J_VERSION = "1.7.25";
   /**
    * The default configuratin used when none is specified.
    */
@@ -429,8 +433,8 @@ public class BaseSetup {
     commonCP.add("../common/classes");
     commonCP.add("../jmxremote/classes");
     commonCP.add("../jmxremote-nio/classes");
-    commonCP.add("../JPPF/lib/slf4j/slf4j-api-1.7.25.jar");
-    commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-1.7.25.jar");
+    commonCP.add("../JPPF/lib/slf4j/slf4j-api-" + SLF4J_VERSION + ".jar");
+    commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-" + SLF4J_VERSION + ".jar");
     commonCP.add("../JPPF/lib/log4j/*");
     commonCP.add("../JPPF/lib/LZ4/*");
     commonCP.add("../JPPF/lib/ApacheCommons/*");

@@ -132,8 +132,8 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
     addCP("../jmxremote/classes").addCP("../jmxremote-nio/classes").addCP("../common/classes").addCP("../node/classes");
     addCP("lib/xstream.jar").addCP("lib/xpp3_min.jar").addCP("lib/xmlpull.jar");
     final String libDir = "../JPPF/lib/";
-    addCP(libDir + "slf4j/slf4j-api-1.7.25.jar");
-    addCP(libDir + "slf4j/slf4j-log4j12-1.7.25.jar");
+    addCP(libDir + "slf4j/slf4j-api-" + BaseSetup.SLF4J_VERSION + ".jar");
+    addCP(libDir + "slf4j/slf4j-log4j12-" + BaseSetup.SLF4J_VERSION + ".jar");
     addCP(libDir + "log4j/log4j-1.2.15.jar");
     addCP(libDir + "LZ4/lz4-1.3.0.jar");
     addCP(libDir + "ApacheCommons/commons-io-2.4.jar");

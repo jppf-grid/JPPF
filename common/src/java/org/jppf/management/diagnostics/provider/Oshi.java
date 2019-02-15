@@ -20,6 +20,8 @@ package org.jppf.management.diagnostics.provider;
 
 import static org.jppf.management.diagnostics.provider.MonitoringConstants.*;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.jppf.utils.TypedProperties;
 
 import oshi.SystemInfo;
@@ -56,6 +58,10 @@ public class Oshi {
    * Represents the current process (i.e. JVM).
    */
   private OSProcess process;
+  /**
+   * Determines whether CPU termperature is available.
+   */
+  private final AtomicBoolean temperatureAvailable = new AtomicBoolean(true);
 
   /**
    * Initialize the Oshi API.
@@ -76,8 +82,15 @@ public class Oshi {
    */
   TypedProperties getValues() {
     final TypedProperties props = new TypedProperties();
-    props.setDouble(CPU_TEMPERATURE, sensors.getCpuTemperature());
-    props.setDouble(CPU_TEMPERATURE, 0d);
+    double temp = -1d;
+    if (temperatureAvailable.get()) {
+      temp = sensors.getCpuTemperature();
+      if (temp <= 0d) {
+        temperatureAvailable.set(false);
+        temp = -1d;
+      }
+    }
+    props.setDouble(CPU_TEMPERATURE, temp);
     props.setString(OS_NAME, os.getFamily() + " " + os.getVersion().getVersion());
     double total = memory.getTotal();
     final double available = memory.getAvailable();

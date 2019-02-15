@@ -98,8 +98,8 @@ public class JPPFTestRunner {
       commonCP.add("../jmxremote/classes");
       commonCP.add("../lib/jppf-common.jar");
       commonCP.add("../lib/jppf-node.jar");
-      commonCP.add("../lib/slf4j-api-1.7.25.jar");
-      commonCP.add("../lib/slf4j-log4j12-1.7.25.jar");
+      commonCP.add("../lib/slf4j-api-" + BaseSetup.SLF4J_VERSION + ".jar");
+      commonCP.add("../lib/slf4j-log4j12-" + BaseSetup.SLF4J_VERSION + ".jar");
       commonCP.add("../lib/log4j-1.2.15.jar");
       config.driver.jppf = "config/driver.template.properties";
       config.driver.log4j = "config/log4j-driver.template.properties";

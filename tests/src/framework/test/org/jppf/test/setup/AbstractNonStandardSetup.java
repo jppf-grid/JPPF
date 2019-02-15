@@ -20,7 +20,7 @@ package test.org.jppf.test.setup;
 
 import static org.junit.Assert.*;
 
-import java.io.*;
+import java.io.NotSerializableException;
 import java.util.*;
 
 import org.jppf.JPPFTimeoutException;
@@ -66,8 +66,8 @@ public class AbstractNonStandardSetup extends BaseTest {
     commonCP.add("classes/tests/config");
     commonCP.add("../common/classes");
     commonCP.add("../node/classes");
-    commonCP.add("../JPPF/lib/slf4j/slf4j-api-1.7.25.jar");
-    commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-1.7.25.jar");
+    commonCP.add("../JPPF/lib/slf4j/slf4j-api-" + BaseSetup.SLF4J_VERSION + ".jar");
+    commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-" + BaseSetup.SLF4J_VERSION + ".jar");
     commonCP.add("../JPPF/lib/log4j/*");
     commonCP.add("../JPPF/lib/LZ4/*");
     commonCP.add("../jmxremote/classes");

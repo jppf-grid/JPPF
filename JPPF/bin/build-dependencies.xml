@@ -85,7 +85,6 @@
     <get.maven.lib g="com.miglayout"        a="miglayout-core"     v="${miglayout.version}" dest="${lib}/MigLayout"/>
     <get.maven.lib g="com.miglayout"        a="miglayout-swing"    v="${miglayout.version}" dest="${lib}/MigLayout"/>
     <get.maven.lib g="com.github.oshi"      a="oshi-core"          v="${oshi.version}"      dest="${lib}/oshi"/>
-    <get.maven.lib g="org.threeten"         a="threetenbp"         v="1.3.6"                dest="${lib}/oshi"/>
     <get.maven.lib g="org.slf4j"            a="slf4j-api"          v="${slf4j.version}"     dest="${lib}/slf4j"/>
     <get.maven.lib g="org.slf4j"            a="slf4j-log4j12"      v="${slf4j.version}"     dest="${lib}/slf4j"/>
     <get.maven.lib g="com.fifesoft"         a="rsyntaxtextarea"    v="${rsta.version}"      dest="${lib}/RSyntaxTextArea"/>

@@ -55,12 +55,7 @@ class QueuingSocketInitializer extends SocketInitializerImpl {
 
   @Override
   public boolean initialize(final SocketWrapper socketWrapper) {
-    final Future<Boolean> f = executor.submit(new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        return QueuingSocketInitializer.super.initialize(socketWrapper);
-      }
-    });
+    final Future<Boolean> f = executor.submit(() -> QueuingSocketInitializer.super.initialize(socketWrapper));
     try {
       return f.get();
     } catch (final Exception e) {
