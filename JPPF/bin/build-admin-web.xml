@@ -39,11 +39,12 @@
   </target>
 
   <!-- Update the dependencies -->
-  <target name="admin.web.init">
+  <target name="admin.web.init" depends="build.doclet">
     <copy todir="${admin-web}/bin" file="${basedir}/CheckStyle_JPPF_config.xml" overwrite="true"/>
     <delete quiet="true"><fileset dir="${admin-web}/lib" includes="jppf-*.jar"/></delete>
     <copy todir="${admin-web}/lib" overwrite="true">
       <fileset dir="${build}">
+        <include name="jppf-javadoc-${version.number}.jar"/>
         <include name="jppf-common-${version.number}.jar"/>
         <include name="jppf-jmxremote-nio-${version.number}.jar"/>
         <include name="jppf-client-${version.number}.jar"/>

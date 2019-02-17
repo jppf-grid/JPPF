@@ -129,9 +129,23 @@
       <jar jarfile="${maven.dist}/@{file}-bundle.jar">
         <fileset dir="${maven.dist}" includes="jppf-@{file}*.*,pom.xml"/>
       </jar>
+      <maven.install file.prefix="${maven.dist}/${artifact.prefix}" pom="${pom.file}"/>
       <antcall target="publish.maven.snapshot" unless:true="${maven.staging}"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
       <antcall target="publish.maven.staging" if:true="${maven.staging}"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
       <delete dir="${maven.dist}" quiet="true" includes="**/*.*"/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="maven.install">
+    <attribute name="file.prefix"/>
+    <attribute name="pom"/>
+    <attribute name="packaging" default="jar"/>
+    <sequential>
+      <artifact:install file="@{file.prefix}.@{packaging}">
+        <pom file="@{pom}"/>
+        <attach file="@{file.prefix}-sources.jar" type="jar" classifier="sources"/>
+        <attach file="@{file.prefix}-javadoc.jar" type="jar" classifier="javadoc"/>
+      </artifact:install>
     </sequential>
   </macrodef>
 

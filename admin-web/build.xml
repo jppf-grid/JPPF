@@ -210,10 +210,24 @@
     <property name="maven.version" value="${version.number}" if:true="${maven.staging}"/>
     <replace file="${pom.file}" token="@version@" value="${maven.version}"/>
     <echo message="maven-jar = ${maven.dist}/${artifact.prefix}"/>
+    <maven.install file.prefix="${maven.dist}/${artifact.prefix}" pom="${pom.file}" packaging="war"/>
     <antcall target="publish.maven.snapshot" unless:true="${maven.staging}"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
     <antcall target="publish.maven.staging" if:true="${maven.staging}"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
   </target>
   
+  <macrodef name="maven.install">
+    <attribute name="file.prefix"/>
+    <attribute name="pom"/>
+    <attribute name="packaging" default="jar"/>
+    <sequential>
+      <artifact:install file="@{file.prefix}.@{packaging}">
+        <pom file="@{pom}"/>
+        <attach file="@{file.prefix}-sources.jar" type="jar" classifier="sources"/>
+        <attach file="@{file.prefix}-javadoc.jar" type="jar" classifier="javadoc"/>
+      </artifact:install>
+    </sequential>
+  </macrodef>
+
   <target name="publish.maven.snapshot" depends="">
     <echo message="deploying ${maven-jar} to SNAPSHOT repository !!!"/>
     <copy file="${maven-jar}.war" toFile="${maven-jar}-SNAPSHOT.war"/>
@@ -293,7 +307,7 @@
     <mkdir dir="${javadoc}"/>
     <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF-JMX-Remote"
       packagenames="**/*.*" classpathref="project.classpath" stylesheetfile="${basedir}/bin/stylesheet.css" verbose="false" use="true" additionalparam="-quiet"
-    >
+      doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${lib.dir}/jppf-javadoc-${version.number}.jar">
       <arg value="-J-Xmx512m"/>
       <packageset dir="${src.dir}/java"/>
       <link href="https://docs.oracle.com/javase/8/docs/api/"/>
