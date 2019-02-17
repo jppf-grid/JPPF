@@ -69,7 +69,7 @@
 					        <?php if ($currentPage == "Home") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/" class="<?php echo $itemClass; ?>">&raquo; Home</a><br></div>
         <?php if ($currentPage == "About") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/about.php" class="<?php echo $itemClass; ?>">&raquo; About</a><br></div>
         <?php if ($currentPage == "Download") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/downloads.php" class="<?php echo $itemClass; ?>">&raquo; Download</a><br></div>
-        <?php if (($currentPage == "6.1 alpha") || ($currentPage == "download-unstable")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="downloads-unstable.php" class="<?php echo $itemClass; ?>">6.1 alpha</a><br></div>
+        <?php if (($currentPage == "6.1 alpha") || ($currentPage == "download-unstable")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/downloads-unstable.php" class="<?php echo $itemClass; ?>">6.1 alpha</a><br></div>
         <?php if ($currentPage == "Features") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/features.php" class="<?php echo $itemClass; ?>">&raquo; Features</a><br></div>
         <?php if ($currentPage == "Patches") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/patches.php" class="<?php echo $itemClass; ?>">&raquo; Patches</a><br></div>
         <?php if ($currentPage == "Samples") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/samples-pack/index.php" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br></div>
@@ -114,14 +114,14 @@
 <h1 align="center">JPPF is released under the Apache 2.0 license</h1>
 <div class="blockWithHighlightedTitle" style="vertical-align: middle">
   <div align="center">
-    <p><b>Apache License</b><br>
+    <h4 style="margin-bottom: 2px"><b>Apache License</b></h4>
     Version 2.0, January 2004<br>
     <a href="http://www.apache.org/licenses/">http://www.apache.org/licenses/</a>
-  </div>
+  </div><br/>
   <div align="justify">
-    <p><b>TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION</b>
+    <h4><b>TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION</b></h4>
     <a name="C1"></a>
-    <p><b>1. Definitions.</b>
+    <h4><b>1. Definitions.</b></h4>
       <p>"License" shall mean the terms and conditions for use, reproduction,
       and distribution as defined by Sections 1 through 9 of this document.
       <p>"Licensor" shall mean the copyright owner or entity authorized by
@@ -170,14 +170,16 @@
       on behalf of whom a Contribution has been received by Licensor and
       subsequently incorporated within the Work.
     <a name="C2"></a>
-    <p><b>2. Grant of Copyright License.</b> Subject to the terms and conditions of
+    <h4><b>2. Grant of Copyright License.</b></h4>
+      <p>Subject to the terms and conditions of
       this License, each Contributor hereby grants to You a perpetual,
       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
       copyright license to reproduce, prepare Derivative Works of,
       publicly display, publicly perform, sublicense, and distribute the
       Work and such Derivative Works in Source or Object form.
     <a name="C3"></a>
-    <p><b>3. Grant of Patent License.</b> Subject to the terms and conditions of
+    <h4><b>3. Grant of Patent License.</b></h4>
+      <p>Subject to the terms and conditions of
       this License, each Contributor hereby grants to You a perpetual,
       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
       (except as stated in this section) patent license to make, have made,
@@ -193,7 +195,8 @@
       granted to You under this License for that Work shall terminate
       as of the date such litigation is filed.
     <a name="C4"></a>
-    <p><b>4. Redistribution.</b> You may reproduce and distribute copies of the
+    <h4><b>4. Redistribution.</b></h4>
+      <p>You may reproduce and distribute copies of the
       Work or Derivative Works thereof in any medium, with or without
       modifications, and in Source or Object form, provided that You
       meet the following conditions:
@@ -229,7 +232,8 @@
       reproduction, and distribution of the Work otherwise complies with
       the conditions stated in this License.
     <a name="C5"></a>
-    <p><b>5. Submission of Contributions.</b> Unless You explicitly state otherwise,
+    <h4><b>5. Submission of Contributions.</b></h4>
+      <p>Unless You explicitly state otherwise,
       any Contribution intentionally submitted for inclusion in the Work
       by You to the Licensor shall be under the terms and conditions of
       this License, without any additional terms or conditions.
@@ -237,12 +241,14 @@
       the terms of any separate license agreement you may have executed
       with Licensor regarding such Contributions.
     <a name="C6"></a>
-    <p><b>6. Trademarks.</b> This License does not grant permission to use the trade
+    <h4><b>6. Trademarks.</b></h4>
+      <p>This License does not grant permission to use the trade
       names, trademarks, service marks, or product names of the Licensor,
       except as required for reasonable and customary use in describing the
       origin of the Work and reproducing the content of the NOTICE file.
     <a name="C7"></a>
-    <p><b>7. Disclaimer of Warranty.</b> Unless required by applicable law or
+    <h4><b>7. Disclaimer of Warranty.</b></h4>
+      <p>Unless required by applicable law or
       agreed to in writing, Licensor provides the Work (and each
       Contributor provides its Contributions) on an "AS IS" BASIS,
       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -252,7 +258,8 @@
       appropriateness of using or redistributing the Work and assume any
       risks associated with Your exercise of permissions under this License.
     <a name="C8"></a>
-    <p><b>8. Limitation of Liability.</b> In no event and under no legal theory,
+    <h4><b>8. Limitation of Liability.</b></h4>
+      <p>In no event and under no legal theory,
       whether in tort (including negligence), contract, or otherwise,
       unless required by applicable law (such as deliberate and grossly
       negligent acts) or agreed to in writing, shall any Contributor be
@@ -264,7 +271,8 @@
       other commercial damages or losses), even if such Contributor
       has been advised of the possibility of such damages.
     <a name="C9"></a>
-    <p><b>9. Accepting Warranty or Additional Liability.</b> While redistributing
+    <h4><b>9. Accepting Warranty or Additional Liability.</b></h4>
+      <p>While redistributing
       the Work or Derivative Works thereof, You may choose to offer,
       and charge a fee for, acceptance of support, warranty, indemnity,
       or other liability obligations and/or rights consistent with this
@@ -274,9 +282,10 @@
       defend, and hold each Contributor harmless for any liability
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
-    <p><b>END OF TERMS AND CONDITIONS</b>
+    <h4><b>END OF TERMS AND CONDITIONS</b></h4>
+    <hr>
     <a name="appendix"></a>
-    <p><b>APPENDIX</b>: How to apply the Apache License to your work.
+    <h4><b>APPENDIX</b>: How to apply the Apache License to your work.</h4>
       <p>To apply the Apache License to your work, attach the following
       boilerplate notice, with the fields enclosed by brackets "[]"
       replaced with your own identifying information. (Don't include
@@ -285,16 +294,18 @@
       file or class name and description of purpose be included on the
       same "printed page" as the copyright notice for easier
       identification within third-party archives.
-    <p>Copyright [yyyy] [name of copyright owner]
-    <p>Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-       <p>http://www.apache.org/licenses/LICENSE-2.0
-    <p>Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+    <div style="background-color: #E2E4F0; margin: 0px 5px 15px 5px; padding: 0px 5px; border-radius: 10px;">
+      <p>Copyright [yyyy] [name of copyright owner]
+      <p>Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
+         <p>http://www.apache.org/licenses/LICENSE-2.0
+      <p>Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    </div>
   </div>
 </div>
 <br>
