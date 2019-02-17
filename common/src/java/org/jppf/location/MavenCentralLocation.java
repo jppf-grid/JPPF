@@ -18,9 +18,7 @@
 
 package org.jppf.location;
 
-import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * This location provides a way to download artifacts from Maven Central, using a maven-like artifact location specification.
@@ -30,27 +28,15 @@ import java.net.URL;
  * @author Laurent Cohen
  * @since 6.0
  */
-public class MavenCentralLocation extends URLLocation {
+public class MavenCentralLocation extends MavenLocation {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
   /**
-   * The group id.
+   * The URL for the Maven Central repository.
    */
-  private String groupId;
-  /**
-   * The artifact id.
-   */
-  private final String artifactId;
-  /**
-   * The version string.
-   */
-  private final String version;
-  /**
-   * The type of packaging.
-   */
-  private final String packaging;
+  public static final String MAVEN_CENTRAL_URL = "http://repo.maven.apache.org/maven2";
 
   /**
    * Create this maven central location with the specified GAV string and packaging.
@@ -61,12 +47,7 @@ public class MavenCentralLocation extends URLLocation {
    * @throws MalformedURLException if resulting URL is incorrect.
    */
   public MavenCentralLocation(final String gav, final String packaging) throws MalformedURLException {
-    super(convertToURL(gav, packaging));
-    final String[] tokens = gav.split(":");
-    this.groupId = tokens[0];
-    this.artifactId = tokens[1];
-    this.version = tokens[2];
-    this.packaging = packaging;
+    super(MAVEN_CENTRAL_URL, gav, packaging);
   }
 
   /**
@@ -105,67 +86,5 @@ public class MavenCentralLocation extends URLLocation {
    */
   public MavenCentralLocation(final String groupId, final String artifactId, final String version, final String packaging) throws MalformedURLException {
     this(groupId + ":" + artifactId + ":" + version, packaging);
-  }
-
-  /**
-   * Convert a maven artifact specification into a downloadable URL.
-   * @param gav the maven identifier in format "groupId:artifactId:version".
-   * @param packaging the type of packaging of the artifact: jar, war, etc.
-   * @return an URL to a downloadable Maven artifact on Maven Central.
-   * @throws MalformedURLException if resulting URL is incorrect.
-   */
-  private static URL convertToURL(final String gav, final String packaging) throws MalformedURLException {
-    final String[] tokens = gav.split(":");
-    if ((tokens == null) || (tokens.length != 3)) throw new IllegalArgumentException("malformed gav '" + gav + "'");
-    final String path = tokens[0].replace(".", "/");
-    return new URL(String.format("http://repo.maven.apache.org/maven2/%s/%s/%s/%s-%s.%s", path, tokens[1], tokens[2], tokens[1], tokens[2], packaging));
-  }
-
-  /**
-   * Since it is not possible to upload data directly to Maven central, this method will always throw an {@code UnsupportedOperationException}.
-   */
-  @Override
-  public OutputStream getOutputStream() throws Exception {
-    throw new UnsupportedOperationException("Uploads to Maven central locations are not supported");
-  }
-
-  /**
-   * Get the group id of the correpsonding Maven artifact.
-   * @return the groupId string.
-   */
-  public String getGroupId() {
-    return groupId;
-  }
-
-  /**
-   * Get the artifact id of the correpsonding Maven artifact.
-   * @return the artifactId string.
-   */
-  public String getArtifactId() {
-    return artifactId;
-  }
-
-  /**
-   * Get the version of the correpsonding Maven artifact.
-   * @return the version string.
-   */
-  public String getVersion() {
-    return version;
-  }
-
-  /**
-   * Get the packaging of the correpsonding Maven artifact.
-   * @return the packaging string.
-   */
-  public String getPackaging() {
-    return packaging;
-  }
-
-  @Override
-  public String toString() {
-    return new StringBuilder(getClass().getSimpleName()).append('[')
-      .append("gav=").append(groupId).append(':').append(artifactId).append(':').append(version)
-      .append(", packaging =").append(packaging)
-      .append(']').toString();
   }
 }

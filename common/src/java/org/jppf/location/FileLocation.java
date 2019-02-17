@@ -62,10 +62,10 @@ public class FileLocation extends AbstractLocation<String> {
 
   @Override
   public OutputStream getOutputStream() throws Exception {
-    final File file = new File(path);
+    final File file = new File(path).getAbsoluteFile();
     if (file.exists() && file.isDirectory()) throw new IOException("Path '" + path + "' is a directory");
     final File parent = file.getParentFile();
-    if (!parent.exists() && !parent.mkdirs()) throw new IOException("could not create directory for '" + path + "'");
+    if ((parent != null) && !parent.exists() && !parent.mkdirs()) throw new IOException("could not create directory for '" + path + "'");
     return new BufferedOutputStream(new FileOutputStream(path));
   }
 
