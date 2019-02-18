@@ -70,7 +70,7 @@ public class TestJobPersistence extends Setup1D1N {
       client = BaseSetup.createClient(null, false);
       final int nbTasks = 3;
       final AtomicBoolean resultsReceived = new AtomicBoolean(false);
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, SimpleTask.class, duration);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, SimpleTask.class, duration);
       pm = new DefaultFilePersistenceManager("root", "job_", ".ser");
       key = pm.computeKey(job);
       assertEquals(key, job.getUuid());
@@ -84,7 +84,7 @@ public class TestJobPersistence extends Setup1D1N {
           }
         }
       });
-      client.submitJob(job);
+      client.submitAsync(job);
       synchronized(resultsReceived) {
         while (!resultsReceived.get()) resultsReceived.wait(100L);
       }
@@ -99,7 +99,7 @@ public class TestJobPersistence extends Setup1D1N {
       assertEquals(uuid, job2.getUuid());
       //int n2 = job2.getResults().size();
       //assertEquals(n, n2);
-      client.submitJob(job2);
+      client.submitAsync(job2);
       final List<Task<?>> results = job2.awaitResults();
       assertEquals(nbTasks, results.size());
       assertEquals(nbTasks, job2.getResults().size());

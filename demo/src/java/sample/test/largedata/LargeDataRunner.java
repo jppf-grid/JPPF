@@ -209,7 +209,7 @@ public class LargeDataRunner {
 
     @Override
     public List<Task<?>> call() throws Exception {
-      return jppfClient.submitJob(job);
+      return jppfClient.submit(job);
     }
   }
 

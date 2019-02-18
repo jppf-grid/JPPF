@@ -58,7 +58,7 @@ public class Runner {
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(5L * 60_000L));
       // submit the job and get the resutls
       System.out.println("submitting job");
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       // process the job's results
       for (final Task<?> task : results) {
         if (task.getThrowable() != null) System.out.printf("task %s raised an exception : %s%n", task.getId(), ExceptionUtils.getStackTrace(task.getThrowable()));

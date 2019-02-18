@@ -193,11 +193,11 @@ public class TestDefaultPolicies extends Setup1D2N {
    */
   private static void checkPolicyResults(final JPPFClient client, final String nodeUuid) throws Exception {
     final int nbTasks = 50;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
     int i = 0;
     for (final Task<?> task: job.getJobTasks()) task.setId("" + i++);
     print(false, false, "submitting job");
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     print(false, false, "got job results");
     assertNotNull(results);
     assertEquals(nbTasks, results.size());

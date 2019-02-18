@@ -72,9 +72,9 @@ public class TestJPPFJobSLA3 extends BaseTest {
   @Test(timeout=8000)
   public void testOfflineJob() throws Exception {
     final int nbTasks = 1;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 1L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 1L);
     job.getSLA().setRemoteClassLoadingEnabled(false);
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i=0; i<nbTasks; i++) {
@@ -93,9 +93,9 @@ public class TestJPPFJobSLA3 extends BaseTest {
   @Test(timeout=8000)
   public void testOnlineJob() throws Exception {
     final int nbTasks = 1;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, MyTask.class);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, MyTask.class);
     job.getSLA().setRemoteClassLoadingEnabled(true);
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i=0; i<nbTasks; i++) {

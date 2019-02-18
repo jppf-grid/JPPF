@@ -99,13 +99,10 @@ public class NativeLibRunner {
    * @throws Exception if an error occurs while executing the job.
    */
   public void executeBlockingJob(final JPPFJob job) throws Exception {
-    // set the job in blocking mode.
-    job.setBlocking(true);
-
     // Submit the job and wait until the results are returned.
     // The results are returned as a list of JPPFTask instances,
     // in the same order as the one in which the tasks where initially added the job.
-    final List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submit(job);
 
     // process the results
     for (final Task<?> task : results) {
@@ -128,13 +125,10 @@ public class NativeLibRunner {
    * @throws Exception if an error occurs while executing the job.
    */
   public void executeNonBlockingJob(final JPPFJob job) throws Exception {
-    // set the job in non-blocking (or asynchronous) mode.
-    job.setBlocking(false);
-
     // Submit the job. This call returns immediately without waiting for the execution of
     // the job to complete. As a consequence, the object returned for a non-blocking job is
     // always null. Note that we are calling the exact same method as in the blocking case.
-    jppfClient.submitJob(job);
+    jppfClient.submitAsync(job);
 
     // do something else here, while the job is being executed ...
 

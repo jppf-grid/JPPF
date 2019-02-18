@@ -57,7 +57,7 @@ public class JmxLogging {
       final JPPFJob job = new JPPFJob();
       initJmxLogging();
       for (int i = 1; i <= 10; i++) job.add(new MyTask()).setId(Integer.toString(i));
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       System.out.println("received results: " + results);
     } catch (final Exception e) {
       e.printStackTrace();

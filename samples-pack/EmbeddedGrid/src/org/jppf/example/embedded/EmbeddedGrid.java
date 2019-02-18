@@ -83,7 +83,7 @@ public class EmbeddedGrid {
         print("client connected, now submitting a job");
         final JPPFJob job = new JPPFJob().setName("embedded grid");
         job.add(new HelloTask());
-        final String result = (String) client.submitJob(job).get(0).getResult();
+        final String result = (String) client.submit(job).get(0).getResult();
         print("execution result for job '%s': %s", job.getName(), result);
       }
 

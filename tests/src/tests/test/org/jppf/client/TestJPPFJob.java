@@ -69,10 +69,10 @@ public class TestJPPFJob extends Setup1D1N {
       .set(LOCAL_EXECUTION_ENABLED, true)
       .set(LOCAL_EXECUTION_THREADS, 4);
     try (final JPPFClient client = BaseSetup.createClient(null, false)) {
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 50L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 50L);
       final CountingJobListener listener = new CountingJobListener();
       job.addJobListener(listener);
-      client.submitJob(job);
+      client.submit(job);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
     } finally {
@@ -90,9 +90,9 @@ public class TestJPPFJob extends Setup1D1N {
       BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       final int nbTasks = 10;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 5000L);
       final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
-      client.submitJob(job);
+      client.submitAsync(job);
       listener.await();
       final boolean cancelled = job.cancel(true);
       assertTrue(cancelled);
@@ -121,9 +121,9 @@ public class TestJPPFJob extends Setup1D1N {
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", method);
       try {
         final int nbTasks = 1;
-        final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
+        final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 3000L);
         final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
-        client.submitJob(job);
+        client.submitAsync(job);
         listener.await();
         final boolean cancelled = job.cancel(false);
         assertFalse(cancelled);
@@ -159,8 +159,8 @@ public class TestJPPFJob extends Setup1D1N {
       int totalCancelCount = 0;
       for (int i=1; i<=nbJobs; i++) {
         print(false, false, ">>> test iteration %d", i);
-        final JPPFJob job = BaseTestHelper.createJob(name + "-" + i, "tci-" + i, false, false, nbTasks, LifeCycleTask.class, 1000L);
-        client.submitJob(job);
+        final JPPFJob job = BaseTestHelper.createJob(name + "-" + i, "tci-" + i, false, nbTasks, LifeCycleTask.class, 1000L);
+        client.submitAsync(job);
         //Thread.sleep(1L);
         print(false, false, ">>> cancelling job %d", i);
         assertTrue(job.cancel(true));
@@ -196,8 +196,8 @@ public class TestJPPFJob extends Setup1D1N {
       BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       final int nbTasks = 1;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
-      client.submitJob(job);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 2000L);
+      client.submitAsync(job);
       job.get(1000L, TimeUnit.MILLISECONDS);
     }
   }
@@ -213,9 +213,9 @@ public class TestJPPFJob extends Setup1D1N {
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       final int nbTasks = 1;
       final long duration = 3000L;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, duration);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, duration);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(duration/2L));
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       int count = 0;

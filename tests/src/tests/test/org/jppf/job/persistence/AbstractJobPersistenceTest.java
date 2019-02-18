@@ -110,14 +110,14 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public void testSimplePersistedJob() throws Exception {
     final int nbTasks = 10;
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(method, false, nbTasks, LifeCycleTask.class, 0L);
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     print(false, false, "got jmx connection");
     final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(true);
     print(false, false, "submitting job");
-    client.submitJob(job);
+    client.submitAsync(job);
     final List<Task<?>> results = job.awaitResults();
     print(false, false, "checking job results");
     checkJobResults(nbTasks, results, false);
@@ -134,11 +134,11 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public void testSimplePersistedJobRetrieval() throws Exception {
     final int nbTasks = 10;
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(method, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
     print(false, false, "submitting job");
-    client.submitJob(job);
+    client.submitAsync(job);
     final List<Task<?>> results = job.awaitResults();
     if (h2Server != null) Script.main("-url", DB_URL, "-user", DB_USER, "-password", DB_PWD, "-script", "test1h2dump.log");
     print(false, false, "checking job results");
@@ -168,11 +168,11 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public void testSimplePersistedJobCancellation() throws Exception {
     final int nbTasks = 40;
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 100L);
+    final JPPFJob job = BaseTestHelper.createJob(method, false, nbTasks, LifeCycleTask.class, 100L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(true);
     print(false, false, "submitting job");
-    client.submitJob(job);
+    client.submitAsync(job);
     Thread.sleep(1000L);
     print(false, false, "cancelling job");
     assertTrue(job.cancel());
@@ -195,7 +195,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public void testJobAutoRecoveryOnDriverRestart() throws Exception {
     final int nbTasks = 20;
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 200L);
+    final JPPFJob job = BaseTestHelper.createJob(method, false, nbTasks, LifeCycleTask.class, 200L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
     print(false, false, "getting JMX connection");
@@ -204,7 +204,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       final PersistedJobsManagerMBean mgr = jmx.getPersistedJobsManager();
       final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);
       print(false, false, "submitting job");
-      client.submitJob(job);
+      client.submitAsync(job);
       print(false, false, "awaiting JOB_DISPATCHED notification");
       listener.await();
       print(false, false, "waiting for job fully persisted");
@@ -245,7 +245,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public void testJobAutoExecuteOnDriverRestart() throws Exception {
     final int nbTasks = 20;
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, AddonSimpleTask.class, 200L);
+    final JPPFJob job = BaseTestHelper.createJob(method, false, nbTasks, AddonSimpleTask.class, 200L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(true).setDeleteOnCompletion(false);
     print(false, false, "getting JMX connection");
@@ -254,7 +254,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       final PersistedJobsManagerMBean mgr = jmx.getPersistedJobsManager();
       final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);
       print(false, false, "submitting job");
-      client.submitJob(job);
+      client.submitAsync(job);
       print(false, false, "awaiting JOB_DISPATCHED notification");
       listener.await();
       print(false, false, "waiting for job fully persisted");
@@ -306,7 +306,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       print(false, false, "awaiting 2 connections");
       pool.awaitActiveConnections(Operator.EQUAL, 2);
       
-      final JPPFJob job = BaseTestHelper.createJob(method, true, false, nbTasks, LifeCycleTask.class, 100L);
+      final JPPFJob job = BaseTestHelper.createJob(method, false, nbTasks, LifeCycleTask.class, 100L);
       job.getSLA().setCancelUponClientDisconnect(false);
       job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
       job.getClientSLA().setMaxChannels(2);
@@ -320,7 +320,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       };
       job.addJobListener(listener);
       print(false, false, "submitting job");
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       assertEquals(2, dispatchList.size());
       print(false, false, "dispatch list: %s", dispatchList);
       assertNotSame(dispatchList.get(0), dispatchList.get(1));

@@ -47,7 +47,6 @@ public class FibonacciFJ {
     try {
       client = new JPPFClient();
       final JPPFJob job = new JPPFJob();
-      job.setBlocking(true);
 
       final TypedProperties config = JPPFConfiguration.getProperties();
       COUNT = config.getInt("fib.fj.nbTasks", 10);
@@ -59,7 +58,7 @@ public class FibonacciFJ {
 
       System.out.println("Submitting job...");
       long dur = System.nanoTime();
-      client.submitJob(job);
+      client.submit(job);
       dur = System.nanoTime() - dur;
       System.out.printf("Job done in %.3f ms%n", dur / 1000000.0);
 

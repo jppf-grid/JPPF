@@ -39,7 +39,7 @@ public class FileCopyRunner {
       final JPPFJob job = new JPPFJob();
       job.setName("copy file");
       job.add(new FileCopyTask());
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       final Task<?> task = results.get(0);
       if (task.getThrowable() != null) System.out.println("got exception: " + ExceptionUtils.getStackTrace(task.getThrowable()));
       else System.out.println("result: " + task.getResult());

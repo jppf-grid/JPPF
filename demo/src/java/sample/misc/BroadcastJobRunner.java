@@ -69,7 +69,7 @@ public class BroadcastJobRunner {
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(5000L));
       job.getClientSLA().setMaxChannels(2);
       for (int i=0; i<1; i++) job.add(new LongTask(10L)).setId("my task" + (i + 1));
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       System.out.println("job complete");
       for (final Task<?> task : results) {
         if (task.getThrowable() != null) System.out.printf("got exception for task '%' : %s%n", task.getId(), ExceptionUtils.getStackTrace(task.getThrowable()));

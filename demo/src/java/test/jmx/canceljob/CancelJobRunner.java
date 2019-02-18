@@ -66,7 +66,6 @@ public class CancelJobRunner {
       for (int i=0; i<n; i++) {
         final JPPFJob job = new JPPFJob();
         job.setName("Cancel-" + i);
-        job.setBlocking(false);
         job.add(new LifeCycleTask(duration)).setId(job.getName() + ":task-0");
         jobs.add(job);
       }

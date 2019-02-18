@@ -42,7 +42,7 @@ public class NetworkInterceptorDemo {
       job.setName("Network Interceptor Demo");
       job.add(new MyTask()).setId("task 1");
       System.out.println("demo: submitting demo job");
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       System.out.printf("demo: ***** results for '%s' *****%n", job.getName());
       for (final Task<?> task : results) {
         if (task.getThrowable() != null) System.out.printf("demo: got exception: %s%n",

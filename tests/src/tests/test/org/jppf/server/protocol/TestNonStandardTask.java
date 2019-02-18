@@ -49,7 +49,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
     final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add(AnnotatedStaticMethodTask.class, "testParam");
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     final Task<?> task = results.get(0);
@@ -71,7 +71,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
     final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add(new AnnotatedInstanceMethodTask(), "testParam");
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     final Task<?> task = results.get(0);
@@ -96,7 +96,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
     final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add(AnnotatedConstructorTask.class, "testParam");
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     final Task<?> task = results.get(0);
@@ -122,7 +122,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
     final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add("staticMethod", PojoTask.class, "testParam");
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     final Task<?> task = results.get(0);
@@ -145,7 +145,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
     final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add("instanceMethod", new PojoTask(), "testParam");
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     final Task<?> task = results.get(0);
@@ -170,7 +170,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
     final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add("PojoTask", PojoTask.class, "testParam");
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     final Task<?> task = results.get(0);
@@ -197,7 +197,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
     final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add(new RunnableTask("testParam"));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     final Task<?> task = results.get(0);
@@ -221,7 +221,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
     final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add(new CallableTask("testParam"));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     final Task<?> task = results.get(0);
@@ -248,7 +248,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
     job.add(() -> System.out.println(resultMessage));
     job.add(() -> resultMessage);
     final int nbTasks = job.getTaskCount();
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     results.forEach(task -> {

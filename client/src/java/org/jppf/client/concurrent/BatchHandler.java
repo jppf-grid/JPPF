@@ -370,7 +370,6 @@ class BatchHandler extends ThreadSynchronization implements Runnable {
   private JPPFJob createJob() {
     final JPPFJob job = new JPPFJob();
     job.setName(getClass().getSimpleName() + " job " + JOB_COUNT.incrementAndGet());
-    job.setBlocking(false);
     job.addJobListener(executor);
     if (debugEnabled) log.debug("created job " + job);
     //configureJob(job);

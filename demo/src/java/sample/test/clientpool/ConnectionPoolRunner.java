@@ -81,7 +81,7 @@ public class ConnectionPoolRunner {
         final List<JPPFJob> jobs = new ArrayList<>(size);
         for (int i=1; i<=size; i++) jobs.add(createJob(String.format("job_%d_%d", (n + 1), i), nbTasks, duration));
         for (final JPPFJob job: jobs) {
-          client.submitJob(job);
+          client.submit(job);
           print("[" + getElapsed() + "] submittted job '" + job.getName() + "'");
         }
         for (JPPFJob job: jobs) printJobResults(job);
@@ -105,7 +105,6 @@ public class ConnectionPoolRunner {
   private static JPPFJob createJob(final String name, final int nbTasks, final long taskDuration) throws Exception {
     final JPPFJob job = new JPPFJob();
     job.setName(name);
-    job.setBlocking(false);
     job.getClientSLA().setMaxChannels(2);
     for (int i=1; i<=nbTasks; i++) job.add(new MyTask(taskDuration)).setId(name + ":task_" + i);
     return job;

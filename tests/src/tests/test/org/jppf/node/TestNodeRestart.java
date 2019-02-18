@@ -95,9 +95,9 @@ public class TestNodeRestart extends BaseTest {
       forwarder.restart(NodeSelector.ALL_NODES, true);
       print(false, false, ">>> awaiting CONNECTED state for node");
       myListener.await();
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 0L);
       print(false, false, ">>> submitting job '%s'", job.getName());
-      client.submitJob(job);
+      client.submit(job);
       print(false, false, ">>> got job results");
       assertEquals(1, myListener.disconnectedCount);
       assertEquals(1, myListener.connectedCount);

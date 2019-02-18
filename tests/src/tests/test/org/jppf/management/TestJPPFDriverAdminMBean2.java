@@ -48,9 +48,9 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
     final long duration = 2500L;
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     BaseTestHelper.printToAll(client, true, true, true, false, "submitting job");
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, duration);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, duration);
     final AwaitJobListener listener = new AwaitJobListener(job, JobEvent.Type.JOB_DISPATCH);
-    client.submitJob(job);
+    client.submitAsync(job);
     BaseTestHelper.printToAll(client, true, true, true, false, "waiting for JOB_DISPATCH notification");
     listener.await();
     BaseTestHelper.printToAll(client, true, true, true, false, "restarting driver");
@@ -72,7 +72,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     final String jobNamePrefix = ReflectionUtils.getCurrentMethodName();
     print(false, false, "submitting job 1");
-    List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(jobNamePrefix + "-1", true, false, nbTasks, LifeCycleTask.class, duration));
+    List<Task<?>> results = client.submit(BaseTestHelper.createJob(jobNamePrefix + "-1", false, nbTasks, LifeCycleTask.class, duration));
     print(false, false, "checking job 1 results");
     checkResults(results, nbTasks);
     print(false, false, "awaiting working connection pool");
@@ -87,7 +87,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
       print(false, false, "waiting for 1 connection");
       while (client.awaitWorkingConnectionPool() == null) Thread.sleep(10L);
       print(false, false, "submitting job 2");
-      results = client.submitJob(BaseTestHelper.createJob(jobNamePrefix + "-2", true, false, nbTasks, LifeCycleTask.class, duration));
+      results = client.submit(BaseTestHelper.createJob(jobNamePrefix + "-2", false, nbTasks, LifeCycleTask.class, duration));
       BaseTestHelper.printToAll(client, true, true, true, false, "checking job 2 results");
       checkResults(results, nbTasks);
     } finally {

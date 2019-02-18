@@ -49,7 +49,7 @@ public class TestScriptedTask extends Setup1D1N1C {
     for (int i = 0; i < nbTasks; i++) {
       job.add(new ScriptedTask<String>("groovy", script, "someId", null)).setId("(" + (i + 1) + ")");
     }
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i = 0; i < nbTasks; i++) {
@@ -75,7 +75,7 @@ public class TestScriptedTask extends Setup1D1N1C {
     for (int i = 0; i < nbTasks; i++) {
       job.add(new ScriptedTask<String>("javascript", script, "someId", null)).setId("(" + (i + 1) + ")");
     }
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i = 0; i < nbTasks; i++) {

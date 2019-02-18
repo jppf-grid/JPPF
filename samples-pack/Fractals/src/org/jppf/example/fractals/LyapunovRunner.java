@@ -61,7 +61,7 @@ public class LyapunovRunner extends AbstractRunner {
     log.info("Executing " + nbTask + " tasks");
     for (int i = 0; i < nbTask; i++)
       job.add(new LyapunovTask(i));
-    final List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submit(job);
     return results;
   }
 

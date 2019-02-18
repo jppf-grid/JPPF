@@ -71,7 +71,7 @@ public class CustomLoadBalancerRunner {
       // With 4 tasks and the node's heap set to 64 MB, the load-balancer will be forced to split the job in 2 at least.
       final JPPFJob heavyJob = runner.createJob("Heavy Job", 4, taskFootprint, 5L * 1000L, 60L * 1000L, heavyPolicy);
       // This job has long-running tasks, so we can submit it and create the second job while it is executing.
-      jppfClient.submitJob(heavyJob);
+      jppfClient.submitAsync(heavyJob);
 
       // Create a "light" job
       // We want at least 2 light tasks executing concurrently in a node, to mitigate the network overhead.
@@ -83,7 +83,7 @@ public class CustomLoadBalancerRunner {
       // (total time = 200 * 80 / 4)
       final JPPFJob lightJob = runner.createJob("Light Job", 200, 10 * KB, 80L, 3L * 1000L, lightPolicy);
       // Submit the light job.
-      jppfClient.submitJob(lightJob);
+      jppfClient.submitAsync(lightJob);
 
       // now we obtain and process the results - this will cause a lot of logging to the console!
       runner.processJobResults(heavyJob);
@@ -131,9 +131,6 @@ public class CustomLoadBalancerRunner {
 
     // Assign an execution policy to the job.
     job.getSLA().setExecutionPolicy(policy);
-
-    // Set the job in non-blocking (asynchronous) mode.
-    job.setBlocking(false);
 
     return job;
   }

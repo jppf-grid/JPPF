@@ -135,7 +135,7 @@ public class SequenceAlignmentRunner {
     final long start2 = System.nanoTime();
     final AlignmentJobListener listener = new AlignmentJobListener(job.getJobTasks().size());
     job.addJobListener(listener);
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     final long elapsed2 = DateTimeUtils.elapsedFrom(start2);
     float maxScore = 0;
     SequenceAlignmentTask maxTask = null;

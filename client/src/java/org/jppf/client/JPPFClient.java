@@ -109,8 +109,48 @@ public class JPPFClient extends AbstractGenericClient {
     return new JPPFClientConnectionImpl(this, name, pool);
   }
 
-  @Override
+  /**
+   * Submit the specified job for execution.
+   * @param job the job to submit and execute.
+   * @return the job's results as a list of {@link Task tasks} if the job is {@link AbstractJPPFJob#isBlocking() blocking}, or {@code null} if it is non-blocking.
+   * @deprecated a job should be submittable either synchronously or asynchronously, regardless of its state.
+   * The way it is submitted is the user's choice at the time of submission, using one of {@link JPPFClient#submit(JPPFJob)} or {@link JPPFClient#submitAsync(JPPFJob)}. 
+   */
   public List<Task<?>> submitJob(final JPPFJob job) {
+    if (job.isBlocking()) return submit(job);
+    submitAsync(job);
+    return null;
+  }
+
+  /**
+   * Submit the specified job for execution.
+   * @param job the job to submit and execute.
+   * @return the job's results as a list of {@link Task tasks}.
+   * @since 6.1
+   */
+  public List<Task<?>> submit(final JPPFJob job) {
+    preSubmit(job);
+    getJobManager().submitJob(job);
+    return job.awaitResults();
+  }
+
+  /**
+   * Submit the specified job for execution.
+   * @param job the job to submit and execute.
+   * @return the submitted job.
+   * @since 6.1
+   */
+  public JPPFJob submitAsync(final JPPFJob job) {
+    preSubmit(job);
+    getJobManager().submitJob(job);
+    return job;
+  }
+
+  /**
+   * Perform pre-submission job checks and adjustments.
+   * @param job the jkob to check.
+   */
+  private void preSubmit(final JPPFJob job) {
     if (isClosed()) throw new IllegalStateException("this client is closed");
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.getJobTasks().isEmpty()) throw new IllegalStateException("job cannot be empty");
@@ -130,9 +170,6 @@ public class JPPFClient extends AbstractGenericClient {
     if (log.isTraceEnabled()) {
       job.forEach(t -> log.trace("task {}, pos={}, taskObject={}, taskObject class={}", t, t.getPosition(), t.getTaskObject(), (t.getTaskObject() != null) ? t.getTaskObject().getClass() : null));
     }
-    getJobManager().submitJob(job);
-    if (job.isBlocking()) return job.awaitResults();
-    return null;
   }
 
   /**

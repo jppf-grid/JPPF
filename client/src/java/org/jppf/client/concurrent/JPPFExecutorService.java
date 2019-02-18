@@ -370,7 +370,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    */
   void submitJob(final JPPFJob job) throws Exception {
     if (debugEnabled) log.debug("submitting job '" + job.getName() + "' with " + job.getJobTasks().size() + " tasks");
-    client.submitJob(job);
+    client.submitAsync(job);
     synchronized (jobMap) {
       jobMap.put(job.getUuid(), job);
     }

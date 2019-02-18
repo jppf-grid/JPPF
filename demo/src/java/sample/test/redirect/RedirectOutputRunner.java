@@ -47,7 +47,7 @@ public class RedirectOutputRunner {
       job.setName(name);
       final int nbTasks = 10;
       for (int i=1; i<=nbTasks; i++) job.add(new RedirectOutputTask()).setId(name + " - task " + i);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       for (final Task <?>task: results) {
         final Throwable e = task.getThrowable();
         if (e != null) System.out.println("'" + task.getId() + "' raised an exception: " + ExceptionUtils.getStackTrace(e));

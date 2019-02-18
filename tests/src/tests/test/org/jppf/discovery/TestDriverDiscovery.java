@@ -181,8 +181,8 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
       final int nbNodes = BaseSetup.nbNodes();
       final int nbTasks = tasksPerNode * nbNodes;
       final String name = ReflectionUtils.getCurrentMethodName();
-      final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
-      final List<Task<?>> results = client.submitJob(job);
+      final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 1L);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       for (final Task<?> t: results) {

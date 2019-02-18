@@ -93,7 +93,7 @@ public class LocalExecutionRunner {
         job.add(task);
       }
       // submit the tasks for execution
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       for (Task<?> task : results) {
         final Throwable e = task.getThrowable();
         if (e != null) throw e;
@@ -123,13 +123,12 @@ public class LocalExecutionRunner {
       for (int i = 0; i < nbJobs; i++) {
         final JPPFJob job = new JPPFJob();
         job.setName("job " + i);
-        job.setBlocking(false);
         for (int j = 0; j < nbTasks; j++) job.add(new LongTask(length)).setId("task " + i + ':' + j);
         jobs.add(job);
       }
       final long start = System.nanoTime();
       print("submitting the jobs");
-      for (JPPFJob job : jobs) jppfClient.submitJob(job);
+      for (JPPFJob job : jobs) jppfClient.submitAsync(job);
       print("getting the results");
       for (JPPFJob job : jobs) {
         job.awaitResults();
@@ -174,7 +173,7 @@ public class LocalExecutionRunner {
     job.add(new MyTask());
     //job.setDataProvider(new ClientDataProvider());
     // submit the tasks for execution
-    final List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submit(job);
     for (Task<?> task : results) {
       final Throwable e = task.getThrowable();
       if (e != null) throw e;

@@ -91,7 +91,7 @@ public class JPPFSourceCompiler {
       final JPPFJob job = new JPPFJob();
       job.setName("compiled class job");
       job.add(task);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       final Task<?> result = results.get(0);
       if (result.getThrowable() != null) output("got exception: " + ExceptionUtils.getStackTrace(result.getThrowable()));
       else output("got result: " + result.getResult());

@@ -53,9 +53,8 @@ public class JobManagementTestRunner {
     final long duration = props.getLong("job.management.duration", 1000L);
     final JPPFJob job = new JPPFJob(jobName);
     job.setName(jobName);
-    job.setBlocking(false);
     for (int i = 0; i < nbTasks; i++) job.add(new LongTask(duration)).setId(jobName + " - task " + i);
-    client.submitJob(job);
+    client.submitAsync(job);
     // wait to ensure the job has been dispatched to the nodes
     Thread.sleep(1000);
     driver.cancelJob(job.getUuid());
@@ -86,14 +85,14 @@ public class JobManagementTestRunner {
       }
       for (JMXNodeConnectionWrapper node : nodes) node.updateThreadPoolSize(4);
       Thread.sleep(500L);
-      client.submitJob(createJob("broadcast1"));
+      client.submit(createJob("broadcast1"));
       Thread.sleep(500L);
       final NodeSelector selector = new ExecutionPolicySelector(new AtLeast("jppf.processing.threads", 4));
       int n = driver.nbNodes(selector);
       System.out.println("found " + n + " nodes, expected = 2");
       nodes[1].updateThreadPoolSize(2);
       Thread.sleep(500L);
-      client.submitJob(createJob("broadcast2"));
+      client.submit(createJob("broadcast2"));
       Thread.sleep(500L);
       n = driver.nbNodes(selector);
       System.out.println("found " + n + " nodes, expected = 1");

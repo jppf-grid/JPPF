@@ -46,9 +46,9 @@ public class ResubmitRunner extends AbstractScenarioRunner {
   public void run() {
     try {
       final long start = System.nanoTime();
-      final JPPFJob job = BaseTestHelper.createJob("resubmit", false, false, 1, LifeCycleTask.class, 5000L);
+      final JPPFJob job = BaseTestHelper.createJob("resubmit", false, 1, LifeCycleTask.class, 5000L);
       job.addJobListener(new MyJobListener());
-      getSetup().getClient().submitJob(job);
+      getSetup().getClient().submitAsync(job);
       while (!dispatched.get()) Thread.sleep(1000L);
       getSetup().getDriverManagementProxy().restartShutdown(1L, 1L);
       job.awaitResults();

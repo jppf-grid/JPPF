@@ -104,7 +104,7 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter {
         job.setDataProvider(new MemoryMapDataProvider());
         job.getDataProvider().setParameter(MatrixTask.DATA_KEY, b);
         // submit the tasks for execution
-        jppfClient.submitJob(job);
+        jppfClient.submitAsync(job);
         waitForResults();
         final List<Task<?>> results = new ArrayList<>();
         for (final Map.Entry<Integer, Task<?>> entry: resultMap.entrySet()) results.add(entry.getValue());

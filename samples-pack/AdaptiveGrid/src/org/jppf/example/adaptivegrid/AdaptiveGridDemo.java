@@ -119,7 +119,6 @@ public class AdaptiveGridDemo implements Runnable {
       try {
         final JPPFJob job = new JPPFJob();
         job.setName(jobName);
-        job.setBlocking(false);
         // add a single task
         job.add(new SimpleTask(duration));
         jobs.add(job);
@@ -133,7 +132,7 @@ public class AdaptiveGridDemo implements Runnable {
     manager.updateGridSetup(batchSize);
 
     // submit the jobs for execution
-    for (final JPPFJob job: jobs) client.submitJob(job);
+    for (final JPPFJob job: jobs) client.submitAsync(job);
     // get the results of the jobs
     for (final JPPFJob job: jobs) {
       final List<Task<?>> results = job.awaitResults();

@@ -43,7 +43,7 @@ public class Task1 extends AbstractTask<String> {
       final JPPFJob job = new JPPFJob();
       job.add(new Task2());
       job.getSLA().setExecutionPolicy(new Equal("id", 2));
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       System.out.println("Result of Task2: [" + results.get(0).getResult() + ']');
       setResult("Task1 executed successfully");
     } catch (final Exception e) {

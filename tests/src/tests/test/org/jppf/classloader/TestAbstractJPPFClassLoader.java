@@ -53,8 +53,8 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
   public void testGetResources() throws Exception {
     final String name = ReflectionUtils.getCurrentMethodName();
     final String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
-    List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
-    results = client.submitJob(BaseTestHelper.createJob(name + "2", true, false, 1, MyTask.class, resource));
+    List<Task<?>> results = client.submit(BaseTestHelper.createJob(name + "1", false, 1, MyTask.class, resource));
+    results = client.submit(BaseTestHelper.createJob(name + "2", false, 1, MyTask.class, resource));
     assertNotNull(results);
     assertEquals(1, results.size());
     final Task<?> task = results.get(0);
@@ -72,7 +72,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
   public void testGetResourcesNoDuplicate() throws Exception {
     final int nbLookups = 3;
     final String name = ReflectionUtils.getCurrentMethodName();
-    final List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name, true, false, 1, ResourceLoadingTask.class, nbLookups));
+    final List<Task<?>> results = client.submit(BaseTestHelper.createJob(name, false, 1, ResourceLoadingTask.class, nbLookups));
     assertNotNull(results);
     assertEquals(1, results.size());
     final Task<?> task = results.get(0);
@@ -103,8 +103,8 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
   public void testClassLoadersMatch() throws Exception {
     final String name = ReflectionUtils.getCurrentMethodName();
     final String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
-    List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
-    results = client.submitJob(BaseTestHelper.createJob(name + "2", true, false, 1, MyTask.class, resource));
+    List<Task<?>> results = client.submit(BaseTestHelper.createJob(name + "1", false, 1, MyTask.class, resource));
+    results = client.submit(BaseTestHelper.createJob(name + "2", false, 1, MyTask.class, resource));
     assertNotNull(results);
     assertEquals(1, results.size());
     final MyTask task = (MyTask) results.get(0);
@@ -150,7 +150,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
       if (callable) job.add(new MyCallable(i));
       else job.add(new MyTask2(i));
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
-      final Task<?> task = client.submitJob(job).get(0);
+      final Task<?> task = client.submit(job).get(0);
       final Throwable t = task.getThrowable();
       assertNull(t);
       if (i == 1) {

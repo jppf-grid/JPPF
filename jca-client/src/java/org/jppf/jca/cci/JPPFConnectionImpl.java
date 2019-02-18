@@ -101,9 +101,8 @@ public class JPPFConnectionImpl implements JPPFConnection {
 
   @Override
   public String submit(final JPPFJob job, final JobStatusListener listener) throws Exception {
-    job.setBlocking(false);
     if (listener != null) job.addJobStatusListener(listener);
-    managedConnection.retrieveJppfClient().submitJob(job);
+    managedConnection.retrieveJppfClient().submitAsync(job);
     return job.getUuid();
   }
 

@@ -75,7 +75,7 @@ public class FTPRunner {
     job.setDataProvider(dataProvider);
     // add a single task
     job.add(new FTPTask("input.txt", "output.html"));
-    final List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submit(job);
     for (final Task<?> t : results) {
       if (t.getThrowable() != null) System.out.println("task error: " + ExceptionUtils.getStackTrace(t.getThrowable()));
       else System.out.println("task result: " + t.getResult());

@@ -182,9 +182,9 @@ public class TestMultiServer extends AbstractNonStandardSetup {
       final int nbNodes = getNbNodes();
       final int nbTasks = 100;
       final String name = ReflectionUtils.getCurrentClassAndMethod();
-      final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
+      final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 1L);
       job.getClientSLA().setMaxChannels(2);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       final CollectionMap<String, Task<?>> map = new ArrayListHashMap<>();

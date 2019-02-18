@@ -92,12 +92,11 @@ public class NonBlockingPoolMatrixRunner {
           final JPPFJob job = new JPPFJob();
           job.setDataProvider(dataProvider);
           for (int i = 0; i < size; i++) job.add(new MatrixTask(a.getRow(i)));
-          job.setBlocking(false);
           // create a task for each row in matrix a
           submissions.add(job);
         }
         // submit the tasks for execution
-        for (JPPFJob job: submissions) jppfClient.submitJob(job);
+        for (JPPFJob job: submissions) jppfClient.submitAsync(job);
 
         for (JPPFJob job: submissions) {
           final List<Task<?>> results = job.awaitResults();

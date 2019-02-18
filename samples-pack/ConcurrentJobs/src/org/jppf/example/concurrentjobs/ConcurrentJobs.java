@@ -71,8 +71,6 @@ public class ConcurrentJobs {
     final int nbJobs = 4;
     final ExecutorService executor = Executors.newFixedThreadPool(nbJobs);
     try (final JPPFClient jppfClient = new JPPFClient()) {
-      // make sure the client has enough connections
-      ensureConcurrency(jppfClient, nbJobs);
       final List<Future<JPPFJob>> futures = new ArrayList<>(nbJobs);
       // delegate the job submissions to separate threads
       for (int i=1; i<=nbJobs; i++) {
@@ -119,7 +117,7 @@ public class ConcurrentJobs {
     @Override
     public JPPFJob call() throws Exception {
       // submit the job, blocking until the job completes
-      jppfClient.submitJob(job);
+      jppfClient.submit(job);
       // return the job once completed
       return job;
     }
@@ -132,15 +130,12 @@ public class ConcurrentJobs {
   public void singleThreadNonBlockingJobs() throws Exception {
     final int nbJobs = 4;
     try (final JPPFClient jppfClient = new JPPFClient()) {
-      // make sure the client has enough connections
-      ensureConcurrency(jppfClient, nbJobs);
       final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
       for (int i=0; i<nbJobs; i++) {
         // create the job and its tasks
         final JPPFJob job = createJob("singleThreadNonBlockingJob " + i, 3, 1000L);
-        job.setBlocking(false);
         jobs.add(job);
-        jppfClient.submitJob(job);
+        jppfClient.submitAsync(job);
       }
       for (final JPPFJob job: jobs) {
         job.awaitResults();
@@ -157,13 +152,10 @@ public class ConcurrentJobs {
   public void asynchronousNonBlockingJobs() throws Exception {
     final int nbJobs = 4;
     try (final JPPFClient jppfClient = new JPPFClient()) {
-      // make sure the client has enough connections
-      ensureConcurrency(jppfClient, nbJobs);
       // synchronization helper that tells us when all jobs have completed
       final CountDownLatch countDown = new CountDownLatch(nbJobs);
       for (int i=1; i<=nbJobs; i++) {
         final JPPFJob job = createJob("asynchronousNonBlockingJob " + i, 3, 1000L);
-        job.setBlocking(false);
         // results will be processed asynchronously within
         // the job listener's jobEnded() notifications
         job.addJobListener(new JobListenerAdapter() {
@@ -176,7 +168,7 @@ public class ConcurrentJobs {
           }
         });
         // submit the job
-        jppfClient.submitJob(job);
+        jppfClient.submitAsync(job);
       }
       // wait until all jobs are complete
       // i.e. until the count down reaches 0
@@ -192,10 +184,8 @@ public class ConcurrentJobs {
     final int concurrencyLimit = 4;
     try (final JPPFClient jppfClient = new JPPFClient();
         AbstractJPPFJobStream jobProvider = new JobProvider(concurrencyLimit)) {
-      // make sure the client has enough connections
-      ensureConcurrency(jppfClient, concurrencyLimit);
       // build and submit the provided jobs until no more is available
-      jobProvider.forEach(job -> jppfClient.submitJob(job));
+      jobProvider.forEach(jppfClient::submitAsync);
       // wait until no more job is pending or executing before exiting
       jobProvider.awaitEndOfStream();
       System.out.printf("*** executed a total of %,d jobs and %,d tasks%n", jobProvider.getJobCount(), jobProvider.getTaskCount());
@@ -239,21 +229,6 @@ public class ConcurrentJobs {
       } else { // otherwise display the task result
         System.out.printf("result of %s : %s%n", task.getId(), task.getResult());
       }
-    }
-  }
-
-  /**
-   * Ensure that the JPPF client has the specified number of connections.
-   * @param jppfClient the jppf client.
-   * @param nbJobs the desired number of concurrent jobs.
-   * @throws Exception if any error occurs.
-   */
-  private static void ensureConcurrency(final JPPFClient jppfClient, final int nbJobs) throws Exception {
-    // wait until a connection pool is available
-    final JPPFConnectionPool pool = jppfClient.awaitActiveConnectionPool();
-    // if the concurrency is not sufficient, increase it to the desired level
-    if (pool.getMaxJobs() < nbJobs) {
-      pool.setMaxJobs(nbJobs);
     }
   }
 }

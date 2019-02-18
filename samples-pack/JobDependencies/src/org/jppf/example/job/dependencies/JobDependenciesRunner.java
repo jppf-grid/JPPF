@@ -64,7 +64,7 @@ public class JobDependenciesRunner {
       }
 
       // submit all the jobs asynchronously
-      for (JPPFJob job: jobs) client.submitJob(job);
+      for (JPPFJob job: jobs) client.submit(job);
       // await the jobs results and print them
       for (JPPFJob job: jobs) printJobResults(job);
 
@@ -84,8 +84,6 @@ public class JobDependenciesRunner {
     job.setName(spec.getId());
     // add the dependencies information to the job metadata
     job.getMetadata().setParameter(DependencySpec.DEPENDENCIES_METADATA_KEY, spec);
-    // asynchronous job execution
-    job.setBlocking(false);
     // the job MUST be suspended before submission
     job.getSLA().setSuspended(true);
     // add a single task and give it a readable id

@@ -95,7 +95,6 @@ public class JPPFCallableRunner {
       final String name = "job-" + StringUtils.padLeft(String.valueOf(n), '0', 4);
       final JPPFJob job = new JPPFJob(name);
       job.getClientSLA().setMaxChannels(maxChannels);
-      job.setBlocking(false);
       for (int i=1; i<=nbTasks; i++) job.add(new MyTask(time, size)).setId(name + ":task-" + StringUtils.padLeft(String.valueOf(i), '0', 5));
       job.addJobListener(new JobListenerAdapter() {
         @Override
@@ -107,7 +106,7 @@ public class JPPFCallableRunner {
       jobList.add(job);
     }
     callableResult = "from MyCallable";
-    for (JPPFJob job: jobList) jppfClient.submitJob(job);
+    for (JPPFJob job: jobList) jppfClient.submitAsync(job);
     for (JPPFJob job: jobList) {
       job.awaitResults();
       print("got results for job '" + job.getName() + "'");

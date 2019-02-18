@@ -52,9 +52,8 @@ public class GenericRunner {
           System.out.println("received " + event.getJobTasks().size() + " tasks");
         }
       };
-      job.setBlocking(false);
       job.addJobListener(jobListener);
-      client.submitJob(job);
+      client.submitAsync(job);
       results = job.awaitResults();
       for (final Task<?> task: results) {
         System.out.println("*****************************************");

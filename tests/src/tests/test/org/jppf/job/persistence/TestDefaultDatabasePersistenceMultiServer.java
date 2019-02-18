@@ -108,10 +108,10 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
       });
       final int nbTasks = 10;
       final String method = ReflectionUtils.getCurrentMethodName();
-      final JPPFJob job = BaseTestHelper.createJob(method, true, false, nbTasks, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(method, false, nbTasks, LifeCycleTask.class, 0L);
       job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
       job.getClientSLA().setMaxChannels(2);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       checkJobResults(nbTasks, results, false);
       // check that tasks were dispatched to both drivers and attached nodes
       final Set<String> set = new HashSet<>();

@@ -83,10 +83,10 @@ public class TestClientPreferencePolicy extends AbstractNonStandardSetup {
    */
   private static void testTruePolicy(final String name, final Preference preference, final ExecutionPolicy policy, final String...expectedNodes) throws Exception {
     final int nbTasks = 10;
-    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 10L);
+    final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 10L);
     job.getClientSLA().setPreferencePolicy(preference);
     job.getClientSLA().setExecutionPolicy(policy);
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertEquals(nbTasks, results.size());
     for (final Task<?> tsk: results) {
       assertTrue(tsk instanceof LifeCycleTask);
@@ -102,11 +102,11 @@ public class TestClientPreferencePolicy extends AbstractNonStandardSetup {
    */
   @Test(timeout=15000)
   public void testContradictoryExecutionPolicy() throws Exception {
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, 20L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, 20L);
     job.getClientSLA().setPreferencePolicy(new Preference(new LessThan("id", 2)));
     job.getClientSLA().setExecutionPolicy(new AtLeast("id", 2));
     job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(2000L));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertEquals(1, results.size());
     final LifeCycleTask task = (LifeCycleTask) results.get(0);
     assertNull(task.getResult());
@@ -130,10 +130,10 @@ public class TestClientPreferencePolicy extends AbstractNonStandardSetup {
    */
   private static void testFalsePolicy(final String name, final Preference policy) throws Exception {
     final int nbTasks = 1;
-    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 20L);
+    final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 20L);
     job.getClientSLA().setPreferencePolicy(policy);
     job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(2000L));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertEquals(nbTasks, results.size());
     final LifeCycleTask task = (LifeCycleTask) results.get(0);
     assertNull(task.getResult());

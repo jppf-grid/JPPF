@@ -142,7 +142,7 @@ public class NBodyRunner {
       dp.setParameter("positions", positions);
       final long start = System.nanoTime();
       // submit the tasks for execution
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       //System.out.println(msg);
       for (final Task<?> task: results) {
         final Throwable t = task.getThrowable();

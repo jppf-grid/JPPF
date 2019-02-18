@@ -546,7 +546,7 @@ div.topNav div.aboutLanguage {
 }
 
 span.deprecatedLabel + div.block span.deprecationComment {
-  margin-left: -8px;
+  margin-left: -0px;
   padding-left: 8px;
 }
 
@@ -555,7 +555,7 @@ span.deprecatedLabel, span.deprecationComment {
 }
 
 span.deprecatedLabel + span.deprecationComment {
-  margin-left: -4px;
+  margin-left: -1px;
   padding-left: 8px;
 }
 

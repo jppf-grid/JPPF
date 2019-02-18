@@ -82,9 +82,9 @@ public class TestTaskCancellation extends BaseTest {
   @Test(timeout=10000)
   public void testInterruptibleJPPFTask() throws Exception {
     final int nbTasks = 1;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyTask.class, TIME_SHORT, true);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, MyTask.class, TIME_SHORT, true);
     job.getClientSLA().setExecutionPolicy(localPolicy);
-    client.submitJob(job);
+    client.submitAsync(job);
     Thread.sleep(TIME_SHORT / 2L);
     job.cancel();
     final List<Task<?>> results = job.awaitResults();
@@ -107,9 +107,9 @@ public class TestTaskCancellation extends BaseTest {
   @Test(timeout=10000)
   public void testUninterruptibleJPPFTask() throws Exception {
     final int nbTasks = 1;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyTask.class, TIME_SHORT, false);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, MyTask.class, TIME_SHORT, false);
     job.getClientSLA().setExecutionPolicy(localPolicy);
-    client.submitJob(job);
+    client.submitAsync(job);
     Thread.sleep(TIME_SHORT / 2L);
     job.cancel();
     final List<Task<?>> results = job.awaitResults();
@@ -133,10 +133,10 @@ public class TestTaskCancellation extends BaseTest {
   @Test(timeout=10000)
   public void testInterruptibleCallable() throws Exception {
     final int nbTasks = 1;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyCallable.class, TIME_SHORT, true);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, MyCallable.class, TIME_SHORT, true);
     for (final Task<?> task: job) ((JPPFAnnotatedTask) task).setCancelCallback(new MyCancelCallback());
     job.getClientSLA().setExecutionPolicy(localPolicy);
-    client.submitJob(job);
+    client.submitAsync(job);
     Thread.sleep(TIME_SHORT / 2L);
     job.cancel();
     final List<Task<?>> results = job.awaitResults();
@@ -160,10 +160,10 @@ public class TestTaskCancellation extends BaseTest {
   @Test(timeout=10000)
   public void testUninterruptibleCallable() throws Exception {
     final int nbTasks = 1;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyCallable.class, TIME_SHORT, false);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, MyCallable.class, TIME_SHORT, false);
     for (final Task<?> task: job) ((JPPFAnnotatedTask) task).setCancelCallback(new MyCancelCallback());
     job.getClientSLA().setExecutionPolicy(localPolicy);
-    client.submitJob(job);
+    client.submitAsync(job);
     Thread.sleep(TIME_SHORT / 2L);
     job.cancel();
     final List<Task<?>> results = job.awaitResults();

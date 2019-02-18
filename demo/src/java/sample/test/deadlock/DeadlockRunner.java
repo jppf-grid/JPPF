@@ -89,13 +89,12 @@ public class DeadlockRunner {
         final TimeMarker marker = new TimeMarker().start();
         int count = 0;
         for (final JPPFJob job: jobProvider) {
-          if ((job != null) && !client.isClosed()) client.submitJob(job);
+          if ((job != null) && !client.isClosed()) client.submit(job);
           if (count == ro.triggerNodeDeadlockAfter) {
             final JPPFJob deadlockingJob = new JPPFJob();
             deadlockingJob.setName("deadlock trigger job");
-            deadlockingJob.setBlocking(false);
             deadlockingJob.add(new DeadlockingTask());
-            client.submitJob(deadlockingJob);
+            client.submitAsync(deadlockingJob);
           }
           count++;
           //requestNodeShutdown(client);
@@ -213,9 +212,8 @@ public class DeadlockRunner {
   private static void submitDeadlockingJob(final JPPFClient client) throws Exception {
     final JPPFJob job = new JPPFJob();
     job.setName("Deadlocking job");
-    job.setBlocking(false);
     job.add(new DeadlockingTask());
-    client.submitJob(job);
+    client.submit(job);
   }
 
   /**

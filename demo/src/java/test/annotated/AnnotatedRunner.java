@@ -73,9 +73,8 @@ public class AnnotatedRunner {
       final JPPFJob job = new JPPFJob();
       job.setName("demo job " + (i + 1));
       job.add(new AnnotatedTask(time, (i + 1)));
-      job.setBlocking(false);
       jobs.add(job);
-      jppfClient.submitJob(job);
+      jppfClient.submitAsync(job);
     }
     for (final JPPFJob job: jobs) {
       final List<Task<?>> results = job.awaitResults();
@@ -106,9 +105,8 @@ public class AnnotatedRunner {
       job.setName("demo job " + (i + 1));
       final Task<?> task = (Task<?>) cl.loadClass("test.TestClass").newInstance();
       job.add(task);
-      job.setBlocking(false);
       jobs.add(job);
-      jppfClient.submitJob(job);
+      jppfClient.submitAsync(job);
     }
     for (final JPPFJob job: jobs) {
       final List<Task<?>> results = job.awaitResults();

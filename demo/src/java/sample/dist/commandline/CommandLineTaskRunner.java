@@ -64,7 +64,7 @@ public class CommandLineTaskRunner {
     /* job.addTask(new TestTask("1"));
      * for (JPPFTask t: job.getTasks()) t.setTimeoutSchedule(new JPPFSchedule(5000)); */
 
-    final List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submit(job);
     for (final Task<?> task: results) {
       if (task.getThrowable() != null) task.getThrowable().printStackTrace();
       System.out.println("result: " + task.getResult());

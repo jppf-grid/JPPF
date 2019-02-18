@@ -92,10 +92,10 @@ public class TestGridPolicy extends Setup1D2N1C {
     final String name = ReflectionUtils.getCurrentClassAndMethod();
     final ExecutionPolicy p = PolicyParser.parsePolicy(xml);
     printOut("%s() grid policy:%n%s%n", name, p);
-    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i=0; i<nbTasks; i++) {
@@ -116,10 +116,10 @@ public class TestGridPolicy extends Setup1D2N1C {
     final String name = ReflectionUtils.getCurrentClassAndMethod();
     final ExecutionPolicy p = PolicyParser.parsePolicy(xml);
     printOut("%s() grid policy:%n%s%n", name, p);
-    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i=0; i<nbTasks; i++) {
@@ -138,10 +138,10 @@ public class TestGridPolicy extends Setup1D2N1C {
     final int nbTasks = 5;
     final String xml = FileUtils.readTextFile(RESOURCES_DIR + "/ValidFalseGridPolicy.xml");
     final ExecutionPolicy p = PolicyParser.parsePolicy(xml);
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i=0; i<nbTasks; i++) {
@@ -161,10 +161,10 @@ public class TestGridPolicy extends Setup1D2N1C {
     // more than 1 node with at least 1 processing thread
     final ExecutionPolicy p = new NodesMatching(Operator.MORE_THAN, 1, new AtLeast(JPPFProperties.PROCESSING_THREADS.getName(), 1));
     printOut("%s() grid policy:%n%s%n", name, p);
-    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i=0; i<nbTasks; i++) {
@@ -183,10 +183,10 @@ public class TestGridPolicy extends Setup1D2N1C {
     final int nbTasks = 5;
     // at least 4 nodes with at least 1 processing thread
     final ExecutionPolicy p = new NodesMatching(Operator.AT_LEAST, 4, new AtLeast(JPPFProperties.PROCESSING_THREADS.getName(), 1));
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i=0; i<nbTasks; i++) {
@@ -206,10 +206,10 @@ public class TestGridPolicy extends Setup1D2N1C {
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     // more than 4 nodes with at least 1 processing thread
     final ExecutionPolicy p = new NodesMatching(Operator.AT_LEAST, 4, new AtLeast(JPPFProperties.PROCESSING_THREADS.getName(), 1));
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(3*JOB_TIMEOUT)); // to avoid the job being stuck
-    client.submitJob(job);
+    client.submitAsync(job);
     try {
       Thread.sleep(1000L);
       // a static node uuid is already assigned in the master's config file and must be overriden

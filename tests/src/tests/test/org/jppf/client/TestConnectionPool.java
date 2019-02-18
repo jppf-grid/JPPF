@@ -65,8 +65,8 @@ public class TestConnectionPool extends Setup1D1N {
     configure(0);
     client = BaseSetup.createClient(null, false);
     final int nbTasks = 100;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
-    final List<Task<?>> results = client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 0L);
+    final List<Task<?>> results = client.submit(job);
     testJobResults(nbTasks, results);
   }
 
@@ -79,8 +79,8 @@ public class TestConnectionPool extends Setup1D1N {
     configure(2);
     client = BaseSetup.createClient(null, false);
     final int nbTasks = 100;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
-    final List<Task<?>> results = client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 0L);
+    final List<Task<?>> results = client.submit(job);
     testJobResults(nbTasks, results);
   }
 
@@ -94,10 +94,10 @@ public class TestConnectionPool extends Setup1D1N {
     client = BaseSetup.createClient(null, false);
     while (client.getAllConnectionsCount() < 2) Thread.sleep(10L);
     final int nbTasks = 100;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 0L);
     // default max channels is 1 for backward compatibility with previous versions of the client.
     job.getClientSLA().setMaxChannels(10);
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     testJobResults(nbTasks, results);
   }
 
@@ -237,13 +237,13 @@ public class TestConnectionPool extends Setup1D1N {
     final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
     final MyJobListener listener = new MyJobListener();
     for (int i=1; i<=nbJobs; i++) {
-      final JPPFJob job = BaseTestHelper.createJob(prefix + "-" + i, false, false, 1, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(prefix + "-" + i, false, 1, LifeCycleTask.class, 0L);
       job.addJobListener(listener);
       jobs.add(job);
     }
     for (final JPPFJob job: jobs) {
       print(false, false, "submitting job %s", job);
-      client.submitJob(job);
+      client.submitAsync(job);
     }
     for (final JPPFJob job: jobs) {
       final List<Task<?>> result = job.awaitResults();

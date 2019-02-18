@@ -83,7 +83,7 @@ public class DataSizeRunner {
       final JPPFJob job = new JPPFJob();
       job.setName("Datasize job " + i);
       for (int j = 0; j < nbTasks; j++) job.add(new DataTask(datasize, inNodeOnly));
-      jppfClient.submitJob(job);
+      jppfClient.submit(job);
       /* for (JPPFTask t: results)
        * {
        * if (t.getException() != null) System.out.println("task error: " + t.getException().getMessage());

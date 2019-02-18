@@ -99,8 +99,8 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
     assertEquals(Thread.NORM_PRIORITY, state.getThreadPriority());
     assertEquals(JPPFNodeState.ConnectionState.CONNECTED, state.getConnectionStatus());
     assertEquals(JPPFNodeState.ExecutionState.IDLE, state.getExecutionStatus());
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
-    client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, 2000L);
+    client.submitAsync(job);
     Thread.sleep(750L);
     state = nodeJmx.state();
     assertNotNull(state);
@@ -162,8 +162,8 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
     JPPFNodeState state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(0, state.getNbTasksExecuted());
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
-    client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 1L);
+    client.submit(job);
     state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(nbTasks, state.getNbTasksExecuted());
@@ -249,9 +249,9 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testCancelJob() throws Exception {
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 5000L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, 5000L);
     final String uuid = job.getUuid();
-    client.submitJob(job);
+    client.submitAsync(job);
     Thread.sleep(750L);
     nodeJmx.cancelJob(uuid, false);
     final List<Task<?>> result = job.awaitResults();

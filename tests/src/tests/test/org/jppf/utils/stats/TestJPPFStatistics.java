@@ -60,13 +60,13 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   @Test(timeout=15000)
   public void testLatestQueueTaskCountUponNodeRestart() throws Exception {
     final int nbTasks = 2;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 2000L);
     print(false, false, "getting jmx connection");
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     print(false, false, "resetting statistics");
     jmx.resetStatistics();
     print(false, false, "submitting job '%s'", job.getName());
-    client.submitJob(job);
+    client.submitAsync(job);
     Thread.sleep(1000L);
     print(false, false, "restarting node");
     jmx.getNodeForwarder().restart(NodeSelector.ALL_NODES);
@@ -84,14 +84,14 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   @Test(timeout=10000)
   public void testLatestQueueTaskCountUponTaskResubmit() throws Exception {
     final int nbTasks = 2;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, ResubmittingTask.class, 100L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, ResubmittingTask.class, 100L);
     print(false, false, "getting jmx connection");
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     print(false, false, "resetting statistics");
     jmx.resetStatistics();
     job.getSLA().setMaxTaskResubmits(1);
     print(false, false, "submitting job '%s'", job.getName());
-    client.submitJob(job);
+    client.submitAsync(job);
     print(false, false, "waiting for job results");
     final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
@@ -106,7 +106,7 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   @Test(timeout=10000)
   public void testTaskAndJobCountUponClientClose() throws Exception {
     final int nbTasks = 1;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 2000L);
     print(false, false, "getting jmx connection");
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     print(false, false, "resetting statistics");
@@ -115,7 +115,7 @@ public class TestJPPFStatistics extends Setup1D1N1C {
     job.getSLA().setSuspended(true);
     final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_QUEUED);
     print(false, false, "submitting job '%s'", job.getName());
-    client.submitJob(job);
+    client.submitAsync(job);
     print(false, false, "waiting for JOB_QUEUED notification");
     listener.await();
     try {
@@ -139,7 +139,7 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   public void testTaskAndJobCountUponClientCloseWithoutCancel() throws Exception {
     final int nbTasks = 1;
     final long duration = 3000L;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, duration);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, duration);
     print(false, false, "getting jmx connection");
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     print(false, false, "resetting statistics");
@@ -147,7 +147,7 @@ public class TestJPPFStatistics extends Setup1D1N1C {
     job.getSLA().setCancelUponClientDisconnect(false);
     final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
     print(false, false, "submitting job '%s'", job.getName());
-    client.submitJob(job);
+    client.submitAsync(job);
     final long start = System.nanoTime();
     print(false, false, "waiting for JOB_DISPATCHED notification");
     listener.await();
@@ -176,13 +176,13 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   @Test(timeout=10000)
   public void testTaskAndJobCountUponCompletion() throws Exception {
     final int nbTasks = 1;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 100L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 100L);
     print(false, false, "getting jmx connection");
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     print(false, false, "resetting statistics");
     jmx.resetStatistics();
     print(false, false, "submitting job '%s'", job.getName());
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     print(false, false, "checking stats");
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
@@ -196,13 +196,13 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   public void testTaskAndJobCountUponCancel() throws Exception {
     final int nbTasks = 1;
     final String notif = "task notif";
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L, true, notif);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 2000L, true, notif);
     print(false, false, "getting jmx connection");
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     print(false, false, "resetting statistics");
     final AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(client, notif);
     print(false, false, "submitting job '%s'", job.getName());
-    client.submitJob(job);
+    client.submitAsync(job);
     print(false, false, "waiting for task notification");
     taskListener.await();
     print(false, false, "cancekking job '%s'", job.getName());

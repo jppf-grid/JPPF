@@ -92,8 +92,8 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
       final int nbTasks = 100;
       for (final String algo: algos) {
         jmx.changeLoadBalancerSettings(algo, lbi.getParameters());
-        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
-        final List<Task<?>> results = client.submitJob(job);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, nbTasks, LifeCycleTask.class, 0L);
+        final List<Task<?>> results = client.submit(job);
         checkJobResults(nbTasks, results, false);
         awaitNoMorePendingOperations(mgt);
         assertTrue(checkEmptyChannels(mgt));
@@ -124,8 +124,8 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
       final int nbTasks = 100;
       for (final String algo: algos) {
         jmx.changeLoadBalancerSettings(algo, lbi.getParameters());
-        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
-        final List<Task<?>> results = client.submitJob(job);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, nbTasks, LifeCycleTask.class, 0L);
+        final List<Task<?>> results = client.submit(job);
         checkJobResults(nbTasks, results, false);
         awaitNoMorePendingOperations(mgt);
         final List<String> nodes = mgt.listAllChannels();
@@ -173,9 +173,9 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
       for (int i=0; i<algos.length; i++) {
         final String algo = algos[i];
         jmx.changeLoadBalancerSettings(algo, lbi.getParameters());
-        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, nbTasks, LifeCycleTask.class, 0L);
         if (i > 0) job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, "n" + i));
-        final List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submit(job);
         checkJobResults(nbTasks, results, false);
       }
       awaitNoMorePendingOperations(mgt);
@@ -235,8 +235,8 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
       final String algo = "proportional";
       final int nbTasks = 100;
       jmx.changeLoadBalancerSettings(algo, lbi.getParameters());
-      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
-      final List<Task<?>> results = client.submitJob(job);
+      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, nbTasks, LifeCycleTask.class, 0L);
+      final List<Task<?>> results = client.submit(job);
       checkJobResults(nbTasks, results, false);
       awaitNoMorePendingOperations(mgt);
       List<String> nodes = mgt.listAllChannels();

@@ -77,10 +77,10 @@ public class TestDefaultFilePersistenceP2P extends AbstractDatabaseSetup {
   public void testJobNotPersistedInPeer() throws Exception {
     final int nbTasks = 10;
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(method, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
     job.getClientSLA().setExecutionPolicy(new Equal("jppf.server.port", 11101));
-    client.submitJob(job);
+    client.submitAsync(job);
     final List<Task<?>> results = job.awaitResults();
     showDirContent("persistence1/" + job.getUuid());
     showDirContent("persistence2/" + job.getUuid());

@@ -111,7 +111,7 @@ public class AwaitTaskNotificationListener implements NotificationListener {
    * @throws Exception if any error occurs.
    */
   public synchronized void submitAndAwait(final Collection<JPPFJob> jobs) throws Exception {
-    for (JPPFJob job: jobs) client.submitJob(job);
+    for (JPPFJob job: jobs) client.submitAsync(job);
     System.out.printf("submitted %d jobs%n", jobs.size());
     await();
   }
@@ -122,7 +122,7 @@ public class AwaitTaskNotificationListener implements NotificationListener {
    * @throws Exception if any error occurs.
    */
   public synchronized void submitAndAwait(final JPPFJob...jobs) throws Exception {
-    for (JPPFJob job: jobs) client.submitJob(job);
+    for (JPPFJob job: jobs) client.submitAsync(job);
     await();
   }
 }

@@ -48,7 +48,7 @@ public class TestJPPFConnection {
     try {
       connection = JPPFHelper.getConnection();
       assertNotNull(connection);
-      final JPPFJob job = BaseTestHelper.createJob("JCA testSubmit", true, false, 1, LifeCycleTask.class);
+      final JPPFJob job = BaseTestHelper.createJob("JCA testSubmit", false, 1, LifeCycleTask.class);
       final String id = connection.submit(job);
       assertNotNull(id);
       final List<Task<?>> results = connection.awaitResults(id);
@@ -77,7 +77,7 @@ public class TestJPPFConnection {
     try {
       connection = JPPFHelper.getConnection();
       assertNotNull(connection);
-      final JPPFJob job = BaseTestHelper.createJob("JCA testSubmitAndRetrieve", true, false, nbTasks, LifeCycleTask.class, 500L);
+      final JPPFJob job = BaseTestHelper.createJob("JCA testSubmitAndRetrieve", false, nbTasks, LifeCycleTask.class, 500L);
       id = connection.submit(job);
       assertNotNull(id);
     } finally {
@@ -114,7 +114,7 @@ public class TestJPPFConnection {
     try {
       connection = JPPFHelper.getConnection();
       assertNotNull(connection);
-      final JPPFJob job = BaseTestHelper.createJob("JCA testStatusListenerFromSubmit", true, false, 1, LifeCycleTask.class);
+      final JPPFJob job = BaseTestHelper.createJob("JCA testStatusListenerFromSubmit", false, 1, LifeCycleTask.class);
       final GatheringStatusListener listener = new GatheringStatusListener();
       final String id = connection.submit(job, listener);
       assertNotNull(id);
@@ -140,7 +140,7 @@ public class TestJPPFConnection {
     try {
       connection = JPPFHelper.getConnection();
       assertNotNull(connection);
-      final JPPFJob job = BaseTestHelper.createJob("JCA testCancelJob", true, false, 1, LifeCycleTask.class, 5000L);
+      final JPPFJob job = BaseTestHelper.createJob("JCA testCancelJob", false, 1, LifeCycleTask.class, 5000L);
       final String id = connection.submit(job);
       assertNotNull(id);
       Thread.sleep(1000L);
@@ -168,7 +168,7 @@ public class TestJPPFConnection {
     try {
       connection = JPPFHelper.getConnection();
       assertNotNull(connection);
-      final JPPFJob job = BaseTestHelper.createJob("JCA testCancelJobAfterCompletion", true, false, 1, LifeCycleTask.class, 100L);
+      final JPPFJob job = BaseTestHelper.createJob("JCA testCancelJobAfterCompletion", false, 1, LifeCycleTask.class, 100L);
       final String id = connection.submit(job);
       assertNotNull(id);
       Thread.sleep(3000L);
@@ -199,7 +199,7 @@ public class TestJPPFConnection {
     try {
       connection = JPPFHelper.getConnection();
       assertNotNull(connection);
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 100L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 100L);
       id = connection.submit(job);
       assertNotNull(id);
     } finally {

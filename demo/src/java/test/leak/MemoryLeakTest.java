@@ -71,7 +71,7 @@ public class MemoryLeakTest {
         final JPPFJob job = new JPPFJob();
         job.setName("test" + i);
         for (int j=1; j<=options.nbTasks; j++) job.add(new MyTask(options.duration, options.dataSize)).setId(job.getName() + "_task" + j);
-        final List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submit(job);
         final MyTask task = (MyTask) results.get(0);
         final String res = task.getResult();
         System.out.printf("job '%s' terminated with status '%s'%n", job.getName(), (res == null ? "cancelled" : "completed"));

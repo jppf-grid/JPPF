@@ -133,14 +133,14 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   public void testJobReservationSingleNodeWithRestart() throws Exception {
     final  int nbTasks = 5 * BaseSetup.nbNodes();
     print(false, false, ">>> creating job");
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 1L);
     final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(1);
     print(false, false, ">>> submitting job");
-    final List<Task<?>> result = client.submitJob(job);
+    final List<Task<?>> result = client.submit(job);
     print(false, false, ">>> checking job results");
     assertNotNull(result);
     assertFalse(result.isEmpty());
@@ -168,7 +168,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     final int nbTasksPerNode = 5;
     final int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
     print(false, false, ">>> creating job");
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 500L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 500L);
     final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
@@ -176,7 +176,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     job.getSLA().setMaxNodes(1);
     jobNotificationListener = new AwaitJobNotificationListener(client, JobEventType.JOB_RETURNED);
     print(false, false, ">>> submitting job");
-    client.submitJob(job);
+    client.submitAsync(job);
     print(false, false, ">>> awaiting JOB_RETURNED notfication");
     jobNotificationListener.await();
     print(false, false, ">>> cancelling job");
@@ -216,7 +216,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     print(false, false, ">>> creating job");
     final int nbTasksPerNode = 5;
     final int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 600L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 600L);
     final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
@@ -224,7 +224,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     job.getSLA().setMaxNodes(1);
     jobNotificationListener = new AwaitJobNotificationListener(client, JobEventType.JOB_RETURNED);
     print(false, false, ">>> submitting job");
-    client.submitJob(job);
+    client.submitAsync(job);
     print(false, false, ">>> awaiting JOB_RETURNED notfication");
     jobNotificationListener.await();
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
@@ -265,7 +265,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     print(false, false, ">>> creating job");
     final int nbTasks = 5 * BaseSetup.nbNodes();
     final Set<String> expectedNodes = new TreeSet<>(Arrays.asList("n2", "n3"));
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 1L);
     // Levenshtein scores: node1: 10 ; node2 : 6 ; node3 : 2
     final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
@@ -273,7 +273,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(expectedNodes.size());
     print(false, false, ">>> submiting job");
-    final List<Task<?>> result = client.submitJob(job);
+    final List<Task<?>> result = client.submit(job);
     print(false, false, ">>> checking results");
     assertNotNull(result);
     assertFalse(result.isEmpty());
@@ -305,14 +305,14 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   public void testJobReservationSingleNodeNoRestart() throws Exception {
     print(false, false, ">>> creating job");
     final int nbTasks = 5 * BaseSetup.nbNodes();
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 1L);
     final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props, false));
     job.getSLA().setMaxNodes(1);
     print(false, false, ">>> submiting job");
-    final List<Task<?>> result = client.submitJob(job);
+    final List<Task<?>> result = client.submit(job);
     print(false, false, ">>> checking results");
     assertNotNull(result);
     assertFalse(result.isEmpty());

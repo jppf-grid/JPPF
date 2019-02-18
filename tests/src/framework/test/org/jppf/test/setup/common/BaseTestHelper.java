@@ -98,7 +98,6 @@ public class BaseTestHelper {
    * The type of the tasks is specified via their class, and the constructor to
    * use is specified based on the number of parameters.
    * @param name the job's name.
-   * @param blocking specifies whether the job is blocking.
    * @param broadcast specifies whether the job is a broadcast job.
    * @param nbTasks the number of tasks to add to the job.
    * @param taskClass the class of the tasks to add to the job.
@@ -106,8 +105,8 @@ public class BaseTestHelper {
    * @return a <code>JPPFJob</code> instance.
    * @throws Exception if any error occurs.
    */
-  public static JPPFJob createJob(final String name, final boolean blocking, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception {
-    return createJob(name, null, blocking, broadcast, nbTasks, taskClass, params);
+  public static JPPFJob createJob(final String name, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception {
+    return createJob(name, null, broadcast, nbTasks, taskClass, params);
   }
 
   /**
@@ -116,15 +115,15 @@ public class BaseTestHelper {
    * use is specified based on the number of parameters.
    * @param name the job's name.
    * @param uuid the job uuid.
-   * @param blocking specifies whether the job is blocking.
    * @param broadcast specifies whether the job is a broadcast job.
    * @param nbTasks the number of tasks to add to the job.
    * @param taskClass the class of the tasks to add to the job.
    * @param params the parameters for the tasks constructor.
    * @return a <code>JPPFJob</code> instance.
    * @throws Exception if any error occurs.
+   * @deprecated
    */
-  public static JPPFJob createJob(final String name, final String uuid, final boolean blocking, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception {
+  public static JPPFJob createJob(final String name, final String uuid, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception {
     final JPPFJob job = new JPPFJob(uuid);
     job.setName(name);
     final int nbArgs = (params == null) ? 0 : params.length;
@@ -136,7 +135,7 @@ public class BaseTestHelper {
       final Object o = constructor.newInstance(params);
       job.add(o).setId(String.format(format, job.getName(), i));
     }
-    job.setBlocking(blocking).getSLA().setBroadcastJob(broadcast);
+    job.getSLA().setBroadcastJob(broadcast);
     return job;
   }
 
@@ -145,17 +144,16 @@ public class BaseTestHelper {
    * The type of the tasks is specified via their class, and the constructor to
    * use is specified based on the number of parameters.
    * @param name the job's name.
-   * @param blocking specifies whether the job is blocking.
    * @param broadcast specifies whether the job is a broadcast job.
    * @param tasks the tasks to put in the job.
    * @return a <code>JPPFJob</code> instance.
    * @throws Exception if any error occurs.
    */
-  public static JPPFJob createJob2(final String name, final boolean blocking, final boolean broadcast, final Object...tasks) throws Exception {
+  public static JPPFJob createJob2(final String name, final boolean broadcast, final Task<?>...tasks) throws Exception {
     final JPPFJob job = new JPPFJob();
     job.setName(name);
     for (int i=1; i<=tasks.length; i++) job.add(tasks[i-1]).setId(job.getName() + " - task " + i);
-    job.setBlocking(blocking).getSLA().setBroadcastJob(broadcast);
+    job.getSLA().setBroadcastJob(broadcast);
     return job;
   }
 

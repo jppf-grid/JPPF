@@ -99,11 +99,11 @@ public class TestManyServers extends AbstractNonStandardSetup {
     final String name = ReflectionUtils.getCurrentClassAndMethod();
     final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
     for (int i=1; i<=nbJobs; i++) {
-      final JPPFJob job = BaseTestHelper.createJob(name + '-' + i, false, false, nbTasks, LifeCycleTask.class, 1L);
+      final JPPFJob job = BaseTestHelper.createJob(name + '-' + i, false, nbTasks, LifeCycleTask.class, 1L);
       //job.getClientSLA().setMaxChannels(BaseSetup.nbDrivers());
       jobs.add(job);
     }
-    for (final JPPFJob job: jobs) client.submitJob(job);
+    for (final JPPFJob job: jobs) client.submitAsync(job);
     for (final JPPFJob job: jobs) {
       final List<Task<?>> results = job.awaitResults();
       assertNotNull(results);

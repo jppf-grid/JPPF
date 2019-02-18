@@ -46,7 +46,7 @@ public class HelloWorldRunner {
       job.add("HelloWorldPojoConstructor", HelloWorldPojoConstructor.class, "hello message", 6);
       job.add(new HelloWorldRunnable());
       job.add(new HelloWorldCallable());
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       System.out.println("********** Results: **********");
       for (final Task<?> task: results) {
         if (task.getThrowable() != null) {

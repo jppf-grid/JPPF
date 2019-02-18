@@ -74,7 +74,7 @@ public class MandelbrotRunner extends AbstractRunner {
     job.getSLA().getClassPath().add("android-fractal-demo.apk", androidApk);
     job.getMetadata().setParameter("jppf.node.integration.class", "org.jppf.android.demo.FractalEventHandler");
     for (int i=0; i<nbTask; i++) job.add(new MandelbrotTask(i));
-    return jppfClient.submitJob(job);
+    return jppfClient.submit(job);
   }
 
   @Override

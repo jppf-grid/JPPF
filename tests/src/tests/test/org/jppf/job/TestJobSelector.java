@@ -151,7 +151,7 @@ public class TestJobSelector extends BaseTest {
   private static List<JPPFJob> createJobs(final int nbJobs, final String namePrefix) throws Exception {
     final List<JPPFJob> jobs = new ArrayList<>();
     for (int i=1; i<= nbJobs; i++) {
-      final JPPFJob job = BaseTestHelper.createJob(namePrefix + '-' + i, false, false, 1, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(namePrefix + '-' + i, false, 1, LifeCycleTask.class, 0L);
       job.getMetadata().setParameter("test", i);
       jobs.add(job);
     }

@@ -70,9 +70,9 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
         assertEquals(JPPFNodeState.ConnectionState.CONNECTED, state.getConnectionStatus());
         assertEquals(JPPFNodeState.ExecutionState.IDLE, state.getExecutionStatus());
       }
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, false, nbNodes, LifeCycleTask.class, 2000L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, nbNodes, LifeCycleTask.class, 2000L);
       job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
-      client.submitJob(job);
+      client.submitAsync(job);
       Thread.sleep(750L);
       result = nodeForwarder.state(selector);
       checkNodes(result, JPPFNodeState.class, expectedNodes);
@@ -198,9 +198,9 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(0, state.getNbTasksExecuted());
     }
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, true, false, nbTasks, LifeCycleTask.class, 1L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, nbTasks, LifeCycleTask.class, 1L);
     job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
-    client.submitJob(job);
+    client.submit(job);
     result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
     for (final Map.Entry<String, Object> entry : result.entrySet()) {
@@ -376,10 +376,10 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
     BaseTestHelper.printToAll(client, false, true, true, true, true, ">>> start of %s(%s)", methodName, selectorClass);
     final int nbNodes = expectedNodes.length;
     final int nbTasks = 5 * nbNodes;
-    final JPPFJob job = BaseTestHelper.createJob(methodName + "-" + selectorClass, false, false, nbTasks, LifeCycleTask.class, 5000L);
+    final JPPFJob job = BaseTestHelper.createJob(methodName + "-" + selectorClass, false, nbTasks, LifeCycleTask.class, 5000L);
     job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
     final String uuid = job.getUuid();
-    client.submitJob(job);
+    client.submitAsync(job);
     Thread.sleep(1000L);
     final Map<String, Object> result = nodeForwarder.cancelJob(selector, uuid, false);
     checkNoException(result, expectedNodes);

@@ -51,7 +51,7 @@ public class TestJPPFClientInit extends Setup1D1N {
    */
   @Test(timeout=5000)
   public void testSystemProperties() throws Exception {
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, 1, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, 1, LifeCycleTask.class, 0L);
     job.getJobTasks().get(0).setId("task0");
     final UncaughtExceptionHandler oldEh = Thread.getDefaultUncaughtExceptionHandler();
     final MyUncaughtExceptionHandler myEh = new MyUncaughtExceptionHandler();
@@ -63,7 +63,7 @@ public class TestJPPFClientInit extends Setup1D1N {
       Thread.sleep(1L);
       Thread.setDefaultUncaughtExceptionHandler(myEh);
       for (int i=1; i<=10_000; i++) System.getProperties().remove("test" + i);
-      client.submitJob(job);
+      client.submitAsync(job);
       final List<Task<?>> results = job.get(3L, TimeUnit.SECONDS);
       if (myEh.uncaught != null) throw myEh.uncaught;
       assertNotNull(results);
@@ -96,13 +96,13 @@ public class TestJPPFClientInit extends Setup1D1N {
         final List<JPPFJob> jobs = new ArrayList<>();
         print(false, false, ">>> creating jobs");
         for (int j=1; j<=2; j++) {
-          final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-" + i + (j == 1 ? "a" : "b"), false, false, 1, LifeCycleTask.class, 0L);
+          final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-" + i + (j == 1 ? "a" : "b"), false, 1, LifeCycleTask.class, 0L);
           job.getSLA().setPriority(10 / j);
           job.getJobTasks().get(0).setId("task" + i);
           jobs.add(job);
         }
         print(false, false, ">>> submitting jobs");
-        for (JPPFJob job: jobs) client.submitJob(job);
+        for (JPPFJob job: jobs) client.submitAsync(job);
         for (JPPFJob job: jobs) {
           print(false, false, ">>> awaiting results for job %s", job.getName());
           final List<Task<?>> results = job.get(3L, TimeUnit.SECONDS);

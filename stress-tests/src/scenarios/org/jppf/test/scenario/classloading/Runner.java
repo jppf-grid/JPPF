@@ -45,11 +45,11 @@ public class Runner extends AbstractScenarioRunner {
       final String file = config.getString("class.names.file");
       final List<String> list = FileUtils.getFilePathList(file);
       final long start = System.nanoTime();
-      final JPPFJob job = BaseTestHelper.createJob("classloading", true, true, 1, MyTask.class);
+      final JPPFJob job = BaseTestHelper.createJob("classloading", true, 1, MyTask.class);
       final DataProvider dp = new MemoryMapDataProvider();
       dp.setParameter("list", list);
       job.setDataProvider(dp);
-      getSetup().getClient().submitJob(job);
+      getSetup().getClient().submitAsync(job);
       final long elapsed = System.nanoTime() - start;
       output(job.getName() + " done in " + StringUtils.toStringDuration(elapsed / 1000000L));
     } catch (final Exception e) {

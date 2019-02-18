@@ -66,7 +66,7 @@ public class SubmitQueue extends ThreadSynchronization implements Runnable {
       try {
         final JPPFJob job = queue.poll(1L, TimeUnit.MILLISECONDS);
         if (job != null) {
-          results = client.submitJob(job);
+          results = client.submit(job);
           resultCount.incrementAndGet();
         }
       } catch (final Exception e) {

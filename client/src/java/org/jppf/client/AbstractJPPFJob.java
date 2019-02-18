@@ -59,6 +59,8 @@ public abstract class AbstractJPPFJob<J extends AbstractJPPFJob<J>> implements S
   DataProvider dataProvider;
   /**
    * Determines whether the execution of this job is blocking on the client side.
+   * @deprecated a job should be submissible either synchronously or asynchronously, regardless of its state.
+   * The way it is submitted is the user's choice at the time of submission, using one of {@link JPPFClient#submit(JPPFJob)} or {@link JPPFClient#submitAsync(JPPFJob)}. 
    */
   boolean blocking = true;
   /**
@@ -220,6 +222,8 @@ public abstract class AbstractJPPFJob<J extends AbstractJPPFJob<J>> implements S
   /**
    * Determine whether the execution of this job is blocking on the client side.
    * @return true if the execution is blocking, false otherwise.
+   * @deprecated a job should be submittable either synchronously or asynchronously, regardless of its state.
+   * The submission mode is the user's choice at the time of submission, using one of {@link JPPFClient#submit(JPPFJob) JPPFClient.submit()} or {@link JPPFClient#submitAsync(JPPFJob) JPPFClient.submitAsync()}. 
    */
   public boolean isBlocking() {
     return blocking;
@@ -229,6 +233,8 @@ public abstract class AbstractJPPFJob<J extends AbstractJPPFJob<J>> implements S
    * Specify whether the execution of this job is blocking on the client side.
    * @param blocking true if the execution is blocking, false otherwise.
    * @return this job, for method chaining.
+   * @deprecated a job should be submittable either synchronously or asynchronously, regardless of its state.
+   * The submission mode is the user's choice at the time of submission, using one of {@link JPPFClient#submit(JPPFJob) JPPFClient.submit()} or {@link JPPFClient#submitAsync(JPPFJob) JPPFClient.submitAsync()}. 
    */
   @SuppressWarnings("unchecked")
   public J setBlocking(final boolean blocking) {

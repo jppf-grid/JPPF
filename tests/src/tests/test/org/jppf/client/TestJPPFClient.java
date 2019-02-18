@@ -114,11 +114,11 @@ public class TestJPPFClient extends Setup1D1N {
   public void testSubmit() throws Exception {
     try (final JPPFClient client = new JPPFClient()) {
       final int nbTasks = 50;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
       for (final Task<?> task: job.getJobTasks()) task.setId("" + i++);
       print(false, false, "submitting job");
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       print(false, false, "got job results");
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
@@ -145,9 +145,9 @@ public class TestJPPFClient extends Setup1D1N {
       final int nbTasks = 10;
       //final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
       final AwaitTaskNotificationListener listener = new AwaitTaskNotificationListener(client, "start notif");
-      final JPPFJob job = BaseTestHelper.createJob(name + "-1", false, false, nbTasks, LifeCycleTask.class, 5000L, true, "start notif");
+      final JPPFJob job = BaseTestHelper.createJob(name + "-1", false, nbTasks, LifeCycleTask.class, 5000L, true, "start notif");
       print(false, false, "submitting job 1");
-      client.submitJob(job);
+      client.submitAsync(job);
       print(false, false, "awaiting JOB_DISPATCHED notification");
       listener.await();
       print(false, false, "cancelling job 1");
@@ -162,9 +162,9 @@ public class TestJPPFClient extends Setup1D1N {
         if (task.getResult() == null) count++;
       }
       assertTrue(count > 0);
-      final JPPFJob job2 = BaseTestHelper.createJob(name + "-2", true, false, nbTasks, LifeCycleTask.class, 1L);
+      final JPPFJob job2 = BaseTestHelper.createJob(name + "-2", false, nbTasks, LifeCycleTask.class, 1L);
       print(false, false, "submitting job 2");
-      results = client.submitJob(job2);
+      results = client.submit(job2);
       print(false, false, "got job 2 results");
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
@@ -187,10 +187,10 @@ public class TestJPPFClient extends Setup1D1N {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
       // submit a job to ensure all local execution threads are created
       final int nbTasks = 100;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
       for (final Task<?> task: job) task.setId("" + i++);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       final String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
@@ -229,8 +229,8 @@ public class TestJPPFClient extends Setup1D1N {
   public void testLocalExecutionContextClassLoader() throws Exception {
     JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, true);
     try (final JPPFClient client = new JPPFClient()) {
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, ThreadContextClassLoaderTask.class);
-      final List<Task<?>> results = client.submitJob(job);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, 1, ThreadContextClassLoaderTask.class);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(1, results.size());
       final Task<?> task = results.get(0);
@@ -253,9 +253,9 @@ public class TestJPPFClient extends Setup1D1N {
     try (final JPPFClient client = new JPPFClient()) {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
       final String name = ReflectionUtils.getCurrentClassAndMethod();
-      client.submitJob(BaseTestHelper.createJob(name + "-1", true, false, 1, ThreadContextClassLoaderTask.class));
-      final JPPFJob job = BaseTestHelper.createJob(name + "-2", true, false, 1, ThreadContextClassLoaderTask.class);
-      final List<Task<?>> results = client.submitJob(job);
+      client.submit(BaseTestHelper.createJob(name + "-1", false, 1, ThreadContextClassLoaderTask.class));
+      final JPPFJob job = BaseTestHelper.createJob(name + "-2", false, 1, ThreadContextClassLoaderTask.class);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(1, results.size());
       final Task<?> task = results.get(0);
@@ -273,8 +273,8 @@ public class TestJPPFClient extends Setup1D1N {
   @Test(timeout=10000)
   public void testNotSerializableExceptionFromClient() throws Exception {
     try (JPPFClient client = new JPPFClient()) {
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, true);
-      final List<Task<?>> results = client.submitJob(job);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, 1, NotSerializableTask.class, true);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(1, results.size());
       final Task<?> task = results.get(0);
@@ -292,8 +292,8 @@ public class TestJPPFClient extends Setup1D1N {
   @Test(timeout=10000)
   public void testNotSerializableExceptionFromNode() throws Exception {
     try (final JPPFClient client = new JPPFClient()) {
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, false);
-      final List<Task<?>> results = client.submitJob(job);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, 1, NotSerializableTask.class, false);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(1, results.size());
       final Task<?> task = results.get(0);
@@ -316,12 +316,12 @@ public class TestJPPFClient extends Setup1D1N {
     try (JPPFClient client = new JPPFClient()) {
       client.awaitWorkingConnectionPool();
       // try with "manual" algo
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
       job.addJobListener(listener = new MyJobListener());
       job.getClientSLA().setMaxChannels(10);
       TypedProperties props = new TypedProperties().setInt("size", 1);
       client.setLoadBalancerSettings("manual", props);
-      client.submitJob(job);
+      client.submit(job);
       assertEquals(nbTasks, listener.dispatchCount.get());
       assertEquals(nbTasks, listener.tasksPerDispatch.size());
       for (int i=1; i<=listener.tasksPerDispatch.size(); i++) {
@@ -330,14 +330,14 @@ public class TestJPPFClient extends Setup1D1N {
         assertEquals(1, n.intValue());
       }
       // try with "proportional" algo
-      job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "2", true, false, nbTasks, LifeCycleTask.class, 10L);
+      job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "2", false, nbTasks, LifeCycleTask.class, 10L);
       job.addJobListener(listener = new MyJobListener());
       job.getClientSLA().setMaxChannels(10);
       final JobManagerClient jmc = (JobManagerClient) client.getJobManager();
       while (jmc.nbAvailableConnections() < 2) Thread.sleep(10L);
       props = new TypedProperties().setInt("initialSize", 5).setInt("proportionalityFactor", 1);
       client.setLoadBalancerSettings("proportional", props);
-      client.submitJob(job);
+      client.submit(job);
       assertTrue("expected at least <3> but got <" + listener.dispatchCount.get() + ">", listener.dispatchCount.get() >= 3);
       assertTrue(listener.tasksPerDispatch.size() >= 3);
       for (int i=1; i<=listener.tasksPerDispatch.size(); i++) assertNotNull(listener.tasksPerDispatch.get(i));

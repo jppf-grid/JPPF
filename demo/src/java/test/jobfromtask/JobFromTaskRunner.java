@@ -56,7 +56,7 @@ public class JobFromTaskRunner {
       job.setName("source job");
       job.add(new SourceTask()).setId("source");
       job.getSLA().setMaxNodes(1);
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       for (final Task<?> t: results) {
         final Throwable e = t.getThrowable();
         if (e != null) throw e;
@@ -82,7 +82,7 @@ public class JobFromTaskRunner {
     job.setName("destination job");
     job.add(new DestinationTask(input)).setId("destination task");
     job.getSLA().setMaxNodes(1);
-    final List<Task<?>> result = jppfClient.submitJob(job);
+    final List<Task<?>> result = jppfClient.submit(job);
     return (String) result.get(0).getResult();
   }
 

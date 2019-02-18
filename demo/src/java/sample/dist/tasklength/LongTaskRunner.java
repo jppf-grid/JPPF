@@ -80,7 +80,7 @@ public class LongTaskRunner {
       job.setName("Long task iteration " + iter);
       for (int i=0; i<nbTasks; i++) job.add(new LongTask(length)).setId("" + iter + ':' + (i+1));
       // submit the tasks for execution
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       for (final Task<?> task: results) {
         final Throwable e = task.getThrowable();
         if (e != null) {

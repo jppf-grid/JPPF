@@ -86,7 +86,7 @@ public class AparapiRunner {
       for (int i = 0; i < tasksPerJob; i++)
         job.add(new AparapiTask(matrixA, matrixB, execMode));
       // submit and get the results
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       for (final Task<?> task : results) {
         if (task.getThrowable() != null) throw task.getThrowable();
         final AparapiTask t = (AparapiTask) task;

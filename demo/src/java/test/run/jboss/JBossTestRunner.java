@@ -58,9 +58,8 @@ public class JBossTestRunner {
   public static void perform() throws Exception {
     final JPPFJob job = new JPPFJob("JBoss Runner");
     job.add(new JBossTask("C:/Tools/jboss-5.1.0.GA", "jppf"));
-    job.setBlocking(false);
     job.getSLA().setBroadcastJob(true);
-    client.submitJob(job);
+    client.submitAsync(job);
     final List<Task<?>> results = job.awaitResults();
     final Task<?> task = results.get(0);
     if (task.getThrowable() != null) {

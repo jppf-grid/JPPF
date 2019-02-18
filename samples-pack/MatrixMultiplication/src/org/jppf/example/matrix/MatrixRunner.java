@@ -140,7 +140,7 @@ public class MatrixRunner {
     job.getDataProvider().setParameter(MatrixTask.DATA_KEY, b);
     job.getSLA().setExecutionPolicy(policy);
     // submit the tasks for execution
-    final List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submit(job);
     // initialize the resulting matrix
     final Matrix c = new Matrix(size);
     // Get the matrix values from the tasks results

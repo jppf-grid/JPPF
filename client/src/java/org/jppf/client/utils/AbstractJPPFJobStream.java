@@ -128,7 +128,6 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
     if ((job == null) || job.getJobTasks().isEmpty()) return null;
     submittedJobCount++;
     taskCount += job.getJobTasks().size();
-    job.setBlocking(false);
     job.addJobListener(this);
     currentNbJobs++;
     return job;

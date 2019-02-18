@@ -57,9 +57,8 @@ public class StatsTest {
         for (int i=1; i<= nbJobs; i++) {
           final JPPFJob job = new JPPFJob();
           job.setName("test " + i);
-          job.setBlocking(false);
           for (int j=0; j<tasksPerJob; j++) job.add(new MyTask(duration));
-          client.submitJob(job);
+          client.submit(job);
           if (i >= stopAfter) {
             Thread.sleep(50 + rand.nextInt(150));
             client.close();

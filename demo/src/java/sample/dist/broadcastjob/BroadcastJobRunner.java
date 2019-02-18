@@ -42,7 +42,7 @@ public class BroadcastJobRunner {
       final JPPFJob job = new JPPFJob("broadcast test");
       for (int i=1; i<=nbTasks; i++) job.add(new BroadcastTask()).setId("task " + i);
       job.getSLA().setBroadcastJob(true);
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       for (final Task<?> task: results) {
         final Throwable e = task.getThrowable();
         if (e != null) throw e;

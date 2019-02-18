@@ -74,10 +74,10 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
     }
     final int nbTasks = 20;
     final String name = ReflectionUtils.getCurrentClassAndMethod();
-    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
+    final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 1L);
     // execute only on 1st server
     job.getClientSLA().setExecutionPolicy(new Equal("jppf.server.port", 11101));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     for (final Task<?> t: results) {

@@ -121,13 +121,12 @@ public class TestJobTasksListener extends Setup1D1N {
     try (JPPFClient client = new JPPFClient()) {
       client.awaitWorkingConnectionPool();
       job.setName(ReflectionUtils.getCurrentMethodName());
-      job.setBlocking(false);
       job.getSLA().setCancelUponClientDisconnect(false);
       for (int i=1; i<=nbTasks; i++) job.add(new MyJobTasksListenerTask(String.format("#%02d", i), 100L));
       final CountDownJobListener jobListener = new CountDownJobListener();
       job.addJobListener(jobListener);
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> submitting job");
-      client.submitJob(job);
+      client.submitAsync(job);
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for all tasks to be dispatched");
       jobListener.await(); // wait until all tasks have been dispatched to the server
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for job to be queued in the driver");
@@ -172,7 +171,6 @@ public class TestJobTasksListener extends Setup1D1N {
     try (final JPPFClient client = new JPPFClient()) {
       client.awaitWorkingConnectionPool();
       job.setName(ReflectionUtils.getCurrentMethodName());
-      job.setBlocking(false);
       job.getSLA().setCancelUponClientDisconnect(false);
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(300L));
       job.getSLA().setMaxDispatchExpirations(maxExpirations);
@@ -180,7 +178,7 @@ public class TestJobTasksListener extends Setup1D1N {
       final CountDownJobListener jobListener = new CountDownJobListener();
       job.addJobListener(jobListener);
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> submitting job");
-      client.submitJob(job);
+      client.submitAsync(job);
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for all tasks to be dispatched");
       jobListener.await(); // wait until all tasks have been dispatched to the server
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for job to be queued in the driver");

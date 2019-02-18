@@ -108,8 +108,7 @@ public class WebCrawlerRunner {
     }
     if (job.getJobTasks() == null) return new ArrayList<>();
     job.addJobListener(new CrawlerResultCollector());
-    job.setBlocking(false);
-    client.submitJob(job);
+    client.submitAsync(job);
     return job.awaitResults();
   }
 

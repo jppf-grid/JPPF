@@ -80,7 +80,7 @@ public class ProfilingRunner {
       final JPPFJob job = new JPPFJob();
       job.setName("profiling-" + iter);
       for (int i = 0; i < nbTask; i++) job.add(new EmptyTask(dataSize));
-      jppfClient.submitJob(job);
+      jppfClient.submit(job);
       final long elapsed = System.nanoTime() - start;
       System.out.println("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed / 1000000));
     }

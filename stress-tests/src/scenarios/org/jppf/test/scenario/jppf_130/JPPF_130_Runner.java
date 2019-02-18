@@ -62,8 +62,7 @@ public class JPPF_130_Runner extends AbstractScenarioRunner {
           job.getClientSLA().setMaxChannels(10);
           job.setName("ruleset job_" + n);
           for (int i=0; i<nbTasks; i++) job.add(new JPPF_130_Task(nbLookups));
-          job.setBlocking(false);
-          client.submitJob(job);
+          client.submitAsync(job);
           final List<Task<?>> results = job.awaitResults();
           for (final Task<?> task: results) {
             final Throwable t = task.getThrowable();

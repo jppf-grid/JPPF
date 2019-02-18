@@ -105,9 +105,9 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
       final String[] algos = { "manual", "nodethreads" };
       for (final String algo: algos) {
         for (int i=0; i<jmxList.size(); i++) jmxList.get(i).changeLoadBalancerSettings(algo, lbis.get(i).getParameters());
-        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, NB_TASKS, LifeCycleTask.class, 1L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, NB_TASKS, LifeCycleTask.class, 1L);
         job.getClientSLA().setMaxChannels(2);
-        final List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submit(job);
         checkJobResults(NB_TASKS, results, false);
         assertTrue(checkEmptyChannels(mgt));
       }
@@ -131,9 +131,9 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
       final String[] algos = { "proportional", "autotuned", "rl2" };
       for (final String algo: algos) {
         for (int i=0; i<jmxList.size(); i++) jmxList.get(i).changeLoadBalancerSettings(algo, lbis.get(i).getParameters());
-        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, NB_TASKS, LifeCycleTask.class, 1L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, NB_TASKS, LifeCycleTask.class, 1L);
         job.getClientSLA().setMaxChannels(2);
-        final List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submit(job);
         checkJobResults(NB_TASKS, results, false);
         awaitNoMorePendingOperations(mgt);
         final List<String> channels = mgt.listAllChannels();
@@ -179,11 +179,11 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
         final String algo = algos[i];
         print(false, false, ">>> algo=%-12s", algo);
         for (int j=0; j<jmxList.size(); j++) jmxList.get(j).changeLoadBalancerSettings(algo, lbis.get(j).getParameters());
-        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, NB_TASKS, LifeCycleTask.class, 1L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, NB_TASKS, LifeCycleTask.class, 1L);
         job.getClientSLA().setMaxChannels(2);
         if (i > 0) job.getClientSLA().setExecutionPolicy(new Equal("jppf.driver.uuid", true, "d" + (2 - i % 2)));
         print(false, false, ">>> submitting job %s", job.getName());
-        final List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submit(job);
         print(false, false, ">>> checking job results");
         checkJobResults(NB_TASKS, results, false);
       }
@@ -237,9 +237,9 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
     try {
       final String algo = "proportional";
       for (int i=0; i<jmxList.size(); i++) jmxList.get(i).changeLoadBalancerSettings(algo, lbis.get(i).getParameters());
-      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, NB_TASKS, LifeCycleTask.class, 1L);
+      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, NB_TASKS, LifeCycleTask.class, 1L);
       job.getClientSLA().setMaxChannels(2);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       checkJobResults(NB_TASKS, results, false);
       awaitNoMorePendingOperations(mgt);
       final List<String> channels = mgt.listAllChannels();

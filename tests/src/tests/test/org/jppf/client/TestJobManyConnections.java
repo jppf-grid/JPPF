@@ -61,9 +61,9 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
     final int nbTasks = 100;
     for (int i=1; i<=3; i++) {
       BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> creating job %d", i);
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-" + i, true, false, nbTasks, LifeCycleTask.class, 1L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-" + i, false, nbTasks, LifeCycleTask.class, 1L);
       BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> submitting job %d", i);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> checking job %d results", i);
       testJobResults(nbTasks, results);
     }
@@ -77,11 +77,11 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
   public void testMaxDriverDepth() throws Exception {
     final int nbTasks = 100;
     BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> creating job");
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class);
     job.getClientSLA().setExecutionPolicy(new Equal("jppf.server.port", 11101));
     job.getSLA().setMaxDriverDepth(1);
     BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> submitting job %s", job.getName());
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> checking results for job %s", job.getName());
     testJobResults(nbTasks, results);
     BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> checking single node 'n1' for job %s", job.getName());

@@ -43,7 +43,7 @@ public class WordCountRunner {
     final Parameters params = new Parameters();
     TimeMarker marker = null;
     JobProvider provider = null;
-    try (JPPFClient client = new JPPFClient();
+    try (final JPPFClient client = new JPPFClient();
         // the auto-close of jobProvider will wait until all results are merged
         JobProvider jobProvider = new JobProvider(params.jobCapacity, params)) {
       provider = jobProvider;
@@ -55,7 +55,7 @@ public class WordCountRunner {
       marker = new TimeMarker().start();
       // read the wikipedia file and build jobs according to the configuration parameters
       for (final JPPFJob job:  jobProvider) {
-        if (job != null) client.submitJob(job);
+        if (job != null) client.submitAsync(job);
       }
       // wait until all job results have been processed
       while (jobProvider.hasPendingJob()) Thread.sleep(10L);

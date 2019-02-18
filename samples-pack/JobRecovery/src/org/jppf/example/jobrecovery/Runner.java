@@ -112,7 +112,7 @@ public class Runner {
    * @throws Exception if any error occurs.
    */
   private static void executeJob(final JPPFJob job) throws Exception {
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     for (final Task<?> task : results) {
       if (task.getThrowable() != null) System.out.println("task " + task.getId() + " exception occurred: " + ExceptionUtils.getStackTrace(task.getThrowable()));
       else System.out.println("task " + task.getId() + " result: " + task.getResult());

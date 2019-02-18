@@ -143,10 +143,10 @@ public class TestJobListener extends BaseTest {
       final String startNotification = "start notification";
       final AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(jppfClient, startNotification);
       final int nbTasks = 1;
-      final JPPFJob job = BaseTestHelper.createJob(name, false, false, nbTasks, LifeCycleTask.class, 3000L, true, startNotification);
+      final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 3000L, true, startNotification);
       job.addJobListener(listener);
       print(false, false, "submitting job");
-      jppfClient.submitJob(job);
+      jppfClient.submitAsync(job);
       print(false, false, "waiting for task start notification");
       taskListener.await();
       BaseTestHelper.printToAll(jppfClient, true, true, true, false, false, "resetting client");
@@ -177,10 +177,10 @@ public class TestJobListener extends BaseTest {
     print(false, false, ">>> creating client");
     jppfClient = BaseSetup.createClient(null, false);
     print(false, false, ">>> creating job");
-    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
     print(false, false, ">>> submitting job %s", job.getName());
-    final List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submit(job);
     print(false, false, ">>> got job results");
     assertNotNull(results);
     assertEquals(nbTasks, results.size());

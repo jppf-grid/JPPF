@@ -85,9 +85,9 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
   @Test(timeout = 10000)
   public void testSimpleJobDeserializationError() throws Exception {
     final int nbTasks = 5;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 10L);
     job.getSLA().getClassPath().setForceClassLoaderReset(true);
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     for (final Task<?> task : results) {
@@ -105,10 +105,10 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
   @Test(timeout = 10000)
   public void testSimpleJob() throws Exception {
     final int nbTasks = 5;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 10L);
     final Location<?> loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
     job.getSLA().getClassPath().add(loc);
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     for (final Task<?> task : results) {
@@ -127,12 +127,12 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
   @Test(timeout = 10000)
   public void testJobDispatchExpiration() throws Exception {
     final int nbTasks = 1;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 2500L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 2500L);
     final Location<?> loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
     job.getSLA().getClassPath().add(loc);
     job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(1000L));
     job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", false, "n2"));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     for (final Task<?> task : results) {

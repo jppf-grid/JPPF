@@ -69,11 +69,11 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   public void testJobExpirationAtDateClient() throws Exception {
     try {
       configure(false, true, 1);
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, SimpleTask.class, TIME_LONG);
       final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
       final Date date = new Date(System.currentTimeMillis() + TIME_SHORT);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
       final Task<?> task = results.get(0);
@@ -91,11 +91,11 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   public void testJobExpirationAtDateTooLateClient() throws Exception {
     try {
       configure(false, true, 1);
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_SHORT);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, SimpleTask.class, TIME_SHORT);
       final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
       final Date date = new Date(System.currentTimeMillis() + TIME_LONG);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
       final Task<?> task = results.get(0);
@@ -114,9 +114,9 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   public void testJobExpirationAfterDelayClient() throws Exception {
     try {
       configure(false, true, 1);
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, SimpleTask.class, TIME_LONG);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
       final Task<?> task = results.get(0);
@@ -134,9 +134,9 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   public void testJobExpirationAfterDelayTooLateClient() throws Exception {
     try {
       configure(false, true, 1);
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_SHORT);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, SimpleTask.class, TIME_SHORT);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
       final Task<?> task = results.get(0);
@@ -156,12 +156,12 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
     try {
       configure(false, true, 1);
       final String methodName = ReflectionUtils.getCurrentMethodName();
-      final JPPFJob job1 = BaseTestHelper.createJob(methodName + "-1", false, false, 1, SimpleTask.class, TIME_LONG);
+      final JPPFJob job1 = BaseTestHelper.createJob(methodName + "-1", false, 1, SimpleTask.class, TIME_LONG);
       job1.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
-      final JPPFJob job2 = BaseTestHelper.createJob(methodName + "-2", false, false, 1, SimpleTask.class, TIME_SHORT);
+      final JPPFJob job2 = BaseTestHelper.createJob(methodName + "-2", false, 1, SimpleTask.class, TIME_SHORT);
       job2.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
-      jppfClient.submitJob(job1);
-      jppfClient.submitJob(job2);
+      jppfClient.submitAsync(job1);
+      jppfClient.submitAsync(job2);
       List<Task<?>> results = job1.awaitResults();
       assertNotNull(results);
       assertEquals(results.size(), 1);
@@ -188,9 +188,9 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       configure(true, true, 1);
       BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
       final int nbTasks = 10;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class);
       job.getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", false));
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       for (final Task<?> t: results) {
@@ -214,9 +214,9 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       configure(true, true, 1);
       BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
       final int nbTasks = 10;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class);
       job.getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       for (final Task<?> t: results) {
@@ -240,9 +240,9 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       configure(true, true, 1);
       BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
       final int nbTasks = 10;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 100L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 100L);
       job.getClientSLA().setMaxChannels(1);
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       // check that no 2 tasks were executing at the same time on different channels
@@ -273,9 +273,9 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
       jppfClient.awaitActiveConnectionPool().setMaxJobs(1);
       final int nbTasks = Math.max(2*Runtime.getRuntime().availableProcessors(), 10);
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 100L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 100L);
       job.getClientSLA().setMaxChannels(2);
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       boolean found = false;
@@ -313,11 +313,11 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       jppfClient.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 15));
       BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
       final int nbTasks = 100, maxDispatchSize = 6;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class);
       job.getClientSLA().setMaxDispatchSize(maxDispatchSize);
       final DispatchCounterJobListener listener = new DispatchCounterJobListener();
       job.addJobListener(listener);
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       assertCompare(Operator.AT_MOST, maxDispatchSize, listener.maxDispatchSize);
@@ -340,11 +340,11 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       pool.setMaxJobs(100);
       print(false, false, "got pool %s", pool);
       final int nbTasks = 50;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 10L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 10L);
       job.getClientSLA().setMaxDispatchSize(6).setAllowMultipleDispatchesToSameChannel(true);
       final DispatchCounterJobListener listener = new DispatchCounterJobListener();
       job.addJobListener(listener);
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       assertTrue(listener.multipleConcurrentDispatches);
@@ -367,11 +367,11 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       pool.setMaxJobs(100);
       print(false, false, "got pool %s", pool);
       final int nbTasks = 50;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 10L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 10L);
       job.getClientSLA().setMaxDispatchSize(6).setAllowMultipleDispatchesToSameChannel(false);
       final DispatchCounterJobListener listener = new DispatchCounterJobListener();
       job.addJobListener(listener);
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       assertFalse(listener.multipleConcurrentDispatches);

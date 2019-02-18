@@ -71,7 +71,7 @@ public class Demo {
         task.setId("" + i);
         job.add(task);
       }
-      final List<Task<?>> results = getClient().submitJob(job);
+      final List<Task<?>> results = getClient().submit(job);
       for (final Task<?> task: results) {
         sb.append("Task ").append(task.getId()).append(" : ").append(task.getResult()).append("<br/>");
       }

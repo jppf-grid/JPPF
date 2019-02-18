@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.*;
 import java.util.regex.Pattern;
 
 import org.jppf.client.event.*;
-import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
@@ -142,14 +141,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     }
     return null;
   }
-
-  /**
-   * Submit a JPPFJob for execution.
-   * @param job the job to execute.
-   * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances for a blocking job, or null if the job is non-blocking.
-   * @since 4.0
-   */
-  public abstract List<Task<?>> submitJob(JPPFJob job);
 
   /**
    * Invoked when the status of a client connection has changed.

@@ -98,7 +98,7 @@ public class TestJMX {
     final String listenerID = driverJmx.registerForwardingNotificationListener(new AllNodesSelector(), JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
     final JPPFJob job = new JPPFJob();
     for (int i = 0; i < 5; i++) job.add(new LongTask(100L)).setId(String.valueOf(i + 1));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     Thread.sleep(500L);
     driverJmx.unregisterForwardingNotificationListener(listenerID);
     Thread.sleep(500L);
@@ -119,7 +119,7 @@ public class TestJMX {
         task.setTimeoutSchedule(new JPPFSchedule(50L));
         job.add(task).setId(String.valueOf(j + 1));
       }
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       output(job.getName() + " : received " + results.size() + " results");
     }
   }

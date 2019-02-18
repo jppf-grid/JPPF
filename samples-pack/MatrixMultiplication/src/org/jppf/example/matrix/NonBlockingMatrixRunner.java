@@ -106,7 +106,7 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter {
         job.getDataProvider().setParameter(MatrixTask.DATA_KEY, b);
         job.addJobListener(this);
         // submit the tasks for execution
-        jppfClient.submitJob(job);
+        jppfClient.submit(job);
         waitForResults();
         final List<Task<?>> results = new ArrayList<>();
         for (final Map.Entry<Integer, Task<?>> entry : resultMap.entrySet())
@@ -157,10 +157,9 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter {
         final JPPFJob job = new JPPFJob();
         job.setDataProvider(dataProvider);
         for (int i = 0; i < size; i++) job.add(new MatrixTask(a.getRow(i)));
-        job.setBlocking(false);
         job.addJobListener(this);
         // submit the tasks for execution
-        jppfClient.submitJob(job);
+        jppfClient.submitAsync(job);
         waitForResults();
         final List<Task<?>> results = new ArrayList<>();
         for (final Map.Entry<Integer, Task<?>> entry : resultMap.entrySet())

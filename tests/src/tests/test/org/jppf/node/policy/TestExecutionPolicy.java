@@ -311,7 +311,7 @@ public class TestExecutionPolicy extends AbstractTestExecutionPolicy {
     info.getRuntime().setString("ipv4.addresses", "localhost|192.168.1.14");
     final TestCustomPolicy tcp = new TestCustomPolicy();
     final ExecutionPolicy policy = new Contains("jppf.uuid", true, "AB").and(tcp);
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, 1, LifeCycleTask.class, 0L);
     final JPPFStatistics stats = JPPFStatisticsHelper.createServerStatistics();
     policy.setContext(job.getSLA(), job.getClientSLA(), job.getMetadata(), 2, stats);
     final PolicyContext ctx = tcp.getContext();

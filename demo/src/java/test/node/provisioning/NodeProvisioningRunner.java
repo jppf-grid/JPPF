@@ -72,10 +72,9 @@ public class NodeProvisioningRunner {
 
     System.out.println("submitting job ...");
     final JPPFJob job = new JPPFJob();
-    job.setBlocking(false);
     job.setName("Hello World");
     for (int i=1; i<=4; i++) job.add(new LongTask(30_000L)).setId("task " + i);
-    client.submitJob(job);
+    client.submitAsync(job);
 
     Thread.sleep(2000L);
     System.out.printf("provisioning 0 slaves%n");

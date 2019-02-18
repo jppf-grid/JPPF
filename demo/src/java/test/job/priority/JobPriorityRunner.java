@@ -108,7 +108,6 @@ public class JobPriorityRunner {
       task.setId("" + (i + 1));
       job.add(task);
     }
-    job.setBlocking(false);
     return job;
   }
 
@@ -194,7 +193,7 @@ public class JobPriorityRunner {
     @Override
     public void run() {
       try {
-        jppfClient.submitJob(job);
+        jppfClient.submitAsync(job);
         final List<Task<?>> results = job.awaitResults();
         print("job '" + job.getName() + "' complete");
         for (final Task<?> task : results) {

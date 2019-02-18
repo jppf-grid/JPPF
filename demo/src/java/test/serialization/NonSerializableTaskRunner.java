@@ -39,7 +39,7 @@ public class NonSerializableTaskRunner {
       job.setName("job name");
       job.add(new NonSerializableTask(false));
       job.add(new NonSerializableTask(false));
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       for (final Task<?> task : results) {
         if (task.getThrowable() != null) System.out.printf("task %d got exception: %s%n", task.getPosition(), ExceptionUtils.getStackTrace(task.getThrowable()));
         else System.out.printf("task %d got result: %s%n", task.getPosition(), task.getResult());

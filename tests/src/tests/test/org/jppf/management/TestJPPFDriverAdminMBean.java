@@ -58,7 +58,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
     double n = stats.getSnapshot(NODES).getLatest();
     assertTrue("nb nodes should be 2 but is " + n, n == 2d);
     assertTrue(stats.getSnapshot(TASK_DISPATCH).getTotal() == 0d);
-    client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, duration));
+    client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, duration));
     while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     stats = driver.statistics();
     n = stats.getSnapshot(IDLE_NODES).getLatest();
@@ -80,7 +80,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
   @Test(timeout = 10000)
   public void testResetStatistics() throws Exception {
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 10, LifeCycleTask.class, 100L));
+    client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 10, LifeCycleTask.class, 100L));
     while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     driver.resetStatistics();
     final JPPFStatistics stats = driver.statistics();
@@ -126,8 +126,8 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
     Collection<JPPFManagementInfo> coll = driver.idleNodesInformation();
     assertNotNull(coll);
     assertEquals(2, coll.size());
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
-    client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, 2000L);
+    client.submitAsync(job);
     Thread.sleep(500L);
     coll = driver.idleNodesInformation();
     assertEquals(1, coll.size());
@@ -160,8 +160,8 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
     Thread.sleep(500L);
     int n = driver.nbIdleNodes();
     assertEquals(nbNodes, n);
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
-    client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, 2000L);
+    client.submitAsync(job);
     Thread.sleep(1000L);
     n = driver.nbIdleNodes();
     assertEquals(nbNodes - 1, n);
@@ -269,9 +269,9 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
       int i = 0;
       for (final JPPFManagementInfo info : nodesList) nodeUuids[i++] = info.getUuid();
       // recheck that the job is executed on all nodes
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-1", true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-1", false, nbTasks, LifeCycleTask.class, 0L);
       final Set<String> executedOnUuids = new HashSet<>();
-      List<Task<?>> results = client.submitJob(job);
+      List<Task<?>> results = client.submit(job);
       for (final Task<?> t : results) {
         final LifeCycleTask task = (LifeCycleTask) t;
         if (!executedOnUuids.contains(task.getNodeUuid())) executedOnUuids.add(task.getNodeUuid());
@@ -282,8 +282,8 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
       executedOnUuids.clear();
       final NodeSelector selector = new UuidSelector(nodeUuids[1]);
       driver.toggleActiveState(selector);
-      job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-2", true, false, nbTasks, LifeCycleTask.class, 0L);
-      results = client.submitJob(job);
+      job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-2", false, nbTasks, LifeCycleTask.class, 0L);
+      results = client.submit(job);
       for (final Task<?> t : results) {
         final LifeCycleTask task = (LifeCycleTask) t;
         if (!executedOnUuids.contains(task.getNodeUuid())) executedOnUuids.add(task.getNodeUuid());
@@ -326,9 +326,9 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
       assertFalse(map.get(nodeUuids[0]));
       assertTrue(map.containsKey(nodeUuids[1]));
       assertTrue(map.get(nodeUuids[1]));
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-1", true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-1", false, nbTasks, LifeCycleTask.class, 0L);
       print(false, false, ">>> executing job %s", job.getName());
-      List<Task<?>> results = client.submitJob(job);
+      List<Task<?>> results = client.submit(job);
       print(false, false, ">>> checking results for job %s", job.getName());
       for (final Task<?> t : results) {
         final LifeCycleTask task = (LifeCycleTask) t;
@@ -343,9 +343,9 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
       print(false, false, ">>> setting active state of node %s to true", nodeUuids[0]);
       driver.setActiveState(selector, true);
       waitForNodeInState(driver, nodeUuids[0], true);
-      job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-2", true, false, nbTasks, LifeCycleTask.class, 0L);
+      job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-2", false, nbTasks, LifeCycleTask.class, 0L);
       print(false, false, ">>> executing job %s", job.getName());
-      results = client.submitJob(job);
+      results = client.submit(job);
       print(false, false, ">>> checking results for job %s", job.getName());
       for (final Task<?> t : results) {
         final LifeCycleTask task = (LifeCycleTask) t;

@@ -76,14 +76,13 @@ public class ManyJobsRunner {
       jobs[n] = new JPPFJob();
       final String s = StringUtils.padLeft("" + (n + 1), '0', 4);
       jobs[n].setName("JPPF Job " + s);
-      jobs[n].setBlocking(false);
       jobs[n].getSLA().setPriority((nbJobs - n) / 10);
       //job.getJobSLA().setMaxNodes(1);
       jobs[n].getClientSLA().setMaxChannels(1);
       for (int i = 0; i < nbTask; i++) jobs[n].add(new LongTask(length, false)).setId("job-" + (n + 1) + ':' + (i + 1));
       /* JPPFResultCollector collector = (JPPFResultCollector) jobs[n].getResultListener();
        * jobs[n].setResultListener(collector); */
-      jppfClient.submitJob(jobs[n]);
+      jppfClient.submitAsync(jobs[n]);
     }
     print("submitted " + nbJobs + " jobs");
     for (int n = 0; n < nbJobs; n++) jobs[n].awaitResults();

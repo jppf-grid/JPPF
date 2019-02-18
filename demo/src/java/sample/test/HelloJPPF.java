@@ -82,7 +82,7 @@ public class HelloJPPF implements Serializable {
     for (int i = 1; i < 4; i++) job.add(new InnerTask(i));
     try {
       // execute tasks
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       // show results
       System.out.println("Got " + results.size() + " results: ");
       final Iterator<Task<?>> it = results.iterator();

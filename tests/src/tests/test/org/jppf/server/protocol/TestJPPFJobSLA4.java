@@ -82,9 +82,9 @@ public class TestJPPFJobSLA4 extends BaseTest {
     try {
       client.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 100));
       jmx.changeLoadBalancerSettings("manual", new TypedProperties().setInt("size", 15));
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 10L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 10L);
       job.getSLA().setMaxDispatchSize(maxDispatchSize);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       for (final Task<?> result: results) {
@@ -116,9 +116,9 @@ public class TestJPPFJobSLA4 extends BaseTest {
     try {
       client.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 100));
       jmx.changeLoadBalancerSettings("manual", new TypedProperties().setInt("size", 15));
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, DispatchCountingTask.class);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, DispatchCountingTask.class);
       job.getSLA().setMaxDispatchSize(6).setAllowMultipleDispatchesToSameChannel(true);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       int maxConcurrentDispatches = 0;
@@ -151,9 +151,9 @@ public class TestJPPFJobSLA4 extends BaseTest {
     try {
       client.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 100));
       jmx.changeLoadBalancerSettings("manual", new TypedProperties().setInt("size", 15));
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, DispatchCountingTask.class);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, DispatchCountingTask.class);
       job.getSLA().setMaxDispatchSize(6).setAllowMultipleDispatchesToSameChannel(false);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       int maxConcurrentDispatches = 0;

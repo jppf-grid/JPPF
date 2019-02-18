@@ -71,7 +71,6 @@ public class DBRunner {
         task.setId("" + i);
         job.add(task);
       }
-      job.setBlocking(false);
       // customize the result listener to display a message each time a task result is received
       final JobListener jobListener = new JobListenerAdapter() {
         @Override
@@ -83,7 +82,7 @@ public class DBRunner {
         }
       };
       job.addJobListener(jobListener);
-      jppfClient.submitJob(job);
+      jppfClient.submitAsync(job);
       Thread.sleep(timeBeforeRestartNode);
       // restart the node to demonstrate the transaction recovery
       output("restarting node");

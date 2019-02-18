@@ -81,9 +81,9 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       final int nbTasks = 100;
       for (final String algo: algos) {
         client.setLoadBalancerSettings(algo, lbi.getParameters());
-        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, nbTasks, LifeCycleTask.class, 0L);
         job.getClientSLA().setMaxChannels(2);
-        final List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submit(job);
         checkJobResults(nbTasks, results, false);
         assertTrue(checkEmptyChannels(mgt));
       }
@@ -112,9 +112,9 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       final int nbTasks = 100;
       for (final String algo: algos) {
         client.setLoadBalancerSettings(algo, lbi.getParameters());
-        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, nbTasks, LifeCycleTask.class, 0L);
         job.getClientSLA().setMaxChannels(2);
-        final List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submit(job);
         checkJobResults(nbTasks, results, false);
         awaitNoMorePendingOperations(mgt);
         final List<String> channels = mgt.listAllChannels();
@@ -160,10 +160,10 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       for (int i=0; i<algos.length; i++) {
         final String algo = algos[i];
         client.setLoadBalancerSettings(algo, lbi.getParameters());
-        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, nbTasks, LifeCycleTask.class, 0L);
         job.getClientSLA().setMaxChannels(2);
         if (i > 0) job.getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", i == 1));
-        final List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submit(job);
         checkJobResults(nbTasks, results, false);
       }
       awaitNoMorePendingOperations(mgt);
@@ -223,9 +223,9 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       final String algo = "proportional";
       final int nbTasks = 100;
       client.setLoadBalancerSettings(algo, lbi.getParameters());
-      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, nbTasks, LifeCycleTask.class, 0L);
       job.getClientSLA().setMaxChannels(2);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       checkJobResults(nbTasks, results, false);
       awaitNoMorePendingOperations(mgt);
       final List<String> channels = mgt.listAllChannels();
@@ -274,7 +274,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       final String algo = "proportional";
       final int nbTasks = 100;
       client.setLoadBalancerSettings(algo, lbi.getParameters());
-      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, false, nbTasks, LifeCycleTask.class, 0L);
       job.getClientSLA().setMaxChannels(2);
       job.addJobListener(new JobListenerAdapter() {
         @Override
@@ -282,7 +282,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
           print(false, false, "job '%s' dispatching %d tasks to %s", event.getJob().getName(), event.getJobTasks().size(), event.getConnection());
         }
       });
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       checkJobResults(nbTasks, results, false);
       awaitNoMorePendingOperations(mgt);
       final List<String> channels = mgt.listAllChannels();

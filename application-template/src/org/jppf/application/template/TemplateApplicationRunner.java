@@ -95,13 +95,10 @@ public class TemplateApplicationRunner {
     // Create a job
     final JPPFJob job = createJob("Template blocking job");
 
-    // set the job in blocking mode.
-    job.setBlocking(true);
-
     // Submit the job and wait until the results are returned.
     // The results are returned as a list of Task<?> instances,
     // in the same order as the one in which the tasks where initially added to the job.
-    final List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submit(job);
 
     // process the results
     processExecutionResults(job.getName(), results);
@@ -117,13 +114,10 @@ public class TemplateApplicationRunner {
     // Create a job
     final JPPFJob job = createJob("Template non-blocking job");
 
-    // set the job in non-blocking (or asynchronous) mode.
-    job.setBlocking(false);
-
     // Submit the job. This call returns immediately without waiting for the execution of
     // the job to complete. As a consequence, the object returned for a non-blocking job is
     // always null. Note that we are calling the exact same method as in the blocking case.
-    jppfClient.submitJob(job);
+    jppfClient.submitAsync(job);
 
     // the non-blocking job execution is asynchronous, we can do anything else in the meantime
     System.out.println("Doing something while the job is executing ...");
@@ -167,11 +161,8 @@ public class TemplateApplicationRunner {
       // create a job with a distinct name
       final JPPFJob job = createJob("Template concurrent job " + i);
 
-      // set the job in non-blocking (or asynchronous) mode.
-      job.setBlocking(false);
-
       // submit the job for execution, without blocking the current thread
-      jppfClient.submitJob(job);
+      jppfClient.submitAsync(job);
 
       // add this job to the list
       jobList.add(job);

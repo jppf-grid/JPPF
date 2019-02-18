@@ -81,9 +81,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   @Test(timeout = TEST_TIMEOUT)
   public void testCancelJob() throws Exception {
     final int nbTasks = 10;
-    final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
+    final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 5000L);
     final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
-    client.submitJob(job);
+    client.submitAsync(job);
     listener.await();
     final DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
@@ -277,7 +277,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   private static List<JPPFJob> createMultipleJobs(final int nbJobs, final int nbTasks, final long taskDuration, final String namePrefix, final boolean suspended) throws Exception {
     final List<JPPFJob> jobs = new ArrayList<>();
     for (int i=1; i<= nbJobs; i++) {
-      final JPPFJob job = BaseTestHelper.createJob(namePrefix + '-' + i, false, false, nbTasks, LifeCycleTask.class, taskDuration);
+      final JPPFJob job = BaseTestHelper.createJob(namePrefix + '-' + i, false, nbTasks, LifeCycleTask.class, taskDuration);
       job.getSLA().setSuspended(suspended);
       jobs.add(job);
     }
@@ -299,7 +299,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
     print(false, false, "waiting for %d connections in the pool", n);
     pool.awaitWorkingConnections(Operator.EQUAL, n);
     print(false, false, "submitting %d jobs", n);
-    for (JPPFJob job: jobs) client.submitJob(job);
+    for (JPPFJob job: jobs) client.submitAsync(job);
     print(false, false, "checking jobs");
     action.call();
     print(false, false, "waiting for %d active connections", n);
@@ -317,8 +317,8 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = TEST_TIMEOUT)
   public void testCancelJobAfterCompletion() throws Exception {
-    final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), true, false, 1, LifeCycleTask.class, TIME_SHORT);
-    final List<Task<?>> results = client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, 1, LifeCycleTask.class, TIME_SHORT);
+    final List<Task<?>> results = client.submit(job);
     assertEquals(1, results.size());
     assertNotNull(results.get(0));
     assertNotNull(results.get(0).getResult());
@@ -339,9 +339,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
     assertNotNull(driver);
     final DriverJobManagementMBean jobManager = driver.getJobManager();
     assertNotNull(jobManager);
-    final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3500L);
+    final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 3500L);
     job.getSLA().setSuspended(true);
-    client.submitJob(job);
+    client.submitAsync(job);
     Thread.sleep(1000L);
     jobManager.resumeJob(job.getUuid());
     Thread.sleep(1000L);
@@ -365,7 +365,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
     try {
       print(false, false, "changing driver load-balancer settings");
       driver.changeLoadBalancerSettings("manual", new TypedProperties().setInt("size", 1));
-      final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 2000L);
+      final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 2000L);
       final JobSLA sla = job.getSLA();
       final JobMetadata metadata = job.getMetadata();
       sla.setMaxNodes(1);
@@ -377,7 +377,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
       final MyNotifListener listener = new MyNotifListener(job);
       jobManager.addNotificationListener(listener, null, null);
       print(false, false, "submitting job");
-      client.submitJob(job);
+      client.submitAsync(job);
       print(false, false, "awaiting JOB_DISPATCHED notifications");
       listener.await();
       print(false, false, "removing notification listener");

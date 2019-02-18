@@ -55,7 +55,7 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
     final URL url = getClass().getClassLoader().getResource("client-resource-1.txt");
     printOut("local url = %s", url);
     final String name = ReflectionUtils.getCurrentMethodName();
-    final List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name, true, false, 1, MyTask.class));
+    final List<Task<?>> results = client.submit(BaseTestHelper.createJob(name, false, 1, MyTask.class));
     assertNotNull(results);
     assertEquals(1, results.size());
     final MyTask task = (MyTask) results.get(0);

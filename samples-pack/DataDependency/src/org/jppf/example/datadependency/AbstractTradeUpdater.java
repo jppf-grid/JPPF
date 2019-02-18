@@ -224,12 +224,11 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable {
     private void submitOneJobPerNode(final String nodeId, final List<String> tradeIdList) throws Exception {
       final JPPFJob job = new JPPFJob();
       job.setName("Job (" + jobCount.incrementAndGet() + ")");
-      job.setBlocking(false);
       // set an execution policy that forces execution on the node with the specified id
       job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", false, nodeId));
       // create a task for each trade
       for (String tradeId: tradeIdList) job.add(createTask(tradeId));
-      jppfClient.submitJob(job);
+      jppfClient.submitAsync(job);
       resultsExecutor.execute(new ResultCollectionTask(job, timestamp));
     }
 
@@ -246,11 +245,10 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable {
       for (final String tradeId: tradeIdList) {
         final JPPFJob job = new JPPFJob();
         job.setName("[Node id=" + nodeId + "] trade=" + tradeId + " (" + jobCount.incrementAndGet() + ")");
-        job.setBlocking(false);
         // set an execution policy that forces execution on the node with the specified id
         job.getSLA().setExecutionPolicy(policy);
         job.add(createTask(tradeId));
-        jppfClient.submitJob(job);
+        jppfClient.submitAsync(job);
         resultsExecutor.execute(new ResultCollectionTask(job, timestamp));
       }
     }

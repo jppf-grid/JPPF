@@ -197,7 +197,6 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
     newJob.setSLA(job.getSLA());
     newJob.setClientSLA(job.getJob().getClientSLA());
     newJob.setMetadata(job.getMetadata());
-    newJob.setBlocking(job.getJob().isBlocking());
     newJob.setName(job.getName());
     for (final Task<?> task : tasks) {
       // needed as JPPFJob.addTask() resets the position

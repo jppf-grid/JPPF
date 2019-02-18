@@ -119,9 +119,9 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
       assertEquals(Integer.valueOf(0), taskMonitor.getTotalTasksSucessfull());
       assertEquals(Long.valueOf(0L), taskMonitor.getTotalTaskCpuTime());
       assertEquals(Long.valueOf(0L), taskMonitor.getTotalTaskElapsedTime());
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task_2");
-      client.submitJob(job);
+      client.submit(job);
       assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> taskMonitor.getTotalTasksExecuted() == 2, 3000L, 250L, false));
       assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksInError());
       assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksSucessfull());
@@ -143,9 +143,9 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
   public void testReset() throws Exception {
     final long duration = 100L;
     try {
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task_2");
-      client.submitJob(job);
+      client.submit(job);
       assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> taskMonitor.getTotalTasksExecuted() == 2, 3000L, 250L, false));
       assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksInError());
       assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksSucessfull());
@@ -175,9 +175,9 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
     final NodeNotificationListener listener = new NodeNotificationListener();
     try {
       taskMonitor.addNotificationListener(listener, null, null);
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks - 1, LifeCycleTask.class, duration);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks - 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task_" + nbTasks);
-      final List<Task<?>> result = client.submitJob(job);
+      final List<Task<?>> result = client.submit(job);
       assertTrue(ConcurrentUtils.awaitCondition(() -> listener.notifs.size() == nbTasks + 1, 3000L, 250L, false));
       assertNull(listener.exception);
       assertEquals(1, listener.userObjects.size());

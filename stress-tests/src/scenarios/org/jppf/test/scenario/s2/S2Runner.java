@@ -49,8 +49,8 @@ public class S2Runner extends AbstractScenarioRunner {
 
       for (int i = 1; i <= nbJobs; i++) {
         final long start = System.nanoTime();
-        final JPPFJob job = BaseTestHelper.createJob("S2-job-" + i, true, false, nbTasks, LifeCycleTask.class, 0L);
-        getSetup().getClient().submitJob(job);
+        final JPPFJob job = BaseTestHelper.createJob("S2-job-" + i, false, nbTasks, LifeCycleTask.class, 0L);
+        getSetup().getClient().submit(job);
         final long elapsed = (System.nanoTime() - start) / 1000000L;
         if (elapsed < min) min = elapsed;
         if (elapsed > max) max = elapsed;

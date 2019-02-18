@@ -124,9 +124,9 @@ public class AbstractNonStandardSetup extends BaseTest {
     final int nbNodes = getNbNodes();
     final int nbTasks = tasksPerNode * nbNodes;
     final String name = ReflectionUtils.getCurrentClassAndMethod();
-    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 250L);
+    final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 250L);
     job.getClientSLA().setExecutionPolicy(policy);
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     final CollectionMap<String, Task<?>> map = new ArrayListHashMap<>();
@@ -164,8 +164,8 @@ public class AbstractNonStandardSetup extends BaseTest {
       assertEquals(2, pool.getConnections(JPPFClientConnectionStatus.workingStatuses()).size()); 
       final String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
       final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
-      for (int i=1; i<=nbJobs; i++) jobs.add(BaseTestHelper.createJob(name + '-' + i, false, false, nbTasks, LifeCycleTask.class, 10L));
-      for (final JPPFJob job: jobs) client.submitJob(job);
+      for (int i=1; i<=nbJobs; i++) jobs.add(BaseTestHelper.createJob(name + '-' + i, false, nbTasks, LifeCycleTask.class, 10L));
+      for (final JPPFJob job: jobs) client.submitAsync(job);
       for (final JPPFJob job: jobs) {
         final List<Task<?>> results = job.awaitResults();
         assertNotNull(results);
@@ -193,8 +193,8 @@ public class AbstractNonStandardSetup extends BaseTest {
     final int tasksPerNode = 5;
     final int nbNodes = getNbNodes();
     final int nbTasks = tasksPerNode * nbNodes;
-    final JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 1000L);
-    client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, nbTasks, LifeCycleTask.class, 1000L);
+    client.submitAsync(job);
     Thread.sleep(1500L);
     client.cancelJob(job.getUuid());
     final List<Task<?>> results = job.awaitResults();
@@ -217,8 +217,8 @@ public class AbstractNonStandardSetup extends BaseTest {
     final int tasksPerNode = 5;
     final int nbNodes = getNbNodes();
     final int nbTasks = tasksPerNode * nbNodes;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
-    final List<Task<?>> results = client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, NotSerializableTask.class, false);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     for (final Task<?> task: results) {
@@ -237,8 +237,8 @@ public class AbstractNonStandardSetup extends BaseTest {
     final int tasksPerNode = 5;
     final int nbNodes = getNbNodes();
     final int nbTasks = tasksPerNode * nbNodes;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
-    final List<Task<?>> results = client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, NotSerializableTask.class, false);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     for (final Task<?> task: results) {

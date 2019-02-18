@@ -79,10 +79,9 @@ public class SerializationOverflowRunner {
     final JPPFJob job = new JPPFJob();
     job.setName(name);
     for (int j = 1; j <= nbTasks; j++) job.add(new SerializationOverflowTask(time, j));
-    job.setBlocking(blocking);
     if (blocking) {
       output("* submitting job '" + job.getName() + "'");
-      final List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submit(job);
       output("+ got results for job " + job.getName());
       for (final Task<?> task : results) {
         final Throwable e = task.getThrowable();
@@ -94,7 +93,7 @@ public class SerializationOverflowRunner {
       //for (JPPFTask t: results) output((String) t.getResult());
     } else {
       job.getSLA().setCancelUponClientDisconnect(true);
-      jppfClient.submitJob(job);
+      jppfClient.submitAsync(job);
       output("job '" + job.getName() + "' submitted");
     }
   }

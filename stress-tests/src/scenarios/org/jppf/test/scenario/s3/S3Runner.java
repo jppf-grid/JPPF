@@ -51,9 +51,9 @@ public class S3Runner extends AbstractScenarioRunner {
 
       for (int i = 1; i <= nbJobs; i++) {
         final long start = System.nanoTime();
-        final JPPFJob job = BaseTestHelper.createJob("S3-job-" + i, true, false, nbTasks, MyTask.class, count);
+        final JPPFJob job = BaseTestHelper.createJob("S3-job-" + i, false, nbTasks, MyTask.class, count);
         job.getMetadata().setParameter("job.name", "job-" + i);
-        getSetup().getClient().submitJob(job);
+        getSetup().getClient().submit(job);
         final long elapsed = (System.nanoTime() - start) / 1000000L;
         if (elapsed < min) min = elapsed;
         if (elapsed > max) max = elapsed;

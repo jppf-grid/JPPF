@@ -161,10 +161,10 @@ public class TestScriptedPolicy extends Setup1D2N1C {
   @Test(timeout=5000)
   public void testInServerGroovy() throws Exception {
     final ScriptedPolicy p = new ScriptedPolicy("groovy", "jppfSystemInfo.getJppf().getString('jppf.node.uuid') == 'n2'");
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, 0L);
     job.getSLA().setExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(4000L)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), 1);
     final Task<?> task = results.get(0);
@@ -180,10 +180,10 @@ public class TestScriptedPolicy extends Setup1D2N1C {
   @Test(timeout=5000)
   public void testInServerJavascript() throws Exception {
     final ScriptedPolicy p = new ScriptedPolicy("javascript", "jppfSystemInfo.getJppf().getString('jppf.node.uuid') == 'n2'");
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, 0L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, 0L);
     job.getSLA().setExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(4000L)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), 1);
     final Task<?> task = results.get(0);
@@ -201,10 +201,10 @@ public class TestScriptedPolicy extends Setup1D2N1C {
     try {
       client.setLocalExecutionEnabled(true);
       final ExecutionPolicy p = new Equal("jppf.channel.local", true).and(new ScriptedPolicy("groovy", "true"));
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, 0L);
       job.getClientSLA().setExecutionPolicy(p);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(4000L)); // to avoid the job being stuck
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
       final Task<?> task = results.get(0);

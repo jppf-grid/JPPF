@@ -58,9 +58,9 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       jmx.changeLoadBalancerSettings("manual", new TypedProperties().setInt("size", 1));
       final NotifyingTaskListener listener = new NotifyingTaskListener();
       listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
-      final JPPFJob job = BaseTestHelper.createJob2(ReflectionUtils.getCurrentMethodName(), true, false, new NotifyingTask(100L), new NotifyingTask(5000L));
+      final JPPFJob job = BaseTestHelper.createJob2(ReflectionUtils.getCurrentMethodName(), false, new NotifyingTask(100L), new NotifyingTask(5000L));
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(2000L));
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), 2);
       Task<?> task = results.get(0);
@@ -106,9 +106,9 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       BaseTestHelper.printToAll(client, false, "trace 2");
       //Thread.sleep(250);
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotifyingTask.class, 5000L, true, true);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, NotifyingTask.class, 5000L, true, true);
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(750L)).setMaxDispatchExpirations(maxExpirations);
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       BaseTestHelper.printToAll(client, false, "trace 3");
       assertNotNull(results);
       assertEquals(results.size(), 1);

@@ -197,8 +197,8 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
     final String[] dsNames = { "commonDS", "nodeDS" };
     for (final String dsName: dsNames) {
       final String name = method + "_" + dsName;
-      final JPPFJob job = BaseTestHelper.createJob(name, true, false, 1, DBTask.class, dsName, "h2dump_" + name + ".log");
-      final List<Task<?>> results = client.submitJob(job);
+      final JPPFJob job = BaseTestHelper.createJob(name, false, 1, DBTask.class, dsName, "h2dump_" + name + ".log");
+      final List<Task<?>> results = client.submit(job);
       for (final Task<?> task: results) {
         throwUnknown(task.getThrowable());
         assertNull(task.getThrowable());
@@ -216,10 +216,10 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
   public void testDatasourceExecutionPolicy() throws Exception {
     final String method = ReflectionUtils.getCurrentMethodName();
     for (int i=1; i<=BaseSetup.nbNodes(); i++) {
-      final JPPFJob job = BaseTestHelper.createJob(method + "_" + i, true, false, 1, DSInfoTask.class);
+      final JPPFJob job = BaseTestHelper.createJob(method + "_" + i, false, 1, DSInfoTask.class);
       final String uuid = "n" + i;
       job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", false, uuid));
-      final List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submit(job);
       assertNotNull(results);
       assertEquals(1, results.size());
       final DSInfoTask task = (DSInfoTask) results.get(0);

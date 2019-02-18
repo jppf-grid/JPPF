@@ -119,7 +119,6 @@ public class J2EEDemo {
         final JPPFJob job = new JPPFJob();
         final String name = jobNamePrefix + ' ' + n;
         job.setName(name);
-        job.setBlocking(false);
         for (int i=1; i<=nbTasks; i++) job.add(new DemoTask(duration)).setId(name + " task " + i);
         id = connection.submit(job);
         idList.add(id);

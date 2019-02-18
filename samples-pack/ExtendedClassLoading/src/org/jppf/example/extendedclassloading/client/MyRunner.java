@@ -115,7 +115,7 @@ public class MyRunner {
    */
   private static void executeJob(final JPPFClient client, final JPPFJob job) throws Exception {
     // submit the job to the grid
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
 
     // process the results
     output("*** results for job '" + job.getName() + "'");

@@ -77,11 +77,11 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   @Test(timeout=8000)
   public void testJobExpirationAtDate() throws Exception {
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, SimpleTask.class, TIME_LONG);
     final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
     final Date date = new Date(System.currentTimeMillis() + TIME_SHORT);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), 1);
     final Task<?> task = results.get(0);
@@ -94,11 +94,11 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   @Test(timeout=8000)
   public void testJobExpirationAtDateTooLate() throws Exception {
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_SHORT);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, SimpleTask.class, TIME_SHORT);
     final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
     final Date date = new Date(System.currentTimeMillis() + TIME_LONG);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), 1);
     final Task<?> task = results.get(0);
@@ -112,9 +112,9 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   @Test(timeout=8000)
   public void testJobExpirationAfterDelay() throws Exception {
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, SimpleTask.class, TIME_LONG);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), 1);
     final Task<?> task = results.get(0);
@@ -127,9 +127,9 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   @Test(timeout=8000)
   public void testJobExpirationAfterDelayTooLate() throws Exception {
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_SHORT);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, SimpleTask.class, TIME_SHORT);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), 1);
     final Task<?> task = results.get(0);
@@ -143,10 +143,10 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   @Test(timeout=5000)
   public void testSuspendedJobExpiration() throws Exception {
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, SimpleTask.class, TIME_LONG);
     job.getSLA().setSuspended(true);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), 1);
     final Task<?> task = results.get(0);
@@ -159,12 +159,12 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   @Test(timeout=10000)
   public void testMultipleJobsExpiration() throws Exception {
-    final JPPFJob job1 = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", false, false, 1, SimpleTask.class, TIME_LONG);
+    final JPPFJob job1 = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", false, 1, SimpleTask.class, TIME_LONG);
     job1.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
-    final JPPFJob job2 = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", false, false, 1, SimpleTask.class, TIME_SHORT);
+    final JPPFJob job2 = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", false, 1, SimpleTask.class, TIME_SHORT);
     job2.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
-    client.submitJob(job1);
-    client.submitJob(job2);
+    client.submitAsync(job1);
+    client.submitAsync(job2);
     List<Task<?>> results = job1.awaitResults();
     assertNotNull(results);
     assertEquals(results.size(), 1);
@@ -191,9 +191,9 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     f.deleteOnExit();
     try {
       assertFalse(f.exists());
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, FileTask.class, fileName, false);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, FileTask.class, fileName, false);
       job.getSLA().setCancelUponClientDisconnect(false);
-      client.submitJob(job);
+      client.submitAsync(job);
       Thread.sleep(1000L);
       client.close();
       Thread.sleep(2000L);
@@ -221,12 +221,12 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
       final JPPFJob[] jobs = new JPPFJob[nbJobs];
       final ExecutionPolicy policy = new Equal("jppf.node.uuid", false, "n1");
       for (int i=0; i<nbJobs; i++) {
-        jobs[i] = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + i, false, false, 1, LifeCycleTask.class, 750L);
+        jobs[i] = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + i, false, 1, LifeCycleTask.class, 750L);
         jobs[i].getSLA().setPriority(i);
         jobs[i].getSLA().setExecutionPolicy(policy);
       }
       for (int i=0; i<nbJobs; i++) {
-        client.submitJob(jobs[i]);
+        client.submitAsync(jobs[i]);
         if (i == 0) Thread.sleep(500L);
       }
       final List<List<Task<?>>> results = new ArrayList<>(nbJobs);
@@ -248,9 +248,9 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
   @Test(timeout=8000)
   public void testJobExecutionPolicy() throws Exception {
     final int nbTasks = 10;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class);
     job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", false, "n2"));
-    final List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (final Task<?> t: results) {
@@ -268,9 +268,9 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
   @Test(timeout=8000)
   public void testBroadcastJob() throws Exception {
     final String suffix = "node-";
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, true, 1, FileTask.class, suffix, true);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, 1, FileTask.class, suffix, true);
     job.getSLA().setMaxNodes(2);
-    client.submitJob(job);
+    client.submit(job);
     for (int i=1; i<=2; i++) {
       final File file = new File("node-n" + i + ".tmp");
       try {
@@ -293,14 +293,14 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
       pool.setSize(2);
       pool.awaitConnections(Operator.EQUAL, 2, 5000L, JPPFClientConnectionStatus.workingStatuses());
       final String methodName = ReflectionUtils.getCurrentMethodName();
-      final JPPFJob job1 = BaseTestHelper.createJob(methodName + "-normal", false, false, 10, LifeCycleTask.class, 500L);
+      final JPPFJob job1 = BaseTestHelper.createJob(methodName + "-normal", false, 10, LifeCycleTask.class, 500L);
       job1.getSLA().setPriority(1000);
       final String suffix = "broadcast-node-";
-      final JPPFJob job2 = BaseTestHelper.createJob(methodName + "-broadcast", false, true, 1, FileTask.class, suffix, true);
+      final JPPFJob job2 = BaseTestHelper.createJob(methodName + "-broadcast", true, 1, FileTask.class, suffix, true);
       job2.getSLA().setPriority(-1000);
-      client.submitJob(job1);
+      client.submitAsync(job1);
       Thread.sleep(500L);
-      client.submitJob(job2);
+      client.submitAsync(job2);
       job1.awaitResults();
       job2.awaitResults();
       for (int i=1; i<=2; i++) {
@@ -324,10 +324,10 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
   @Test(timeout=5000)
   public void testBroadcastJobNoNodeAvailable() throws Exception {
     final String suffix = "node-";
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, true, 1, FileTask.class, suffix, true);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, 1, FileTask.class, suffix, true);
     job.getSLA().setMaxNodes(2);
     job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", false, "no node has this as uuid!"));
-    client.submitJob(job);
+    client.submit(job);
     for (int i=1; i<=2; i++) {
       final File file = new File("node-n" + i + ".tmp");
       try {
@@ -374,7 +374,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   private static void checkSendResultsStrategy(final String jobName, final String strategyName, final int expectedReturnedCount) throws Exception {
     final int nbTasks = 20;
-    final JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, LifeCycleTask.class, 1L);
+    final JPPFJob job = BaseTestHelper.createJob(jobName, false, nbTasks, LifeCycleTask.class, 1L);
     final AtomicInteger returnedCount = new AtomicInteger(0);
     final JobListener listener = new JobListenerAdapter() {
       @Override
@@ -384,7 +384,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     };
     job.addJobListener(listener);
     job.getSLA().setResultsStrategy(strategyName);
-    client.submitJob(job);
+    client.submit(job);
     assertEquals(expectedReturnedCount, returnedCount.get());
   }
 
