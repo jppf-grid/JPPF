@@ -59,7 +59,7 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
   @Override
   public void actionPerformed(final ActionEvent event) {
     final AbstractButton btn = (AbstractButton) event.getSource();
-    location = ((btn != null) && btn.isShowing()) ? location = btn.getLocationOnScreen() : new Point(0, 0);
+    location = ((btn != null) && btn.isShowing()) ? btn.getLocationOnScreen() : new Point(0, 0);
     thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/VisibleStatsPanel.xml");
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), LocalizationUtils.getLocalized(BASE, "visible.columns.panel.label"), false);
     final PickListOption option = (PickListOption) thisPanel.findFirstWithName("visible.stats.selection");
