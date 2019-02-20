@@ -17,18 +17,19 @@
  */
 package org.jppf.ui.monitoring.node.actions;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
 
 import javax.swing.*;
 
-import org.jppf.client.monitoring.topology.*;
-import org.jppf.management.*;
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
+import org.jppf.management.JPPFSystemInformation;
 import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.factory.OptionsHandler;
-import org.jppf.ui.utils.*;
+import org.jppf.ui.utils.TopologyUtils;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -73,7 +74,8 @@ public class SystemInformationAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("system.information"), false);
+    final Frame frame = OptionsHandler.getMainWindow();
+    final JDialog dialog = new JDialog(frame, localize("system.information"), false);
     dialog.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
     dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
     dialog.addWindowListener(new WindowAdapter() {
@@ -99,6 +101,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
     };
     setOkCancelKeys(panel, null, escAction);
     readyDialog(dialog, panel, location);
+    dialog.setSize(600, 600);
     runAction(new AsyncRunnable(dialog, editor));
   }
 

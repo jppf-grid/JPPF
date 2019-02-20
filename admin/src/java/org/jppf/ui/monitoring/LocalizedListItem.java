@@ -20,13 +20,14 @@ package org.jppf.ui.monitoring;
 
 import java.util.Locale;
 
+import org.jppf.ui.picklist.Tooltipped;
 import org.jppf.utils.LocalizationUtils;
 
 /**
  * Instances of this class are the items displayed in the pick list.
  * @author Laurent Cohen
  */
-public class LocalizedListItem {
+public class LocalizedListItem implements Tooltipped {
   /**
    * The non-localized name of this item.
    */
@@ -101,6 +102,7 @@ public class LocalizedListItem {
   /**
    * @return the localized tooltip of this item.
    */
+  @Override
   public String getTooltip() {
     return tooltip;
   }

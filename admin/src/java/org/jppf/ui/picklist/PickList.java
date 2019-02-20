@@ -84,18 +84,8 @@ public class PickList<T> extends JPanel {
    * Default constructor.
    */
   public PickList() {
-    final JComponent compLeft = setupList(availableList, null, new ListSelectionListener() {
-      @Override
-      public void valueChanged(final ListSelectionEvent e) {
-        onAvailableSelectionChange();
-      }
-    });
-    final JComponent compRight = setupList(pickedList, null, new ListSelectionListener() {
-      @Override
-      public void valueChanged(final ListSelectionEvent e) {
-        onPickedSelectionChange();
-      }
-    });
+    final JComponent compLeft = setupList(availableList, null, event -> onAvailableSelectionChange());
+    final JComponent compRight = setupList(pickedList, null, event -> onPickedSelectionChange());
     final MigLayout layout = new MigLayout("insets 0");
     setLayout(layout);
     add(compLeft, "grow, push");
@@ -120,6 +110,7 @@ public class PickList<T> extends JPanel {
     GuiUtils.adjustScrollbarsThickness(scrollPane);
     scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    list.setCellRenderer(new TooltippedListCellRenderer());
     return scrollPane;
   }
 
@@ -292,16 +283,18 @@ public class PickList<T> extends JPanel {
         maxItem = item;
       }
     }
+    availableList.setPrototypeCellValue(maxItem);
     final List<T> availableItems = new ArrayList<>(allItems);
     availableItems.removeAll(pickedItems);
     DefaultListModel<Object> model = (DefaultListModel<Object>) availableList.getModel();
     model.removeAllElements();
-    for (Object o: availableItems) model.addElement(o);
+    for (final Object o: availableItems) model.addElement(o);
+    availableList.setVisibleRowCount(allItems.size());
+    pickedList.setPrototypeCellValue(maxItem);
     model = (DefaultListModel<Object>) pickedList.getModel();
     model.removeAllElements();
-    for (Object o: pickedItems) model.addElement(o);
-    availableList.setPrototypeCellValue(maxItem);
-    pickedList.setPrototypeCellValue(maxItem);
+    for (final Object o: pickedItems) model.addElement(o);
+    pickedList.setVisibleRowCount(allItems.size());
   }
 
   /**
@@ -463,4 +456,15 @@ public class PickList<T> extends JPanel {
     }
   }
 
+  /**
+   * A ListCellRenderer that displays a tooltip, if any, for each cell.
+   */
+  private static class TooltippedListCellRenderer extends DefaultListCellRenderer {
+    @Override
+    public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+      final JLabel comp = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+      if (value instanceof Tooltipped) comp.setToolTipText(((Tooltipped) value).getTooltip());
+      return comp;
+    }
+  }
 }
