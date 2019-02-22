@@ -25,17 +25,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.management.*;
-
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.job.*;
-import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
 import org.jppf.utils.streams.StreamUtils;
@@ -268,63 +263,6 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
   }
 
   /**
-   * Test that a job is only executed on one node at a time.
-   * @throws Exception if any error occurs.
-   */
-  @Test(timeout=8000)
-  @Ignore
-  public void testJobMaxNodes() throws Exception {
-    final int nbTasks = 5 * BaseSetup.nbNodes();
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);
-    job.getSLA().setMaxNodes(1);
-    final List<Task<?>> results = client.submitJob(job);
-    assertNotNull(results);
-    assertEquals(results.size(), nbTasks);
-    // check that no 2 tasks were executing at the same time on different nodes
-    for (int i=0; i<results.size()-1; i++) {
-      final LifeCycleTask t1 = (LifeCycleTask) results.get(i);
-      final Range<Double> r1 = new Range<>(t1.getStart(), t1.getStart() + t1.getElapsed());
-      for (int j=i+1; j<results.size(); j++) {
-        final LifeCycleTask t2 = (LifeCycleTask) results.get(j);
-        final Range<Double> r2 = new Range<>(t2.getStart(), t2.getStart() + t2.getElapsed());
-        assertFalse("r1=" + r1 + ", r2=" + r2 + ", uuid1=" + t1.getNodeUuid() + ", uuid2=" + t2.getNodeUuid(),
-            r1.intersects(r2, false) && !t1.getNodeUuid().equals(t2.getNodeUuid()));
-      }
-    }
-  }
-
-  /**
-   * Test that a job is executed on both nodes.
-   * @throws Exception if any error occurs.
-   */
-  @Test(timeout=8000)
-  @Ignore
-  public void testJobMaxNodes2() throws Exception {
-    final int nbTasks = 5 * BaseSetup.nbNodes();
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);
-    job.getSLA().setMaxNodes(2);
-    final List<Task<?>> results = client.submitJob(job);
-    assertNotNull(results);
-    assertEquals(results.size(), nbTasks);
-    boolean found = false;
-    // check that at least 2 tasks were executing at the same time on different nodes
-    for (int i=0; i<results.size()-1; i++) {
-      final LifeCycleTask t1 = (LifeCycleTask) results.get(i);
-      final Range<Double> r1 = new Range<>(t1.getStart(), t1.getStart() + t1.getElapsed());
-      for (int j=i+1; j<results.size(); j++) {
-        final LifeCycleTask t2 = (LifeCycleTask) results.get(j);
-        final Range<Double> r2 = new Range<>(t2.getStart(), t2.getStart() + t2.getElapsed());
-        if (r1.intersects(r2) && !t1.getNodeUuid().equals(t2.getNodeUuid())) {
-          found = true;
-          break;
-        }
-      }
-      if (found) break;
-    }
-    assertTrue(found);
-  }
-
-  /**
    * Test that a broadcast job is executed on all nodes.
    * @throws Exception if any error occurs.
    */
@@ -398,53 +336,6 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
       } finally {
         if (file.exists()) file.delete();
       }
-    }
-  }
-
-  /**
-   * Test that a job is not resubmitted when the SLA flag {@code applyMaxResubmitsUponNoError} is true
-   * and {@code maxTaskResubmits} is set to 0.
-   * @throws Exception if any error occurs.
-   */
-  @Test(timeout=10000)
-  @Ignore
-  public void testApplyMaxResubmitsUponNodeError() throws Exception {
-    try {
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, LifeCycleTask.class, 15000L);
-      final ExecutionPolicy n1Policy = new Equal("jppf.uuid", false, "n1");
-      job.getSLA().setExecutionPolicy(n1Policy);
-      job.getSLA().setMaxTaskResubmits(0);
-      job.getSLA().setApplyMaxResubmitsUponNodeError(true);
-      JPPFConnectionPool pool;
-      while ((pool = client.getConnectionPool()) == null) Thread.sleep(10L);
-      final JMXDriverConnectionWrapper jmx = pool.getJmxConnection();
-      final DriverJobManagementMBean jobManager = jmx.getJobManager();
-      final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
-      // restart the node upon first dispatch of the job to this node
-      final NotificationListener listener = new NotificationListener() {
-        @Override
-        public synchronized void handleNotification(final Notification notification, final Object handback) {
-          final JobNotification jobNotif = (JobNotification) notification;
-          if (jobNotif.getEventType() == JobEventType.JOB_DISPATCHED) {
-            try {
-              Thread.sleep(500L);
-              forwarder.forwardInvoke(new UuidSelector("n1"), JPPFNodeAdminMBean.MBEAN_NAME, "restart");
-            } catch (@SuppressWarnings("unused") final Exception ignore) {
-              //ignore.printStackTrace();
-            }
-          }
-        }
-      };
-      jobManager.addNotificationListener(listener, null, null);
-      final List<Task<?>> results = client.submitJob(job);
-      assertNotNull(results);
-      assertEquals(1, results.size());
-      final LifeCycleTask task = (LifeCycleTask) results.get(0);
-      assertNull(task.getResult());
-      assertNull(task.getThrowable());
-      assertNull(task.getNodeUuid());
-    } finally {
-      BaseSetup.checkDriverAndNodesInitialized(1, 2);
     }
   }
 
