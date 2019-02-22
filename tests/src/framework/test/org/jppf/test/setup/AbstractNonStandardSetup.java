@@ -70,7 +70,6 @@ public class AbstractNonStandardSetup extends BaseTest {
     commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-" + BaseSetup.SLF4J_VERSION + ".jar");
     commonCP.add("../JPPF/lib/log4j/*");
     commonCP.add("../JPPF/lib/LZ4/*");
-    commonCP.add("../jmxremote/classes");
     commonCP.add("../jmxremote-nio/classes");
     commonCP.add("../JPPF/lib/ApacheCommons/commons-io-2.4.jar");
     commonCP.add("../JPPF/lib/JNA/*");

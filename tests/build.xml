@@ -46,7 +46,6 @@
   <property name="samples-pack"       value="${basedir}/../samples-pack"/>
 
   <property file="${jppf}/bin/build.properties"/>
-  <property file="${basedir}/../jmxremote/build.properties"/>
   <property file="${jppf}/bin/build.number"/>
 
   <!-- ========================================================================= -->
@@ -61,7 +60,6 @@
     <pathelement location="${addons.classes}"/>
     <pathelement location="${client}/classes"/>
     <pathelement location="${common}/classes"/>
-    <pathelement location="${jmxremote}/classes"/>
     <pathelement location="${jmxremote-nio}/classes"/>
     <pathelement location="${node}/classes"/>
     <pathelement location="${lib}/Groovy/groovy-all-1.6.5.jar"/>

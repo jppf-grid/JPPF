@@ -138,6 +138,7 @@
         <exclude name="*atmosphere*.jar"/>
         <exclude name="*guice*.jar"/>
         <exclude name="javax.servlet*.jar"/>
+        <exclude name="*javadoc*.jar"/>
         <exclude name="maven*.jar"/>
       </lib>
       <fileset dir="${basedir}/webapp" excludes="WEB-INF/web.xml"/>

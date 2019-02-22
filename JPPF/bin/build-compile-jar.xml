@@ -131,7 +131,6 @@ limitations under the License.
   <target name="jar" depends="compile" unless="jar.done">
     <jar.module module="node"/>
     <jar.module module="common"/>
-    <jar.module module="jmxremote" jar="jmxremote_optional" version="${jmx.version.number}"/>
     <jar.module module="jmxremote-nio"/>
     <jar.module module="client"/>
     <jar.module module="admin"/>
@@ -176,7 +175,6 @@ limitations under the License.
   <!-- ==================================================================== -->
 
   <target name="jar.src" depends="compile" unless="jar.src.done">
-    <jar.src.module module="jmxremote" jar="jmxremote_optional" version="${jmx.version.number}"/>
     <jar.src.module module="common"/>
     <jar.src.module module="jmxremote-nio"/>
     <jar.src.module module="node"/>

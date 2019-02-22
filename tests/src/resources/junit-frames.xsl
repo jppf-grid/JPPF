@@ -248,6 +248,7 @@ h4 { font-size: 12pt; font-weight: bold }
 h5 { font-size: 10pt; font-weight: bold; margin-top: 10pt; margin-bottom: 10pt }
 table  { font-size: 11pt; font-family: Arial, Verdana, sans-serif; margin: 0px }
 hr { margin: 2px; border: 5 px solid #E2E4F0; color: #E2E4F0; background-color: #E2E4F0; }
+code { font-size: 10pt }
 </xsl:template>
 
 <!-- Create list of all/failed/errored/skipped tests -->

@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.management.*;
 import javax.management.remote.MBeanServerForwarder;
 
+import org.apache.log4j.Level;
 import org.jppf.jmx.JMXHelper;
 import org.jppf.management.*;
 import org.jppf.utils.JPPFConfiguration;
@@ -34,17 +35,19 @@ import org.jppf.utils.collections.CollectionUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
-import test.org.jppf.test.setup.BaseTest;
+import test.org.jppf.test.setup.*;
 
 /**
  * Unit tests for the the JMXMPServer class.
  * @author Laurent Cohen
  */
-public class TestJMXMPServer extends BaseTest {
+public class TestJMXServer extends BaseTest {
   /** */
   private static final String[] PARAMS = {"param1", "param2", "param3"};
   /** */
   private final static int PORT = 4444;
+  /** */
+  private final static String[] debugLoggers = { "org.jppf.management", "org.jppf.utils.ReflectionHelper", "org.jppf.jmxremote.JPPFJMXConnectorServer" };
 
   /**
    * Register the test mbean.
@@ -54,6 +57,7 @@ public class TestJMXMPServer extends BaseTest {
   public static void setup() throws Exception {
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     server.registerMBean(new StandardMBean(new MyTest(), MyTestMBean.class), ObjectNameCache.getObjectName(MyTestMBean.MBEAN_NAME));
+    BaseSetup.setLoggerLevel(Level.DEBUG, debugLoggers);
   }
 
   /**
@@ -65,6 +69,7 @@ public class TestJMXMPServer extends BaseTest {
     JPPFConfiguration.remove(JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     server.unregisterMBean(ObjectNameCache.getObjectName(MyTestMBean.MBEAN_NAME));
+    BaseSetup.setLoggerLevel(Level.INFO, debugLoggers);
   }
 
   /**
@@ -75,9 +80,10 @@ public class TestJMXMPServer extends BaseTest {
   public void testNoMBeanForwarder() throws Exception {
     JMXServer server = null;
     try {
-      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT);
-      JPPFConfiguration.remove(JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
-      server = new JMXMPServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
+      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT)
+        .set(JPPFProperties.JMX_REMOTE_PROTOCOL, JMXHelper.JPPF_JMX_PROTOCOL)
+        .remove(JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
+      server = JMXServerFactory.createServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       final MBeanServerForwarder mbsf = server.getMBeanServerForwarder();
       assertNull(mbsf);
@@ -101,18 +107,17 @@ public class TestJMXMPServer extends BaseTest {
     JMXServer server = null;
     JMXConnectionWrapper client = null;
     try {
-      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT)
+      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT).set(JPPFProperties.JMX_REMOTE_PROTOCOL, JMXHelper.JPPF_JMX_PROTOCOL)
         .set(JPPFProperties.MANAGEMENT_SERVER_FORWARDER, CollectionUtils.concatArrays(new String[] {Forwarder1.class.getName()}, PARAMS));
-      server = new JMXMPServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
+      server = JMXServerFactory.createServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       final MBeanServerForwarder mbsf = server.getMBeanServerForwarder();
       assertTrue(mbsf instanceof Forwarder1);
       final Forwarder1 forwarder = (Forwarder1) mbsf;
       final String[] params = forwarder.getParameters();
       assertTrue(Arrays.equals(PARAMS, params));
-      client = new JMXConnectionWrapper(JMXHelper.JMXMP_PROTOCOL, "localhost", PORT, false);
-      client.connectAndWait(9000L);
-      assertTrue(client.isConnected());
+      client = new JMXConnectionWrapper(JMXHelper.JPPF_JMX_PROTOCOL, "localhost", PORT, false);
+      assertTrue(client.connectAndWait(5000L));
       final MyTestMBean mbean = client.getProxy(MyTestMBean.MBEAN_NAME, MyTestMBean.class);
       assertNotNull(mbean);
       mbean.reset();
@@ -125,6 +130,7 @@ public class TestJMXMPServer extends BaseTest {
       assertEquals("myMethod1", mbean.myMethod1());
       assertEquals(6, mbean.myMethod2(3));
       assertEquals(8, mbean.myMethod2(4));
+      Thread.sleep(500L);
       checkCounter(forwarder.getMap, "StringAttribute", 2);
       checkCounter(forwarder.setMap, "StringAttribute", 1);
       checkCounter(forwarder.getMap, "IntAttribute", 2);
@@ -158,19 +164,17 @@ public class TestJMXMPServer extends BaseTest {
     JMXServer server = null;
     JMXConnectionWrapper client = null;
     try {
-      JPPFConfiguration
-        .set(JPPFProperties.MANAGEMENT_PORT, PORT)
+      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT).set(JPPFProperties.JMX_REMOTE_PROTOCOL, JMXHelper.JPPF_JMX_PROTOCOL)
         .set(JPPFProperties.MANAGEMENT_SERVER_FORWARDER, CollectionUtils.concatArrays(new String[] {Forwarder2.class.getName()}, PARAMS));
-      server = new JMXMPServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
+      server = JMXServerFactory.createServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       final MBeanServerForwarder mbsf = server.getMBeanServerForwarder();
       assertTrue(mbsf instanceof Forwarder2);
       final Forwarder2 forwarder = (Forwarder2) mbsf;
       final String[] params = forwarder.getParameters();
       assertTrue(Arrays.equals(PARAMS, params));
-      client = new JMXConnectionWrapper(JMXHelper.JMXMP_PROTOCOL, "localhost", PORT, false);
-      client.connectAndWait(9000L);
-      assertTrue(client.isConnected());
+      client = new JMXConnectionWrapper(JMXHelper.JPPF_JMX_PROTOCOL, "localhost", PORT, false);
+      assertTrue(client.connectAndWait(5000L));
       final MyTestMBean mbean = client.getProxy(MyTestMBean.MBEAN_NAME, MyTestMBean.class);
       assertNotNull(mbean);
       mbean.reset();
@@ -215,6 +219,7 @@ public class TestJMXMPServer extends BaseTest {
    * @throws Exception if any error occurs.
    */
   private static void checkCounter(final Map<String, AtomicInteger> map, final String key, final int expected) throws Exception {
+    print(false, false, "checking that counter for %s == %d", key, expected);
     if (expected == 0) assertNull(map.get(key));
     else {
       final AtomicInteger n = map.get(key);
@@ -230,23 +235,26 @@ public class TestJMXMPServer extends BaseTest {
     /**
      * These maps hold counters for getAttribute(), setAttribute() or invoke() calls, where the key is an attribute or method name.
      */
-    Map<String, AtomicInteger> getMap = new HashMap<>(), setMap = new HashMap<>(), invokeMap = new HashMap<>();
+    final Map<String, AtomicInteger> getMap = new HashMap<>(), setMap = new HashMap<>(), invokeMap = new HashMap<>();
 
     @Override
     public Object getAttribute(final ObjectName name, final String attribute) throws MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException {
-      inc(getMap, attribute);
+      final int n = inc(getMap, attribute);
+      print(false, false, "counter for getter %s incremented to %d", attribute, n);
       return super.getAttribute(name, attribute);
     }
 
     @Override
     public void setAttribute(final ObjectName name, final Attribute attribute) throws InstanceNotFoundException, AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException {
-      inc(setMap, attribute.getName());
+      final int n = inc(setMap, attribute.getName());
+      print(false, false, "counter for setter %s incremented to %d", attribute, n);
       super.setAttribute(name, attribute);
     }
 
     @Override
     public Object invoke(final ObjectName name, final String operationName, final Object[] params, final String[] signature) throws InstanceNotFoundException, MBeanException, ReflectionException {
-      inc(invokeMap, operationName);
+      final int n = inc(invokeMap, operationName);
+      print(false, false, "counter for invoke %s incremented to %d", operationName, n);
       return super.invoke(name, operationName, params, signature);
     }
 
@@ -254,11 +262,15 @@ public class TestJMXMPServer extends BaseTest {
      * Incrementer the counter for the specified key in he specified map.
      * @param map the map where the counter is found or created.
      * @param key the key for which to increment or create the counter.
+     * @return the new counter value.
      */
-    private static void inc(final Map<String, AtomicInteger> map, final String key) {
-      AtomicInteger n = map.get(key);
-      if (n == null) map.put(key, n = new AtomicInteger(0));
-      n.incrementAndGet();
+    private static int inc(final Map<String, AtomicInteger> map, final String key) {
+      AtomicInteger n;
+      synchronized(map) {
+        n = map.get(key);
+        if (n == null) map.put(key, n = new AtomicInteger(0));
+      }
+      return n.incrementAndGet();
     }
 
     /**

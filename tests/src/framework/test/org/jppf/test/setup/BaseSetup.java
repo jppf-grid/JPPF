@@ -431,7 +431,6 @@ public class BaseSetup {
     commonCP.add(dir);
     commonCP.add("../node/classes");
     commonCP.add("../common/classes");
-    commonCP.add("../jmxremote/classes");
     commonCP.add("../jmxremote-nio/classes");
     commonCP.add("../JPPF/lib/slf4j/slf4j-api-" + SLF4J_VERSION + ".jar");
     commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-" + SLF4J_VERSION + ".jar");

@@ -23,9 +23,8 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.*;
 
-import javax.management.*;
+import javax.management.MBeanServerConnection;
 import javax.management.remote.*;
-import javax.management.remote.generic.GenericConnector;
 
 import org.jppf.jmx.*;
 import org.jppf.ssl.SSLHelper;
@@ -146,7 +145,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * @throws Exception if any error occcurs.
    */
   private void initJMXMP() throws Exception {
-    env.put(GenericConnector.OBJECT_WRAPPING, JMXMPServer.newObjectWrapping());
+    env.put("jmx.remote.object.wrapping", JMXMPServer.newObjectWrapping());
     env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "com.sun.jmx.remote.protocol");
     env.put("jmx.remote.x.server.max.threads", 1);
     env.put("jmx.remote.x.client.connection.check.period", 0);

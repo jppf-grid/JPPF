@@ -51,8 +51,6 @@
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-src-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote-nio-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-jmxremote-nio-src-${version.number}.jar"/>
-        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
-        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-jmxremote_optional-src-${jmx.version.number}.jar"/>
         <zipfileset dir="${lib}/ApacheCommons" prefix="${@{module}.prefix}/lib" includes="${ApacheCommons.inc}"/>
         <zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="${log4j.inc}"/>
         <zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib" includes="${slf4j.inc}"/>

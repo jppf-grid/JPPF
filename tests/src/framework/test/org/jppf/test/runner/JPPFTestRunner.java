@@ -95,7 +95,6 @@ public class JPPFTestRunner {
     try {
       final TestConfiguration config = new TestConfiguration();
       final List<String> commonCP = new ArrayList<>();
-      commonCP.add("../jmxremote/classes");
       commonCP.add("../lib/jppf-common.jar");
       commonCP.add("../lib/jppf-node.jar");
       commonCP.add("../lib/slf4j-api-" + BaseSetup.SLF4J_VERSION + ".jar");

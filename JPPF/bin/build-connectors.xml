@@ -43,7 +43,6 @@
       <fileset dir="${build}">
         <include name="jppf-client*.jar"/>
         <include name="jppf-common*.jar"/>
-        <include name="jppf-jmxremote_optional*.jar"/>
         <include name="jppf-jmxremote-nio*.jar"/>
         <exclude name="jppf*src*.jar"/>
       </fileset>

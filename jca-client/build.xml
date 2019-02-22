@@ -349,7 +349,6 @@
           <include name="jppf-common-${version.number}.jar" />
           <include name="jppf-client-${version.number}.jar" />
           <include name="jppf-jmxremote-nio-${version.number}.jar" />
-          <include name="jppf-jmxremote_optional-1.2.1.jar" />
           <include name="lz4-1.3.0.jar" />
           <include name="slf4j-api-*.jar" />
           <include name="slf4j-@{logging}-*.jar" />

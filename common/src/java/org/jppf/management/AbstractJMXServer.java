@@ -164,6 +164,7 @@ public abstract class AbstractJMXServer implements JMXServer {
     if (debugEnabled) log.debug("starting {} for protocol={}", getClass().getSimpleName(), protocol);
     final JPPFProperty<String[]> prop = JPPFProperties.MANAGEMENT_SERVER_FORWARDER;
     forwarder = ReflectionHelper.invokeDefaultOrStringArrayConstructor(MBeanServerForwarder.class, prop.getName(), config.get(prop));
+    if (debugEnabled) log.debug("server forwarder = {}", forwarder);
     while (!found) {
       try {
         url = new JMXServiceURL(protocol,  null, managementPort);

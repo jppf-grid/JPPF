@@ -23,8 +23,8 @@ import static org.junit.Assert.*;
 import java.util.Map;
 
 import javax.management.remote.*;
-import javax.management.remote.generic.GenericConnector;
 
+import org.jppf.jmx.JMXHelper;
 import org.jppf.jmxremote.JPPFJMXConnector;
 import org.jppf.management.*;
 import org.jppf.utils.JPPFConfiguration;
@@ -50,7 +50,7 @@ public class TestEnvironmentProviders extends BaseTest {
     JMXConnectionWrapper client = null;
     try {
       TestClientEnvironmentProvider.active = true;
-      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port);
+      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port).set(JPPFProperties.JMX_REMOTE_PROTOCOL, JMXHelper.JPPF_JMX_PROTOCOL);
       //server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server = JMXServerFactory.createServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
@@ -58,7 +58,8 @@ public class TestEnvironmentProviders extends BaseTest {
       client.connectAndWait(3000L);
       assertTrue(client.isConnected());
       final JMXConnector jmxc = client.getJmxconnector();
-      final Map<String, ?> actual = (jmxc instanceof GenericConnector) ? ((GenericConnector) jmxc).getEnv() : ((JPPFJMXConnector) jmxc).getEnvironment();
+      assertTrue(jmxc instanceof JPPFJMXConnector);
+      final Map<String, ?> actual = ((JPPFJMXConnector) jmxc).getEnvironment();
       final Map<String, ?> expected = TestClientEnvironmentProvider.env;
       for (final Map.Entry<String, ?> entry: expected.entrySet()) {
         final String key = entry.getKey();
@@ -97,8 +98,7 @@ public class TestEnvironmentProviders extends BaseTest {
     JMXConnectionWrapper client = null;
     try {
       TestServerEnvironmentProvider.active = true;
-      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port);
-      //server = new JMXMPServer("serverTest", false, JPPFProperties.MANAGEMENT_PORT);
+      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port).set(JPPFProperties.JMX_REMOTE_PROTOCOL, JMXHelper.JPPF_JMX_PROTOCOL);
       server = JMXServerFactory.createServer(JPPFConfiguration.getProperties(), "serverTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       client = new JMXConnectionWrapper("localhost", port, false);

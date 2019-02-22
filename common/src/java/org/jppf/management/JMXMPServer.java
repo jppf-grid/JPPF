@@ -19,10 +19,11 @@
 package org.jppf.management;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.*;
 import java.util.*;
 
-import javax.management.remote.generic.*;
-
+import org.jppf.JPPFUnsupportedOperationException;
+import org.jppf.comm.socket.BootstrapObjectSerializer;
 import org.jppf.jmx.JMXHelper;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -38,11 +39,19 @@ public class JMXMPServer extends AbstractJMXServer {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JMXMPServer.class);
+  private static final Logger log = LoggerFactory.getLogger(JMXMPServer.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * Determines whether trace log statements are enabled.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * 
+   */
+  static final ObjectWrappingInvocationHandler objectWrappingInvocationHandler = new ObjectWrappingInvocationHandler();
   /**
    * An ordered set of configuration properties to use for looking up the desired management port.
    */
@@ -70,6 +79,7 @@ public class JMXMPServer extends AbstractJMXServer {
   @Override
   public void start(final ClassLoader cl) throws Exception {
     if (debugEnabled) log.debug("starting remote connector server");
+    System.out.println("starting JMXMP server");
     final ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     lock.lock();
     try {
@@ -96,9 +106,34 @@ public class JMXMPServer extends AbstractJMXServer {
 
   /**
    * @return a new instance of an implementation of {@code ObjectWrapping}.
+   * @throws Exception if any eror occurs.
+   * @exclude
    */
-  public static ObjectWrapping newObjectWrapping() {
-    //return new CustomWrapping();
-    return new CustomWrapping2();
+  public static Object newObjectWrapping() throws Exception {
+    final ClassLoader cl = JMXMPServer.class.getClassLoader();
+    final Class<?>[] infs = { Class.forName("javax.management.remote.generic.ObjectWrapping", true, cl) };
+    return Proxy.newProxyInstance(cl, infs, objectWrappingInvocationHandler);
+  }
+
+  /**
+   * @exclude
+   */
+  public static class ObjectWrappingInvocationHandler implements InvocationHandler {
+    /**
+     * 
+     */
+    private static final BootstrapObjectSerializer SERIALIZER = new BootstrapObjectSerializer();
+
+    @Override
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+      if ("wrap".equals(method.getName())) {
+        if (traceEnabled) log.trace("wrap: arg0 is a {} : {}", SystemUtils.getSystemIdentity(args[0]), args[0]);
+        return SERIALIZER.serialize(args[0]).buffer;
+      } else if ("unwrap".equals(method.getName())) {
+        if (traceEnabled) log.trace("unwrap: arg0 is a {} : {}", SystemUtils.getSystemIdentity(args[0]), args[0]);
+        return SERIALIZER.deserialize((byte[]) args[0]);
+      }
+      throw new JPPFUnsupportedOperationException("no support for %s" + method);
+    }
   }
 }

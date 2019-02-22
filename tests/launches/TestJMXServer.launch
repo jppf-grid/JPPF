@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.junit.launchconfig">
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-        <listEntry value="/tests"/>
+        <listEntry value="/tests/src/tests/test/org/jppf/management/TestJMXServer.java"/>
     </listAttribute>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
-        <listEntry value="4"/>
+        <listEntry value="1"/>
     </listAttribute>
     <stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
     <booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
@@ -25,7 +25,7 @@
         <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jmxremote-nio&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
     </listAttribute>
     <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
-    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="test.org.jppf.management.TestJMXMPServer"/>
+    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="test.org.jppf.management.TestJMXServer"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="tests"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx256m -Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource -Dlog4j.configuration=config/log4j-client.properties -Djava.util.logging.config.file=classes/tests/config/logging-client.properties"/>
 </launchConfiguration>
