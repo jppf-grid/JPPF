@@ -5,12 +5,12 @@ Thank you very much for taking the time to contribute.
 ## Reporting Bugs
 
 * Ensure the bug was not already reported by searching on GitHub under [Issues](https://github.com/jppf-grid/JPPF/issues).
-* If you can't find an open issue addressing the problem, [open a new one](https://github.com/BOINC/boinc/issues/new).
+* If you can't find an open issue addressing the problem, [open a new one](https://github.com/jppf-grid/JPPF/issues/new/choose).
 
 ## Suggesting Enhancements and new Features
 
 * Ensure the feature or enhancement was not already requested by searching on GitHub under [Issues](https://github.com/jppf-grid/JPPF/issues).
-* If don't find an open issue tackling the idea, [open a new one](https://github.com/jppf-grid/JPPF/issues/new).
+* If don't find an open issue tackling the idea, [open a new one](https://github.com/jppf-grid/JPPF/issues/new/choose).
 
 ## Making Pull Requests
 
