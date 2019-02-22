@@ -122,30 +122,10 @@ public class PickList<T> extends JPanel {
     final JPanel panel = new JPanel();
     final MigLayout layout = new MigLayout("fill, flowy, insets 0 8 0 8");
     panel.setLayout(layout);
-    btnLeft = createButton("Left", "/org/jppf/ui/resources/move-left.png", new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        doLeft();
-      }
-    });
-    btnRight = createButton("Right", "/org/jppf/ui/resources/move-right.png", new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        doRight();
-      }
-    });
-    btnUp = createButton("Up", "/org/jppf/ui/resources/move-up.png", new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        doUp();
-      }
-    });
-    btnDown = createButton("Down", "/org/jppf/ui/resources/move-down.png", new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        doDown();
-      }
-    });
+    btnLeft = createButton("Left", "/org/jppf/ui/resources/arrow-left-double-2.png", event -> doLeft());
+    btnRight = createButton("Right", "/org/jppf/ui/resources/arrow-right-double-2.png", event -> doRight());
+    btnUp = createButton("Up", "/org/jppf/ui/resources/arrow-up-double-2.png", event -> doUp());
+    btnDown = createButton("Down", "/org/jppf/ui/resources/arrow-down-double-2.png", event -> doDown());
     panel.add(btnLeft, "grow 0");
     panel.add(btnRight, "grow 0");
     panel.add(btnUp, "grow 0");
