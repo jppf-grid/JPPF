@@ -63,9 +63,9 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> implements NioCha
    */
   private boolean serverSide;
   /**
-   * The associated MBeanServer (server-side).
+   * The associated connector server (server-side).
    */
-  private MBeanServer mbeanServer;
+  private JPPFJMXConnectorServer jxmConnectorServer;
   /**
    * The associated MBeanServerConnection (clientr-side).
    */
@@ -227,18 +227,18 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> implements NioCha
   }
 
   /**
-   * @return the associated MBeanServer (server-side), if any.
+   * @return the associated JMXConnectorServer (server-side), if any.
    */
-  public MBeanServer getMbeanServer() {
-    return mbeanServer;
+  public JPPFJMXConnectorServer getJxmConnectorServer() {
+    return jxmConnectorServer;
   }
 
   /**
    * Set the associated MBeanServer (server-side).
-   * @param mbeanServer a {@link MBeanServer} instance.
+   * @param connectorServer a {@link JPPFJMXConnectorServer} instance.
    */
-  public void setMbeanServer(final MBeanServer mbeanServer) {
-    this.mbeanServer = mbeanServer;
+  public void setJxmConnectorServer(final JPPFJMXConnectorServer connectorServer) {
+    this.jxmConnectorServer = connectorServer;
   }
 
   /**

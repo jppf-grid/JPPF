@@ -111,7 +111,7 @@ class JMXMessageReader {
     boolean isException = false;
     Object result = null;
     final Object[] p = request.getParams();
-    final MBeanServer mbs = context.getChannels().getMbeanServer();
+    final MBeanServer mbs = context.getChannels().getJxmConnectorServer().getMBeanServer();
     final JMXNioServer jmxServer = context.getServer();
     try {
       checkRequestAuthorization(context, request);
