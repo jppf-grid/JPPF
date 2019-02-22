@@ -37,11 +37,11 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFJMXConnectorServer.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFJMXConnectorServer.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The environment key for the {@link JMXAuthorizationChecker authorization checker}.
    */
@@ -50,7 +50,7 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
    * The environment key for the MBean server.
    * @exclude
    */
-  public static final String MBEAN_SERVER_KEY = "jppf.jmxremote.internal.mbeanserver";
+  public static final String CONNECTOR_SERVER_KEY = "jppf.jmxremote.internal.connectorserver";
   /**
    * The environment for this connector.
    */
@@ -63,6 +63,10 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
    * Whether this connector server is started.
    */
   private boolean started = false;
+  /**
+   * An optional mbean server forwarder that can be set onto this connector.
+   */
+  private MBeanServerForwarder forwarder;
 
   /**
    * Initalize this connector server with the specified  service URL, environemnt and MBean server.
@@ -73,7 +77,7 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
   public JPPFJMXConnectorServer(final JMXServiceURL serviceURL, final Map<String, ?> environment, final MBeanServer mbeanServer) {
     super(mbeanServer);
     if (environment != null) this.environment.putAll(environment);
-    this.environment.put(MBEAN_SERVER_KEY, mbeanServer);
+    this.environment.put(CONNECTOR_SERVER_KEY, this);
     this.address = serviceURL;
   }
 
@@ -86,7 +90,7 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
       final boolean secure = (tls == null) ? false : tls;
       NioHelper.getAcceptorServer().addServer(port, secure, environment, false);
       if (debugEnabled) log.debug("server @{} added listener port {}", address, port);
-      for (JMXNioServer server: JMXNioServerPool.getServers()) server.addConnectionStatusListener(this);
+      for (final JMXNioServer server: JMXNioServerPool.getServers()) server.addConnectionStatusListener(this);
       started = true;
       if (debugEnabled) log.debug("successfully started server @{}", address);
     } catch (final IOException e) {
@@ -102,7 +106,7 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
       if (!started) return;
       started = false;
       try {
-        for (JMXNioServer server: JMXNioServerPool.getServers()) {
+        for (final JMXNioServer server: JMXNioServerPool.getServers()) {
           server.removeAllConnections(address.getPort());
         }
       } finally {
@@ -151,5 +155,16 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
   public void connectionFailed(final JMXConnectionStatusEvent event) {
     if (debugEnabled) log.debug("server @{} connection failed event = {}", address, event);
     connectionFailed(event.getConnectionID(), "connection failed", ExceptionUtils.getStackTrace(event.getThrowable()));
+  }
+
+  @Override
+  public synchronized void setMBeanServerForwarder(final MBeanServerForwarder mbsf) {
+    if (debugEnabled) log.debug("setting MBeanServerForwarder = {}", mbsf);
+    super.setMBeanServerForwarder(mbsf);
+  }
+
+  @Override
+  public synchronized MBeanServer getMBeanServer() {
+    return (forwarder == null) ? super.getMBeanServer() : forwarder;
   }
 }

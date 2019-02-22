@@ -26,7 +26,6 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.*;
 
-import javax.management.MBeanServer;
 import javax.management.remote.*;
 import javax.net.ssl.*;
 
@@ -191,9 +190,9 @@ public final class JMXNioServer extends StatelessNioServer implements JMXNioServ
     final ChannelsPair pair = new ChannelsPair(readingChannel, writingChannel, this, authenticator);
     if (!client) pair.setAuhtorizationChecker(env.get(JPPFJMXConnectorServer.AUTHORIZATION_CHECKER));
     final JMXMessageHandler handler = new JMXMessageHandler(pair, env);
-    final MBeanServer mbeanServer = (MBeanServer) env.get(JPPFJMXConnectorServer.MBEAN_SERVER_KEY);
+    final JPPFJMXConnectorServer connectorServer = (JPPFJMXConnectorServer) env.get(JPPFJMXConnectorServer.CONNECTOR_SERVER_KEY);
     pair.setConnectionID(connectionID);
-    pair.setMbeanServer(mbeanServer);
+    pair.setJxmConnectorServer(connectorServer);
     pair.setServerPort(port);
     readingChannel.setMessageHandler(handler);
     writingChannel.setMessageHandler(handler);
