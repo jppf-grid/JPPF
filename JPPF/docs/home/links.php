@@ -127,6 +127,7 @@
 		}
 		mysql_free_result($result);
 ?>
+    <div class="blockWithHighlightedTitle">
 <?php
 		$count = 0;
 		foreach ($groups as $key => $value)
@@ -141,7 +142,6 @@
 ?>
 				<ul>
 <?php
-				$ref = $key . "." . $line["q_id"];
 				printf("<li><div align='justify'><span class='linksub'><a href='%s'>%s</a>:</span> %s</div></li>", $line["url"], $line["title"], $line["desc"]);
 ?>
 				</ul>
@@ -153,6 +153,7 @@
 		// Closing connection
 		mysql_close($link);
 ?>
+    <br></div>
 </div>
 				</td>
 				</tr>

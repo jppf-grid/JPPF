@@ -19,6 +19,7 @@ $template{name="about-page-header" title="Links"}$
 		mysql_free_result($result);
 ?>
 
+    <div class="blockWithHighlightedTitle">
 <?php
 		$count = 0;
 		foreach ($groups as $key => $value)
@@ -33,7 +34,6 @@ $template{name="about-page-header" title="Links"}$
 ?>
 				<ul>
 <?php
-				$ref = $key . "." . $line["q_id"];
 				printf("<li><div align='justify'><span class='linksub'><a href='%s'>%s</a>:</span> %s</div></li>", $line["url"], $line["title"], $line["desc"]);
 ?>
 				</ul>
@@ -45,4 +45,5 @@ $template{name="about-page-header" title="Links"}$
 		// Closing connection
 		mysql_close($link);
 ?>
+    <br></div>
 $template{name="about-page-footer"}$
