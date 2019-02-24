@@ -164,7 +164,7 @@
         <td align="left" style="font-size: 9pt; color: #6D78B6">
           <a href="/"><img src="/images/jppf_group_large.gif" border="0" alt="JPPF"/></a>
         </td>
-        <td align="middle" valign="middle" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2018 JPPF.org</td>
+        <td align="middle" valign="middle" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2019 JPPF.org</td>
         <td align="right">
           <a href="https://sourceforge.net/projects/jppf-project">
             <img src="https://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
