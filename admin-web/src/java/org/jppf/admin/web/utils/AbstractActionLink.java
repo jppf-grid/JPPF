@@ -23,15 +23,24 @@ import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.model.*;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.jppf.admin.web.AbstractJPPFPage;
+import org.jppf.admin.web.*;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  *
  * @author Laurent Cohen
  */
 public abstract class AbstractActionLink extends AjaxLink<String> {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(AbstractActionLink.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether this link is enabled and/or authorized.  
    */
@@ -74,12 +83,20 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
   protected void onComponentTag(final ComponentTag tag) {
     super.onComponentTag(tag);
     final Pair<String, String> pair = FileUtils.getFileNameAndExtension(imageName);
-    final String format = "<img src='" + RequestCycle.get().getRequest().getContextPath() + "/images/toolbar/%s.%s'/>";
+    final String contextPath = RequestCycle.get().getRequest().getContextPath();
+    String imageKey = null;
     if ((action != null) && (!action.isEnabled() || !action.isAuthorized())) {
       tag.getAttributes().put("class", "button_link_disabled");
-      if (pair != null) setBody(Model.of(String.format(format, pair.first() + "-disabled", pair.second())));
+      if (pair != null) imageKey = pair.first() + "-disabled";
     } else {
-      if (pair != null) setBody(Model.of(String.format(format, pair.first(), pair.second())));
+      if (pair != null) imageKey = pair.first();
+    }
+    if (imageKey != null) {
+      imageKey = "images/toolbar/" + imageKey + "." + pair.second();
+      final String resourceURL = JPPFWebConsoleApplication.get().getSharedImageURL(imageKey);
+      final String html = "<img src='" + contextPath + resourceURL + "'/>";
+      setBody(Model.of(html));
+      if (debugEnabled) log.debug("image html for key = {}, contextPath = {}: {}", imageKey, contextPath, html);
     }
     setEscapeModelStrings(false);
   }

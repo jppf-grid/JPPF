@@ -26,11 +26,14 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.page.*;
 import org.apache.wicket.pageStore.*;
 import org.apache.wicket.pageStore.memory.*;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.resource.*;
 import org.jppf.admin.web.admin.*;
 import org.jppf.admin.web.auth.LoginPage;
 import org.jppf.admin.web.settings.*;
 import org.jppf.admin.web.stats.StatsUpdater;
 import org.jppf.admin.web.topology.TopologyPage;
+import org.jppf.admin.web.utils.ClasspathResource;
 import org.jppf.client.JPPFClient;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyManager;
@@ -88,6 +91,15 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
   @Override
   protected void init() {
     super.init();
+    mountImageResource("images/exit.png");
+    mountImageResource("images/logo.gif");
+    mountImageResource("images/logo-small.gif");
+    mountImageResource("images/toolbar/upload.png");
+    mountImageResource("jppf.css");
+    mountImageResource("images/arrow-right-double-2.png");
+    mountImageResource("images/arrow-left-double-2.png");
+    mountImageResource("images/arrow-up-double-2.png");
+    mountImageResource("images/arrow-down-double-2.png");
     String name = getInitParameter("jppfPersistenceClassName");
     if (debugEnabled) log.debug("read persistence class name '{}' from init parameter", name);
     if (name == null) {
@@ -219,9 +231,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
 
     @Override protected IDataStore newDataStore() {
       // keep everything in memory
-      return new HttpSessionDataStore(new DefaultPageManagerContext(), new IDataStoreEvictionStrategy() {
-        @Override public void evict(final PageTable pageTable) { }
-      });
+      return new HttpSessionDataStore(new DefaultPageManagerContext(), pageTable -> {});
     }
 
     @Override protected IPageStore newPageStore(final IDataStore dataStore) { return new NullPageStore(); }
@@ -239,5 +249,42 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
     @Override public Serializable prepareForSerialization(final String sessionId, final Serializable page) { return null; }
     @Override public Object restoreAfterSerialization(final Serializable serializable) { return null; }
     @Override public IManageablePage convertToPage(final Object page) { return null; }
+  }
+
+  /**
+   *
+   * @param key the resource key.
+   * @return a {@link ResourceReference} pointing to the image.
+   */
+  public ResourceReference getSharedImageResource(final String key) {
+    ResourceReference ref = getSharedResources().get(key);
+    if (ref == null) {
+      final ClasspathResource resource = new ClasspathResource(key);
+      getSharedResources().add(key, resource);
+      ref = getSharedResources().get(key);
+    }
+    return ref;
+  }
+
+  /**
+   *
+   * @param key the resource key.
+   * @return the url of the shared image.
+   */
+  public String getSharedImageURL(final String key) {
+    final ResourceReference ref = getSharedImageResource(key);
+    if (ref == null) return null;
+    String resourceURL = RequestCycle.get().urlFor(ref, null).toString();
+    if (resourceURL.startsWith("./")) resourceURL = resourceURL.substring(1);
+    return resourceURL;
+  }
+
+  /**
+   * Mount the resource with the specified key.
+   * @param key the resource key.
+   */
+  public void mountImageResource(final String key) {
+    final ResourceReference ref = getSharedImageResource(key);
+    mountResource("/" + key, ref);
   }
 }
