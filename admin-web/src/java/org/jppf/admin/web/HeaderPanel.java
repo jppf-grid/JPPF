@@ -46,7 +46,6 @@ public class HeaderPanel extends Panel {
   public HeaderPanel() {
     super("jppf.header");
     final String user = JPPFWebSession.getSignedInUser();
-    //String user = JPPFWebSession.get().getUserName();
     final Locale locale = Session.get().getLocale();
     final String s = (user != null)
       ? LocalizationUtils.getLocalized(getClass().getName(), "jppf.header.user.label", locale) + " " + user

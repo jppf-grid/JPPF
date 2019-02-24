@@ -20,9 +20,9 @@ package org.jppf.admin.web.utils;
 
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.model.*;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.jppf.admin.web.AbstractJPPFPage;
+import org.jppf.admin.web.*;
 import org.jppf.utils.*;
 
 /**
@@ -102,12 +102,19 @@ public class AjaxButtonWithIcon extends AjaxButton {
     super.onComponentTag(tag);
     final Pair<String, String> pair = FileUtils.getFileNameAndExtension(imageName);
     final StringBuilder style = new StringBuilder();
-    final String format = "background-image: url(" + RequestCycle.get().getRequest().getContextPath() + "/images/toolbar/%s.%s)";
+
+    final String contextPath = RequestCycle.get().getRequest().getContextPath();
+    String imageKey = null;
     if ((action != null) && (!action.isEnabled() || !action.isAuthorized())) {
       tag.getAttributes().put("class", "button_link_disabled");
-      if (pair != null) style.append(String.format(format, pair.first() + "-disabled", pair.second()));
+      if (pair != null) imageKey = pair.first() + "-disabled";
     } else {
-      if (pair != null) style.append(String.format(format, pair.first(), pair.second()));
+      if (pair != null) imageKey = pair.first();
+    }
+    if (imageKey != null) {
+      imageKey = "images/toolbar/" + imageKey + "." + pair.second();
+      final String resourceURL = JPPFWebConsoleApplication.get().getSharedImageURL(imageKey);
+      style.append("background-image: url(" + contextPath + resourceURL + ")");
     }
     tag.getAttributes().put("style", style.append(FIXED_STYLE).toString());
   }

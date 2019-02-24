@@ -639,3 +639,41 @@ scrollable, div.scrollable {
   width: 100%;
   overflow: scroll;
 }
+
+.palette-theme-default .palette-buttons button {
+  display: block;
+  padding: 0px;
+}
+.palette-theme-default .palette-buttons button div {
+  height: 16px;
+  width: 16px;
+}
+.palette-theme-default .palette-buttons button.palette-add div {
+  content: none;
+  background: transparent url(images/arrow-right-double-2.png) no-repeat scroll center center;
+}
+.palette-theme-default .palette-buttons button.palette-remove div {
+  content: none;
+  background: transparent url(images/arrow-left-double-2.png) no-repeat scroll center center;
+}
+.palette-theme-default .palette-buttons button.palette-up div {
+  content: none;
+  background: transparent url(images/arrow-up-double-2.png) no-repeat scroll center center;
+}
+.palette-theme-default .palette-buttons button.palette-down div {
+  content: none;
+  background: transparent url(images/arrow-down-double-2.png) no-repeat scroll center center;
+}
+
+.palette-theme-default .palette-buttons button.palette-add div:after {
+  content: none;
+}
+.palette-theme-default .palette-buttons button.palette-remove div:after {
+  content: none;
+}
+.palette-theme-default .palette-buttons button.palette-up div:after {
+  content: none;
+}
+.palette-theme-default .palette-buttons button.palette-down div:after {
+  content: none;
+}

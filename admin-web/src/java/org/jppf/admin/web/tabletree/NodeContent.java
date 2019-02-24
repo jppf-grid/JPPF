@@ -23,6 +23,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.jppf.admin.web.JPPFWebConsoleApplication;
 
 /**
  * A panel that associates a label with an icon.
@@ -38,8 +40,11 @@ public class NodeContent extends Panel {
    */
   public NodeContent(final String id, final DefaultMutableTreeNode treeNode, final TreeNodeRenderer renderer, final boolean showIP) {
     super(id);
+    final String contextPath = RequestCycle.get().getRequest().getContextPath();
     final String iconPath = renderer.getIconPath(treeNode);
-    add(new ContextImage("icon", (iconPath != null) ? iconPath : ""));
+    final String resourceURL = (iconPath != null) ? JPPFWebConsoleApplication.get().getSharedImageURL(iconPath) : null;
+    //if (debugEnabled) log.debug("resourceURL for key = {}: {}", iconPath, resourceURL);
+    add(new ContextImage("icon", (resourceURL != null) ? contextPath + resourceURL : ""));
     final String text = renderer.getText(treeNode, showIP);
     add(new Label("text", (text != null) ? text : ""));
   }
