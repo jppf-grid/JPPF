@@ -244,17 +244,18 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
   public void closeConnection(final AsyncNodeContext context) {
     if (debugEnabled) log.debug("closing {}", context);
     try {
-      context.close();
-      final SelectionKey key = context.getSelectionKey();
-      if (key != null) {
-        key.cancel();
-        key.channel().close();
+      if (context.terminate()) {
+        final SelectionKey key = context.getSelectionKey();
+        if (key != null) {
+          key.cancel();
+          key.channel().close();
+        }
+        peerHandler.onCloseNode(context);
+        JPPFManagementInfo info = context.getManagementInfo();
+        if (info == null) info = new JPPFManagementInfo("unknown host", "unknown host", -1, context.getUuid(), context.isPeer() ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE, context.isSecure());
+        if (debugEnabled) log.debug("firing nodeDisconnected() for {}", info);
+        nodeConnectionHandler.fireNodeDisconnected(info);
       }
-      peerHandler.onCloseNode(context);
-      JPPFManagementInfo info = context.getManagementInfo();
-      if (info == null) info = new JPPFManagementInfo("unknown host", "unknown host", -1, context.getUuid(), context.isPeer() ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE, context.isSecure());
-      if (debugEnabled) log.debug("firing nodeDisconnected() for {}", info);
-      nodeConnectionHandler.fireNodeDisconnected(info);
     } catch (final Exception e) {
       log.error("error closing channel {}: {}", context, ExceptionUtils.getStackTrace(e));
     }

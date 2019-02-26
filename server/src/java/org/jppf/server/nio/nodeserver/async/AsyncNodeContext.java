@@ -333,7 +333,15 @@ public class AsyncNodeContext extends BaseNodeContext {
 
   @Override
   public void close() {
-    if (closed.compareAndSet(false, true)) {
+    terminate();
+  }
+
+  /**
+   * @return {@code true} if calling this method effectively closed the node connection, {@code false} if it was already closed.
+   */
+  boolean terminate() {
+    final boolean res = closed.compareAndSet(false, true);
+    if (res) {
       if (debugEnabled) log.debug("closing channel {}", getChannel());
       final JMXConnectionWrapper jmx = isPeer() ? getPeerJmxConnection() : getJmxConnection();
       setJmxConnection(null);
@@ -347,6 +355,7 @@ public class AsyncNodeContext extends BaseNodeContext {
       sendQueue.clear();
       setExecutionStatus(ExecutorStatus.FAILED);
     }
+    return res;
   }
 
   @Override
