@@ -123,7 +123,7 @@ public class JPPFClient extends AbstractGenericClient {
   }
 
   /**
-   * Submit the specified job for execution.
+   * Submit the specified job for execution and wait for its completion.
    * @param job the job to submit and execute.
    * @return the job's results as a list of {@link Task tasks}.
    * @since 6.1
@@ -135,7 +135,7 @@ public class JPPFClient extends AbstractGenericClient {
   }
 
   /**
-   * Submit the specified job for execution.
+   * Submit the specified job asynchronously for execution, without waiting for the job to complete.
    * @param job the job to submit and execute.
    * @return the submitted job.
    * @since 6.1
