@@ -1,11 +1,11 @@
 <?php
   $currentPage = "download-unstable";
-  $tag1 = "v_6_1_alpha_2";
-  $ver1 = "6.1-alpha-2";
+  $tag1 = "v_6_1_beta";
+  $ver1 = "6.1-beta";
   $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
 ?>
 $template{name="about-page-header" title="Downloads - unstable"}$
-  <h1 align="center">Downloads - JPPF 6.1 alpha 2 preview</h1>
+  <h1 align="center">Downloads - JPPF 6.1 beta preview</h1>
 
   <div class="blockWithHighlightedTitle" style="vertical-align: middle">
     <table style="padding: 2px"><tr>

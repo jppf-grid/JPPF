@@ -1,7 +1,7 @@
 <?php
   $currentPage = "download-unstable";
-  $tag1 = "v_6_1_alpha_2";
-  $ver1 = "6.1-alpha-2";
+  $tag1 = "v_6_1_beta";
+  $ver1 = "6.1-beta";
   $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
 ?>
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -74,7 +74,6 @@
 					        <?php if ($currentPage == "Home") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/" class="<?php echo $itemClass; ?>">&raquo; Home</a><br></div>
         <?php if ($currentPage == "About") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/about.php" class="<?php echo $itemClass; ?>">&raquo; About</a><br></div>
         <?php if ($currentPage == "Download") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/downloads.php" class="<?php echo $itemClass; ?>">&raquo; Download</a><br></div>
-        <?php if (($currentPage == "6.1 alpha") || ($currentPage == "download-unstable")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/downloads-unstable.php" class="<?php echo $itemClass; ?>">6.1 alpha</a><br></div>
         <?php if ($currentPage == "Features") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/features.php" class="<?php echo $itemClass; ?>">&raquo; Features</a><br></div>
         <?php if ($currentPage == "Patches") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/patches.php" class="<?php echo $itemClass; ?>">&raquo; Patches</a><br></div>
         <?php if ($currentPage == "Samples") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/samples-pack/index.php" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br></div>
@@ -116,7 +115,7 @@
         <br/>
 				</div>
 				<div class="jppf_content">
-  <h1 align="center">Downloads - JPPF 6.1 alpha 2 preview</h1>
+  <h1 align="center">Downloads - JPPF 6.1 beta preview</h1>
   <div class="blockWithHighlightedTitle" style="vertical-align: middle">
     <table style="padding: 2px"><tr>
       <td style="width: 20px"><img src="images/icons/folder-download.png"></td>
