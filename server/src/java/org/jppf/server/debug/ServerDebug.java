@@ -116,7 +116,7 @@ public class ServerDebug implements ServerDebugMBean {
    * @return an array of state strings for each channel.
    */
   private static String viewContexts(final Set<NioContext<?>> set) {
-    final StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder().append(set.size()).append(" channels\n");
     synchronized(set) {
       for (NioContext<?> channel: set) sb.append(channel.toString()).append('\n');
     }

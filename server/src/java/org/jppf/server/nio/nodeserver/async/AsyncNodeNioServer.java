@@ -240,11 +240,11 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
    * Close the specified channel.
    * @param context the channel to close.
    */
-  @SuppressWarnings("static-method")
   public void closeConnection(final AsyncNodeContext context) {
     if (debugEnabled) log.debug("closing {}", context);
     try {
       if (context.terminate()) {
+        removeConnection(context);
         final SelectionKey key = context.getSelectionKey();
         if (key != null) {
           key.cancel();
