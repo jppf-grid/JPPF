@@ -201,7 +201,7 @@
         </td>
         <td valign="top">
           <ul class="samplesList">
-            <li><a href="/release_notes.php?version=6.1-alpha-2">Release notes</a></li>
+            <li><a href="/release_notes.php?version=6.1-beta">Release notes</a></li>
           </ul>
         </td>
       </tr></table>
