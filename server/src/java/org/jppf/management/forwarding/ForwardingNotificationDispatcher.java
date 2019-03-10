@@ -106,6 +106,8 @@ class ForwardingNotificationDispatcher {
           if (debugEnabled) log.debug(format, node, ExceptionUtils.getStackTrace(e));
           else log.info(format, node, ExceptionUtils.getMessage(e));
         }
+      } else {
+        if (debugEnabled) log.debug("cannot add {} notification listener for node = {} because the jmx connection is null", mBeanName, node.getUuid());
       }
     } finally {
       lock.unlock();

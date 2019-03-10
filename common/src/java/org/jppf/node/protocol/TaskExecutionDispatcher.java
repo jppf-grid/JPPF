@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 
 import org.jppf.node.event.*;
 import org.jppf.utils.ServiceFinder;
+import org.slf4j.*;
 
 /**
  * 
@@ -31,6 +32,14 @@ import org.jppf.utils.ServiceFinder;
  * @since 4.0
  */
 public class TaskExecutionDispatcher {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(TaskExecutionDispatcher.class);
+  /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * List of listeners to task execution events.
    */
@@ -98,6 +107,7 @@ public class TaskExecutionDispatcher {
    * @param event the event to dispatch.
    */
   private void fireEvent(final TaskExecutionEvent event) {
+    if (traceEnabled) log.trace("firing task notification: {}", event);
     for (final TaskExecutionListener listener : taskExecutionListeners) {
       if (event.isTaskCompletion()) listener.taskExecuted(event);
       else listener.taskNotification(event);

@@ -38,6 +38,10 @@ public class LifeCycleTask extends AbstractTask<String> {
    */
   private static Logger log = LoggerFactory.getLogger(LifeCycleTask.class);
   /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
+  /**
    * One million.
    */
   protected static final int ONE_MILLION = 1000 * 1000;
@@ -133,7 +137,10 @@ public class LifeCycleTask extends AbstractTask<String> {
     start *= ONE_MILLION;
     final JPPFDistributedJob job = this.getJob();
     if (job != null) jobInfo = new JobInfo(job);
-    if (startNotification != null) fireNotification(startNotification, true);
+    if (startNotification != null) {
+      if (traceEnabled) log.trace("firing user task notification '{}'", startNotification);
+      fireNotification(startNotification, true);
+    } else if (traceEnabled) log.trace("no user task notification");
     try {
       executedInNode = isInNode();
       final TypedProperties config = JPPFConfiguration.getProperties();

@@ -89,6 +89,8 @@ public class AwaitTaskNotificationListener implements NotificationListener {
         receivedMessage = true;
         notifyAll();
       }
+    } else {
+      if (debugEnabled) log.debug("received task notification: {}", actualNotif);
     }
   }
 

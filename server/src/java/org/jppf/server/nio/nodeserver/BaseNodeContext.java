@@ -258,15 +258,24 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
   public void initializeJmxConnection() {
     if (!isClosed()) {
       JMXConnectionWrapper jmx = null;
-      if (isLocal()) jmx = jmxConnection = new JMXNodeConnectionWrapper();
-      else {
+      if (isLocal()) {
+        jmxConnection = new JMXNodeConnectionWrapper();
+        jmx = jmxConnection;
+      } else {
         final JPPFManagementInfo info = getManagementInfo();
         if (debugEnabled) log.debug("establishing JMX connection for {}", info);
-        if (!isPeer()) jmx = jmxConnection = new JMXNodeConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
-        else jmx = peerJmxConnection = new JMXDriverConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
+        if (!isPeer()) {
+          jmxConnection = new JMXNodeConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
+          jmx = jmxConnection;
+        } else {
+          peerJmxConnection = new JMXDriverConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
+          jmx = peerJmxConnection;
+        }
       }
       jmx.addJMXWrapperListener(new NodeJMXWrapperListener(this, listener));
       jmx.connect();
+    } else {
+      log.warn("node closed: {}", this);
     }
   }
 
