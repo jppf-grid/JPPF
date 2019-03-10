@@ -137,4 +137,14 @@ public class TaskExecutionEvent extends EventObject {
   public boolean isUserNotification() {
     return !taskCompletion;
   }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("sendViaJmx=").append(sendViaJmx)
+      .append(", taskCompletion=").append(taskCompletion)
+      .append(", taskInformation=").append(taskInformation)
+      .append(", userObject=").append(userObject)
+      .append("]").toString();
+  }
 }
