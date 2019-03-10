@@ -48,8 +48,8 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   public TestWatcher testJPPFStatisticsWatcher = new TestWatcher() {
     @Override
     protected void finished(final Description description) {
-      final String message = String.format("end of method %s()", description.getMethodName());
-      BaseTestHelper.printToAll(client, true, true, true, true, message);
+      final String message = String.format("***** end of method %s() *****", description.getMethodName());
+      BaseTestHelper.printToAll(client, true, true, true, false, message);
     }
   };
 
@@ -200,12 +200,12 @@ public class TestJPPFStatistics extends Setup1D1N1C {
     print(false, false, "getting jmx connection");
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     print(false, false, "resetting statistics");
-    final AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(client, notif);
+    final AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(jmx, notif);
     print(false, false, "submitting job '%s'", job.getName());
     client.submitAsync(job);
     print(false, false, "waiting for task notification");
     taskListener.await();
-    print(false, false, "cancekking job '%s'", job.getName());
+    print(false, false, "cancelling job '%s'", job.getName());
     jmx.cancelJob(job.getUuid());
     print(false, false, "waiting for job results");
     final List<Task<?>> results = job.awaitResults();
