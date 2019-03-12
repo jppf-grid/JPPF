@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2018 JPPF Team.
+ * Copyright (C) 2005-2019 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,16 +20,20 @@ package sample.test.deadlock;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.management.*;
 
 import org.jppf.client.*;
 import org.jppf.client.utils.AbstractJPPFJobStream;
+import org.jppf.job.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.IsMasterNode;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.jppf.utils.Operator;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.slf4j.*;
 
 /**
@@ -70,8 +74,10 @@ public class DeadlockRunner {
     ProvisioningThread pt = null;
     MasterNodeMonitoringThread mnmt = null;
     final JMXDriverConnectionWrapper jmx;
+    final MyJmxListener jmxListener = new MyJmxListener();
     try (final JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
       jmx = getJmxConnection(client);
+      jmx.getJobManager().addNotificationListener(jmxListener, null, null);
       ro.callback = new ScriptedJobCallback();
       //ro.callback = new SystemExitCallback();
       //ro.callback = new JobPersistenceCallback();
@@ -89,7 +95,7 @@ public class DeadlockRunner {
         final TimeMarker marker = new TimeMarker().start();
         int count = 0;
         for (final JPPFJob job: jobProvider) {
-          if ((job != null) && !client.isClosed()) client.submit(job);
+          if ((job != null) && !client.isClosed()) client.submitAsync(job);
           if (count == ro.triggerNodeDeadlockAfter) {
             final JPPFJob deadlockingJob = new JPPFJob();
             deadlockingJob.setName("deadlock trigger job");
@@ -101,8 +107,11 @@ public class DeadlockRunner {
         }
         //while (jobProvider.hasPendingJob()) Thread.sleep(10L);
         jobProvider.awaitEndOfStream();
+        ConcurrentUtils.awaitCondition(() -> jmxListener.getMapSize() <= 0, 5000L, 100L, false);
+        printJobStats(jmxListener);
         printStats(jmx, jobProvider, marker);
       } finally {
+        jmx.getJobManager().removeNotificationListener(jmxListener);
         if (ro.simulateNodeCrashes) {
           pt.setStopped(true);
           mnmt.setStopped(true);
@@ -267,6 +276,14 @@ public class DeadlockRunner {
   }
 
   /**
+   * @param listener .
+   */
+  private static void printJobStats(final MyJmxListener listener) {
+    print("jobs stats: start entries=%d (%s), longest job=%s, missed startCount=%d, jobCount=%,d",
+      listener.getMapSize(), listener.getMap(), listener.longestJobInfo, listener.missedStartCount.get(), listener.jobCount.get());
+  }
+
+  /**
    * Write a csv line where string elements are quoted.
    * @param writer the writer which writes to the file.
    * @param params the elements to write into the file.
@@ -295,5 +312,83 @@ public class DeadlockRunner {
     final String msg = String.format(format, params);
     System.out.println(msg);
     log.info(msg);
+  }
+
+  /** */
+  public static class MyJmxListener implements NotificationListener {
+    /** */
+    final AtomicInteger jobCount = new AtomicInteger(0);
+    /** */
+    final AtomicInteger missedStartCount = new AtomicInteger(0);
+    /**
+     * Mapping of job uuids to their start time.
+     */
+    final Map<String, Long> map = new HashMap<>();
+    /** */
+    final JobInfo longestJobInfo = new JobInfo();
+
+    @Override
+    public void handleNotification(final Notification notification, final Object handback) {
+      final JobNotification notif = (JobNotification) notification;
+      if (notif.getEventType() == JobEventType.JOB_QUEUED) {
+        final long time = System.nanoTime();
+        jobCount.incrementAndGet();
+        synchronized(this) {
+          map.put(notif.getJobInformation().getJobUuid(), time);
+        }
+      } else if (notif.getEventType() == JobEventType.JOB_ENDED) {
+        final long time = System.nanoTime();
+        final JobInformation ji = notif.getJobInformation();
+        final Long startTime;
+        synchronized(this) {
+          startTime = map.remove(ji.getJobUuid());
+          if (startTime != null) {
+            final long elapsed = time - startTime;
+            if (elapsed > longestJobInfo.duration) {
+              longestJobInfo.duration = elapsed;
+              longestJobInfo.jobUuid = ji.getJobUuid();
+              longestJobInfo.jobName = ji.getJobName();
+            }
+          }
+        }
+        if (startTime == null) {
+          missedStartCount.incrementAndGet();
+          log.info("couldn't find start entry for {}", ji);
+        }
+      }
+    }
+
+    /**
+     * @return the number of remaining entries in the map.
+     */
+    synchronized int getMapSize() {
+      return map.size();
+    }
+
+    /**
+     * @return the number of remaining entries in the map.
+     */
+    synchronized Map<String, Long> getMap() {
+      return new HashMap<>(map);
+    }
+  }
+
+  /** */
+  static class JobInfo {
+    /** */
+    String jobUuid;
+    /** */
+    String jobName;
+    /** */
+    long duration;
+
+    @Override
+    public String toString() {
+      return new StringBuilder("[")
+        .append("jobName=").append(jobName)
+        .append(", duration=").append(StringUtils.toStringDuration(duration / 1_000_000L))
+        //.append(", jobUuid=").append(jobUuid)
+        .append("]").toString();
+    }
   }
 }
