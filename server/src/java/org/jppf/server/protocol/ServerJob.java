@@ -119,17 +119,23 @@ public class ServerJob extends AbstractServerJobBase {
     if (b) {
       for (final ServerTask task : bundleTasks) map.putValue(task.getBundle(), task);
     } else if (results != null) {
+      int nbResubmits = 0, maxPos = 0, minPos = Integer.MAX_VALUE;
       for (int i=0; i<bundleTasks.size(); i++) {
         final ServerTask task = bundleTasks.get(i);
         if (task.getState() == TaskState.RESUBMIT) {
           if (traceEnabled) log.trace("task to resubmit: {}", task);
           task.setState(TaskState.PENDING);
+          nbResubmits++;
+          final int pos = task.getJobPosition();
+          if (pos > maxPos) maxPos = pos;
+          if (pos < minPos) minPos = pos;
         } else {
           final DataLocation location = results.get(i);
           task.resultReceived(location);
           map.putValue(task.getBundle(), task);
         }
       }
+      if (debugEnabled && (nbResubmits > 0)) log.debug("got {} tasks to resubmit with minPos={}, maxPos={} for {}", nbResubmits, minPos, maxPos, this); 
     } else {
       if (debugEnabled) log.debug("results are null, job is neither expired nor cancelled, node bundle not expired: {}", bundle);
     }
@@ -147,10 +153,21 @@ public class ServerJob extends AbstractServerJobBase {
     final CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
     lock.lock();
     try {
+      int nbResubmits = 0, maxPos = 0, minPos = Integer.MAX_VALUE;
       for (final ServerTask task : bundle.getTaskList()) {
-        task.resultReceived(throwable);
-        map.putValue(task.getBundle(), task);
+        if (task.getState() == TaskState.RESUBMIT) {
+          if (traceEnabled) log.trace("task to resubmit: {}", task);
+          task.setState(TaskState.PENDING);
+          nbResubmits++;
+          final int pos = task.getJobPosition();
+          if (pos > maxPos) maxPos = pos;
+          if (pos < minPos) minPos = pos;
+        } else {
+          task.resultReceived(throwable);
+          map.putValue(task.getBundle(), task);
+        }
       }
+      if (debugEnabled && (nbResubmits > 0)) log.debug("got {} tasks to resubmit with minPos={}, maxPos={} for {}", nbResubmits, minPos, maxPos, this); 
     } finally {
       lock.unlock();
     }
@@ -165,14 +182,16 @@ public class ServerJob extends AbstractServerJobBase {
    */
   private void postResultsReceived(final CollectionMap<ServerTaskBundleClient, ServerTask> map, final ServerTaskBundleNode bundle, final Throwable throwable) {
     if (debugEnabled) log.debug("client bundle map has {} keys: {}", map.keySet().size(), map.keySet());
-    for (final Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
-      if (throwable == null) entry.getKey().resultReceived(entry.getValue());
-      else entry.getKey().resultReceived(entry.getValue(), throwable);
-      ((JPPFJobManager) notificationEmitter).jobResultsReceived(bundle.getChannel(), this, entry.getValue());
-    }
+    map.forEach((clientBundle, tasks) -> {
+      if (throwable == null) clientBundle.resultReceived(tasks);
+      else clientBundle.resultReceived(tasks, throwable);
+      ((JPPFJobManager) notificationEmitter).jobResultsReceived(bundle.getChannel(), this, tasks);
+      if (debugEnabled) log.debug("received results for {}", clientBundle);
+    });
     taskCompleted(bundle, throwable);
-    if (getJob().getParameter(BundleParameter.FROM_PERSISTENCE, false)) {
+    if (getJob().getParameter(BundleParameter.FROM_PERSISTENCE, false) || submissionStatus.get() == SubmissionStatus.COMPLETE) {
       map.forEach((clientBundle, tasks) -> {
+        if (debugEnabled) log.debug("checking bundleEnded() for {}", clientBundle);
         if (clientBundle.getPendingTasksCount() <= 0) clientBundle.bundleEnded();
       });
     }
@@ -223,15 +242,16 @@ public class ServerJob extends AbstractServerJobBase {
     } finally {
       lock.unlock();
     }
+    if (debugEnabled) log.debug("requeue = {} for bundle {}, job = {}", requeue, bundle, this);
     if (hasPending()) {
-      if (throwable != null) setSubmissionStatus(SubmissionStatus.FAILED);
+      if ((throwable != null) && !requeue) setSubmissionStatus(SubmissionStatus.FAILED);
       if (!isCancelled() && requeue && (onRequeue != null)) onRequeue.run();
     } else {
       setSubmissionStatus(SubmissionStatus.COMPLETE);
       updateStatus(ServerJobStatus.EXECUTING, ServerJobStatus.DONE);
     }
     if (clientBundles.isEmpty() && tasks.isEmpty()) setSubmissionStatus(SubmissionStatus.ENDED);
-    if (debugEnabled) log.debug("submission status = {} for {}", getSubmissionStatus(), this);
+    if (debugEnabled) log.debug("submissionStatus={}, clientBundles={} for {}", getSubmissionStatus(), clientBundles.size(), this);
   }
 
   /**
@@ -253,7 +273,9 @@ public class ServerJob extends AbstractServerJobBase {
   public void cancelDispatch(final ServerTaskBundleNode nodeBundle) {
     try {
       final Future<?> future = nodeBundle.getFuture();
-      if (!future.isDone()) {
+      if (future == null) {
+        nodeBundle.resultsReceived((List<DataLocation>) null);
+      } else if (!future.isDone()) {
         future.cancel(false);
         nodeBundle.resultsReceived((List<DataLocation>) null);
       }

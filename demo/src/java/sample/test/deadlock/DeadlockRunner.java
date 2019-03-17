@@ -33,7 +33,7 @@ import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.IsMasterNode;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**
@@ -43,11 +43,9 @@ public class DeadlockRunner {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ProvisioningThread.class);
-  /**
-   *
-   */
-  private static JMXDriverConnectionWrapper jmx = null;
+  private static Logger log = LoggerFactory.getLogger(DeadlockRunner.class);
+  /** */
+  private static JMXDriverConnectionWrapper jmx;
 
   /**
    * Entry point for this demo.
@@ -55,7 +53,6 @@ public class DeadlockRunner {
    */
   public static void main(final String[] args) {
     try {
-      //StreamUtils.waitKeyPressed("Please press [Enter]");
       final DeadlockRunner runner = new DeadlockRunner();
       runner.jobStreaming();
       //runner.testNodes();
@@ -72,7 +69,6 @@ public class DeadlockRunner {
     print("Running with conccurencyLimit=%,d; streamDuration=%,d; nbJobs=%,d; tasksPerJob=%,d; taskDuration=%,d",
       ro.concurrencyLimit, ro.streamDuration, ro.nbJobs, ro.tasksPerJob, ro.taskOptions.taskDuration);
     ProvisioningThread pt = null;
-    MasterNodeMonitoringThread mnmt = null;
     final JMXDriverConnectionWrapper jmx;
     final MyJmxListener jmxListener = new MyJmxListener();
     try (final JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
@@ -83,15 +79,9 @@ public class DeadlockRunner {
       //ro.callback = new JobPersistenceCallback();
       ensureSufficientConnections(client, ro.clientConnections);
       if (ro.slaves >= 0) updateSlaveNodes(client, ro.slaves);
-      if (ro.simulateNodeCrashes) {
-        pt = new ProvisioningThread(client, ro.waitTime);
-        mnmt = new MasterNodeMonitoringThread(client, 5000L, pt);
-      }
+      if (ro.simulateNodeCrashes) pt = new ProvisioningThread(client, ro.waitTime);
       try {
-        if (ro.simulateNodeCrashes) {
-          new Thread(pt, "ProvisioningThread").start();
-          new Thread(mnmt, "MasterNodeMonitoringThread").start();
-        }
+        if (ro.simulateNodeCrashes) new Thread(pt, "ProvisioningThread").start();
         final TimeMarker marker = new TimeMarker().start();
         int count = 0;
         for (final JPPFJob job: jobProvider) {
@@ -103,37 +93,34 @@ public class DeadlockRunner {
             client.submitAsync(deadlockingJob);
           }
           count++;
-          //requestNodeShutdown(client);
         }
-        //while (jobProvider.hasPendingJob()) Thread.sleep(10L);
+        print("submitted all jobs, awaiting end of job stream");
         jobProvider.awaitEndOfStream();
+        print("reached end of job stream");
         ConcurrentUtils.awaitCondition(() -> jmxListener.getMapSize() <= 0, 5000L, 100L, false);
         printJobStats(jmxListener);
         printStats(jmx, jobProvider, marker);
       } finally {
         jmx.getJobManager().removeNotificationListener(jmxListener);
-        if (ro.simulateNodeCrashes) {
-          pt.setStopped(true);
-          mnmt.setStopped(true);
-        }
+        if (ro.simulateNodeCrashes) pt.setStopped(true);
       }
     } catch (final Exception e) {
-      e.printStackTrace();
+      print("error in job stremaing: %s", ExceptionUtils.getStackTrace(e));
     }
   }
 
-  /**
-   *
-   */
+  /** */
   public void testNodes() {
-    final TypedProperties config = JPPFConfiguration.getProperties();
-    final int[] nbSlaves = StringUtils.parseIntValues(config.getString("deadlock.nbSlaves", "0"));
-    try (JPPFClient jppfClient = new JPPFClient()) {
+    final RunOptions ro = new RunOptions();
+    try (final JPPFClient jppfClient = new JPPFClient()) {
       ensureSufficientConnections(jppfClient, 1);
-      updateSlaveNodes(jppfClient, 0);
+      updateSlaveNodes(jppfClient, ro.slaves);
+      final ProvisioningThread pt = new ProvisioningThread(jppfClient, ro.waitTime);
       final TimeMarker marker = new TimeMarker().start();
-      for (int n: nbSlaves) updateSlaveNodes(jppfClient, n);
+      ThreadUtils.startThread(pt, "node provisioning");
+      Thread.sleep(ro.streamDuration);
       print("total time: %s", marker.stop().getLastElapsedAsString());
+      pt.setStopped(true);
       updateSlaveNodes(jppfClient, 0);
     } catch(final Exception e) {
       e.printStackTrace();
@@ -145,12 +132,16 @@ public class DeadlockRunner {
    * @param job the JPPF job whose results are printed.
    */
   public static void processResults(final JPPFJob job) {
-    print("*** results for job '%s' ***", job.getName());
     final List<Task<?>> results = job.getAllResults();
+    int nbExceptions = 0, nbNoResult = 0;
     for (Task<?> task: results) {
-      if (task.getThrowable() != null) print("%s raised an exception : %s", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
+      //if (task.getThrowable() != null) print("%s raised an exception : %s", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
+      //if (task.getThrowable() != null) print("%s raised an exception : %s", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
+      if (task.getThrowable() != null) nbExceptions++;
+      else if (task.getResult() == null) nbNoResult++;
       //else System.out.printf("result of %s : %s\n", task.getId(), task.getResult());
     }
+    print("*** results for job '%s' : exceptions = %4d, no result = %4d ***", job.getName(), nbExceptions, nbNoResult);
   }
 
   /**
@@ -186,19 +177,6 @@ public class DeadlockRunner {
     forwarder.provisionSlaveNodes(masterSelector, nbSlaves, null);
     while (jmx.nbNodes() != nbSlaves + 1) Thread.sleep(10L);
     print("slaves confirmation wait time: %s", marker.stop().getLastElapsedAsString());
-  }
-
-  /**
-   * Request that a node be shutdown.
-   * @param client the JPPF client to get a JMX connection from.
-   * @throws Exception if any error occurs.
-   */
-  @SuppressWarnings("unused")
-  private static void requestNodeShutdown(final JPPFClient client) throws Exception {
-    print("requesting node shutdown ...");
-    final JMXDriverConnectionWrapper jmx = getJmxConnection(client);
-    final NodeSelector selector = new ExecutionPolicySelector(new IsMasterNode());
-    jmx.getNodeForwarder().shutdown(selector, false);
   }
 
   /**
@@ -387,7 +365,6 @@ public class DeadlockRunner {
       return new StringBuilder("[")
         .append("jobName=").append(jobName)
         .append(", duration=").append(StringUtils.toStringDuration(duration / 1_000_000L))
-        //.append(", jobUuid=").append(jobUuid)
         .append("]").toString();
     }
   }

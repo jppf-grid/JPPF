@@ -18,7 +18,7 @@
     </listAttribute>
     <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.utils.FileReplacer"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-r -f C:/Workspaces/JPPF-trunk-git -i C:/Workspaces/temp/find.txt -o C:/Workspaces/temp/replace.txt -e java,properties,launch,config,xml,xsd,jsp,conf,groovy,js,php,html,bat,sh,md -ef */classes,*\classes,*\home\doc,*\javadoc*,*\csdoc,*\x-*,*\.metadata,*\home\samples-pack,*\home\thebuggenie*,*\home\tracker*,*\node-android\*\build*,*\home\faq*"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-r -f C:/Workspaces/JPPF-trunk-git -i C:/Workspaces/temp/find.txt -o C:/Workspaces/temp/replace.txt -e java,properties,launch,config,xml,xsd,jsp,conf,groovy,js,php,html,bat,sh,md -ef */classes,*\classes,*\home\doc,*\javadoc*,*\csdoc,*\x-*,*\.metadata,*\home\samples-pack,*\home\thebuggenie*,*\home\tracker*,*\node-android\*\build*,*\home\faq* -p"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="demo"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=log4j-client.properties -server -Xmx256m"/>
 </launchConfiguration>

@@ -152,6 +152,7 @@ public abstract class AbstractJPPFJob<J extends AbstractJPPFJob<J>> implements S
   @SuppressWarnings("unchecked")
   public J setName(final String name) {
     this.name = name;
+    results.setJobName(name);
     return (J) this;
   }
 

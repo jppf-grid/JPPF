@@ -83,7 +83,7 @@ public class AsyncClientContext extends StatelessNioContext {
   @Override
   public void handleException(final Exception e) {
     if (getClosed().compareAndSet(false, true)) {
-      if (debugEnabled) log.debug("handling exception on {} : {}", this, (e == null) ? "\n" + ExceptionUtils.getCallStack() : ExceptionUtils.getStackTrace(e));
+      if (debugEnabled) log.debug("handling exception on {}:{}", this, (e == null) ? " null" : "\n" + ExceptionUtils.getStackTrace(e));
       cancelJobsOnClose();
       server.closeConnection(this);
       onClose();
@@ -105,7 +105,7 @@ public class AsyncClientContext extends StatelessNioContext {
     if (!header.isHandshake()) {
       final int[] positions = new int[tasks.size()];
       for (int i=0; i<tasks.size(); i++) positions[i] = tasks.get(i).getJobPosition();
-      if (traceEnabled) log.trace("serializing bundle with tasks postions={}", StringUtils.buildString(positions));
+      //if (traceEnabled) log.trace("serializing bundle with tasks postions={}", StringUtils.buildString(positions));
       header.setParameter(BundleParameter.TASK_POSITIONS, positions);
       header.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
     }
@@ -123,7 +123,7 @@ public class AsyncClientContext extends StatelessNioContext {
    */
   public ServerTaskBundleClient deserializeBundle(final ClientMessage message) throws Exception {
     final List<DataLocation> locations = message.getLocations();
-    if (debugEnabled) log.debug("deserializing {}", message);
+    //if (traceEnabled) log.trace("deserializing {}", message);
     final TaskBundle bundle = message.getBundle();
     if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1));
     return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()), isPeer());
@@ -174,7 +174,9 @@ public class AsyncClientContext extends StatelessNioContext {
    * @param bundle the job to add.
    */
   public void addEntry(final ServerTaskBundleClient bundle) {
-    entryMap.put(bundle.getUuid() + bundle.getId(), new JobEntry(bundle));
+    final String id = bundle.getUuid() + bundle.getId();
+    if (debugEnabled) log.debug("adding job entry '{}'", id);
+    entryMap.put(id, new JobEntry(bundle));
   }
 
   /**
@@ -188,11 +190,14 @@ public class AsyncClientContext extends StatelessNioContext {
 
   /**
    * Remove the job entry with the specified id.
-   * @param id the id of the job entry to retrieve.
+   * @param jobUuid the uuid of the job whose entry to retrieve.
+   * @param bundleId the id of the client job bundle for the entry.
    * @return the removed {@link JobEntry} instance, or {@code null} if there is no entry with the specified id.
    */
-  public JobEntry removeJobEntry(final String id) {
-    return entryMap.remove(id);
+  public JobEntry removeJobEntry(final String jobUuid, final long bundleId) {
+    if (traceEnabled) log.trace("removing job entry with jobUuid={}, bundleId={}, call stack:\n{}", jobUuid, bundleId, ExceptionUtils.getCallStack());
+    else if (debugEnabled) log.debug("removing job entry with jobUuid={}, bundleId={}", jobUuid, bundleId);
+    return entryMap.remove(jobUuid + bundleId);
   }
 
   /**
@@ -203,10 +208,9 @@ public class AsyncClientContext extends StatelessNioContext {
     entryMap.forEach((id, entry) -> {
       cancelJobOnClose(entry);
       if (entry != null) {
-        final ServerTaskBundleClient bundle = entry.getInitialBundleWrapper();
+        final ServerTaskBundleClient bundle = entry.getBundle();
         if ((bundle != null) && (bundle.getSLA().isCancelUponClientDisconnect())) {
           entriesToRemove.add(id);
-          entry.initialBundleWrapper = null;
         }
       }
     });
@@ -220,7 +224,7 @@ public class AsyncClientContext extends StatelessNioContext {
   void cancelJobOnClose(final JobEntry jobEntry) {
     final String jobUuid = jobEntry.jobUuid;
     final int tasksToSend = jobEntry.nbTasksToSend;
-    final ServerTaskBundleClient clientBundle = jobEntry.getInitialBundleWrapper();
+    final ServerTaskBundleClient clientBundle = jobEntry.getBundle();
     if (clientBundle != null) {
       final TaskBundle header = clientBundle.getJob();
       if (debugEnabled) log.debug("cancelUponClientDisconnect={} for {}", header.getSLA().isCancelUponClientDisconnect(), header);

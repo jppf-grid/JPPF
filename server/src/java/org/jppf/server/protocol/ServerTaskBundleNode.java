@@ -229,8 +229,7 @@ public class ServerTaskBundleNode {
     if (getJob().getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
     synchronized (this) {
       requeued = true;
-      for (ServerTask task: taskList)
-        task.resubmit();
+      for (final ServerTask task: taskList) task.resubmit();
     }
   }
 
@@ -241,7 +240,7 @@ public class ServerTaskBundleNode {
     if (getJob().getSLA().isBroadcastJob()) return; // broadcast jobs cannot expire.
     final int max = job.getSLA().getMaxDispatchExpirations();
     synchronized (this) {
-      for (ServerTask task: taskList) {
+      for (final ServerTask task: taskList) {
         if (task.incExpirationCount() > max) task.cancel();
         else task.resubmit();
       }

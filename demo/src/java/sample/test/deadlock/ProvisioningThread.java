@@ -18,13 +18,15 @@
 
 package sample.test.deadlock;
 
-import java.util.Map;
+import java.util.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.policy.*;
-import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.jppf.node.policy.IsMasterNode;
+import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.concurrent.*;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.slf4j.*;
 
 /**
@@ -37,74 +39,89 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
    */
   private static Logger log = LoggerFactory.getLogger(ProvisioningThread.class);
   /**
-   * 
+   * Determines whether debug-level logging is enabled.
    */
-  private final JPPFClient client;
-  /**
-   * 
-   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /** */
+  private static final NodeSelector masterSelector = new ExecutionPolicySelector(new IsMasterNode());
+  /** */
   private final long waitTime;
+  /** */
+  private final JPPFNodeForwardingMBean forwarder;
+  /** */
+  private final JMXDriverConnectionWrapper jmx;
+  /** */
+  private final int initialNbSlaves;
+  /** */
+  private final int nbMasterNodes;
 
   /**
    * 
    * @param client the JPPF client.
-   * @param waitTime .
+   * @param waitTime interval in millis between iterations of this thread.
+   * @throws Exception if any error occurs.
    */
-  public ProvisioningThread(final JPPFClient client, final long waitTime) {
-    this.client = client;
+  public ProvisioningThread(final JPPFClient client, final long waitTime) throws Exception {
     this.waitTime = waitTime;
+    jmx = DeadlockRunner.getJmxConnection(client);
+    log.info("getting forwarder");
+    forwarder = jmx.getNodeForwarder();
+    log.info("got forwarder");
+    final Map<String, Object> map = forwarder.getNbSlaves(masterSelector);
+    nbMasterNodes = map.size();
+    int n = -1;
+    for (Map.Entry<String, Object> entry: map.entrySet()) {
+      if (entry.getValue() instanceof Exception) throw (Exception) entry.getValue();
+      n = (Integer) entry.getValue();
+      break;
+    }
+    if (n < 0) throw new IllegalStateException("no slaves were found");
+    initialNbSlaves = n;
+    DeadlockRunner.print("nb masters: %d, initial nb slaves: %d", nbMasterNodes, initialNbSlaves);
   }
 
   @Override
   public void run() {
     log.info("starting ProvisioningThread, waitTime={}", waitTime);
-    JPPFNodeForwardingMBean forwarder = null;
-    final ExecutionPolicy masterPolicy = new IsMasterNode();
-    final NodeSelector masterSelector = new ExecutionPolicySelector(masterPolicy);
-    while (!isStopped()) {
-      if (forwarder == null) {
-        try {
-          final JMXDriverConnectionWrapper jmx = DeadlockRunner.getJmxConnection(client);
-          log.info("getting forwarder");
-          forwarder = jmx.getNodeForwarder();
-        } catch (final Exception e) {
-          e.printStackTrace();
-          return;
-        }
-        log.info("got forwarder");
-      }
-      if (isStopped()) break;
-      goToSleep(1000L);
-      if (isStopped()) break;
-      try {
-        final Map<String, Object> map = forwarder.provisionSlaveNodes(masterSelector, 40);
-        for (Map.Entry<String, Object> entry: map.entrySet()) {
-          if (entry.getValue() instanceof Exception) throw (Exception) entry.getValue();
-        }
-      } catch(final Exception e) {
-        e.printStackTrace();
-        System.exit(1);
-        return;
-      }
-      if (isStopped()) break;
-      goToSleep(waitTime);
-      if (isStopped()) break;
-      try {
-        final Map<String, Object> map = forwarder.provisionSlaveNodes(masterSelector, 0);
-        for (Map.Entry<String, Object> entry: map.entrySet()) {
-          if (entry.getValue() instanceof Exception) throw (Exception) entry.getValue();
-        }
-      } catch(final Exception e) {
-        e.printStackTrace();
-        System.exit(1);
-        return;
-      }
-    }
     try {
-      forwarder.provisionSlaveNodes(masterSelector, 0);
-    } catch(@SuppressWarnings("unused") final Exception e) {
-      //e.printStackTrace();
-      return;
+      goToSleep(waitTime);
+      while (!isStopped()) {
+        provision(0);
+        if (isStopped()) break;
+        goToSleep(waitTime);
+        if (isStopped()) break;
+        provision(initialNbSlaves);
+        if (isStopped()) break;
+        goToSleep(waitTime);
+      }
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
     }
+  }
+
+  /**
+   * 
+   * @param nbSlaves the number of slaves to provision.
+   * @throws Exception if any error occurs.
+   */
+  private void provision(final int nbSlaves)  throws Exception {
+    if (debugEnabled) log.debug("provisioning {} slaves", nbSlaves);
+    final Map<String, Object> map = forwarder.provisionSlaveNodes(masterSelector, nbSlaves);
+    for (Map.Entry<String, Object> entry: map.entrySet()) {
+      if (entry.getValue() instanceof Exception) {
+        final Exception e = (Exception) entry.getValue();
+        log.error("error provisioning {} slaves on node {}", nbSlaves, entry.getKey(), e);
+      }
+    }
+    ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> 
+      forwarder.getNbSlaves(masterSelector).values().stream().allMatch(o -> (o instanceof Integer) && ((Integer) o == nbSlaves)), 30_000L, 500L, true);
+    ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() == nbMasterNodes * (1 + nbSlaves), 30_000L, 500L, true);
+    if (debugEnabled) log.debug("got all {} slaves", nbSlaves);
+  }
+
+  @Override
+  public synchronized void setStopped(final boolean stopped) {
+    super.setStopped(stopped);
+    wakeUp();
   }
 }

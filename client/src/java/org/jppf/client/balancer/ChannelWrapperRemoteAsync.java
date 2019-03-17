@@ -297,8 +297,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
     if (channelClosed && !resetting) return null;
     if (!channelClosed) {
       final String jobMsg = (clientBundle == null) ? "" : " while handling job " + clientBundle;
-      if (debugEnabled) log.debug("Throwable was raised{} on channel {}\n{}", jobMsg, this, ExceptionUtils.getStackTrace(t));
-      else log.warn("Throwable was raised{} on channel {} : {}", jobMsg, this, ExceptionUtils.getMessage(t));
+      log.warn("Throwable was raised{} on channel {}\n{}", jobMsg, this, ExceptionUtils.getStackTrace(t));
     }
     final Exception exception = (t == null) ? null : ((t instanceof Exception) ? (Exception) t : new JPPFException(t));
     try {

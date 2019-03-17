@@ -31,13 +31,17 @@ import org.jppf.client.utils.AbstractJPPFJobStream;
  */
 public class JobStreamImpl extends AbstractJPPFJobStream {
   /**
+   * 
+   */
+  private static final String JOB_NAME_FORMAT = "streaming job %06d";
+  /**
    *
    */
   final RunOptions options;
   /**
    * Whether this job stream is stopped.
    */
-  boolean stopped = false;
+  boolean stopped;
   /**
    * Whether streaming has started.
    */
@@ -73,7 +77,7 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
   @Override
   protected JPPFJob createNextJob() {
     final JPPFJob job = new JPPFJob();
-    job.setName("streaming job " + getJobCount());
+    job.setName(String.format(JOB_NAME_FORMAT, getJobCount()));
     if (options.callback != null) options.callback.jobCreated(job);
     try {
       for (int i=1; i<=options.tasksPerJob; i++) {
@@ -90,6 +94,7 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
   @Override
   public void close() {
     System.out.println("closing job provider");
+    setStopped(true);
   }
 
   @Override

@@ -97,6 +97,10 @@ public class ServerTaskBundleClient {
    * Id of the source bundle, if any. If no source bundle then it is set to -1.
    */
   final long sourceBundleId;
+  /**
+   * The positions of the tasks in this bundle.
+   */
+  private final int[] tasksPositions;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -152,6 +156,7 @@ public class ServerTaskBundleClient {
       if (forPeer) this.strategy = new SendResultsStrategy.SendAllResultsStrategy();
       else this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
     } else this.strategy = SendResultsStrategyManager.getStrategy(null);
+    this.tasksPositions = computeTasksPositions();
   }
 
   /**
@@ -170,6 +175,7 @@ public class ServerTaskBundleClient {
     this.pendingTasksCount.set(tasks.size());
     this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
     this.sourceBundleId = -1L;
+    this.tasksPositions = computeTasksPositions();
   }
 
   /**
@@ -192,6 +198,17 @@ public class ServerTaskBundleClient {
     this.cancelled = source.isCancelled();
     this.strategy = source.strategy;
     this.sourceBundleId = source.getId();
+    this.tasksPositions = computeTasksPositions();
+  }
+
+  /**
+   * @return the poisitions of the tasks in this bundle.
+   */
+  private int[] computeTasksPositions() {
+    final int[] positions = new int[taskList.size()];
+    int count = 0;
+    for (final ServerTask task: taskList) positions[count++] = task.getJobPosition();
+    return positions;
   }
 
   /**
@@ -248,7 +265,8 @@ public class ServerTaskBundleClient {
     done = pendingTasksCount.get() <= 0;
     final boolean shouldFire = done || strategy.sendResults(this, tasks);
     if (shouldFire) completedTasks = getAndClearCompletedTasks();
-    if (debugEnabled) log.debug("processed {} tasks, completedTasks={}, done={}, tasksToSend={}", tasks.size(), (completedTasks == null ? 0 : completedTasks.size()), done, tasksToSendList.size());
+    if (debugEnabled) log.debug("processed {} tasks, completedTasks={}, done={}, tasksToSend={}, pendingTasksCount={}",
+      tasks.size(), (completedTasks == null) ? 0 : completedTasks.size(), done, tasksToSendList.size(), pendingTasksCount.get());
     if (completedTasks != null) fireTasksCompleted(completedTasks);
   }
 
@@ -473,5 +491,12 @@ public class ServerTaskBundleClient {
      * @param bundle the bundle that notifies that finished.
      */
     void bundleEnded(final ServerTaskBundleClient bundle);
+  }
+
+  /**
+   * @return the positions of the tasks in this bundle.
+   */
+  public int[] getTasksPositions() {
+    return tasksPositions;
   }
 }

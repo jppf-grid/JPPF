@@ -81,6 +81,10 @@ public class AsyncNodeContext extends BaseNodeContext {
    * Whether the job is accepting new jobs.
    */
   private AtomicBoolean acceptingNewJobs = new AtomicBoolean(true);
+  /**
+   * Whether an exception was already handled for this node..
+   */
+  private AtomicBoolean exceptionHandled = new AtomicBoolean(false);
 
   /**
    * @param server the server that handles this context.
@@ -97,16 +101,17 @@ public class AsyncNodeContext extends BaseNodeContext {
 
   @Override
   public void handleException(final Exception exception) {
-    if (!isClosed()) {
+    if (!isClosed() && exceptionHandled.compareAndSet(false, true)) {
+      if (log.isTraceEnabled()) log.trace("handling exception on {}\n{}\ncall stack:\n{}", this, (exception == null) ? "null" : ExceptionUtils.getStackTrace(exception), ExceptionUtils.getCallStack());
+      else if (debugEnabled) log.debug("handling exception on {}\n{}", this, (exception == null) ? "null" : ExceptionUtils.getStackTrace(exception));
       final Map<String, ServerTaskBundleNode> allEntries;
       synchronized(jobToBundlesIds) {
         allEntries = new HashMap<>(entryMap);
+        clear();
       }
-      if (debugEnabled) log.debug("handling exception on {}\n{}", this, ((exception == null) ? ExceptionUtils.getCallStack() : ExceptionUtils.getStackTrace(exception)));
       server.closeConnection(this);
-      for (final Map.Entry<String, ServerTaskBundleNode> entry: allEntries.entrySet()) {
-        handleException(exception, entry.getValue());
-      }
+      if (debugEnabled) log.debug("handling exception for {} node bundles of {}", allEntries.size(), this);
+      for (final Map.Entry<String, ServerTaskBundleNode> entry: allEntries.entrySet()) handleException(exception, entry.getValue());
     }
   }
 
@@ -122,15 +127,18 @@ public class AsyncNodeContext extends BaseNodeContext {
         tmpBundle.setJobReturnReason(JobReturnReason.NODE_CHANNEL_ERROR);
         tmpBundle.taskCompleted(exception);
       }
-      boolean callTaskCompleted = true;
       if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
-        boolean applyMaxResubmit = tmpBundle.getJob().getMetadata().getParameter("jppf.job.applyMaxResubmitOnNodeError", false);
-        applyMaxResubmit |= tmpBundle.getJob().getSLA().isApplyMaxResubmitsUponNodeError();
+        final boolean applyMaxResubmit = tmpBundle.getJob().getSLA().isApplyMaxResubmitsUponNodeError();
         if (debugEnabled) log.debug("applyMaxResubmit={} for {}", applyMaxResubmit, this);
-        if (!applyMaxResubmit) tmpBundle.resubmit();
-        else {
+        final List<DataLocation> results = new ArrayList<>(tmpBundle.getTaskList().size());
+        if (!applyMaxResubmit) {
+          tmpBundle.resubmit();
+          for (final ServerTask task: tmpBundle.getTaskList()) {
+            results.add(task.getInitialTask());
+            task.resubmit();
+          }
+        } else {
           int count = 0;
-          final List<DataLocation> results = new ArrayList<>(tmpBundle.getTaskList().size());
           for (final ServerTask task: tmpBundle.getTaskList()) {
             results.add(task.getInitialTask());
             final int max = tmpBundle.getJob().getSLA().getMaxTaskResubmits();
@@ -141,10 +149,8 @@ public class AsyncNodeContext extends BaseNodeContext {
           }
           if (debugEnabled) log.debug("resubmit count={} for {}", count, this);
           if (count > 0) updateStatsUponTaskResubmit(count);
-          tmpBundle.resultsReceived(results);
-          callTaskCompleted = false;
         }
-        if (callTaskCompleted) tmpBundle.getClientJob().taskCompleted(tmpBundle, exception);
+        tmpBundle.resultsReceived(results);
         updateStatsUponTaskResubmit(tmpBundle.getTaskCount());
       }
     } catch (final Exception e) {
@@ -342,20 +348,28 @@ public class AsyncNodeContext extends BaseNodeContext {
   boolean terminate() {
     final boolean res = closed.compareAndSet(false, true);
     if (res) {
-      if (debugEnabled) log.debug("closing channel {}", getChannel());
+      if (debugEnabled) log.debug("closing channel {}", this);
       final JMXConnectionWrapper jmx = isPeer() ? getPeerJmxConnection() : getJmxConnection();
       setJmxConnection(null);
       setPeerJmxConnection(null);
       if (jmx != null) ThreadUtils.startThread(() -> jmx.close(), "closing " + AsyncNodeContext.this);
       driver.getStatistics().addValue(JPPFStatisticsHelper.NODES, -1);
-      synchronized(jobToBundlesIds) {
-        jobToBundlesIds.clear();
-        entryMap.clear();
-      }
+      clear();
       sendQueue.clear();
       setExecutionStatus(ExecutorStatus.FAILED);
     }
     return res;
+  }
+
+  /**
+   * Clear all job entries and messages to send.
+   */
+  private void clear() {
+    synchronized(jobToBundlesIds) {
+      jobToBundlesIds.clear();
+      entryMap.clear();
+    }
+    sendQueue.clear();
   }
 
   @Override

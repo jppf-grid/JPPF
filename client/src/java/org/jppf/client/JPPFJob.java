@@ -70,6 +70,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    */
   public JPPFJob(final String jobUuid) {
     super(jobUuid);
+    results.setJobName(name);
   }
 
   /**

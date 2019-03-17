@@ -63,7 +63,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
   /**
    * The requeue handler.
    */
-  protected Runnable onRequeue = null;
+  protected Runnable onRequeue;
   /**
    * The data location of the data provider.
    */
@@ -311,6 +311,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
     sb.append("id=").append(id);
     sb.append(", job uuid=").append(uuid);
     sb.append(", name=").append(name);
+    sb.append(", submissionStatus=").append(submissionStatus.get());
     sb.append(", status=").append(status);
     if (lock.tryLock()) {
       try {

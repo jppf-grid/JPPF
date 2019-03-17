@@ -166,14 +166,15 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
     final AsyncNodeContext context = (AsyncNodeContext) key.attachment();
     if (e instanceof CancelledKeyException) {
       if ((context != null) && !context.isClosed()) {
-        log.error("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+        log.error("error on {} : ", context, e);
         closeConnection(context);
       }
     } else if (e instanceof EOFException) {
-      if (debugEnabled) log.debug("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+      if (debugEnabled) log.debug("error on {} : ", context, e);
+      else log.warn("error [{}] on {}", e.toString(), context);
       context.handleException(e);
     } else {
-      log.error("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+      log.error("error on [{}] on {}", e.toString(), context);
       if (context != null) context.handleException(e);
     }
   }

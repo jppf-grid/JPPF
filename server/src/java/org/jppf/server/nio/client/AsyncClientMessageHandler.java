@@ -26,7 +26,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.client.*;
 import org.jppf.server.nio.nodeserver.PeerAttributesHandler;
-import org.jppf.server.protocol.ServerTaskBundleClient;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -97,7 +97,11 @@ public class AsyncClientMessageHandler {
    * @throws Exception if any error occurs.
    */
   void sendJobResults(final AsyncClientContext context, final ServerTaskBundleClient bundle) throws Exception {
-    if (debugEnabled) log.debug("sending job results {} for {}", bundle, context);
+    if (log.isTraceEnabled()) {
+      log.trace("sending job results with originalId={}, bundle={} for {}\ntasks positions = {}",
+        bundle.getOriginalBundleId(), bundle, context, Arrays.toString(bundle.getTasksPositions()));
+    }
+    else if (debugEnabled) log.debug("sending job results with originalId={}, bundle={} for {}", bundle.getOriginalBundleId(), bundle, context);
     final ClientMessage message = context.serializeBundle(bundle);
     context.offerMessageToSend(bundle, message);
   }
@@ -109,15 +113,20 @@ public class AsyncClientMessageHandler {
    * @throws Exception if any error occurs.
    */
   void jobResultsSent(final AsyncClientContext context, final ServerTaskBundleClient bundle) throws Exception {
-    if (debugEnabled) log.debug("job results sent {} for {}", bundle, context);
     final long bundleId = bundle.getOriginalBundleId();
+    if (debugEnabled) log.debug("job results sent bundleId={}, bundle={} for {}", bundleId, bundle, context);
     final JobEntry entry = context.getJobEntry(bundle.getUuid() + bundleId);
-    entry.nbTasksToSend -= bundle.getTaskCount();
-    if (debugEnabled) log.debug("job entry = {}", entry);
-    if (entry.nbTasksToSend <= 0) {
-      if (debugEnabled) log.debug("*** client bundle ended {}", entry.getInitialBundleWrapper());
-      entry.jobEnded();
-      context.removeJobEntry(bundle.getUuid() + bundleId);
+    if (entry != null) {
+      entry.nbTasksToSend -= bundle.getTaskCount();
+      if (debugEnabled) log.debug("job entry = {}", entry);
+      if (entry.nbTasksToSend <= 0) {
+        if (debugEnabled) log.debug("*** client bundle ended {}", entry.getBundle());
+        entry.jobEnded();
+        context.removeJobEntry(bundle.getUuid(), bundleId);
+      }
+    } else {
+      if (log.isTraceEnabled()) log.trace("job entry not found for uuid={}, bundleId={}, call stack:\n{}", bundle.getUuid(), bundleId, ExceptionUtils.getCallStack());
+      else if (debugEnabled) log.debug("job entry not found for uuid={}, bundleId={}", bundle.getUuid(), bundleId);
     }
   }
 

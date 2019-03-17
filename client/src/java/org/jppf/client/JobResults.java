@@ -52,6 +52,10 @@ public class JobResults extends ThreadSynchronization implements Serializable {
    * ordered by ascending position in the submitted list of tasks.
    */
   private final SortedMap<Integer, Task<?>> resultMap = new TreeMap<>();
+  /**
+   * The name of the job.
+   */
+  private String jobName;
 
   /**
    * Get the current number of received results.
@@ -88,7 +92,10 @@ public class JobResults extends ThreadSynchronization implements Serializable {
     for (final Task<?> task : tasks) {
       final int pos = task.getPosition();
       if (traceEnabled) log.debug("adding result at positon {}", pos);
-      if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
+      if (hasResult(pos)) {
+        if (jobName == null) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
+        else log.warn("position {} (out of {}) already has a result (job '{}')", pos, tasks.size(), jobName);
+      }
       resultMap.put(pos, task);
     }
   }
@@ -147,5 +154,13 @@ public class JobResults extends ThreadSynchronization implements Serializable {
    */
   public synchronized void clear() {
     resultMap.clear();
+  }
+
+  /**
+   * Set the name of the job (for debug purposes).
+   * @param name the job name.
+   */
+  void setJobName(final String name) {
+    this.jobName = name;
   }
 }
