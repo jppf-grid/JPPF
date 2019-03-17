@@ -28,29 +28,23 @@ class JobEntry {
   /**
    * The task bundle to send or receive.
    */
-  ServerTaskBundleClient clientBundle;
-  /**
-   * The job as initially submitted by the client.
-   */
-  ServerTaskBundleClient initialBundleWrapper;
+  private final ServerTaskBundleClient clientBundle;
   /**
    * The number of tasks remaining to send.
    */
-  int nbTasksToSend = 0;
+  int nbTasksToSend;
   /**
    * The job uuid.
    */
-  String jobUuid;
+  final String jobUuid;
 
   /**
-   * 
    * @param clientBundle the task bundle to send or receive.
    */
   JobEntry(final ServerTaskBundleClient clientBundle) {
     this.clientBundle = clientBundle;
     jobUuid = clientBundle.getUuid();
-    initialBundleWrapper = clientBundle;
-    nbTasksToSend = initialBundleWrapper.getPendingTasksCount();
+    nbTasksToSend = clientBundle.getPendingTasksCount();
   }
 
   /**
@@ -58,23 +52,16 @@ class JobEntry {
    * @return the number of tasks as an int.
    */
   public int getPendingTasksCount() {
-    if (initialBundleWrapper == null) throw new IllegalStateException("initialBundleWrapper is null");
-    return initialBundleWrapper.getPendingTasksCount();
+    if (clientBundle == null) throw new IllegalStateException("initialBundleWrapper is null");
+    return clientBundle.getPendingTasksCount();
   }
 
   /**
-   * Get the job as initially submitted by the client.
+   * Get the job submitted by the client.
    * @return a <code>ServerTaskBundleClient</code> instance.
    */
-  public ServerTaskBundleClient getInitialBundleWrapper() {
-    return initialBundleWrapper;
-  }
-
-  /**
-   * @return the uuid of the current job, if any.
-   */
-  synchronized String getJobUuid() {
-    return jobUuid;
+  public ServerTaskBundleClient getBundle() {
+    return clientBundle;
   }
 
   /**
@@ -82,9 +69,8 @@ class JobEntry {
    */
   void jobEnded() {
     final ServerTaskBundleClient bundle;
-    if ((bundle = getInitialBundleWrapper()) != null) {
+    if ((bundle = getBundle()) != null) {
       bundle.bundleEnded();
-      initialBundleWrapper = null;
     }
   }
 
@@ -94,7 +80,7 @@ class JobEntry {
       .append("jobUuid=").append(jobUuid)
       .append(", jobName=").append(clientBundle.getJob().getName())
       .append(", nbTasksToSend=").append(nbTasksToSend)
-      //.append(", nb completedBundles=").append(completedBundles.size())
+      .append(", bundleId=").append(clientBundle.getId())
       .append(']').toString();
   }
 }

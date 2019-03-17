@@ -53,15 +53,15 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
   /**
    * A counter for the total number of submitted jobs.
    */
-  private int submittedJobCount = 0;
+  private int submittedJobCount;
   /**
    * A counter for the total number of completed jobs.
    */
-  private int executedJobCount = 0;
+  private int executedJobCount;
   /**
    * A counter for the total number of submitted tasks.
    */
-  private int taskCount = 0;
+  private int taskCount;
   /**
    * Synchronize access to this job stream.
    */

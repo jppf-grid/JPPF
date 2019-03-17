@@ -305,7 +305,7 @@ class JMXMessageReader {
     if (request.getMessageType() == JMXHelper.CLOSE) {
       if (isException) throw (Exception) result;
     } else {
-      final JMXResponse response = new JMXResponse(request.getMessageID(), request.getMessageType(), result, isException);
+      final JMXResponse response = new JMXResponse(request, result, isException);
       context.getMessageHandler().sendMessage(response);
     }
   }

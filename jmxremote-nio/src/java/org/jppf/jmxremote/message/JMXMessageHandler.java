@@ -208,6 +208,7 @@ public class JMXMessageHandler {
         for (Map.Entry<Long, JMXRequest> entry: requestMap.entrySet()) {
           final JMXRequest request = entry.getValue();
           synchronized(request) {
+            request.setResponse(new JMXResponse(request, null, false));
             request.notify();
           }
         }
@@ -218,7 +219,7 @@ public class JMXMessageHandler {
 
   /**
    * Wait for a call to {@code notify()} on the specified message, for at most the request timeout.
-   * The calling method is assumed to own the request's monitor.
+   * The calling method is assumed to own the request's monitor (that is, call this method from a {@code synchronized} block).
    * @param request the message to wait on.
    * @throws JPPFTimeoutException if the timeout was reached before a {@code notify()} was performed.
    * @throws Exception if any other error occurs.

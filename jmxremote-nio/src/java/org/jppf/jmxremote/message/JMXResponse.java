@@ -40,34 +40,13 @@ public class JMXResponse extends AbstractJMXMessage {
   private final Object result;
 
   /**
-   * Initialize this request with the specified ID, request type and parameters.
-   * @param messageID the message id.
-   * @param requestType the type of request.
-   * @param result the request's result.
-   */
-  public JMXResponse(final long messageID, final byte requestType, final Object result) {
-    this(messageID, requestType, result, false);
-  }
-
-  /**
-   * Initialize this request with the specified ID, request type and parameters.
-   * @param messageID the message id.
-   * @param requestType the type of request.
-   * @param exception an exception eventually raised when performing the request.
-   */
-  public JMXResponse(final long messageID, final byte requestType, final Exception exception) {
-    this(messageID, requestType, exception, true);
-  }
-
-  /**
-   * Initialize this request with the specified ID, request type and parameters.
-   * @param messageID the message id.
-   * @param requestType the type of request.
+   * Initialize this request with the ID and request type of the specified message.
+   * @param message the message from which to extract the message id and message type.
    * @param result the request's result.
    * @param isException whether the result is an exception or a normal result.
    */
-  public JMXResponse(final long messageID, final byte requestType, final Object result, final boolean isException) {
-    super(messageID, requestType);
+  public JMXResponse(final JMXMessage message, final Object result, final boolean isException) {
+    super(message.getMessageID(), message.getMessageType());
     this.result = result;
     this.isException = isException;
   }
