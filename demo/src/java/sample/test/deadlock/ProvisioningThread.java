@@ -82,17 +82,14 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
 
   @Override
   public void run() {
-    log.info("starting ProvisioningThread, waitTime={}", waitTime);
+    log.info("starting {}, waitTime={}", getClass().getSimpleName(), waitTime);
     try {
-      goToSleep(waitTime);
+      checkStoppedAndGoToSleep(waitTime);
       while (!isStopped()) {
-        provision(0);
-        if (isStopped()) break;
-        goToSleep(waitTime);
-        if (isStopped()) break;
-        provision(initialNbSlaves);
-        if (isStopped()) break;
-        goToSleep(waitTime);
+        if (!provision(0)) break;
+        if (!checkStoppedAndGoToSleep(waitTime)) break;
+        if (!provision(initialNbSlaves)) break;
+        if (!checkStoppedAndGoToSleep(waitTime)) break;
       }
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
@@ -102,9 +99,10 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
   /**
    * 
    * @param nbSlaves the number of slaves to provision.
+   * @return {@code false} if this thread was stopped, {@code true} otherwise.
    * @throws Exception if any error occurs.
    */
-  private void provision(final int nbSlaves)  throws Exception {
+  private boolean provision(final int nbSlaves)  throws Exception {
     if (debugEnabled) log.debug("provisioning {} slaves", nbSlaves);
     final Map<String, Object> map = forwarder.provisionSlaveNodes(masterSelector, nbSlaves);
     for (Map.Entry<String, Object> entry: map.entrySet()) {
@@ -117,11 +115,23 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
       forwarder.getNbSlaves(masterSelector).values().stream().allMatch(o -> (o instanceof Integer) && ((Integer) o == nbSlaves)), 30_000L, 500L, true);
     ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() == nbMasterNodes * (1 + nbSlaves), 30_000L, 500L, true);
     if (debugEnabled) log.debug("got all {} slaves", nbSlaves);
+    return !isStopped();
   }
 
   @Override
   public synchronized void setStopped(final boolean stopped) {
     super.setStopped(stopped);
     wakeUp();
+  }
+
+  /**
+   * 
+   * @param duration the time to wait in millis.
+   * @return {@code false} if this thread was stopped, {@code true} otherwise.
+   */
+  private boolean checkStoppedAndGoToSleep(final long duration) {
+    if (isStopped()) return false;
+    goToSleep(duration);
+    return !isStopped();
   }
 }
