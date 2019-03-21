@@ -44,11 +44,11 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFJobManager.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFJobManager.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Mapping of jobs to the nodes they are executing on.
    */
@@ -129,7 +129,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     synchronized(jobMap) {
       jobMap.putValue(jobUuid, new ChannelJobPair(channel, serverJob));
     }
-    if (debugEnabled) log.debug("jobId '{}' : dispatched to node {}", bundle.getName(), channel);
+    if (debugEnabled) log.debug("job '{}' dispatched to node {}", bundle.getName(), channel);
     if (!isBroadcastDispatch(serverJob)) {
       submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
       fireJobTasksEvent(channel, nodeBundle, true);
@@ -147,12 +147,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   public synchronized void jobReturned(final AbstractServerJob serverJob, final ExecutorChannel<?> channel, final ServerTaskBundleNode nodeBundle) {
     final TaskBundle bundle = nodeBundle.getJob();
     final String jobUuid = bundle.getUuid();
+    if (debugEnabled) log.debug("job '{}' returned from node {}", bundle.getName(), channel);
     synchronized(jobMap) {
-      if (!jobMap.removeValue(jobUuid, new ChannelJobPair(channel, serverJob))) {
-        log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getName());
-      } else if (debugEnabled) log.debug("jobId '{}' : returned from node {}", bundle.getName(), channel);
+      jobMap.removeValue(jobUuid, new ChannelJobPair(channel, serverJob));
     }
-    //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
     if (!isBroadcastDispatch(serverJob)) {
       submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
       fireJobTasksEvent(channel, nodeBundle, false);
@@ -217,7 +215,6 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
 
   @Override
   public void jobStatusChanged(final AbstractServerJob source, final SubmissionStatus oldValue, final SubmissionStatus newValue) {
-    //jobUpdated(source);
   }
 
   /**
@@ -426,5 +423,4 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     if (!(job instanceof ServerJobBroadcast)) return false;
     return job.getBroadcastUUID() != null;
   }
-
 }

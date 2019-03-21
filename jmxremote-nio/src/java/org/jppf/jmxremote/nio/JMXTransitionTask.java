@@ -97,13 +97,8 @@ public class JMXTransitionTask implements Runnable {
         throw e;
       }
     } catch(final Exception|Error e) {
-      try {
-        if (debugEnabled) log.debug("error on channel {} :\n{}", context, ExceptionUtils.getStackTrace(e));
-        else log.warn("error on channel {} : {}", context, ExceptionUtils.getMessage(e));
-      } catch (final Exception e2) {
-        if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e2));
-        else log.warn("error on channel: {}", ExceptionUtils.getMessage(e2));
-      }
+      if (debugEnabled) log.debug("error on channel {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+      else log.warn("error on channel {} : {}", context, ExceptionUtils.getMessage(e));
       if (e instanceof Exception) context.handleException((Exception) e);
       else throw (Error) e;
     }
