@@ -111,6 +111,10 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * Sequence number provider for the the provisioning notifications.
    */
   private final AtomicLong notificationSequence = new AtomicLong(0L);
+  /**
+   * 
+   */
+  private final long startDelayIncrement;
 
   /**
    * Initialize this manager.
@@ -119,7 +123,9 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
   public SlaveNodeManager(final Node node) {
     this.node = node;
     masterDir = new File(System.getProperty("user.dir"));
-    if (debugEnabled) log.debug("masterDir = {}, request check timeout = {} ms", masterDir, REQUEST_CHECK_TIMEOUT);
+    final long n = node.getConfiguration().getLong("jppf.node.provisioning.slave.start.delay.increment", 0L);
+    startDelayIncrement = (n >= 0L) ? n : 0L;
+    if (debugEnabled) log.debug("masterDir = {}, request check timeout = {} ms, slave start delay increment = {}", masterDir, REQUEST_CHECK_TIMEOUT, startDelayIncrement);
     computeSlaveClasspath();
   }
 
@@ -185,13 +191,13 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     } else {
       // otherwise start the missing number of slaves
       if (debugEnabled) log.debug("starting " + -diff + " processes");
-      for (int i=size; i<requestedSlaves; i++) {
+      for (int i=size, count=0; i<requestedSlaves; i++, count++) {
         id = reserveNextAvailableId();
         final String slaveDirPath = SLAVE_PATH_PREFIX + id;
         try {
           log.debug("starting slave at {}", slaveDirPath);
           setupSlaveNodeFiles(slaveDirPath, this.configOverrides, id);
-          final SlaveNodeLauncher slave = new SlaveNodeLauncher(id, slaveDirPath, slaveClasspath);
+          final SlaveNodeLauncher slave = new SlaveNodeLauncher(id, slaveDirPath, slaveClasspath, startDelayIncrement * count);
           slave.addProcessLauncherListener(this);
           ThreadUtils.startDaemonThread(slave, slaveDirPath);
         } catch(final Exception|Error e) {
@@ -239,8 +245,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
       if (debugEnabled) log.debug("config source dir '{}' does not exist", slaveConfigSrc);
     }
     // get the JPPF config, apply the overrides, then save it to the slave's folder
-    final TypedProperties config = node.getConfiguration();
-    final TypedProperties props = new TypedProperties(config);
+    final TypedProperties props = new TypedProperties(node.getConfiguration());
     props.remove("jppf.node.uuid");
     for (String key: configOverrides.stringPropertyNames()) props.setProperty(key, configOverrides.getProperty(key));
     props.set(JPPFProperties.PROVISIONING_MASTER, false);

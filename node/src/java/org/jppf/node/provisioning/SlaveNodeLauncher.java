@@ -68,6 +68,10 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
    * The command line used to start the slave node process.
    */
   private List<String> launchCommand;
+  /**
+   * How log to wait before actually starting the slave process.
+   */
+  private final long startDelay;
 
   /**
    * Initialize this process launcher.
@@ -76,10 +80,22 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
    * @param classpath the slave node's classpath.
    */
   public SlaveNodeLauncher(final int id, final String name, final List<String> classpath) {
+    this(id, name, classpath, 0L);
+  }
+
+  /**
+   * Initialize this process launcher.
+   * @param id the id as an int.
+   * @param name internal name given tot he process.
+   * @param classpath the slave node's classpath.
+   * @param startDelay how log to wait before actually starting the slave process.
+   */
+  public SlaveNodeLauncher(final int id, final String name, final List<String> classpath, final long startDelay) {
     this.id = id;
     this.name = name;
     this.classpath = classpath;
     slaveDir = new File(name);
+    this.startDelay = startDelay;
     if (log.isDebugEnabled()) log.debug("slaveDir = " + slaveDir);
   }
 
@@ -94,6 +110,7 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
       startSocketListener();
       synchronized(this) {
         if (isStopped()) return;
+        if (startDelay > 0L) wait(startDelay);
         process = startProcess();
         setStarted(true);
         fireProcessStarted();
@@ -103,7 +120,6 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
       fireProcessStopped(false);
       tearDown();
     } catch (@SuppressWarnings("unused") final Exception e) {
-      //e.printStackTrace();
       fireProcessStopped(false);
     } finally {
       setStarted(false);
