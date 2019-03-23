@@ -404,12 +404,7 @@ public class AsyncNodeMessageHandler {
   private void updateMaxJobs(final AsyncNodeContext context, final TaskBundle bundle) {
     final int n = context.getMaxJobs();
     final Integer newMaxJobs = bundle.getParameter(NODE_MAX_JOBS);
-    int maxJobs = 0;
-    if (n <= 0) {
-      maxJobs = (newMaxJobs == null) ? driver.getConfiguration().get(JPPFProperties.NODE_MAX_JOBS) : newMaxJobs;
-    } else if (newMaxJobs != null) {
-      maxJobs = (newMaxJobs <= 0) ? driver.getConfiguration().get(JPPFProperties.NODE_MAX_JOBS) : newMaxJobs;
-    }
+    final int maxJobs = (newMaxJobs == null) ? driver.getConfiguration().get(JPPFProperties.NODE_MAX_JOBS) : newMaxJobs;
     if (debugEnabled) log.debug("n={}, newMaxJobs={}, computed maxJobs={}, context={}", n, newMaxJobs, maxJobs, context);
     if (maxJobs > 0) context.setMaxJobs(maxJobs);
   }
