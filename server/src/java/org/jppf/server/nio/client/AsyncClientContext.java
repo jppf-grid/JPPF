@@ -242,7 +242,7 @@ public class AsyncClientContext extends StatelessNioContext {
           if (debugEnabled) log.debug("tasksToSend={}, tasksToSend2={}, n={}, taskCount={}, serverJob={}", new Object[] {tasksToSend, tasksToSend2, n, taskCount, job});
           final JPPFStatistics stats = driver.getStatistics();
           stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -taskCount);
-          driver.getQueue().removeBundle(job);
+          if (job != null) driver.getQueue().removeBundle(job);
         } catch(final Exception e) {
           log.error(e.getMessage(), e);
         }
