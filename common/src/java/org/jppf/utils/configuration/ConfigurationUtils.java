@@ -67,11 +67,53 @@ public class ConfigurationUtils {
   public static Properties hidePasswords(final Properties props) {
     if (props == null) return null;
     final Properties  result = new Properties();
-    final String[] keys = { "password", "pwd" };
+    final String[] keys = { "password", "pwd", "passw" };
     for (final String name: props.stringPropertyNames()) {
       if (StringUtils.hasOneOf(name, true, keys)) result.setProperty(name, "********");
       else result.setProperty(name, props.getProperty(name));
     }
     return result;
+  }
+
+
+  /**
+   * Parse a memory size value in format [size][unit] where:
+   * <ul>
+   * <li>size is a positive {@code long} value</li>
+   * <li>unit is one of 'g', 'm', 'k', 'b' or uppercase equivalents 'G', 'M', 'K', 'B'. If the unit string is anything else then it defaults to 'b'</li>
+   * </ul>
+   * Examples: 2g, 1536M, 123456k, 123456789b
+   * @param source the string to parse.
+   * @return parse the used memory threshold that triggers user data offloading, from the configuration.
+   */
+  public static long parseDataSize(final String source) {
+    char unit = 0;
+    int i;
+    for (i=0; i<source.length(); i++) {
+      final char c = source.charAt(i);
+      if ((i == 0) && (c == '-')) continue;
+      if (!Character.isDigit(c)) {
+        unit = Character.toLowerCase(c);
+        break;
+      }
+    }
+    long threshold = 0;
+    try {
+      threshold = Long.valueOf(source.substring(0, i));
+    } catch (@SuppressWarnings("unused") final Exception e) {
+      threshold = (long) (0.8d * Runtime.getRuntime().maxMemory());
+    }
+    switch(unit) {
+      case 'g':
+        threshold *= 1024L * 1024L * 1024L;
+        break;
+      case 'm':
+        threshold *= 1024L * 1024L;
+        break;
+      case 'k':
+        threshold *= 1024L;
+        break;
+    }
+    return threshold;
   }
 }
