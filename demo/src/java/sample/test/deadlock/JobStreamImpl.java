@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.JobEvent;
 import org.jppf.client.utils.AbstractJPPFJobStream;
+import org.jppf.node.protocol.*;
 
 /**
  *
@@ -31,11 +32,11 @@ import org.jppf.client.utils.AbstractJPPFJobStream;
  */
 public class JobStreamImpl extends AbstractJPPFJobStream {
   /**
-   * 
+   * Format for the name of each job, where the parameter is the job sequence number.
    */
   private static final String JOB_NAME_FORMAT = "streaming job %06d";
   /**
-   *
+   * Options set in the configuration, describing the number and attributes of each job.
    */
   final RunOptions options;
   /**
@@ -50,6 +51,10 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
    * Streaming start time.
    */
   long start;
+  /**
+   * An optional data provider set onto each job.
+   */
+  final DataProvider dp;
 
   /**
    * Initialize this job provider.
@@ -58,6 +63,10 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
   public JobStreamImpl(final RunOptions options) {
     super(options.concurrencyLimit);
     this.options = options;
+    if (options.dataProviderSize >= 0) {
+      dp = new MemoryMapDataProvider();
+      dp.setParameter("data", new byte[options.dataProviderSize]);
+    } else dp = null;
   }
 
   @Override
@@ -85,6 +94,7 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
         final MyTask task = new MyTask(message, options.taskOptions);
         job.add(task).setId(String.format("%s - task %d", job.getName(), i));
       }
+      if (dp != null) job.setDataProvider(dp);
     } catch(final Exception e) {
       e.printStackTrace();
     }

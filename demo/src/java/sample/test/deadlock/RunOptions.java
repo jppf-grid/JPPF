@@ -19,6 +19,7 @@
 package sample.test.deadlock;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.ConfigurationUtils;
 
 /**
  * Java wrapper for the options of the jobs streaming demo.
@@ -77,6 +78,10 @@ public class RunOptions {
    * The task-specific options.
    */
   public final TaskOptions taskOptions;
+  /**
+   * Time interval in ms for un-provisioning of the slave nodes, when simulating node crashes
+   */
+  public final int dataProviderSize = (int) ConfigurationUtils.parseDataSize(config.getString("deadlock.dataProviderSize", "-1b"));
 
   /**
    * 
@@ -91,7 +96,7 @@ public class RunOptions {
    */
   private static TaskOptions createTaskOptions() {
     final TaskOptions to = new TaskOptions();
-    to.dataSize = config.getInt("deadlock.dataSize", -1);
+    to.dataSize = (int) ConfigurationUtils.parseDataSize(config.getString("deadlock.dataSize", "-1b"));
     to.taskDuration = config.getLong("deadlock.taskDuration", 10L);
     to.useCPU = config.getBoolean("deadlock.useCPU", false);
     return to;

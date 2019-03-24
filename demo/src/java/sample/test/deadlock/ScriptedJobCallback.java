@@ -28,22 +28,28 @@ import org.jppf.utils.*;
 public class ScriptedJobCallback extends JobStreamingCallback.Adapter {
   /** */
   final String jobCreatedScript, jobCompletedScript;
+  /** */
+  final ScriptDefinition jobCreatedScriptDef, jobCompletedScriptDef;
 
   /** */
   public ScriptedJobCallback() {
     final TypedProperties config = JPPFConfiguration.getProperties();
     jobCreatedScript = config.getString("deadlock.script.created");
+    jobCreatedScriptDef = (jobCreatedScript != null) ? new ScriptDefinition("javascript", jobCreatedScript, "deadlock.script.created", null) : null;
     jobCompletedScript = config.getString("deadlock.script.completed");
+    jobCompletedScriptDef = (jobCompletedScript != null) ? new ScriptDefinition("javascript", jobCompletedScript, "deadlock.script.completed", null) : null;
   }
 
   @Override
   public void jobCreated(final JPPFJob job) {
-    if (jobCreatedScript != null) runScript(job, "deadlock.script.created", jobCreatedScript);
+    //if (jobCreatedScript != null) runScript(job, "deadlock.script.created", jobCreatedScript);
+    if (jobCreatedScriptDef != null) runScript(job, jobCreatedScriptDef);
   }
 
   @Override
   public void jobCompleted(final JPPFJob job, final JobStreamImpl jobStream) {
-    if (jobCompletedScript != null) runScript(job, "deadlock.script.completed", jobCompletedScript);
+    //if (jobCompletedScript != null) runScript(job, "deadlock.script.completed", jobCompletedScript);
+    if (jobCompletedScriptDef != null) runScript(job, jobCompletedScriptDef);
   }
 
   /**
@@ -52,11 +58,26 @@ public class ScriptedJobCallback extends JobStreamingCallback.Adapter {
    * @param scriptID .
    * @param script .
    */
-  private static void runScript(final JPPFJob job, final String scriptID, final String script) {
+  static void runScript(final JPPFJob job, final String scriptID, final String script) {
     final Map<String, Object> variables = new HashMap<>();
     variables.put("job", job);
     try {
-      new ScriptDefinition("javascript", script, variables).evaluate();
+      new ScriptDefinition("javascript", script, scriptID, variables).evaluate();
+    } catch (final JPPFScriptingException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * 
+   * @param job .
+   * @param scriptDef .
+   */
+  static void runScript(final JPPFJob job, final ScriptDefinition scriptDef) {
+    final Map<String, Object> variables = new HashMap<>();
+    variables.put("job", job);
+    try {
+      scriptDef.evaluate(variables);
     } catch (final JPPFScriptingException e) {
       e.printStackTrace();
     }

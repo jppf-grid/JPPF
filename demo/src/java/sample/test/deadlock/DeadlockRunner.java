@@ -82,8 +82,8 @@ public class DeadlockRunner {
       if (ro.simulateNodeCrashes) pt = new ProvisioningThread(client, ro.waitTime);
       try {
         if (ro.simulateNodeCrashes) new Thread(pt, "ProvisioningThread").start();
-        final TimeMarker marker = new TimeMarker().start();
         int count = 0;
+        final TimeMarker marker = new TimeMarker().start();
         for (final JPPFJob job: jobProvider) {
           if ((job != null) && !client.isClosed()) client.submitAsync(job);
           if (count == ro.triggerNodeDeadlockAfter) {
@@ -95,9 +95,11 @@ public class DeadlockRunner {
           count++;
         }
         print("submitted all jobs, awaiting end of job stream");
+        if (ro.simulateNodeCrashes) pt.setStopped(true);
         jobProvider.awaitEndOfStream();
         print("reached end of job stream");
         ConcurrentUtils.awaitCondition(() -> jmxListener.getMapSize() <= 0, 5000L, 100L, false);
+        marker.stop();
         printJobStats(jmxListener);
         printStats(jmx, jobProvider, marker);
       } finally {
@@ -135,11 +137,8 @@ public class DeadlockRunner {
     final List<Task<?>> results = job.getAllResults();
     int nbExceptions = 0, nbNoResult = 0;
     for (Task<?> task: results) {
-      //if (task.getThrowable() != null) print("%s raised an exception : %s", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
-      //if (task.getThrowable() != null) print("%s raised an exception : %s", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
       if (task.getThrowable() != null) nbExceptions++;
       else if (task.getResult() == null) nbNoResult++;
-      //else System.out.printf("result of %s : %s\n", task.getId(), task.getResult());
     }
     print("*** results for job '%s' : exceptions = %4d, no result = %4d ***", job.getName(), nbExceptions, nbNoResult);
   }
@@ -153,6 +152,7 @@ public class DeadlockRunner {
   private static void ensureSufficientConnections(final JPPFClient client, final int nbConnections) throws Exception {
     print("***** ensuring %d connections ...", nbConnections);
     final JPPFConnectionPool pool = client.awaitConnectionPool();
+    if (pool.getSize() == nbConnections) return;
     print("***** ensuring %d connections, found pool = %s", nbConnections, pool);
     pool.setSize(nbConnections);
     print("***** ensuring %d connections, called setSize(%d)", nbConnections, nbConnections);
@@ -222,14 +222,18 @@ public class DeadlockRunner {
     double maxDev = 0d;
     final int[] nbTasks = new int[nbNodes];
     int count = 0;
-    for (final Map.Entry<String, Object> entry: map.entrySet()) nbTasks[count++] = ((JPPFNodeState) entry.getValue()).getNbTasksExecuted();
-    for (int nb: nbTasks) {
+    for (final Map.Entry<String, Object> entry: map.entrySet()) {
+      final Object value = entry.getValue();
+      if (value instanceof JPPFNodeState) nbTasks[count++] = ((JPPFNodeState) value).getNbTasksExecuted();
+      else nbTasks[count++] = 0;
+    }
+    for (final int nb: nbTasks) {
       if (nb > max) max = nb;
       if (nb < min) min = nb;
       total += nb;
     }
     mean = total / nbNodes;
-    for (int nb: nbTasks) {
+    for (final int nb: nbTasks) {
       final double dev = Math.abs(nb - mean);
       if (dev > maxDev) maxDev = dev;
       if (dev < minDev) minDev = dev;
@@ -237,7 +241,7 @@ public class DeadlockRunner {
     }
     meanDev /= nbNodes;
     final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
-    print("executed a total of %,d jobs and %,d tasks in %s", jobProvider.getJobCount(), jobProvider.getTaskCount(), marker.stop().getLastElapsedAsString());
+    print("executed a total of %,d jobs and %,d tasks in %s", jobProvider.getJobCount(), jobProvider.getTaskCount(), marker.getLastElapsedAsString());
     print("nodes = %d, tasks = %,.2f; avg = %,.2f; min = %,.2f; max = %,.2f", nbNodes, total, mean, min, max);
     print("deviations: avg = %,.2f; min = %,.2f; max = %,.2f", meanDev, minDev, maxDev);
     final File file = new File("lb.csv");

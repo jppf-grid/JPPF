@@ -18,7 +18,7 @@
 
 package sample.test.deadlock;
 
-import java.util.*;
+import java.util.Map;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
@@ -27,6 +27,7 @@ import org.jppf.node.policy.IsMasterNode;
 import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.concurrent.*;
 import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -54,6 +55,8 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
   private final int initialNbSlaves;
   /** */
   private final int nbMasterNodes;
+  /** */
+  private final long jmxTimeout;
 
   /**
    * 
@@ -77,6 +80,7 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
     }
     if (n < 0) throw new IllegalStateException("no slaves were found");
     initialNbSlaves = n;
+    jmxTimeout = client.getConfig().get(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT);
     DeadlockRunner.print("nb masters: %d, initial nb slaves: %d", nbMasterNodes, initialNbSlaves);
   }
 
@@ -112,8 +116,8 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
       }
     }
     ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> 
-      forwarder.getNbSlaves(masterSelector).values().stream().allMatch(o -> (o instanceof Integer) && ((Integer) o == nbSlaves)), 30_000L, 500L, true);
-    ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() == nbMasterNodes * (1 + nbSlaves), 30_000L, 500L, true);
+      forwarder.getNbSlaves(masterSelector).values().stream().allMatch(o -> (o instanceof Integer) && ((Integer) o == nbSlaves)), jmxTimeout, 500L, true);
+    ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() == nbMasterNodes * (1 + nbSlaves), jmxTimeout, 500L, true);
     if (debugEnabled) log.debug("got all {} slaves", nbSlaves);
     return !isStopped();
   }
