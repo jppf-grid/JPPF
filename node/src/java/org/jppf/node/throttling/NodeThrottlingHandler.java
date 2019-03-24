@@ -106,8 +106,7 @@ public class NodeThrottlingHandler extends ServiceProviderHandler<JPPFNodeThrott
   }
 
   /**
-   * 
-   * @return true if the node accepts new jobs, false otherwise.
+   * @return {@code true} if the node accepts new jobs, {@code false} otherwise.
    */
   public synchronized boolean check() {
     new CheckTask(false).run();

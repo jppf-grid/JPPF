@@ -23,7 +23,7 @@ import java.io.*;
 import org.jppf.utils.streams.BoundedByteArrayOutputStream;
 
 /**
- * Wrapper fro manipulating a block of data in memory.
+ * Wrapper for manipulating a block of data in memory.
  * This implementation of the {@link Location} interface allows writing to and reading from a <code>byte</code> array.
  * @author Laurent Cohen
  */

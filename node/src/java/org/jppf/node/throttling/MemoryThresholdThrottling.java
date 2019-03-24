@@ -36,7 +36,7 @@ import org.slf4j.*;
  * jppf.node.throttling.memory.threshold.active = true
  * <span style="color: green"># % of maximum heap size that causes the node to refuse jobs</span>
  * jppf.node.throttling.memory.threshold = 87.5
- * <span style="color: green"># number of time the check returns false before invoking System.gc()</span>
+ * <span style="color: green"># number of times the check returns false before invoking System.gc()</span>
  * jppf.node.throttling.memory.threshold.maxNbTimesFalse = 5
  * </pre>
  * @author Laurent Cohen
@@ -75,7 +75,7 @@ public class MemoryThresholdThrottling implements JPPFNodeThrottling {
     final boolean active = node.getConfiguration().getBoolean("jppf.node.throttling.memory.threshold.active", false);
     if (firstTime) {
       firstTime = false;
-      if (debugEnabled) log.debug("MemoryThresholdThrottling is {}", active ?"active" : "inactive");
+      if (debugEnabled) log.debug("MemoryThresholdThrottling is {}", active ? "active" : "inactive");
     }
     if (!active) return true;
     final double threshold = node.getConfiguration().getDouble("jppf.node.throttling.memory.threshold", 90d);
