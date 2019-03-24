@@ -108,33 +108,36 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
    * @param totalTime the total round-trip time of the bundle between the driver and the node.
    */
   private void computeBundleSize(final int size, final double totalTime) {
-    final double diff = (rl2State.performanceCache.getPreviousMean() - rl2State.performanceCache.getMean()) / rl2State.performanceCache.getPreviousMean();
+    final PerformanceCache perfCache = rl2State.performanceCache;
+    final double diff = (perfCache.getPreviousMean() - perfCache.getMean()) / perfCache.getPreviousMean();
     // if a negative difference in performance is beyond the configured threshold,
     // assume the performance profile has changed and re-learn it from scratch
+    final SortedMap<Integer, State> statesBySize = rl2State.statesBySize;
+    final CollectionSortedMap<Double, State> statesByTime = rl2State.statesByTime;
     if (diff < -profile.getPerformanceVariationThreshold()) {
       if (debugEnabled) log.debug(format("resetting states (diff=%,f, threshold=%,f)", diff, profile.getPerformanceVariationThreshold()));
-      rl2State.statesBySize.clear();
-      rl2State.statesByTime.clear();
+      statesBySize.clear();
+      statesByTime.clear();
     }
-    State state = rl2State.statesBySize.get(rl2State.bundleSize);
+    State state = statesBySize.get(rl2State.bundleSize);
     if (state == null) {
       state = new State();
       state.size = size;
       state.mean = totalTime / size;
       state.total = state.mean;
       state.count = 1;
-      rl2State.statesBySize.put(rl2State.bundleSize, state);
+      statesBySize.put(rl2State.bundleSize, state);
     } else {
-      rl2State.statesByTime.removeValue(state.mean, state);
+      statesByTime.removeValue(state.mean, state);
       final double mean = totalTime / size;
       //if (mean < state.mean) state.mean = mean;
       state.count++;
       state.total += mean;
       state.mean = state.total / state.count;
     }
-    rl2State.statesByTime.putValue(state.mean, state);
-    boolean choseRandom = true;
-    final int nbStates = rl2State.statesBySize.size();
+    statesByTime.putValue(state.mean, state);
+    boolean choseRandom = false;
+    final int nbStates = statesBySize.size();
     double p = 0d;
     // if nbStates < minSamples, keep building the set of states by chosing the next bundle size randomly
     if (nbStates < profile.getMinSamples()) choseRandom = true;
@@ -146,17 +149,18 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
       //if (debugEnabled) log.debug(format("p=%,f, choseRandom=%b, nbStates=%,d", p, choseRandom, nbStates));
     }
     // if nbStates >= maxSamples, use the state that produced the best performance (no random selection)
-    else choseRandom = false;
+    //else choseRandom = false;
 
     if (choseRandom && (nbStates < maxSize)) {
       int n = 0;
       do {
         n = 1 + rand.nextInt(maxSize);
-      } while (rl2State.statesBySize.get(n) != null);
+      } while (statesBySize.get(n) != null);
       rl2State.bundleSize = n;
     } else {
-      final double key = rl2State.statesByTime.firstKey();
-      final List<State> list = new ArrayList<>(rl2State.statesByTime.getValues(key));
+      final double key = statesByTime.firstKey();
+      //final List<State> list = new ArrayList<>(rl2State.statesByTime.getValues(key));
+      final List<State> list = (List<State>) statesByTime.getValues(key);
       final int listSize = list.size();
       final int idx = (listSize == 1) ? 0 : rand.nextInt(list.size());
       rl2State.bundleSize = list.get(idx).size;
@@ -175,11 +179,19 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
     lock.lock();
     try {
       if (!rl2State.statesBySize.isEmpty() && (rl2State.statesBySize.lastKey() > maxSize)) {
-        final Map<Integer, State> map = new HashMap<>(rl2State.statesBySize.tailMap(maxSize + 1));
+        //final Map<Integer, State> map = new HashMap<>(rl2State.statesBySize.tailMap(maxSize + 1));
+        final Map<Integer, State> map = rl2State.statesBySize.tailMap(maxSize + 1);
+        final List<State> states = new ArrayList<>(map.values());
+        for (final State state: states) {
+          final State st = rl2State.statesBySize.remove(state.size);
+          if (st != null) rl2State.statesByTime.removeValue(state.mean, state);
+        }
+        /*
         for (final Map.Entry<Integer, State> entry: map.entrySet()) {
           final State state = rl2State.statesBySize.remove(entry.getKey());
           if (state != null) rl2State.statesByTime.removeValue(state.mean, state);
         }
+        */
       }
       if (rl2State.statesBySize.isEmpty()) rl2State.bundleSize = 1 + rand.nextInt(maxSize);
     } finally {
@@ -294,6 +306,6 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
     /**
      * The states sorted by ascending mean execution time.
      */
-    private CollectionSortedMap<Double, State> statesByTime = new SetSortedMap<>();
+    private CollectionSortedMap<Double, State> statesByTime = new ArrayListSortedMap<>();
   }
 }
