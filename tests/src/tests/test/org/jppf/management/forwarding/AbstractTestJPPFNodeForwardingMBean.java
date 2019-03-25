@@ -21,6 +21,7 @@ package test.org.jppf.management.forwarding;
 import static org.junit.Assert.*;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
@@ -60,7 +61,7 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
   public TestWatcher setup1D2N1CWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
-      BaseTestHelper.printToAll(client, false, false, true, true, false, "start of method %s()", description.getMethodName());
+      BaseTestHelper.printToAll(client, false, false, true, true, false, "***** start of method %s() *****", description.getMethodName());
     }
   };
 
@@ -116,6 +117,29 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
       final Object value = result.get(uuid);
       assertNotNull(value);
       assertEquals(expectedClass, value.getClass());
+    }
+  }
+
+  /**
+   * Check that there are results for all the expected nodes, and only these nodes.
+   * @param <T> the types of the values in the {@code result} map.
+   * @param result the result to chek.
+   * @param expectedClass the expected class of each result value.
+   * @param predicate a boolean test performed on each value of the {@code result} map.
+   * @param expectedNodes the list of expected nodes.
+   * @throws Exception if any error occurs or the check fails.
+   */
+  @SuppressWarnings("unchecked")
+  protected static <T> void checkNodes(final Map<String, Object> result, final Class<T> expectedClass, final Predicate<T> predicate, final String... expectedNodes) throws Exception {
+    assertNotNull(result);
+    assertFalse(result.isEmpty());
+    assertEquals(expectedNodes.length, result.size());
+    for (final String uuid : expectedNodes) {
+      assertTrue(result.containsKey(uuid));
+      final Object value = result.get(uuid);
+      assertNotNull(value);
+      assertEquals(expectedClass, value.getClass());
+      assertTrue(predicate.test((T) value));
     }
   }
 

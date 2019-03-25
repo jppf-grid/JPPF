@@ -117,21 +117,16 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @throws Exception if any error occurs.
    */
   private static void testUpdateThreadPoolSize(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    Map<String, Object> result = nodeForwarder.state(selector);
-    checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-      assertEquals(1, state.getThreadPoolSize());
-    }
-    result = nodeForwarder.updateThreadPoolSize(selector, 3);
-    checkNoException(result, expectedNodes);
-    result = nodeForwarder.state(selector);
-    checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-      assertEquals(3, state.getThreadPoolSize());
-    }
-    nodeForwarder.updateThreadPoolSize(selector, 1);
+    final String methodName = ReflectionUtils.getCurrentMethodName();
+    BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> start of %s(%s)", methodName, selector.getClass().getSimpleName());
+    checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getThreadPoolSize() == 1, expectedNodes);
+    BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> setting threadPoolSize to 3");
+    checkNoException(nodeForwarder.updateThreadPoolSize(selector, 3), expectedNodes);
+    checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getThreadPoolSize() == 3, expectedNodes);
+    BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> setting threadPoolSize back to 1");
+    checkNoException(nodeForwarder.updateThreadPoolSize(selector, 1), expectedNodes);
+    checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getThreadPoolSize() == 1, expectedNodes);
+    BaseTestHelper.printToAll(client, true, true, true, true, false, "<<< end of %s(%s)", methodName, selector.getClass().getSimpleName());
   }
 
   /**
@@ -153,22 +148,12 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    */
   private static void testUpdateThreadPriority(final NodeSelector selector, final String... expectedNodes) throws Exception {
     try {
-      Map<String, Object> result = nodeForwarder.state(selector);
-      checkNodes(result, JPPFNodeState.class, expectedNodes);
-      for (final Map.Entry<String, Object> entry : result.entrySet()) {
-        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-        assertEquals(Thread.NORM_PRIORITY, state.getThreadPriority());
-      }
-      result = nodeForwarder.updateThreadsPriority(selector, Thread.MAX_PRIORITY);
-      checkNoException(result, expectedNodes);
-      result = nodeForwarder.state(selector);
-      checkNodes(result, JPPFNodeState.class, expectedNodes);
-      for (final Map.Entry<String, Object> entry : result.entrySet()) {
-        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-        assertEquals(Thread.MAX_PRIORITY, state.getThreadPriority());
-      }
+      checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getThreadPriority() == Thread.NORM_PRIORITY, expectedNodes);
+      checkNoException(nodeForwarder.updateThreadsPriority(selector, Thread.MAX_PRIORITY), expectedNodes);
+      checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getThreadPriority() == Thread.MAX_PRIORITY, expectedNodes);
     } finally {
-      nodeForwarder.updateThreadsPriority(selector, Thread.NORM_PRIORITY);
+      checkNoException(nodeForwarder.updateThreadsPriority(selector, Thread.NORM_PRIORITY), expectedNodes);
+      checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getThreadPriority() == Thread.NORM_PRIORITY, expectedNodes);
     }
   }
 
@@ -192,29 +177,13 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
   private static void testResetTaskCounter(final NodeSelector selector, final String... expectedNodes) throws Exception {
     final int nbNodes = expectedNodes.length;
     final int nbTasks = 5 * nbNodes;
-    Map<String, Object> result = nodeForwarder.state(selector);
-    checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-      assertEquals(0, state.getNbTasksExecuted());
-    }
+    checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getNbTasksExecuted() == 0, expectedNodes);
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, nbTasks, LifeCycleTask.class, 1L);
     job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
     client.submit(job);
-    result = nodeForwarder.state(selector);
-    checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-      assertEquals(5, state.getNbTasksExecuted());
-    }
-    result = nodeForwarder.resetTaskCounter(selector);
-    checkNoException(result, expectedNodes);
-    result = nodeForwarder.state(selector);
-    checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-      assertEquals(0, state.getNbTasksExecuted());
-    }
+    checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getNbTasksExecuted() == 5, expectedNodes);
+    checkNoException(nodeForwarder.resetTaskCounter(selector), expectedNodes);
+    checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getNbTasksExecuted() == 0, expectedNodes);
   }
 
   /**
@@ -235,29 +204,11 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @throws Exception if any error occurs.
    */
   private static void testSetTaskCounter(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    Map<String, Object> result = nodeForwarder.state(selector);
-    checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-      assertEquals(0, state.getNbTasksExecuted());
-    }
-    result = nodeForwarder.setTaskCounter(selector, 12);
-    System.out.println("testSetTaskCounter() result = " + result);
-    checkNullResults(result, expectedNodes);
-    result = nodeForwarder.state(selector);
-    checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-      assertEquals(12, state.getNbTasksExecuted());
-    }
-    result = nodeForwarder.setTaskCounter(selector, 0);
-    checkNullResults(result, expectedNodes);
-    result = nodeForwarder.state(selector);
-    checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-      assertEquals(0, state.getNbTasksExecuted());
-    }
+    checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getNbTasksExecuted() == 0, expectedNodes);
+    checkNullResults(nodeForwarder.setTaskCounter(selector, 12), expectedNodes);
+    checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getNbTasksExecuted() == 12, expectedNodes);
+    checkNullResults(nodeForwarder.setTaskCounter(selector, 0), expectedNodes);
+    checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getNbTasksExecuted() == 0, expectedNodes);
   }
 
   /**
@@ -373,7 +324,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
   private static void testCancelJob(final NodeSelector selector, final String... expectedNodes) throws Exception {
     final String methodName = ReflectionUtils.getCurrentMethodName();
     final String selectorClass = selector.getClass().getSimpleName();
-    BaseTestHelper.printToAll(client, false, true, true, true, true, ">>> start of %s(%s)", methodName, selectorClass);
+    BaseTestHelper.printToAll(client, false, true, true, true, false, ">>> start of %s(%s)", methodName, selectorClass);
     final int nbNodes = expectedNodes.length;
     final int nbTasks = 5 * nbNodes;
     final JPPFJob job = BaseTestHelper.createJob(methodName + "-" + selectorClass, false, nbTasks, LifeCycleTask.class, 5000L);
@@ -414,11 +365,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @throws Exception if any error occurs.
    */
   private static void testGetDelegationModel(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    final Map<String, Object> result = nodeForwarder.getDelegationModel(selector);
-    checkNodes(result, DelegationModel.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      assertEquals(DelegationModel.PARENT_FIRST, entry.getValue());
-    }
+    checkNodes(nodeForwarder.getDelegationModel(selector), DelegationModel.class, model -> model == DelegationModel.PARENT_FIRST, expectedNodes);
   }
 
   /**
@@ -439,19 +386,9 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @throws Exception if any error occurs.
    */
   private static void testSetDelegationModel(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    Map<String, Object> result = nodeForwarder.setDelegationModel(selector, DelegationModel.URL_FIRST);
-    checkNullResults(result, expectedNodes);
-    result = nodeForwarder.getDelegationModel(selector);
-    checkNodes(result, DelegationModel.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      assertEquals(DelegationModel.URL_FIRST, entry.getValue());
-    }
-    result = nodeForwarder.setDelegationModel(selector, DelegationModel.PARENT_FIRST);
-    checkNullResults(result, expectedNodes);
-    result = nodeForwarder.getDelegationModel(selector);
-    checkNodes(result, DelegationModel.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      assertEquals(DelegationModel.PARENT_FIRST, entry.getValue());
-    }
+    checkNullResults(nodeForwarder.setDelegationModel(selector, DelegationModel.URL_FIRST), expectedNodes);
+    checkNodes(nodeForwarder.getDelegationModel(selector), DelegationModel.class, model -> model == DelegationModel.URL_FIRST, expectedNodes);
+    checkNullResults(nodeForwarder.setDelegationModel(selector, DelegationModel.PARENT_FIRST), expectedNodes);
+    checkNodes(nodeForwarder.getDelegationModel(selector), DelegationModel.class, model -> model == DelegationModel.PARENT_FIRST, expectedNodes);
   }
 }
