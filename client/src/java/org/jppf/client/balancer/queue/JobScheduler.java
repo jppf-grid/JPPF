@@ -261,7 +261,7 @@ public class JobScheduler extends ThreadSynchronization implements Runnable {
             else if (traceEnabled) log.trace("no channel found for job {}", job);
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
-          if ((channel != null) && !selectedBundle.isCancellingOrCancelled()) {
+          if ((channel != null) && (selectedBundle != null) && !selectedBundle.isCancellingOrCancelled()) {
             dispatched = dispatchJobToChannel(channel, selectedBundle);
           }
         } catch (final Exception ex) {
