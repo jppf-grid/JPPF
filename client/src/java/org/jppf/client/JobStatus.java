@@ -40,5 +40,13 @@ public enum JobStatus {
   /**
    * The job execution has failed.
    */
-  FAILED
+  FAILED;
+  
+  /**
+   * Return whether this status indicates that the job is done, that is, this status is either {@link #COMPLETE} or {@link #FAILED}.
+   * @return true if this status is {@link #COMPLETE} or {@link #FAILED}, false otherwise.
+   */
+  public boolean isDone() {
+    return (this == COMPLETE) || (this == FAILED);
+  }
 }

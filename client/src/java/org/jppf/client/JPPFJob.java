@@ -30,7 +30,6 @@ import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.slf4j.*;
 
 /**
@@ -363,13 +362,21 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * @throws TimeoutException if the tiemout expired and {@code raiseTimeoutException == true}.
    */
   void await(final long timeout, final boolean raiseTimeoutException) throws TimeoutException {
-    final boolean fullfilled = ConcurrentUtils.awaitCondition(results, new ConcurrentUtils.Condition() {
-      @Override public boolean evaluate() {
-        final JobStatus status = getStatus();
-        return (results.size() >= tasks.size()) && ((status == JobStatus.FAILED) || (status == JobStatus.COMPLETE));
+    final long start = System.nanoTime();
+    long elapsed;
+    final int nbTasks = tasks.size();
+    try {
+      synchronized(results) {
+        while (((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout) && ((results.size() < nbTasks) || !getStatus().isDone())) {
+          results.wait(timeout - elapsed);
+        }
+        if (!getStatus().isDone() && raiseTimeoutException) throw new TimeoutException("timeout expired");
       }
-    }, timeout, 1000L);
-    if (!fullfilled && raiseTimeoutException) throw new TimeoutException("timeout expired");
+    } catch (final TimeoutException e) {
+      throw e;
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
   }
 
   /**
