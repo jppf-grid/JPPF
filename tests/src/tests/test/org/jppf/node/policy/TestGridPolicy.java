@@ -23,17 +23,16 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.jppf.JPPFException;
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
-import org.jppf.utils.Operator;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
 
-import test.org.jppf.test.setup.Setup1D2N1C;
+import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -209,6 +208,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(3*JOB_TIMEOUT)); // to avoid the job being stuck
+    BaseTestHelper.printToAll(client, true, true, true, true, false, "submitting job %s", job.getName());
     client.submitAsync(job);
     try {
       Thread.sleep(1000L);
@@ -216,8 +216,11 @@ public class TestGridPolicy extends Setup1D2N1C {
       final TypedProperties overrides = new TypedProperties();
       overrides.setString("jppf.node.uuid", "$script{ java.util.UUID.randomUUID().toString(); }$");
       // start 1 slave node for each master
+      BaseTestHelper.printToAll(client, true, true, true, true, false, "provisioning slave nodes");
       jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 1, overrides);
+      BaseTestHelper.printToAll(client, true, true, true, true, false, "awaiting job results");
       final List<Task<?>> results = job.awaitResults();
+      BaseTestHelper.printToAll(client, true, true, true, true, false, "got job results");
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       for (int i=0; i<nbTasks; i++) {
@@ -227,6 +230,7 @@ public class TestGridPolicy extends Setup1D2N1C {
       }
     } finally {
       // terminate the slave nodes
+      BaseTestHelper.printToAll(client, true, true, true, true, false, "stopping slave nodes");
       jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
     }
   }
