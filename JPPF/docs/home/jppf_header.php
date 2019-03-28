@@ -22,7 +22,7 @@
         <td width="80"></td>
         <td align="right">
           <table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
-            <tr>
+            <tr class="row_shadow">
               <td style="width: 1px"></td>
               <?php $cl = (($currentPage == "Home") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_start"; ?>
 <td class="<?php echo $cl; ?>">&nbsp;<a href="/index.php" class="<?php echo $cl; ?>">Home</a>&nbsp;</td>

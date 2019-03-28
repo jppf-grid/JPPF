@@ -1,7 +1,7 @@
 <?php
   require_once("db_settings.inc.php");
   $currentPage="Home";
-  $jppf_version = "6.0";
+  $jppf_version = "6.1";
 ?>
 $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
   <script src="scripts/jquery.js"></script>
@@ -32,7 +32,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
   <script>anim_main2();</script>
   <div align="center">
     <br/>
-    <h2><i>New</i>: JPPF 6.0 is here, <a href='/release_notes.php?version=6.0'>check it out!</a></h2>
+    <h2><i>New</i>: JPPF 6.1 is here, <a href='/release_notes.php?version=6.1'>check it out!</a></h2>
   </div>
   <br><div class="blockWithHighlightedTitle" style="padding-left: 25px">
     <p style="font-size: 12pt">JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
@@ -61,7 +61,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
       <li>fault-tolerance and self-repair capabilities</li>
       <li>exceptional level of service and reliability</li>
       <li>full, comprehensive documentation</li>
-      <li>broad set of fully documented end-to-end <a href="/samples-pack">samples and demos</a></li>
+      <li>broad set of fully documented <a href="/samples-pack">samples and demos</a></li>
       <li>flexible licensing with the <a href="/license.php"><b>Apache License v2.0</b></a></li>
     </ul>
     </div>
@@ -89,7 +89,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
     <?php
       $i = 1;
       while (($line = mysql_fetch_array($result, MYSQL_ASSOC)) && ($i <= 5)) {
-        printf("<a href='news.php#news%d' style='font-size: 10pt'><span style='white-space: nowrap'>%s %s</span></a><br>", $i, date("n/j/Y", strtotime($line["date"])), $line["title"]);
+        printf("<a href='news.php#news%d'><span style='white-space: nowrap'>%s %s</span></a><br>", $i, date("m/d/Y", strtotime($line["date"])), $line["title"]);
         $i++;
       }
       mysql_free_result($result);

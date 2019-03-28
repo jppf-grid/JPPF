@@ -105,6 +105,7 @@
       </fileset>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template/run.sh" stage="never" os="unix"/>
     </pack>
+    <!--
     <pack name="JPPF_Node_Android_Distributables" required="no" preselected="yes">
       <description>Redistributable binaries for the Android node</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-node-android-redist" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-android-redist">
@@ -135,6 +136,7 @@
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-dotnet/screensaver.sh" stage="never" os="unix"/>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-dotnet/bin/jsw/JPPFNode" stage="never" os="unix"/>
     </pack>
+    -->
     <pack name="JPPF_User_Guide" required="no" preselected="yes">
       <description>Full user guide in PDF format</description>
       <fileset dir="./build/@{app.ver}" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-User-Guide">
