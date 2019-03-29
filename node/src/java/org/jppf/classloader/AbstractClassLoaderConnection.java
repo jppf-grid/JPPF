@@ -46,7 +46,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
   /**
    * The object which sends the class laoding requests and receives the responses.
    */
-  protected ClassLoaderRequestHandler requestHandler = null;
+  protected ClassLoaderRequestHandler requestHandler;
 
   /**
    * Perform the part of the handshake common to remote and local nodes. This consists in:
@@ -66,6 +66,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
       requestRunner.run();
       final Throwable t = requestRunner.getThrowable();
       if (t != null) {
+        if (debugEnabled) log.debug("handshake error from {} for request = {}: {}", this, request, ExceptionUtils.getMessage(t));
         if (t instanceof Exception) throw (Exception) t;
         else throw new RuntimeException(t);
       }
@@ -76,6 +77,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
       log.debug(e.getMessage(), e);
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
     } catch (final Exception e) {
+      log.error("error during class loader handshake, connection = {}", this, e);
       throw new RuntimeException(e);
     }
   }
@@ -100,9 +102,8 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
       if (debugEnabled) log.debug("received node response");
       requestRunner.reset();
     } catch (final Exception e) {
-      final String format = "error sending close channel command : {}";
-      if (debugEnabled) log.debug(format, ExceptionUtils.getStackTrace(e));
-      else log.warn(format, ExceptionUtils.getMessage(e));
+      if (debugEnabled) log.debug( "error sending close channel command from {}:\n{}", this, ExceptionUtils.getStackTrace(e));
+      else log.warn( "error sending close channel command form {}: {}", this, ExceptionUtils.getMessage(e));
     }
   }
 
@@ -120,6 +121,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     resource = f.get();
     final Throwable t = ((ResourceFuture<?>) f).getThrowable();
     if (t != null) {
+      if (debugEnabled) log.debug("error loading resource {} from {}: {}", resource, this, ExceptionUtils.getMessage(t));
       if (t instanceof Exception) throw (Exception) t;
       else if (t instanceof Error) throw (Error) t;
       else throw new JPPFException(t);
@@ -141,9 +143,19 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     try {
       init();
     } catch (final Exception e) {
+      if (debugEnabled) log.debug("{} could not reconnect to the server after connection reset: {}", this, ExceptionUtils.getMessage(e));
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the server after connection reset", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
     } finally {
       lock.unlock();
     }
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("channel=").append(channel)
+      .append(", initializing=").append(initializing)
+      .append(", requestHandler=").append(requestHandler)
+      .append(']').toString();
   }
 }

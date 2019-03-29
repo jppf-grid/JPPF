@@ -31,7 +31,7 @@ public abstract class AbstractNodeConnection<C> implements NodeConnection<C> {
   /**
    * The channel used to communicate witht he driver.
    */
-  protected C channel = null;
+  protected C channel;
   /**
    * Used to synchronize access to the communication channel from multiple threads.
    */
