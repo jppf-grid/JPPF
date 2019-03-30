@@ -1,7 +1,7 @@
 # Network Interceptor demo
 
 <h3>What does the sample do?</h3>
-<p>This sample demonstrates the use of a <a href="https://www.jppf.org/doc/6.0/index.php?title=Network_interceptors">Network interceptor</a> in a very simple authentication scheme.
+<p>This sample demonstrates the use of a <a href="https://www.jppf.org/doc/6.2/index.php?title=Network_interceptors">Network interceptor</a> in a very simple authentication scheme.
 <p>The authentication consists in the client side of each connection sending a user name that must match the user name on the server side. The server then sends a response, either "OK" or an error message.
 If the repsonse is "OK" then client will proceed with the conenction, otherwise it will exit.
 <p>The user name is set as a system property -Djppf.user.name=&lt;user_name&gt; on all JPPF processes (client, server, nodes), and the interceptor encrypts it before send it over the network.
@@ -14,7 +14,7 @@ To build and run the demo, please follow these steps:
 <ol class="samplesList">
   <li>The first thing to do is to generate the secret key used for encryption and decryption: open a command prompt in <b>JPPF-x.y.z-samples-pack/NetworkInterceptor</b> and type "<b>ant -Dpassword=&lt;keystore_password&gt;</b>"
     This will compile the demo's code, generate a secret key and store it in a keystore, store the provided keystore password in a file in Base64 format, and finally put all these files in the file <b>NetworkInterceptor.jar</b></li>
-  <li>You will then need to have a JPPF server and at least one node installed. For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.0/index.php?title=Introduction">JPPF documentation</a></li>
+  <li>You will then need to have a JPPF server and at least one node installed. For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.2/index.php?title=Introduction">JPPF documentation</a></li>
   <li>before starting the server and node, we will need to configure them so they can discover and use the interceptor:
     <ul class="samplesNestedList" style="list-style-type: hyphen">
       <li>add <b>NetworkInterceptor.jar</b> to their classpath, by simply dropping it into their <b>lib</b> directory</li>
@@ -56,6 +56,6 @@ successful server authentication
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
-  <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
+  <li><a href="https://www.jppf.org/doc/6.2/">The JPPF documentation</a></li>
 </ul>
 
