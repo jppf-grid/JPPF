@@ -8,21 +8,14 @@ $template{name="about-page-header" title="Downloads"}$
   <div class="blockWithHighlightedTitle" style="vertical-align: middle">
     <div style="margin: 10px 5px">
       <img src="images/icons/folder-download.png" width="20"/>
-      <h4 style="display: inline">All JPPF releases:</h4> <a href="https://search.maven.org/#search|ga|1|g:org.jppf">Maven Central</a> -
-      <a href="https://github.com/jppf-grid/JPPF/tags">Releases on Github</a> -
-      <a href="https://sourceforge.net/projects/jppf-project/files/jppf-project">Older releases on SF.net</a> -
-      <a href="downloads-unstable.php">JPPF 6.2 alpha preview</a>
+      <h4 style="display: inline">All JPPF releases:</h4>
+      <ul class="inline">
+        $template{name="download-link" label="Maven Central" link="https://search.maven.org/#search|ga|1|g:org.jppf"}$
+        $template{name="download-link" label="Releases on Github" link="https://github.com/jppf-grid/JPPF/tags"}$
+        $template{name="download-link" label="Older releases on SF.net" link="https://sourceforge.net/projects/jppf-project/files/jppf-project"}$
+        $template{name="download-link" label="JPPF 6.2 alpha preview" link="downloads-unstable.php"}$
+      </ul>
     </div>
-    <!--
-    <table style="padding: 2px"><tr>
-      <td style="width: 20px"><img src="images/icons/folder-download.png"></td>
-      <td><h4>All JPPF releases:</h4></td>
-      $template{name="download-link" label="Maven Central" link="https://search.maven.org/#search|ga|1|g:org.jppf"}$
-      $template{name="download-link" label="Releases on Github" link="https://github.com/jppf-grid/JPPF/tags"}$
-      $template{name="download-link" label="Older releases on SF.net" link="https://sourceforge.net/projects/jppf-project/files/jppf-project"}$
-      $template{name="download-link" label="JPPF 6.2 alpha preview" link="downloads-unstable.php"}$
-    </tr></table>
-    -->
   </div>
   <br>
 

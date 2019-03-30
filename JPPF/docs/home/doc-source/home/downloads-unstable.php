@@ -1,20 +1,22 @@
 <?php
   $currentPage = "download-unstable";
-  $tag1 = "v_6_1_beta";
-  $ver1 = "6.1-beta";
+  $tag1 = "v_6_2_alpha";
+  $ver1 = "6.2-alpha";
   $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
 ?>
 $template{name="about-page-header" title="Downloads - unstable"}$
-  <h1 align="center">Downloads - JPPF 6.1 beta preview</h1>
+  <h1 align="center">Downloads - JPPF 6.2 alpha preview</h1>
 
   <div class="blockWithHighlightedTitle" style="vertical-align: middle">
-    <table style="padding: 2px"><tr>
-      <td style="width: 20px"><img src="images/icons/folder-download.png"></td>
-      <td><h4>All JPPF releases:</h4></td>
-      $template{name="download-link" label="Maven Central" link="https://search.maven.org/#search|ga|1|g:org.jppf"}$
-      $template{name="download-link" label="Releases on Github" link="https://github.com/jppf-grid/JPPF/tags"}$
-      $template{name="download-link" label="Older releases on SF.net" link="https://sourceforge.net/projects/jppf-project/files/jppf-project"}$
-    </tr></table>
+    <div style="margin: 10px 5px">
+      <img src="images/icons/folder-download.png" width="20"/>
+      <h4 style="display: inline">All JPPF releases:</h4>
+      <ul class="inline">
+        $template{name="download-link" label="Maven Central" link="https://search.maven.org/#search|ga|1|g:org.jppf"}$
+        $template{name="download-link" label="Releases on Github" link="https://github.com/jppf-grid/JPPF/tags"}$
+        $template{name="download-link" label="Older releases on SF.net" link="https://sourceforge.net/projects/jppf-project/files/jppf-project"}$
+      </ul>
+    </div>
   </div>
   <br>
 
@@ -22,6 +24,20 @@ $template{name="about-page-header" title="Downloads - unstable"}$
     <div class="blockWithHighlightedTitle">
       <a name="<?php echo $ver1 ?>"></a>
       $template{name="highlighted-title-with-icon" img="images/icons/download.png" title="JPPF <?php echo $ver1 ?>" heading="h1" style="margin: 10px 0px"}$
+      <div style="border: solid 1px #6D78B6; background-color: #FFFD94; padding: 5px">
+        <b>Notice:</b> the development of JPPF <?php echo $ver1 ?> has just started. There is currently no binary distribution. Stay tuned!
+      </div>
+      <h3>Samples and tutorials</h3>
+      <ul class="list_nomargin">
+        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-samples-pack.zip'; ?>">JPPF samples pack</a></li>
+        <li>Make sure to get started with our <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/></li>
+      </ul>
+    </div>
+    <!--
+    <div class="blockWithHighlightedTitle">
+      <a name="<?php echo $ver1 ?>"></a>
+      $template{name="highlighted-title-with-icon" img="images/icons/download.png" title="JPPF <?php echo $ver1 ?>" heading="h1" style="margin: 10px 0px"}$
+
       <h3>Deployable JPPF binaries</h3>
       <ul class="list_nomargin">
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-driver.zip'; ?>">Server/driver distribution</a></li>
@@ -47,9 +63,19 @@ $template{name="about-page-header" title="Downloads - unstable"}$
       <h3>Samples and tutorials</h3>
       <ul class="list_nomargin">
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-samples-pack.zip'; ?>">JPPF samples pack</a></li>
-        <li>Make sure to get started with our <a href="/doc/6.1/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/></li>
+        <li>Make sure to get started with our <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/></li>
       </ul>
     </div>
+    -->
+    <div style="height: 8px"></div>
+    <div class="blockWithHighlightedTitle">
+      $template{name="highlighted-title-with-icon" img="images/icons/folder-download.png" title="JPPF 6.2 roadmap" heading="h3"}$
+      <ul class="samplesList">
+        <li>The current state of the 6.2 milestone can be found <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/8/search/1"><b>here</b></a>.<br/></li>
+        <li><a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/18/search/1">Open issues</a> and <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/7/search/1">closed issues</a></li>
+      </ul>
+    </div>
+    <div style="height: 6px"></div>
     <br>
   </div>
 
@@ -64,37 +90,21 @@ $template{name="about-page-header" title="Downloads - unstable"}$
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/documentation.png" title="Documentation preview" heading="h3"}$
       <p>Doc preview for the major new features:
-      <!--
-      <ul class="samplesList">
-        <li><a href="/doc/6.1">JPPF 6.1 User Guide</a></li>
-        <li><a href="/javadoc/6.1">JPPF 6.1 Javadoc</a></li>
-      </ul>
-      -->
-
       <table style="width: 100%"><tr>
         <td valign="top">
-          <ul class="samplesList">
-            <li><a href="/doc/6.1">JPPF 6.1 User Guide</a></li>
-            <li><a href="/javadoc/6.1">JPPF 6.1 Javadoc</a></li>
+          <ul class="samplesList" style="margin-bottom: 0px">
+            <li><a href="/doc/6.2">JPPF 6.2 User Guide</a></li>
+            <li><a href="/javadoc/6.2">JPPF 6.2 Javadoc</a></li>
           </ul>
         </td>
         <td valign="top">
-          <ul class="samplesList">
-            <li><a href="/release_notes.php?version=6.1-beta">Release notes</a></li>
+          <ul class="samplesList" style="margin-bottom: 0px">
+            <li><a href="/release_notes.php?version=6.1">Release notes</a></li>
           </ul>
         </td>
       </tr></table>
 
     </div>
-    <div style="height: 8px"></div>
-    <div class="blockWithHighlightedTitle">
-      $template{name="highlighted-title-with-icon" img="images/icons/folder-download.png" title="JPPF 6.1 roadmap" heading="h3"}$
-      <ul class="samplesList">
-        <li>The current state of the 6.1 milestone can be found <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/8/search/1"><b>here</b></a>.<br/></li>
-        <li><a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/18/search/1">Open issues</a> and <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/7/search/1">closed issues</a></li>
-      </ul>
-    </div>
-    <div style="height: 6px"></div>
   </div>
 
 $template{name="about-page-footer"}$

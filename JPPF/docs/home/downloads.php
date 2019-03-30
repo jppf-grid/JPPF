@@ -76,15 +76,15 @@
         <?php if ($currentPage == "Source code") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="https://github.com/jppf-grid/JPPF" class="<?php echo $itemClass; ?>">&raquo; Source code</a><br></div>
         <hr/>
                 <?php if ($currentPage == "All docs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc" class="<?php echo $itemClass; ?>">&raquo; All docs</a><br></div>
+        <?php if (($currentPage == "v6.2 (alpha)") || ($currentPage == "v6.2-alpha")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.2" class="<?php echo $itemClass; ?>">v6.2 (alpha)</a><br></div>
         <?php if (($currentPage == "v6.1") || ($currentPage == "v6.1")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.1" class="<?php echo $itemClass; ?>">v6.1</a><br></div>
         <?php if (($currentPage == "v6.0") || ($currentPage == "v6.0")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php if (($currentPage == "v5.2") || ($currentPage == "v5.2")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
-        <?php if (($currentPage == "v5.1") || ($currentPage == "v5.1")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php if ($currentPage == "All Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/#javadoc" class="<?php echo $itemClass; ?>">&raquo; All Javadoc</a><br></div>
+        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.2" class="<?php echo $itemClass; ?>">v6.2 (alpha)</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.1" class="<?php echo $itemClass; ?>">v6.1</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php if ($currentPage == "All .Net APIs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc#csdoc" class="<?php echo $itemClass; ?>">&raquo; All .Net APIs</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
@@ -93,16 +93,11 @@
         <hr/>
         <?php if ($currentPage == "Github issues") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="https://github.com/jppf-grid/JPPF/issues" class="<?php echo $itemClass; ?>">&raquo; Github issues</a><br></div>
         <?php if ($currentPage == "Issue tracker") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/tracker/tbg" class="<?php echo $itemClass; ?>">&raquo; Issue tracker</a><br></div>
-        <!--
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/1/search/1" class="<?php echo $itemClass; ?>">bugs</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/9/search/1" class="<?php echo $itemClass; ?>">features</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/2/search/1" class="<?php echo $itemClass; ?>">enhancements</a><br></div>
-        -->
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1" class="<?php echo $itemClass; ?>">next version</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/22/search/1" class="<?php echo $itemClass; ?>">maintenance</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=6.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=6.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "CI") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/ci.php" class="<?php echo $itemClass; ?>">&raquo; CI</a><br></div>
@@ -120,37 +115,14 @@
   <div class="blockWithHighlightedTitle" style="vertical-align: middle">
     <div style="margin: 10px 5px">
       <img src="images/icons/folder-download.png" width="20"/>
-      <h4 style="display: inline">All JPPF releases:</h4> <a href="https://search.maven.org/#search|ga|1|g:org.jppf">Maven Central</a> -
-      <a href="https://github.com/jppf-grid/JPPF/tags">Releases on Github</a> -
-      <a href="https://sourceforge.net/projects/jppf-project/files/jppf-project">Older releases on SF.net</a> -
-      <a href="downloads-unstable.php">JPPF 6.2 alpha preview</a>
+      <h4 style="display: inline">All JPPF releases:</h4>
+      <ul class="inline">
+        <li>&#8226; <a href="https://search.maven.org/#search|ga|1|g:org.jppf"><b>Maven Central</b></a></li>
+        <li>&#8226; <a href="https://github.com/jppf-grid/JPPF/tags"><b>Releases on Github</b></a></li>
+        <li>&#8226; <a href="https://sourceforge.net/projects/jppf-project/files/jppf-project"><b>Older releases on SF.net</b></a></li>
+        <li>&#8226; <a href="downloads-unstable.php"><b>JPPF 6.2 alpha preview</b></a></li>
+      </ul>
     </div>
-    <!--
-    <table style="padding: 2px"><tr>
-      <td style="width: 20px"><img src="images/icons/folder-download.png"></td>
-      <td><h4>All JPPF releases:</h4></td>
-      <td style="vertical-align: middle">
-        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
-          <li><a href="https://search.maven.org/#search|ga|1|g:org.jppf"><b>Maven Central</b></a></li>
-        </ul>
-      </td>
-      <td style="vertical-align: middle">
-        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
-          <li><a href="https://github.com/jppf-grid/JPPF/tags"><b>Releases on Github</b></a></li>
-        </ul>
-      </td>
-      <td style="vertical-align: middle">
-        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
-          <li><a href="https://sourceforge.net/projects/jppf-project/files/jppf-project"><b>Older releases on SF.net</b></a></li>
-        </ul>
-      </td>
-      <td style="vertical-align: middle">
-        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
-          <li><a href="downloads-unstable.php"><b>JPPF 6.2 alpha preview</b></a></li>
-        </ul>
-      </td>
-    </tr></table>
-    -->
   </div>
   <br>
   <div class="column_left" style="text-align: justify; padding: 0px; font-size: 11pt">

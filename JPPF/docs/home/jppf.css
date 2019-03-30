@@ -397,3 +397,13 @@ tr.row_shadow td {
   box-shadow: 4px 4px 4px #6D78B6
 }
 */
+
+ul.inline {
+  display: inline;
+  text-align: left;
+  padding: 0px;
+}
+ul.inline li {
+  display: inline;
+  margin-left: 10px;
+}
