@@ -148,10 +148,10 @@
   </div>
   <div class="column_left">
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
-    <a href="/doc/v5/index.php?title=A_first_taste_of_JPPF" style="text-decoration: none">
+    <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF" style="text-decoration: none">
     <h3 style="${style}"><img src="images/icons/getting-started.png" class="titleWithIcon"/>Getting started</h3>
     </a>
-    Take an easy start with our <a href="/doc/v5/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a><br><br>
+    Take an easy start with our <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a><br><br>
     </div>
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3 style="${style}"><img src="images/icons/easy.png" class="titleWithIcon"/>Easy and powerful</h3>

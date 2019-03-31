@@ -41,10 +41,10 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
 
   <div class="column_left">
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
-    <a href="/doc/v5/index.php?title=A_first_taste_of_JPPF" style="text-decoration: none">
+    <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF" style="text-decoration: none">
     $template{name="title-with-icon" img="images/icons/getting-started.png" title="Getting started" heading="h3"}$
     </a>
-    Take an easy start with our <a href="/doc/v5/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a><br><br>
+    Take an easy start with our <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a><br><br>
     </div>
 
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
