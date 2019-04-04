@@ -20,7 +20,7 @@ package test.org.jppf.test.setup.common;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.concurrent.*;
 
 import org.jppf.JPPFError;
 import org.jppf.client.*;
@@ -353,5 +353,23 @@ public class BaseTestHelper {
     for (int i=0; i<msg.length() - 2 * (STARS.length() + 1); i++) sb.append('-');
     final String s = sb.append(' ').append(STARS).toString();
     return new String[] { s, msg, s };
+  }
+
+  /**
+   * Execute a {@link Callable} in a separate thread and throw an exception if it times out.
+   * @param <T> the type of result of the callable.
+   * @param timeout the timeout in millis.
+   * @param callable teh callable to execute.
+   * @throws Exception if any error occurs.
+   * @return the callable's result.
+   */
+  public static <T> T executeWithTimeout(final long timeout, final Callable<T> callable) throws Exception {
+    final ExecutorService executor = Executors.newSingleThreadExecutor();
+    try {
+      final Future<T> f = executor.submit(callable);
+      return f.get(timeout, TimeUnit.MILLISECONDS);
+    } finally {
+      executor.shutdownNow();
+    }
   }
 }

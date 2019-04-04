@@ -22,6 +22,7 @@ import org.jppf.node.policy.Equal;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Test a multi-server topology with 2 servers, 1 node attached to each server and 1 client,
@@ -39,7 +40,7 @@ public class TestMultiServerWithSSL extends AbstractNonStandardSetup {
     final TestConfiguration config = createConfig("ssl2_p2p");
     config.driver.log4j = "classes/tests/config/ssl2_p2p/log4j-driver.template.properties";
     config.node.log4j = "classes/tests/config/ssl2_p2p/log4j-node.template.properties";
-    client = BaseSetup.setup(2, 2, true, false, config);
+    client = BaseTestHelper.executeWithTimeout(15_000L, () -> BaseSetup.setup(2, 2, true, false, config));
   }
 
   /**
