@@ -63,13 +63,13 @@ class AcceptorMessageReader {
     while (true) {
       if (context.readMessage(null)) {
         final int id = context.getId();
-        if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), context);
+        final String name = JPPFIdentifiers.asString(id), hexName = Integer.toHexString(id).toUpperCase();
+        if (debugEnabled) log.debug("read identifier '{}' (0x{}) for {}", name, hexName, context);
         final NioServer<?, ?> server = NioHelper.getServer(id);
         if (server == null) {
-          final String name = JPPFIdentifiers.asString(id);
           if ((name == null) || "UNKNOWN".equalsIgnoreCase(name))
-            throw new JPPFException("unknown JPPF identifier: " + id + " (0x" + Integer.toHexString(id).toUpperCase() + ")");
-          else throw new JPPFException("no server is started for JPPF identifier [" + id + ", 0x" + Integer.toHexString(id).toUpperCase() + ", " + name + "]");
+            throw new JPPFException("unknown JPPF identifier: " + id + " (0x" + hexName + ")");
+          else throw new JPPFException("no server is started for JPPF identifier [" + id + ", 0x" + hexName + ", " + name + "]");
         }
         if (debugEnabled) log.debug("cancelling key for {}", context);
         final SocketChannel socketChannel = context.getSocketChannel();

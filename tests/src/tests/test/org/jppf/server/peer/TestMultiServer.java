@@ -26,7 +26,7 @@ import org.jppf.client.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
@@ -211,6 +211,32 @@ public class TestMultiServer extends AbstractNonStandardSetup {
       for (final Map.Entry<JMXDriverConnectionWrapper, LoadBalancingInformation> entry: lbiMap.entrySet()) {
         final LoadBalancingInformation driverLbi = entry.getValue();
         if (driverLbi != null) entry.getKey().changeLoadBalancerSettings(driverLbi.getAlgorithm(), driverLbi.getParameters());
+      }
+    }
+  }
+
+  /**
+   * Test that multiple non-blocking jobs can be sent asynchronously.
+   * @throws Exception if any error occurs
+   */
+  //@Test(timeout = 15_000L)
+  public void testPoolSize() throws Exception {
+    final int nbConnections = 10;
+    final JPPFConnectionPool pool = client.findConnectionPool("driver1");
+    assertNotNull(pool);
+    assertEquals(1, pool.connectionCount(JPPFClientConnectionStatus.workingStatuses()));
+    final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
+    assertTrue(jmx.isConnected());
+    for (int i=1; i<=10; i++) {
+      //BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> iteration #%d", i);
+      try {
+        pool.setSize(nbConnections);
+        pool.awaitConnections(Operator.EQUAL, nbConnections, 5000L, JPPFClientConnectionStatus.workingStatuses());
+        assertEquals(nbConnections, pool.connectionCount(JPPFClientConnectionStatus.workingStatuses())); 
+      } finally {
+        pool.setSize(1);
+        pool.awaitConnections(Operator.EQUAL, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
+        assertEquals(1, pool.connectionCount(JPPFClientConnectionStatus.workingStatuses()));
       }
     }
   }
