@@ -124,7 +124,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    */
   @Test(timeout=TEST_TIMEOUT)
   public void testClassLoadingInterruptionWithTask() throws Exception {
-    testInterruption(false);
+    testInterruption(ReflectionUtils.getCurrentMethodName(), false);
   }
 
   /**
@@ -135,18 +135,18 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    */
   @Test(timeout=TEST_TIMEOUT)
   public void testClassLoadingInterruptionWithCallable() throws Exception {
-    testInterruption(true);
+    testInterruption(ReflectionUtils.getCurrentMethodName(), true);
   }
 
   /**
+   * @param jobPrefix .
    * @param callable .
    * @throws Exception if any error occurs
    */
-  private static void testInterruption(final boolean callable) throws Exception {
-    final String name = ReflectionUtils.getCurrentMethodName() + "(" + (callable ? "Callable" : "task") + " ";
+  private static void testInterruption(final String jobPrefix, final boolean callable) throws Exception {
     for (int i=1; i<=10; i++) {
       final JPPFJob job = new JPPFJob();
-      job.setName(name + i);
+      job.setName(jobPrefix + "-" + i);
       if (callable) job.add(new MyCallable(i));
       else job.add(new MyTask2(i));
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));

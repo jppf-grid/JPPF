@@ -26,10 +26,9 @@ import org.jppf.client.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.jppf.utils.Operator;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -64,7 +63,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("p2p");
     config.driver.log4j = "classes/tests/config/p2p/log4j-driver.properties";
-    client = BaseSetup.setup(2, 2, true, true, config);
+    client = BaseTestHelper.executeWithTimeout(15_000L, () -> BaseSetup.setup(2, 2, true, true, config));
   }
 
   /**
