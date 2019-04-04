@@ -51,7 +51,7 @@ public class TestMultiServerSetup extends AbstractNonStandardSetup {
     } finally {
       for (int i=1; i<=BaseSetup.nbNodes(); i++) {
         JMXNodeConnectionWrapper nodeJmx = null;
-        try (JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("localhost", NODE_MANAGEMENT_PORT_BASE + i, false)) {
+        try (final JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("localhost", NODE_MANAGEMENT_PORT_BASE + i, false)) {
           nodeJmx = jmx;
           jmx.connectAndWait(3000L);
           final DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();

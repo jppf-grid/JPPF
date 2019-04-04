@@ -21,6 +21,7 @@ package test.org.jppf.server.peer;
 import static org.junit.Assert.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.jppf.client.*;
 import org.jppf.client.monitoring.topology.*;
@@ -64,7 +65,12 @@ public class TestMultiServer extends AbstractNonStandardSetup {
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("p2p");
     config.driver.log4j = "classes/tests/config/p2p/log4j-driver.properties";
-    client = BaseSetup.setup(2, 2, true, true, config);
+    client = BaseTestHelper.executeWithTimeout(15_000L, new Callable<JPPFClient>() {
+      @Override
+      public JPPFClient call() throws Exception {
+        return BaseSetup.setup(2, 2, true, true, config);
+      }
+    });
   }
 
   /**
