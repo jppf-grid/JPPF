@@ -21,6 +21,7 @@ package org.jppf.server.nio.classloader.node;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jppf.classloader.ResourceProvider;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.ClassNioServer;
@@ -46,16 +47,20 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
   /**
    * The thread polling the local channel.
    */
-  protected ChannelSelectorThread selectorThread = null;
+  protected ChannelSelectorThread selectorThread;
   /**
    * The local channel, if any.
    */
-  protected ChannelWrapper<?> localChannel = null;
+  protected ChannelWrapper<?> localChannel;
   /**
    * Mapping of channels to their uuid.
    */
   //protected final Map<String, ChannelWrapper<?>> nodeConnections = new HashMap<>();
   protected final Map<String, ChannelWrapper<?>> nodeConnections = new ConcurrentHashMap<>();
+  /**
+   * Reads resource files from the classpath.
+   */
+  private final ResourceProvider resourceProvider = ResourceProvider.Factory.initResourceProvider();
 
   /**
    * Initialize this class server.
@@ -207,5 +212,13 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
     final List<ChannelWrapper<?>> list = super.getAllConnections();
     if (localChannel != null) list.add(localChannel);
     return list;
+  }
+
+  /**
+   * Get the resource provider for this server.
+   * @return a ResourceProvider instance.
+   */
+  public ResourceProvider getResourceProvider() {
+    return resourceProvider;
   }
 }

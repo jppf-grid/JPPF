@@ -81,11 +81,16 @@ public abstract class AbstractNioMessageBase implements NioMessage {
    */
   protected AbstractNioMessageBase(final NioContext<?> channel) {
     this.channel = channel;
-    this.sslHandler = channel.getSSLHandler();
-    this.ssl = sslHandler != null;
-    if (ssl) {
-      sslHandlerReadCount = sslHandler.getChannelReadCount();
-      sslHandlerWriteCount = sslHandler.getChannelWriteCount();
+    if (channel != null) {
+      this.sslHandler = channel.getSSLHandler();
+      this.ssl = sslHandler != null;
+      if (ssl) {
+        sslHandlerReadCount = sslHandler.getChannelReadCount();
+        sslHandlerWriteCount = sslHandler.getChannelWriteCount();
+      }
+    } else {
+      this.ssl = false;
+      this.sslHandler = null;
     }
   }
 

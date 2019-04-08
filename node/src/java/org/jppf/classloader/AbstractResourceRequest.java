@@ -22,60 +22,53 @@ package org.jppf.classloader;
  * Encapsulates a remote resource request submitted asynchronously
  * via the single-thread executor.
  */
-abstract class AbstractResourceRequest implements ResourceRequestRunner
-{
+abstract class AbstractResourceRequest implements ResourceRequestRunner {
   /**
    * Used to collect any throwable raised during communication with the server.
    */
-  protected Throwable throwable = null;
+  protected Throwable throwable;
   /**
    * The request to send.
    */
-  protected JPPFResourceWrapper request = null;
+  protected JPPFResourceWrapper request;
   /**
    * The response received.
    */
-  protected JPPFResourceWrapper response = null;
+  protected JPPFResourceWrapper response;
 
   /**
    * Initialize with the specified request.
    */
-  public AbstractResourceRequest()
-  {
+  public AbstractResourceRequest() {
   }
 
   /**
    * Initialize with the specified request.
    * @param request the request to send.
    */
-  public AbstractResourceRequest(final JPPFResourceWrapper request)
-  {
+  public AbstractResourceRequest(final JPPFResourceWrapper request) {
     this.request = request;
   }
 
   @Override
-  public Throwable getThrowable()
-  {
+  public Throwable getThrowable() {
     return throwable;
   }
 
   @Override
-  public void reset()
-  {
+  public void reset() {
     this.request = null;
     this.response = null;
     this.throwable = null;
   }
 
   @Override
-  public void setRequest(final JPPFResourceWrapper request)
-  {
+  public void setRequest(final JPPFResourceWrapper request) {
     this.request = request;
   }
 
   @Override
-  public JPPFResourceWrapper getResponse()
-  {
+  public JPPFResourceWrapper getResponse() {
     return response;
   }
 }

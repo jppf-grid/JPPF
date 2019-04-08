@@ -53,11 +53,11 @@ class WaitingNodeRequestState extends NodeClassServerState {
   /**
    * 
    */
-  private static AtomicLong callableSeq = new AtomicLong(0L);
+  private static final AtomicLong callableSeq = new AtomicLong(0L);
   /**
    * The class cache.
    */
-  private final ClassCache classCache = driver.getInitializer().getClassCache();
+  private final ClassCache classCache;
 
   /**
    * Initialize this state with a specified NioServer.
@@ -65,6 +65,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
    */
   public WaitingNodeRequestState(final NodeClassNioServer server) {
     super(server);
+    this.classCache = driver.getInitializer().getClassCache();
     this.isFileLookup = server.getDriver().getConfiguration().get(JPPFProperties.CLASSLOADER_FILE_LOOKUP);
   }
 
@@ -91,7 +92,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
         return null;
       }
       boolean allDefinitionsFound = true;
-      for (JPPFResourceWrapper resource: res.getResources()) allDefinitionsFound &= processResource(channel, resource);
+      for (JPPFResourceWrapper resource: res.getResources()) allDefinitionsFound &= processResource(context, resource);
       if (allDefinitionsFound) return sendResponse(context);
       if (debugEnabled) log.debug("pending responses {} for node: {}", context.getNbPendingResponses(), channel);
       return TO_IDLE_NODE;
@@ -101,25 +102,25 @@ class WaitingNodeRequestState extends NodeClassServerState {
 
   /**
    * Process a resource request.
-   * @param channel encapsulates the context and channel.
+   * @param context encapsulates the context and channel.
    * @param resource the resource request description
    * @return <code>true</code> if the resource definition was found, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
-  private boolean processResource(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception {
+  private boolean processResource(final NodeClassContext context, final JPPFResourceWrapper resource) throws Exception {
     final boolean dynamic = resource.isDynamic();
-    if (!dynamic || (resource.getRequestUuid() == null)) return processNonDynamic(channel, resource);
-    return processDynamic(channel, resource);
+    if (!dynamic || (resource.getRequestUuid() == null)) return processNonDynamic(context, resource);
+    return processDynamic(context, resource);
   }
 
   /**
    * Process a request to the driver's resource provider.
-   * @param channel encapsulates the context and channel.
+   * @param context encapsulates the context and channel.
    * @param resource the resource request description
    * @return <code>true</code> if the resource definition was found, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
-  private boolean processNonDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception {
+  private boolean processNonDynamic(final NodeClassContext context, final JPPFResourceWrapper resource) throws Exception {
     byte[] b = null;
     final String name = resource.getName();
     final TraversalList<String> uuidPath = resource.getUuidPath();
@@ -129,7 +130,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
       final ClassLoader cl = getClass().getClassLoader();
       if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {
         final List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, cl, fileLookup);
-        if (debugEnabled) log.debug(build("multiple resources ", list != null ? "" : "not ", "found [", name, "] in driver's classpath for node: ", channel));
+        if (debugEnabled) log.debug(build("multiple resources ", list != null ? "" : "not ", "found [", name, "] in driver's classpath for node: ", context));
         if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
       } else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null) {
         final String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
@@ -139,10 +140,10 @@ class WaitingNodeRequestState extends NodeClassServerState {
         if ((uuid == null) && !resource.isDynamic()) uuid = driver.getUuid();
         if (uuid != null) b = classCache.getCacheContent(uuid, name);
         final boolean alreadyInCache = (b != null);
-        if (debugEnabled) log.debug(build("resource ", alreadyInCache ? "" : "not ", "found [", name, "] in cache for node: ", channel));
+        if (debugEnabled) log.debug(build("resource ", alreadyInCache ? "" : "not ", "found [", name, "] in cache for node: ", context));
         if (!alreadyInCache) {
           b = server.getResourceProvider().getResource(name, cl, fileLookup);
-          if (debugEnabled) log.debug(build("resource ", b == null ? "not " : "", "found [", name, "] in the driver's classpath for node: ", channel));
+          if (debugEnabled) log.debug(build("resource ", b == null ? "not " : "", "found [", name, "] in the driver's classpath for node: ", context));
         }
         if ((b != null) || !resource.isDynamic()) {
           if ((b != null) && !alreadyInCache) classCache.setCacheContent(driver.getUuid(), name, b);
@@ -156,16 +157,15 @@ class WaitingNodeRequestState extends NodeClassServerState {
 
   /**
    * Process a request to the client's resource provider.
-   * @param channel encapsulates the context and channel.
+   * @param context encapsulates the context and channel.
    * @param resource the resource request description
    * @return <code>true</code> if the resource definition was found in the cache, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
-  private boolean processDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception {
+  private boolean processDynamic(final NodeClassContext context, final JPPFResourceWrapper resource) throws Exception {
     byte[] b = null;
     final String name = resource.getName();
     final TraversalList<String> uuidPath = resource.getUuidPath();
-    final NodeClassContext context = (NodeClassContext) channel.getContext();
     if (resource.isSingleResource()) {
       b = classCache.getCacheContent(uuidPath.getFirst(), name);
       if (b != null) {
@@ -180,15 +180,15 @@ class WaitingNodeRequestState extends NodeClassServerState {
     final String uuid = resource.getUuidPath().getCurrentElement();
     final ChannelWrapper<?> provider = findProviderConnection(uuid);
     if (provider != null) {
-      if (debugEnabled) log.debug(build("requesting resource " + resource + " from client: ", provider, " for node: ", channel));
+      if (debugEnabled) log.debug(build("requesting resource " + resource + " from client: ", provider, " for node: ", context));
       final ClientClassContext providerContext = (ClientClassContext) provider.getContext();
-      final ResourceRequest request = new ResourceRequest(channel, resource);
+      final ResourceRequest request = new ResourceRequest(context.getChannel(), resource);
       resource.setState(JPPFResourceWrapper.State.PROVIDER_REQUEST);
       context.addPendingResponse(resource, request);
       providerContext.addRequest(request);
       return false;
     }
-    if (debugEnabled) log.debug(build("no available provider for uuid=", uuid, " : setting null response for node ", channel));
+    if (debugEnabled) log.debug(build("no available provider for uuid=", uuid, " : setting null response for node ", context));
     resource.setDefinition(null);
     resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
     return true;

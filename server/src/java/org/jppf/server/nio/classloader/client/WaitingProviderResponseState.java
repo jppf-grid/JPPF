@@ -51,9 +51,7 @@ class WaitingProviderResponseState extends ClientClassServerState {
    */
   public WaitingProviderResponseState(final ClientClassNioServer server) {
     super(server);
-    classCache = driver
-      .getInitializer()
-      .getClassCache();
+    classCache = driver.getInitializer().getClassCache();
   }
 
   /**

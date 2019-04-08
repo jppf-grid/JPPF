@@ -43,7 +43,7 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager<JPPFLocalNode> 
     final PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>() {
       @Override
       public AbstractJPPFClassLoader run() {
-        final LocalClassLoaderConnection connection = node.getClassLoaderConnection();
+        final AbstractClassLoaderConnection<?> connection = node.getClassLoaderConnection();
         return new JPPFLocalClassLoader(connection, this.getClass().getClassLoader());
       }
     };

@@ -70,7 +70,7 @@ public class JMXMessageWriter {
       }
       final MessageWrapper msg = context.getCurrentMessageWrapper();
       try {
-        if (context.writeMessage(null)) {
+        if (context.writeMessage()) {
           if (debugEnabled) log.debug("fully sent message {} from context {}", msg, context);
           context.setMessage(null);
           context.setCurrentMessageWrapper(null);

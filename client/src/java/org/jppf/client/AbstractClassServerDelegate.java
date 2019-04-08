@@ -48,7 +48,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   /**
    * Indicates whether this socket handler should be terminated and stop processing.
    */
-  protected boolean stop = false;
+  protected boolean stop;
   /**
    * Reads resource files from the classpath.
    */
@@ -56,11 +56,11 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   /**
    * Unique identifier for this class server delegate, obtained from the local JPPF client.
    */
-  protected String clientUuid = null;
+  protected String clientUuid;
   /**
    * Determines if the handshake with the server has been performed.
    */
-  protected boolean handshakeDone = false;
+  protected boolean handshakeDone;
   /**
    * Readable name for this delegate.
    */
@@ -112,7 +112,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * @throws Exception if any error is raised.
    */
   protected JPPFResourceWrapper readResource() throws Exception {
-    if (debugEnabled) log.debug(formattedName + " reading next resource ...");
+    if (debugEnabled) log.debug("{} reading next resource ...", formattedName);
     return (JPPFResourceWrapper) IOHelper.unwrappedData(socketClient, socketClient.getSerializer());
   }
 
@@ -132,10 +132,10 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * @throws Exception if any error occurs.
    */
   protected void handshake() throws Exception {
-    if (debugEnabled) log.debug(formattedName + " : sending channel identifier {}", JPPFIdentifiers.asString(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL));
+    if (debugEnabled) log.debug("{} : sending channel identifier {}", formattedName, JPPFIdentifiers.asString(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL));
     socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
     if (owner.isSSLEnabled()) createSSLConnection();
-    if (debugEnabled) log.debug(formattedName + " : sending initial resource");
+    if (debugEnabled) log.debug("{} : sending initial resource", formattedName);
     final JPPFResourceWrapper resource = new JPPFResourceWrapper();
     resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
     resource.addUuid(clientUuid);
@@ -144,7 +144,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     // read the server response
     readResource();
     handshakeDone = true;
-    if (debugEnabled) log.debug(formattedName + " : server handshake done");
+    if (debugEnabled) log.debug("{} : server handshake done", formattedName);
   }
 
   /**
@@ -155,10 +155,9 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     boolean found = true;
     final JPPFResourceWrapper resource = readResource();
     final String name = resource.getName();
-    if (debugEnabled) log.debug(formattedName + " resource requested: " + resource);
+    if (debugEnabled) log.debug("{} resource requested: {}, requestUuid={}, resourceIds={}", formattedName, resource, resource.getRequestUuid(), resource.getResourceIds());
     final Collection<ClassLoader> loaders = ((AbstractJPPFClientConnection) owner).getClient().getRegisteredClassLoaders(resource.getRequestUuid());
-    //if (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
-    if (debugEnabled) log.debug(formattedName + " using classloaders=" + loaders);
+    if (debugEnabled) log.debug("{} using classloaders={}", formattedName, loaders);
     final boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && FILE_LOOKUP;
     if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {
       final List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, loaders, fileLookup);
@@ -176,8 +175,8 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
       if (callable == null) resource.setDefinition(b);
       else resource.setCallable(b);
       if (debugEnabled) {
-        if (found) log.debug(formattedName + " found resource: " + name + " (" + b.length + " bytes)");
-        else log.debug(formattedName + " resource not found: " + name);
+        if (found) log.debug("{} found resource: [} ({} bytes)", formattedName, name, b.length);
+        else log.debug("{} resource not found: {}", formattedName, name);
       }
     }
     resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
@@ -190,10 +189,10 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    */
   @Override
   public void close() {
-    if (debugEnabled) log.debug("closing " + getName());
+    if (debugEnabled) log.debug("closing {}", getName());
     stop = true;
     super.close();
-    if (debugEnabled) log.debug(getName() + " closed");
+    if (debugEnabled) log.debug("{} closed", getName());
   }
 
   @Override

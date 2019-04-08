@@ -48,6 +48,10 @@ public class NodeClassContext extends AbstractClassContext<NodeClassState> {
    * Used to synchronize pending responses performed by multiple threads.
    */
   private final Lock lockResponse = new ReentrantLock();
+  /**
+   * Time at which the current request was received.
+   */
+  protected long requestStartTime;
 
   /**
    * @param driver reference to the JPPF driver.
@@ -70,6 +74,12 @@ public class NodeClassContext extends AbstractClassContext<NodeClassState> {
       }
     }
     return b;
+  }
+
+  @Override
+  public JPPFResourceWrapper deserializeResource() throws Exception {
+    requestStartTime = System.nanoTime();
+    return super.deserializeResource();
   }
 
   /**
@@ -180,5 +190,13 @@ public class NodeClassContext extends AbstractClassContext<NodeClassState> {
     sb.append(", ssl=").append(ssl);
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Get the time at which the current request was received.
+   * @return the time in nanos.
+   */
+  public long getRequestStartTime() {
+    return requestStartTime;
   }
 }

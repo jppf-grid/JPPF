@@ -18,7 +18,6 @@
 
 package org.jppf.server.nio.classloader;
 
-import org.jppf.classloader.ResourceProvider;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 
@@ -29,11 +28,6 @@ import org.jppf.server.JPPFDriver;
  * @author Laurent Cohen
  */
 public abstract class ClassNioServer<S extends Enum<S>, T extends Enum<T>> extends NioServer<S, T> {
-  /**
-   * Reads resource files from the classpath.
-   */
-  protected ResourceProvider resourceProvider = ResourceProvider.Factory.initResourceProvider();
-
   /**
    * Initialize this class server.
    * @param identifier the channel identifier for channels handled by this server.
@@ -53,14 +47,6 @@ public abstract class ClassNioServer<S extends Enum<S>, T extends Enum<T>> exten
    */
   public ClassCache getClassCache() {
     return getDriver().getInitializer().getClassCache();
-  }
-
-  /**
-   * Get the resource provider for this server.
-   * @return a ResourceProvider instance.
-   */
-  public ResourceProvider getResourceProvider() {
-    return resourceProvider;
   }
 
   /**

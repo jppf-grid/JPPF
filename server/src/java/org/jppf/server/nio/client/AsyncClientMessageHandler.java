@@ -25,8 +25,9 @@ import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.client.*;
+import org.jppf.server.nio.classloader.client.async.*;
 import org.jppf.server.nio.nodeserver.PeerAttributesHandler;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.ServerTaskBundleClient;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -219,11 +220,20 @@ public class AsyncClientMessageHandler {
    * @throws Exception if any error occurs.
    */
   private void awaitClassProvider(final String uuid) throws Exception {
-    final ClientClassNioServer classServer = driver.getClientClassServer();
-    List<ClientClassContext> list = classServer.getProviderContexts(uuid);
-    while ((list == null) || list.isEmpty()) {
-      Thread.sleep(1L);
-      list = classServer.getProviderContexts(uuid);
+    if (JPPFDriver.ASYNC) {
+      final AsyncClientClassNioServer classServer = driver.getAsyncClientClassServer();
+      List<AsyncClientClassContext> list = classServer.getProviderConnections(uuid);
+      while ((list == null) || list.isEmpty()) {
+        Thread.sleep(1L);
+        list = classServer.getProviderConnections(uuid);
+      }
+    } else {
+      final ClientClassNioServer classServer = driver.getClientClassServer();
+      List<ClientClassContext> list = classServer.getProviderContexts(uuid);
+      while ((list == null) || list.isEmpty()) {
+        Thread.sleep(1L);
+        list = classServer.getProviderContexts(uuid);
+      }
     }
   }
 }

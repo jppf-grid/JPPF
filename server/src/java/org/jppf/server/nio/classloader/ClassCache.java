@@ -45,11 +45,11 @@ public class ClassCache {
   /**
    * Total number of cache lookups.
    */
-  private long nbLookups = 0L;
+  private long nbLookups;
   /**
    * Total number of positive cache lookups.
    */
-  private long nbHits = 0L;
+  private long nbHits;
 
   /**
    * Add a resource content to the class cache.

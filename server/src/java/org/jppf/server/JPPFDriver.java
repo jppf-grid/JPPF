@@ -32,7 +32,9 @@ import org.jppf.process.LauncherListener;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.classloader.LocalClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
+import org.jppf.server.nio.classloader.client.async.AsyncClientClassNioServer;
 import org.jppf.server.nio.classloader.node.NodeClassNioServer;
+import org.jppf.server.nio.classloader.node.async.*;
 import org.jppf.server.nio.client.AsyncClientNioServer;
 import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
 import org.jppf.server.nio.nodeserver.async.*;
@@ -64,6 +66,10 @@ public class JPPFDriver extends AbstractJPPFDriver {
    * Whether the driver was started via the {@link #main(String[]) main()} method.
    */
   boolean startedfromMain = false;
+  /**
+   * Whether to use async nio model for the class loader servers.
+   */
+  public static final boolean ASYNC = JPPFConfiguration.getProperties().getBoolean("jppf.async", true);
 
   /**
    * Initialize this JPPF driver with the specified configuration.
@@ -98,8 +104,13 @@ public class JPPFDriver extends AbstractJPPFDriver {
       nodeHeartbeatServer = initHeartbeatServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL);
       clientHeartbeatServer = initHeartbeatServer(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, useSSL);
     }
-    NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(new ClientClassNioServer(this, useSSL)));
-    NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(new NodeClassNioServer(this, useSSL)));
+    if (ASYNC) {
+      NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, asyncClientClassServer = startServer(new AsyncClientClassNioServer(this, JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, useSSL)));
+      NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, asyncNodeClassServer = startServer(new AsyncNodeClassNioServer(this, JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, useSSL)));
+    } else {
+      NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(new ClientClassNioServer(this, useSSL)));
+      NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(new NodeClassNioServer(this, useSSL)));
+    }
     NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, asyncClientNioServer = startServer(new AsyncClientNioServer(this, JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, asyncNodeNioServer = startServer(new AsyncNodeNioServer(this, JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptorServer = new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts, statistics));
@@ -271,7 +282,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
    * Shutdown this driver and all its components.
    */
   void shutdownNow() {
-    log.info("Shutting down");
+    log.info("Shutting down JPPF driver");
     if (debugEnabled) log.debug("closing acceptor");
     if (acceptorServer != null) acceptorServer.shutdown();
     if (debugEnabled) log.debug("closing node heartbeat server");
@@ -304,14 +315,22 @@ public class JPPFDriver extends AbstractJPPFDriver {
    * @throws Exception if any error occurs.
    */
   private void initLocalNode() throws Exception {
-    final LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext(this));
-    final TypedProperties configuration = new TypedProperties(this.configuration);
-    localClassChannel.getContext().setChannel(localClassChannel);
+    AbstractClassLoaderConnection<?> classLoaderConnection = null;
     final String uuid = configuration.getString("jppf.node.uuid", JPPFUuid.normalUUID());
+    final TypedProperties configuration = new TypedProperties(this.configuration);
     final boolean secure = configuration.get(JPPFProperties.SSL_ENABLED);
     configuration.set(JPPFProperties.MANAGEMENT_PORT_NODE, configuration.get(secure ? JPPFProperties.SERVER_SSL_PORT : JPPFProperties.SERVER_PORT));
-    final LocalClassLoaderConnection classLoaderConnection = new LocalClassLoaderConnection(uuid, localClassChannel);
-    nodeClassServer.initLocalChannel(localClassChannel);
+    if (ASYNC) {
+      final AsyncNodeClassContext context = new AsyncNodeClassContext(asyncNodeClassServer, null);
+      context.setLocal(true);
+      classLoaderConnection = new AsyncLocalClassLoaderConnection(uuid, context);
+      asyncNodeClassServer.addNodeConnection(uuid, context);
+    } else {
+      final LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext(this));
+      localClassChannel.getContext().setChannel(localClassChannel);
+      classLoaderConnection = new LocalClassLoaderConnection(uuid, localClassChannel);
+      nodeClassServer.initLocalChannel(localClassChannel);
+    }
 
     final AsyncNodeContext ctx = new AsyncNodeContext(asyncNodeNioServer, null, true);
     ctx.setNodeInfo(getSystemInformation(), false);

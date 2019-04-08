@@ -18,24 +18,41 @@
 
 package org.jppf.nio;
 
+import org.jppf.classloader.JPPFResourceWrapper;
+
 /**
  * Nio message that reads or writes a single object from/to the network.
  * @author Laurent Cohen
  */
-public class BaseNioMessage extends AbstractNioMessage {
+public class ClassLoaderNioMessage extends AbstractNioMessage {
+  /**
+   * The associated class loader resource.
+   */
+  private JPPFResourceWrapper resource;
+
   /**
    * Initialize this nio message with the specified sll flag.
    * @param channel the channel to read from or write to.
    */
-  public BaseNioMessage(final NioContext<?> channel) {
+  public ClassLoaderNioMessage(final NioContext<?> channel) {
     super(channel);
   }
 
   /**
    * Initialize this nio message with the specified sll flag.
    * @param channel the channel to read from or write to.
+   * @param resource the associated class loader resource.
    */
-  public BaseNioMessage(final ChannelWrapper<?> channel) {
+  public ClassLoaderNioMessage(final NioContext<?> channel, final JPPFResourceWrapper resource) {
+    super(channel);
+    this.resource = resource;
+  }
+
+  /**
+   * Initialize this nio message with the specified sll flag.
+   * @param channel the channel to read from or write to.
+   */
+  public ClassLoaderNioMessage(final ChannelWrapper<?> channel) {
     super(channel);
   }
 
@@ -55,5 +72,12 @@ public class BaseNioMessage extends AbstractNioMessage {
   @Override
   protected void beforeFirstWrite() throws Exception {
     nbObjects = 1;
+  }
+
+  /**
+   * @return the associated class loader resource.
+   */
+  public JPPFResourceWrapper getResource() {
+    return resource;
   }
 }

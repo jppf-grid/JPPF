@@ -29,8 +29,7 @@ import org.jppf.JPPFUnsupportedOperationException;
  * @author Laurent Cohen
  * @exclude
  */
-public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
-{
+public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V> {
   /**
    * The completion status of the task represented by this future.
    */

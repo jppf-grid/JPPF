@@ -21,8 +21,7 @@ package org.jppf.server.nio.classloader;
  * This class encapsulates the content oif a class cache entry.
  * @author Domingos Creado
  */
-class CacheClassContent
-{
+class CacheClassContent {
   /**
    * The actual content of this element.
    */
@@ -32,8 +31,7 @@ class CacheClassContent
    * Initialize this content with the specified data.
    * @param content the data as an array of bytes.
    */
-  public CacheClassContent(final byte[] content)
-  {
+  public CacheClassContent(final byte[] content) {
     this.content = content;
   }
 
@@ -41,8 +39,7 @@ class CacheClassContent
    * Get the actual content of this element.
    * @return the data as an array of bytes.
    */
-  public byte[] getContent()
-  {
+  public byte[] getContent() {
     return content;
   }
 }

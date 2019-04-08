@@ -64,7 +64,7 @@ public class JPPFPeerInitializer implements Runnable {
   /**
    * The class loader channel initializer.
    */
-  private PeerResourceProvider provider;
+  private AbstractPeerConnectionHandler provider;
   /**
    * The job data channel initializer.
    */
@@ -118,7 +118,11 @@ public class JPPFPeerInitializer implements Runnable {
     if (debugEnabled) log.debug("start initialization of peer [{}]", peerName);
     try {
       if (connecting.compareAndSet(false, true)) {
-        if (provider == null) provider = new PeerResourceProvider(peerName, connectionInfo, driver.getClientClassServer(), secure, connectionUuid);
+        if (provider == null) {
+          provider = JPPFDriver.ASYNC
+            ? new AsyncPeerResourceProvider(peerName, connectionInfo, driver.getAsyncClientClassServer(), secure, connectionUuid)
+            : new PeerResourceProvider(peerName, connectionInfo, driver.getClientClassServer(), secure, connectionUuid);
+        }
         provider.init();
         if (node == null) node = new AsyncPeerNode(peerName, connectionInfo, driver.getAsyncClientNioServer(), secure, connectionUuid);
         node.onCloseAction = () -> start();

@@ -38,7 +38,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper {
   private final transient Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = new HashMap<>();
 
   /**
-   *
+   * Default constructor.
    */
   public CompositeResourceWrapper() {
   }

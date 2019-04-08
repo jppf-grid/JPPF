@@ -18,7 +18,7 @@
 
 package org.jppf.server.node.local;
 
-import org.jppf.classloader.LocalClassLoaderConnection;
+import org.jppf.classloader.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 
@@ -30,7 +30,7 @@ public class JPPFLocalNode extends JPPFNode {
   /**
    * Wraps the connection to the driver's class server.
    */
-  private LocalClassLoaderConnection classLoaderConnection;
+  private AbstractClassLoaderConnection<?> classLoaderConnection;
 
   /**
    * Initialize this local node with the specified I/O handler.
@@ -38,7 +38,7 @@ public class JPPFLocalNode extends JPPFNode {
    * @param nodeConnection wraps the connection to the driver's job server.
    * @param classLoaderConnection wraps the connection to the driver's class server.
    */
-  public JPPFLocalNode(final TypedProperties configuration, final AsyncLocalNodeConnection nodeConnection, final LocalClassLoaderConnection classLoaderConnection) {
+  public JPPFLocalNode(final TypedProperties configuration, final AsyncLocalNodeConnection nodeConnection, final AbstractClassLoaderConnection<?> classLoaderConnection) {
     super(uuidFromConfig(configuration), configuration);
     this.nodeConnection = nodeConnection;
     this.classLoaderConnection = classLoaderConnection;
@@ -58,7 +58,7 @@ public class JPPFLocalNode extends JPPFNode {
    * Get the connection to the driver's class server.
    * @return a {@link LocalClassLoaderConnection} instance.
    */
-  LocalClassLoaderConnection getClassLoaderConnection() {
+  AbstractClassLoaderConnection<?> getClassLoaderConnection() {
     return classLoaderConnection;
   }
 

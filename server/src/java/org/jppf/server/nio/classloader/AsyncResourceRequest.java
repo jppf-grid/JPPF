@@ -21,16 +21,20 @@ package org.jppf.server.nio.classloader;
 import static org.jppf.classloader.ResourceIdentifier.*;
 
 import org.jppf.classloader.*;
-import org.jppf.nio.ChannelWrapper;
+import org.jppf.server.nio.classloader.node.async.*;
 
 /**
  * Instances of this class represent a class loading request from a node to a client channel.
  */
-public class ResourceRequest {
+public class AsyncResourceRequest {
+  /**
+   * The types of resource.
+   */
+  private static final ResourceIdentifier[] RESOURCE_IDS = { DEFINITION, RESOURCE_LIST, RESOURCE_MAP };
   /**
    * The node class loader channel.
    */
-  private final ChannelWrapper<?> channel;
+  private final AsyncNodeClassContext context;
   /**
    * The resource to lookup in the client.
    */
@@ -42,20 +46,21 @@ public class ResourceRequest {
 
   /**
    * Initialize this request with the specified node channel and resource.
-   * @param channel the node class loader channel.
+   * @param context the node class loader channel.
    * @param resource the resource to lookup in the client.
    */
-  public ResourceRequest(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) {
-    this.channel = channel;
+  public AsyncResourceRequest(final AsyncNodeClassContext context, final JPPFResourceWrapper resource) {
+    this.requestStartTime = System.nanoTime();
+    this.context = context;
     this.resource = resource;
   }
 
   /**
    * Get the node class loader channel.
-   * @return a {@link ChannelWrapper} instance.
+   * @return a {@link AsyncNodeClassContext} instance.
    */
-  public ChannelWrapper<?> getChannel() {
-    return channel;
+  public AsyncNodeClassContext getContext() {
+    return context;
   }
 
   /**
@@ -72,10 +77,8 @@ public class ResourceRequest {
    */
   public void setResource(final JPPFResourceWrapper resource) {
     Object o = null;
-    for (ResourceIdentifier id: new ResourceIdentifier[] { DEFINITION, RESOURCE_LIST, RESOURCE_MAP }) {
-      if ((o = resource.getData(id)) != null) {
-        this.resource.setData(id, o);
-      }
+    for (final ResourceIdentifier id: RESOURCE_IDS) {
+      if ((o = resource.getData(id)) != null) this.resource.setData(id, o);
     }
     final long callableId = resource.getCallableID();
     if ((callableId == this.resource.getCallableID()) && (callableId >= 0) && ((o = resource.getCallable()) != null)) this.resource.setCallable((byte[]) o);
@@ -85,7 +88,7 @@ public class ResourceRequest {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
+    sb.append("context=").append(context);
     sb.append(", resource=").append(resource);
     sb.append(']');
     return sb.toString();

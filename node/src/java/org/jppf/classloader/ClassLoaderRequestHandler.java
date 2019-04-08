@@ -53,7 +53,7 @@ public class ClassLoaderRequestHandler {
   /**
    * The batch request to which resource requests are added.
    */
-  private CompositeResourceWrapper nextRequest = null;
+  private CompositeResourceWrapper nextRequest;
   /**
    * Object which sends the class loading requets to the driver and receives the response.
    */
@@ -66,7 +66,7 @@ public class ClassLoaderRequestHandler {
   /**
    * A thread wrapping the periodic task.
    */
-  private Thread periodicThread = null;
+  private Thread periodicThread;
   /**
    * 
    */
@@ -77,7 +77,7 @@ public class ClassLoaderRequestHandler {
    * @param requestRunner the periodic task submitted to the scheduled executor.
    */
   public ClassLoaderRequestHandler(final ResourceRequestRunner requestRunner) {
-    this.nextRequest = new CompositeResourceWrapper();
+    this.nextRequest = newRequest();
     this.requestRunner = requestRunner;
     periodicThread = ThreadUtils.startDaemonThread(periodicTask, "PeriodicTask");
   }
@@ -131,7 +131,7 @@ public class ClassLoaderRequestHandler {
             }
             if (isStopped()) return;
             request = nextRequest;
-            nextRequest = new CompositeResourceWrapper();
+            nextRequest = newRequest();
           }
           final Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = request.getFutureMap();
           final int n = futureMap.size();
@@ -175,5 +175,14 @@ public class ClassLoaderRequestHandler {
    */
   public ResourceRequestRunner getRequestRunner() {
     return requestRunner;
+  }
+
+  /**
+   * @return a new resource request.
+   */
+  private static CompositeResourceWrapper newRequest() {
+    final CompositeResourceWrapper request = new CompositeResourceWrapper();
+    request.setState(JPPFResourceWrapper.State.NODE_REQUEST);
+    return request;
   }
 }

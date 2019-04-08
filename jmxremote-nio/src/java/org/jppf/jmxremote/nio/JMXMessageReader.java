@@ -71,7 +71,7 @@ class JMXMessageReader {
     while (true) {
       boolean b = false;
       try {
-        b = context.readMessage(null);
+        b = context.readMessage();
       } catch (final IOException e) {
         final ChannelsPair pair = context.getChannels();
         if (pair.isClosed() || pair.isClosing()) return;

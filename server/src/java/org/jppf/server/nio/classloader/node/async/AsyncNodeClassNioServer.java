@@ -16,19 +16,21 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.client;
+package org.jppf.server.nio.classloader.node.async;
 
 import java.io.EOFException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.*;
 
+import org.jppf.classloader.*;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.classloader.client.*;
-import org.jppf.server.nio.classloader.client.async.*;
+import org.jppf.server.nio.client.AsyncClientContext;
+import org.jppf.server.nio.nodeserver.BaseNodeContext;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
@@ -38,27 +40,31 @@ import org.slf4j.*;
  * The NIO server that handles asynchronous client connections, which can handle multiple jobs concurrently.
  * @author Laurent Cohen
  */
-public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientContext> {
+public final class AsyncNodeClassNioServer extends StatelessNioServer<AsyncNodeClassContext> {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(AsyncClientNioServer.class);
+  private static final Logger log = LoggerFactory.getLogger(AsyncNodeClassNioServer.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static final boolean traceEnabled = log.isTraceEnabled();
-  /**
    * The message handler for this server.
    */
-  private final AsyncClientMessageHandler messageHandler;
+  private final AsyncNodeClassMessageHandler messageHandler;
   /**
    * Reference to the driver.
    */
   private final JPPFDriver driver;
+  /**
+   * Mapping of channels to their uuid.
+   */
+  protected final Map<String, AsyncNodeClassContext> nodeConnections = new ConcurrentHashMap<>();
+  /**
+   * Reads resource files from the classpath.
+   */
+  private final ResourceProvider resourceProvider = ResourceProvider.Factory.initResourceProvider();
 
   /**
    * @param driver reference to the driver.
@@ -66,38 +72,22 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if any error occurs.
    */
-  public AsyncClientNioServer(final JPPFDriver driver, final int identifier, final boolean useSSL) throws Exception {
+  public AsyncNodeClassNioServer(final JPPFDriver driver, final int identifier, final boolean useSSL) throws Exception {
     super(identifier, useSSL);
     this.driver = driver;
     selectTimeout = 1000L;
-    messageHandler = new AsyncClientMessageHandler(driver);
+    messageHandler = new AsyncNodeClassMessageHandler(driver);
   }
 
   @Override
   protected void initReaderAndWriter() {
-    messageReader = new AsyncClientMessageReader(this);
-    messageWriter = new AsyncClientMessageWriter(this);
-  }
-
-  @Override
-  protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
-    if (traceEnabled) {
-      int writable = 0, readable = 0, invalid = 0;
-      for (final SelectionKey key: selectedKeys) {
-        if (!key.isValid()) invalid++;
-        else {
-          if (key.isReadable()) readable++;
-          if (key.isWritable()) writable++;
-        }
-      }
-      log.trace("nb keys = {}, readable = {}, writable = {}, invalid = {}", selectedKeys.size(), readable, writable, invalid);
-    }
-    super.go(selectedKeys);
+    messageReader = new AsyncNodeClassMessageReader(this);
+    messageWriter = new AsyncNodeClassMessageWriter(this);
   }
 
   @Override
   protected void handleSelectionException(final SelectionKey key, final Exception e) {
-    final AsyncClientContext context = (AsyncClientContext) key.attachment();
+    final AsyncNodeClassContext context = (AsyncNodeClassContext) key.attachment();
     if (e instanceof CancelledKeyException) {
       if ((context != null) && !context.isClosed()) {
         log.error("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
@@ -116,7 +106,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
   public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
     try {
       if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
-      final AsyncClientContext context = createContext(channel, ssl);
+      final AsyncNodeClassContext context = createContext(channel, ssl);
       registerChannel(context, channel);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
@@ -132,9 +122,9 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
    * @return a new {@link AsyncClientContext} instance.
    * @throws Exception if any error occurs.
    */
-  private AsyncClientContext createContext(final SocketChannel channel, final boolean ssl)
+  private AsyncNodeClassContext createContext(final SocketChannel channel, final boolean ssl)
     throws Exception {
-    final AsyncClientContext context = createNioContext(channel);
+    final AsyncNodeClassContext context = createNioContext(channel);
     if (debugEnabled) log.debug("creating context for channel={}, ssl={}: {}", channel, ssl, context);
     context.setSsl(ssl);
     if (ssl) {
@@ -150,10 +140,10 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
    * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  private static void configureSSL(final AsyncClientContext context) throws Exception {
+  private static void configureSSL(final AsyncNodeClassContext context) throws Exception {
     if (debugEnabled) log.debug("configuring SSL for {}", context);
     final SocketChannel channel = context.getSocketChannel();
-    final SSLContext sslContext = SSLHelper.getSSLContext(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
+    final SSLContext sslContext = SSLHelper.getSSLContext(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
     final InetSocketAddress addr = (InetSocketAddress) channel.getRemoteAddress();
     final SSLEngine engine = sslContext.createSSLEngine(addr.getHostString(), addr.getPort());
     final SSLParameters params = SSLHelper.getSSLParameters();
@@ -165,15 +155,15 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
   }
 
   @Override
-  public AsyncClientContext createNioContext(final Object...params) {
-    return new AsyncClientContext(this, (SocketChannel) params[0]);
+  public AsyncNodeClassContext createNioContext(final Object...params) {
+    return new AsyncNodeClassContext(this, (SocketChannel) params[0]);
   }
 
   /**
    * Close the specified channel.
    * @param context the channel to close.
    */
-  public void closeConnection(final AsyncClientContext context) {
+  public void closeConnection(final AsyncNodeClassContext context) {
     if (debugEnabled) log.debug("closing {}", context);
     try {
       final SelectionKey key = context.getSelectionKey();
@@ -182,75 +172,108 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
         key.channel().close();
       }
       final String uuid = context.getUuid();
-      if (uuid != null) {
-        if (JPPFDriver.ASYNC) handleClassLoaderAsync(context, uuid);
-        else handleClassLoader(context, uuid);
+      if (uuid != null) removeNodeConnection(uuid);
+      try {
+        context.close();
+      } catch(final Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.warn(e.getMessage());
+      }
+      if (context.isPeer()) {
+        try {
+          final BaseNodeContext ctx = getDriver().getAsyncNodeNioServer().getConnection(uuid);
+          if (ctx != null) ctx.handleException(null);
+        } catch(final Exception e) {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          else log.warn(e.getMessage());
+        }
       }
     } catch (final Exception e) {
-      log.error("error closing channel {}", context, e);
+      log.error("error closing channel {}: {}", context, ExceptionUtils.getStackTrace(e));
     } finally {
       driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, -1);
     }
   }
 
   /**
-   * @param context the channel to close.
-   * @param uuid the uuid of the conenction to close.
-   * @throws Exception if any errort occurs.
+   * Get a channel from its uuid.
+   * @param uuid the uuid key to look up in the the map.
+   * @return channel the corresponding channel.
    */
-  private void handleClassLoader(final AsyncClientContext context, final String uuid) throws Exception {
-    final ClientClassNioServer classServer = driver.getClientClassServer();
-    final List<ClientClassContext> list = classServer.getProviderContexts(uuid);
-    if (debugEnabled) log.debug("found {} provider connections for clientUuid={}; context={}", list.size(), uuid, context);
-    if (!list.isEmpty()) {
-      for (final ClientClassContext ctx: list) {
-        if (ctx.getConnectionUuid().equals(context.getConnectionUuid())) {
-          if (debugEnabled) log.debug("found provider connection with connectionUuid={} : {}", context.getConnectionUuid(), ctx);
-          try {
-            classServer.closeConnection(ctx.getChannel(), false);
-          } catch (final Exception e) {
-            log.error(e.getMessage(), e);
-          }
-          break;
-        }
+  public AsyncLocalNodeClassloaderContext getNodeConnection(final String uuid) {
+    return nodeConnections.get(uuid);
+  }
+
+  /**
+   * Put the specified uuid / channel pair into the uuid map.
+   * @param uuid the uuid key to add to the map.
+   * @param channel the corresponding channel.
+   */
+  public void addNodeConnection(final String uuid, final AsyncNodeClassContext channel) {
+    if (debugEnabled) log.debug("adding node connection: uuid=" + uuid + ", channel=" + channel);
+    nodeConnections.put(uuid, channel);
+  }
+
+  /**
+   * Remove the specified uuid entry from the uuid map.
+   * @param uuid the uuid key to remove from the map.
+   * @return channel the corresponding channel.
+   */
+  public AsyncLocalNodeClassloaderContext removeNodeConnection(final String uuid) {
+    if (debugEnabled) log.debug("removing node connection: uuid=" + uuid);
+    return nodeConnections.remove(uuid);
+  }
+
+  /**
+   * Called when the node failed to respond to a heartbeat message.
+   * @param channel the channel to close.
+   */
+  public void connectionFailed(final AsyncNodeClassContext channel) {
+    if (channel != null) {
+      if (debugEnabled) log.debug("about to close channel = {} with uuid = {}", channel, channel.getUuid());
+      closeConnection(channel);
+    }
+  }
+
+  /**
+   * Close and remove all connections accepted by this server.
+   * @see org.jppf.nio.NioServer#removeAllConnections()
+   */
+  @Override
+  public synchronized void removeAllConnections() {
+    if (!isStopped()) return;
+    final List<AsyncNodeClassContext> list  = new ArrayList<>(nodeConnections.values());
+    nodeConnections.clear();
+    super.removeAllConnections();
+    for (AsyncNodeClassContext channel: list) {
+      try {
+        closeConnection(channel);
+      } catch (final Exception e) {
+        log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
       }
     }
   }
 
   /**
-   * @param context the channel to close.
-   * @param uuid the uuid of the conenction to close.
-   * @throws Exception if any errort occurs.
+   * @return the list of all current connections.
    */
-  private void handleClassLoaderAsync(final AsyncClientContext context, final String uuid) throws Exception {
-    final AsyncClientClassNioServer classServer = driver.getAsyncClientClassServer();
-    final List<AsyncClientClassContext> list = classServer.getProviderConnections(uuid);
-    if (debugEnabled) log.debug("found {} provider connections for clientUuid={}; context={}", (list == null) ? 0 :list.size(), uuid, context);
-    if ((list != null) && !list.isEmpty()) {
-      for (final AsyncClientClassContext ctx: list) {
-        if (ctx.getConnectionUuid().equals(context.getConnectionUuid())) {
-          if (debugEnabled) log.debug("found provider connection with connectionUuid={} : {}", context.getConnectionUuid(), ctx);
-          try {
-            classServer.closeConnection(ctx, false);
-          } catch (final Exception e) {
-            log.error(e.getMessage(), e);
-          }
-          break;
-        }
-      }
-    }
+  public List<AsyncNodeClassContext> getAllNodeConnections() {
+    final List<AsyncNodeClassContext> list = new ArrayList<>(nodeConnections.values());
+    //if (localChannel != null) list.add(localChannel);
+    return list;
   }
 
-  @Override
-  public void removeAllConnections() {
-    if (!isStopped()) return;
-    super.removeAllConnections();
+  /**
+   * Get the resource provider for this server.
+   * @return a ResourceProvider instance.
+   */
+  public ResourceProvider getResourceProvider() {
+    return resourceProvider;
   }
-
   /**
    * @return the message handler for this server.
    */
-  public AsyncClientMessageHandler getMessageHandler() {
+  public AsyncNodeClassMessageHandler getMessageHandler() {
     return messageHandler;
   }
 

@@ -33,17 +33,11 @@ public class Pair<U, V> implements Serializable {
   /**
    * The first object of this pair.
    */
-  protected U first = null;
+  protected final U first;
   /**
    * The second object of this pair.
    */
-  protected V second = null;
-
-  /**
-   * Default constructor provided as a convenience for subclasses.
-   */
-  protected Pair() {
-  }
+  protected final V second;
 
   /**
    * Initialize this pair with two values.

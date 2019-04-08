@@ -96,19 +96,19 @@ public class JPPFResourceWrapper implements Serializable {
   /**
    * Determines whether the class should be loaded through the network classloader.
    */
-  private boolean dynamic = false;
+  private boolean dynamic;
   /**
    * The state associated with this resource wrapper.
    */
-  private State state = null;
+  private State state;
   /**
    * The uuid sent by a node when it first contacts a resource provider.
    */
-  private String providerUuid = null;
+  private String providerUuid;
   /**
    * Uuid of the original task bundle that triggered this resource request.
    */
-  private String requestUuid = null;
+  private String requestUuid;
   /**
    * Contains data about the kind of lookup that is to be done.
    */
@@ -116,8 +116,21 @@ public class JPPFResourceWrapper implements Serializable {
   /**
    * Performance optimization.
    */
-  protected transient JPPFResourceWrapper[] resources = null;
+  protected transient JPPFResourceWrapper[] resources;
+  /**
+   * Uniquely identifies this resource request in the server.
+   */
+  private Map<String, Long> resourceIds;
+  /**
+   * The time at which the request is received by the server.
+   */
+  private transient long requestStartTime;
 
+  /**
+   * Default constructor.
+   */
+  public JPPFResourceWrapper() {
+  }
   /**
    * Add a uuid to the uuid path of this resource wrapper.
    * @param uuid the identifier as a string.
@@ -389,5 +402,52 @@ public class JPPFResourceWrapper implements Serializable {
    */
   public boolean isSingleResource() {
     return !hasAny(MULTIPLE, MULTIPLE_NAMES, CALLABLE);
+  }
+
+  /**
+   * @param uuid the uuid of the driver for which to get a resource id.
+   * @return the unique identifier this resource request in the server.
+   */
+  public long getResourceId(final String uuid) {
+    if (resourceIds == null) return -1L;
+    return resourceIds.get(uuid);
+  }
+
+  /**
+   * Set the unique identifier for this resource request in the specified driver.
+   * @param uuid the uuid of the driver for which to set a resource id.
+   * @param resourceId the identifier as a {@code long}.
+   */
+  public void setResourceId(final String uuid, final long resourceId) {
+    if (resourceIds == null) resourceIds = new HashMap<>();
+    resourceIds.put(uuid, resourceId);
+  }
+
+  /**
+   * @return the map of driver uuids to resource id.
+   */
+  public Map<String, Long> getResourceIds() {
+    return resourceIds;
+  }
+
+  /**
+   * @param resourceIds the map of driver uuids to resource id.
+   */
+  public void setResourceIds(final Map<String, Long> resourceIds) {
+    this.resourceIds = resourceIds;
+  }
+
+  /**
+   * @return the time at which the request is received by the server.
+   */
+  public long getRequestStartTime() {
+    return requestStartTime;
+  }
+
+  /**
+   * @param requestStartTime the time at which the request is received by the server.
+   */
+  public void setRequestStartTime(final long requestStartTime) {
+    this.requestStartTime = requestStartTime;
   }
 }

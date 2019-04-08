@@ -23,10 +23,13 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -36,6 +39,15 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public class TestJobManyConnections extends AbstractNonStandardSetup {
+  /** */
+  @Rule
+  public TestWatcher testJobManyConnections = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      BaseTestHelper.printToAll(client, false, false, true, true, true, "start of method %s()", description.getMethodName());
+    }
+  };
+
   /**
    * Launches 3 drivers connected to each other,  with 1 node attached to each and start the client.
    * @throws Exception if a process could not be started.
@@ -49,7 +61,19 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
     client = BaseSetup.setup(nbDrivers, nbDrivers, true, false, config);
     print(false, false, "client configuration:\n%s", client.getConfig().asString());
     checkPeers(nbDrivers, 10_000L, false, true);
-    client.setLoadBalancerSettings("proportional", new TypedProperties().setInt("InitialiSize", 10));
+    client.setLoadBalancerSettings("proportional", new TypedProperties().setInt("InitialSize", 10));
+  }
+
+  /**
+   * Stops the driver and nodes and close the client.
+   * @throws Exception if a process could not be stopped.
+   */
+  @AfterClass
+  public static void cleanupTestJobManyConnections() throws Exception {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11103)) {
+      assertTrue(jmx.connectAndWait(5000L));
+      BaseSetup.generateDriverThreadDump(jmx);
+    }
   }
 
   /**
