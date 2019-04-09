@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader.client.async;
+package org.jppf.server.nio.classloader.client;
 
 import org.jppf.classloader.*;
 import org.jppf.server.JPPFDriver;

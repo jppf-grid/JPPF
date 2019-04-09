@@ -30,10 +30,8 @@ import org.jppf.nio.acceptor.AcceptorNioServer;
 import org.jppf.node.initialization.OutputRedirectHook;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.nio.classloader.client.ClientClassNioServer;
-import org.jppf.server.nio.classloader.client.async.AsyncClientClassNioServer;
-import org.jppf.server.nio.classloader.node.NodeClassNioServer;
-import org.jppf.server.nio.classloader.node.async.AsyncNodeClassNioServer;
+import org.jppf.server.nio.classloader.client.AsyncClientClassNioServer;
+import org.jppf.server.nio.classloader.node.AsyncNodeClassNioServer;
 import org.jppf.server.nio.client.AsyncClientNioServer;
 import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
 import org.jppf.server.nio.nodeserver.async.AsyncNodeNioServer;
@@ -89,15 +87,7 @@ abstract class AbstractJPPFDriver {
   /**
    * Serves class loading requests from the JPPF nodes.
    */
-  ClientClassNioServer clientClassServer;
-  /**
-   * Serves class loading requests from the JPPF nodes.
-   */
   AsyncClientClassNioServer asyncClientClassServer;
-  /**
-   * Serves class loading requests from the JPPF nodes.
-   */
-  NodeClassNioServer nodeClassServer;
   /**
    * Serves class loading requests from the JPPF nodes.
    */
@@ -192,26 +182,8 @@ abstract class AbstractJPPFDriver {
    * @return a <code>ClassNioServer</code> instance.
    * @exclude
    */
-  public ClientClassNioServer getClientClassServer() {
-    return clientClassServer;
-  }
-
-  /**
-   * Get the JPPF class server.
-   * @return a <code>ClassNioServer</code> instance.
-   * @exclude
-   */
   public AsyncClientClassNioServer getAsyncClientClassServer() {
     return asyncClientClassServer;
-  }
-
-  /**
-   * Get the JPPF class server.
-   * @return a <code>ClassNioServer</code> instance.
-   * @exclude
-   */
-  public NodeClassNioServer getNodeClassServer() {
-    return nodeClassServer;
   }
 
   /**

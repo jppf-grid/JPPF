@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader.node.async;
+package org.jppf.server.nio.classloader.node;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -25,7 +25,7 @@ import org.jppf.classloader.*;
 import org.jppf.nio.ClassLoaderNioMessage;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.server.nio.classloader.client.async.*;
+import org.jppf.server.nio.classloader.client.*;
 import org.jppf.server.nio.nodeserver.BaseNodeContext;
 import org.jppf.utils.TraversalList;
 import org.jppf.utils.configuration.JPPFProperties;

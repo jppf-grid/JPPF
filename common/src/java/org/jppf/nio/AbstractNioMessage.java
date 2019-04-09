@@ -52,14 +52,6 @@ public abstract class AbstractNioMessage extends AbstractNioMessageBase {
   }
 
   /**
-   * Initialize this nio message with the specified sll flag.
-   * @param channel the channel to read from or write to.
-   */
-  protected AbstractNioMessage(final ChannelWrapper<?> channel) {
-    this(channel.getContext());
-  }
-
-  /**
    * Add a location to the data locations of this message.
    * @param location the location to add.
    */

@@ -25,6 +25,7 @@ import org.jppf.comm.recovery.HeartbeatMessage;
 import org.jppf.io.IOHelper;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.classloader.node.AsyncNodeClassContext;
 import org.jppf.server.nio.client.AsyncClientNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.utils.*;
@@ -132,12 +133,12 @@ class HeartbeatContext extends StatelessNioContext {
     if (server.getIdentifier() == JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL) {
       final BaseNodeContext nodeContext = driver.getAsyncNodeNioServer().getConnection(uuid);
       if (nodeContext != null) driver.getAsyncNodeNioServer().connectionFailed(nodeContext);
-      final ChannelWrapper<?> nodeClassChannel = driver.getNodeClassServer().getNodeConnection(uuid);
-      if (nodeClassChannel != null) driver.getNodeClassServer().connectionFailed(nodeClassChannel);
+      final AsyncNodeClassContext nodeClassChannel = driver.getAsyncNodeClassServer().getNodeConnection(uuid);
+      if (nodeClassChannel != null) driver.getAsyncNodeClassServer().connectionFailed(nodeClassChannel);
     } else {
       final AsyncClientNioServer server = driver.getAsyncClientNioServer();
       driver.getAsyncClientNioServer().performContextAction(ctx -> uuid.equals(ctx.getUuid()), server::closeConnection);
-      driver.getClientClassServer().removeProviderConnections(uuid);
+      driver.getAsyncClientClassServer().removeProviderConnections(uuid);
     }
     handleException(null);
   }
@@ -163,7 +164,6 @@ class HeartbeatContext extends StatelessNioContext {
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
-    sb.append(", state=").append(getState());
     sb.append(", ssl=").append(ssl);
     sb.append(", interestOps=").append(getInterestOps());
     sb.append(", socketChannel=").append(getSocketChannel());

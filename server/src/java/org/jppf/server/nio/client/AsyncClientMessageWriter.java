@@ -52,7 +52,7 @@ public class AsyncClientMessageWriter extends NioMessageWriter<AsyncClientContex
     if (debugEnabled) log.debug("fully sent message {} for job [uuid={}, name={}, handshake={}] from context {}", data, header.getUuid(), header.getName(), header.isHandshake(), context);
     if (!header.isHandshake()) {
       final ServerTaskBundleClient clientBundle = msg.getClientBundle();
-      server.getTransitionManager().execute(() -> {
+      NioHelper.getGlobalexecutor().execute(() -> {
         try {
           ((AsyncClientNioServer) server).getMessageHandler().jobResultsSent(context, clientBundle);
         } catch (final Exception e) {

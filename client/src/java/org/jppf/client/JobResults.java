@@ -44,10 +44,6 @@ public class JobResults extends ThreadSynchronization implements Serializable {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether trace-level logging is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * A map containing the tasks that have been successfully executed,
    * ordered by ascending position in the submitted list of tasks.
    */
@@ -91,7 +87,7 @@ public class JobResults extends ThreadSynchronization implements Serializable {
     if (debugEnabled) log.debug("adding {} results", tasks.size());
     for (final Task<?> task : tasks) {
       final int pos = task.getPosition();
-      if (traceEnabled) log.debug("adding result at positon {}", pos);
+      if (debugEnabled) log.debug("adding result at position {}", pos);
       if (hasResult(pos)) {
         if (jobName == null) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
         else log.warn("position {} (out of {}) already has a result (job '{}')", pos, tasks.size(), jobName);

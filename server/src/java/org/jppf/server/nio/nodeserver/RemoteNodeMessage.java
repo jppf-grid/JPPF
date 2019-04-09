@@ -19,7 +19,6 @@
 package org.jppf.server.nio.nodeserver;
 
 import org.jppf.io.IOHelper;
-import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 
@@ -28,14 +27,6 @@ import org.jppf.server.nio.AbstractTaskBundleMessage;
  * @author Laurent Cohen
  */
 public class RemoteNodeMessage extends AbstractTaskBundleMessage {
-  /**
-   * Initialize this nio message with the specified sll flag.
-   * @param channel the channel to read from or write to.
-   */
-  public RemoteNodeMessage(final ChannelWrapper<?> channel) {
-    super(channel);
-  }
-
   /**
    * Initialize this nio message with the specified sll flag.
    * @param context the channel to read from or write to.

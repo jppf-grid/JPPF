@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader.client.async;
+package org.jppf.server.nio.classloader.client;
 
 import java.io.EOFException;
 import java.net.InetSocketAddress;
@@ -105,7 +105,7 @@ public final class AsyncClientClassNioServer extends StatelessNioServer<AsyncCli
   }
 
   @Override
-  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
+  public void accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
     try {
       if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
       final AsyncClientClassContext context = createContext(channel, ssl);
@@ -115,7 +115,6 @@ public final class AsyncClientClassNioServer extends StatelessNioServer<AsyncCli
       log.error(e.getMessage(), e);
     }
     driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, 1);
-    return null;
   }
 
   /**

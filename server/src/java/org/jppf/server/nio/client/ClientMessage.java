@@ -45,15 +45,6 @@ public class ClientMessage extends AbstractTaskBundleMessage {
   }
 
   /**
-   * Initialize this nio message with the specified channel.
-   * @param channel the channel to read from or write to.
-   */
-  public ClientMessage(final ChannelWrapper<?> channel) {
-    super(channel);
-    this.clientBundle = null;
-  }
-
-  /**
    * Actions to take after the first object in the message has been fully read.
    * @throws Exception if an IO error occurs.
    */

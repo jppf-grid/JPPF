@@ -169,10 +169,11 @@ public class PersistenceHandler {
       Arrays.sort(resultPositions);
       if (Arrays.equals(taskPositions, resultPositions) && header.getSLA().getPersistenceSpec().isDeleteOnCompletion()) {
         if (debugEnabled) log.debug("job already has completed: {}", header);
-        persistence.deleteJob(jobUuid);
+        if (header.getSLA().getPersistenceSpec().isDeleteOnCompletion()) persistence.deleteJob(jobUuid);
         return null;
       }
       final int[] positionsToLoad = new int[taskPositions.length - resultPositions.length];
+      if (debugEnabled) log.debug("{} missing results for job {}", positionsToLoad, header);
       int i = 0;
       for (int pos: taskPositions) {
         if (Arrays.binarySearch(resultPositions, pos) < 0) positionsToLoad[i++] = pos;

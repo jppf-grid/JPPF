@@ -38,16 +38,6 @@ public abstract class StatelessNioContext extends AbstractNioContext<EmptyEnum> 
    */
   protected boolean local;
 
-  @Override
-  public boolean readMessage(final ChannelWrapper<?> channel) throws Exception {
-    return readMessage();
-  }
-
-  @Override
-  public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception {
-    return writeMessage();
-  }
-
   /**
    * @return the message to write, if any.
    */
@@ -75,12 +65,14 @@ public abstract class StatelessNioContext extends AbstractNioContext<EmptyEnum> 
    * @return whether a message was fully read.
    * @throws Exception if any error occurs.
    */
+  @Override
   public abstract boolean readMessage() throws Exception;
 
   /**
    * @return whether a message was fully written.
    * @throws Exception if any error occurs.
    */
+  @Override
   public abstract boolean writeMessage() throws Exception;
 
   /**

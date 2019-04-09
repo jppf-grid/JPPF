@@ -41,14 +41,6 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage {
   }
 
   /**
-   * Initialize this nio message with the specified sll flag.
-   * @param channel the channel to read from or write to.
-   */
-  public AbstractTaskBundleMessage(final ChannelWrapper<?> channel) {
-    super(channel);
-  }
-
-  /**
    * Get the latest bundle that was sent or received.
    * @return a <code>JPPFTaskBundle</code> instance.
    */

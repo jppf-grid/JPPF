@@ -23,7 +23,7 @@ import org.jppf.JPPFRuntimeException;
 import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.nio.ClassLoaderNioMessage;
-import org.jppf.server.nio.classloader.client.async.*;
+import org.jppf.server.nio.classloader.client.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

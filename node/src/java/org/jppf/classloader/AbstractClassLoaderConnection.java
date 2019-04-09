@@ -129,14 +129,16 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     if (list.size() > 0) list.setPosition(uuidPath.size()-1);
     for (final Map.Entry<ResourceIdentifier, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
     resource.setRequestUuid(requestUuid);
-    final Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
-    resource = f.get();
-    final Throwable t = ((ResourceFuture<?>) f).getThrowable();
-    if (t != null) {
-      if (debugEnabled) log.debug("error loading resource {} from {}: {}", resource, this, ExceptionUtils.getMessage(t));
-      if (t instanceof Exception) throw (Exception) t;
-      else if (t instanceof Error) throw (Error) t;
-      else throw new JPPFException(t);
+    if (requestHandler != null) {
+      final Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
+      resource = f.get();
+      final Throwable t = ((ResourceFuture<?>) f).getThrowable();
+      if (t != null) {
+        if (debugEnabled) log.debug("error loading resource {} from {}: {}", resource, this, ExceptionUtils.getMessage(t));
+        if (t instanceof Exception) throw (Exception) t;
+        else if (t instanceof Error) throw (Error) t;
+        else throw new JPPFException(t);
+      }
     }
     return resource;
   }

@@ -230,7 +230,7 @@ public class AsyncNodeMessageHandler {
    * @throws Exception if any error occurs.
    */
   private static void processOfflineRequest(final AsyncNodeContext context, final ServerTaskBundleNode nodeBundle) throws Exception {
-    if (debugEnabled) log.debug("processing offline request, nodeBundle={} for node={}", nodeBundle, context.getChannel());
+    if (debugEnabled) log.debug("processing offline request, nodeBundle={} for node={}", nodeBundle, context);
     context.getServer().getOfflineNodeHandler().addNodeBundle(nodeBundle);
     context.cleanup();
     context.getServer().closeConnection(context);
@@ -248,7 +248,7 @@ public class AsyncNodeMessageHandler {
     final long id = bundle.getBundleId();
     final ServerTaskBundleNode nodeBundle = context.getServer().getOfflineNodeHandler().removeNodeBundle(jobUuid, id);
     if (nodeBundle == null) return;
-    if (debugEnabled) log.debug(build("processing offline reopen with jobUuid=", jobUuid, ", id=", id, ", nodeBundle=", nodeBundle, ", node=", context.getChannel()));
+    if (debugEnabled) log.debug(build("processing offline reopen with jobUuid=", jobUuid, ", id=", id, ", nodeBundle=", nodeBundle, ", node=", context));
     context.addJobEntry(nodeBundle);
     process(received, context);
     if (bundle.getParameter(CLOSE_COMMAND, false)) {
@@ -300,7 +300,7 @@ public class AsyncNodeMessageHandler {
     final ServerJob job = nodeBundle.getClientJob();
     final Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
     if (t != null) {
-      if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
+      if (debugEnabled) log.debug("node {} returned exception parameter in the header for bundle {} : {}", context, newBundle, ExceptionUtils.getMessage(t));
       nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
       nodeBundle.resultsReceived(t);
     } else if (job.isCancelled()) {

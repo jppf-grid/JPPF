@@ -208,15 +208,12 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       print(false, false, "awaiting JOB_DISPATCHED notification");
       listener.await();
       print(false, false, "waiting for job fully persisted");
-      assertTrue(ConcurrentUtils.awaitCondition(new ConditionFalseOnException() {
-        @Override
-        public boolean evaluateWithException() throws Exception {
-          final int[][] positions = mgr.getPersistedJobPositions(job.getUuid());
-          return (positions != null) && (positions.length > 0) && (positions[0] != null) && (positions[0].length == nbTasks);
-        }
+      assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> {
+        final int[][] positions = mgr.getPersistedJobPositions(job.getUuid());
+        return (positions != null) && (positions.length > 0) && (positions[0] != null) && (positions[0].length == nbTasks);
       } , 6000L, 500L, false));
       Thread.sleep(500L);
-      print(false, false, "about to request driver restart");
+      print(false, false, "requesting driver restart");
       jmx.restartShutdown(100L, 1L);
     }
     Thread.sleep(400L);

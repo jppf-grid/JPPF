@@ -119,9 +119,7 @@ public class JPPFPeerInitializer implements Runnable {
     try {
       if (connecting.compareAndSet(false, true)) {
         if (provider == null) {
-          provider = JPPFDriver.ASYNC
-            ? new AsyncPeerResourceProvider(peerName, connectionInfo, driver.getAsyncClientClassServer(), secure, connectionUuid)
-            : new PeerResourceProvider(peerName, connectionInfo, driver.getClientClassServer(), secure, connectionUuid);
+          provider = new AsyncPeerResourceProvider(peerName, connectionInfo, driver.getAsyncClientClassServer(), secure, connectionUuid);
         }
         provider.init();
         if (node == null) node = new AsyncPeerNode(peerName, connectionInfo, driver.getAsyncClientNioServer(), secure, connectionUuid);

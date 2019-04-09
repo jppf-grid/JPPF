@@ -37,14 +37,6 @@ public class SimpleNioMessage extends AbstractNioMessageBase {
   }
 
   /**
-   * Initialize this nio message.
-   * @param channel the channel to read from or write to.
-   */
-  public SimpleNioMessage(final ChannelWrapper<?> channel) {
-    this(channel.getContext());
-  }
-
-  /**
    * Add a location to the data locations of this message.
    * @param location the location to add.
    */

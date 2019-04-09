@@ -82,7 +82,7 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
   }
 
   @Override
-  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
+  public void accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
     final boolean peer, final Object... params) {
     try {
       if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
@@ -92,7 +92,6 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-    return null;
   }
 
   /**

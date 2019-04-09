@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader.node.async;
+package org.jppf.server.nio.classloader.node;
 
 import java.nio.channels.*;
 import java.util.*;
@@ -82,7 +82,7 @@ public class AsyncNodeClassContext extends AbstractAsynClassContext implements A
 
   @Override
   public void handleException(final Exception e) {
-    if (debugEnabled) log.debug("excception on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
+    if (debugEnabled) log.debug("excception on channel {} :\n{}", this, ExceptionUtils.getStackTrace(e));
     getServer().closeConnection(this);
   }
 

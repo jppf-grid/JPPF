@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader.node.async;
+package org.jppf.server.nio.classloader.node;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.nio.*;
@@ -50,7 +50,7 @@ public class AsyncNodeClassMessageWriter extends NioMessageWriter<AsyncNodeClass
     final JPPFResourceWrapper resource = msg.getResource();
     if (debugEnabled) log.debug("fully sent message {} for resource = {} from context {}", data, resource, context);
     if ((resource != null) && (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)) {
-      server.getTransitionManager().execute(() -> {
+      NioHelper.getGlobalexecutor().execute(() -> {
         try {
           ((AsyncNodeClassNioServer) server).getMessageHandler().responseSent(context, resource);
         } catch (final Exception e) {

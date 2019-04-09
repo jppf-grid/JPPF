@@ -27,33 +27,18 @@ import java.nio.channels.SocketChannel;
  */
 public interface NioContext<S extends Enum<S>> extends NioChannelHandler, CloseableContext {
   /**
-   * Get the current state of the channel this context is associated with.
-   * @return a state enum value.
-   */
-  S getState();
-
-  /**
-   * Set the current state of the channel this context is associated with.
-   * @param state a state enum value.
-   * @return true if the state was effectively changed to the specified value, false if the channel was transitioned to a different state.
-   */
-  boolean setState(S state);
-
-  /**
    * Read data from a channel.
-   * @param wrapper the channel to read the data from.
    * @return true if all the data has been read, false otherwise.
    * @throws Exception if an error occurs while reading the data.
    */
-  boolean readMessage(ChannelWrapper<?> wrapper) throws Exception;
+  boolean readMessage() throws Exception;
 
   /**
    * Write data to a channel.
-   * @param wrapper the channel to write the data to.
    * @return true if all the data has been written, false otherwise.
    * @throws Exception if an error occurs while writing the data.
    */
-  boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception;
+  boolean writeMessage() throws Exception;
 
   /**
    * Get the uuid of the node or client for this context.
@@ -72,18 +57,6 @@ public interface NioContext<S extends Enum<S>> extends NioChannelHandler, Closea
    * @param e exception.
    */
   void handleException(final Exception e);
-
-  /**
-   * Get the associated channel.
-   * @return a {@link ChannelWrapper} instance.
-   */
-  ChannelWrapper<?> getChannel();
-
-  /**
-   * Set the associated channel.
-   * @param channel a {@link ChannelWrapper} instance.
-   */
-  void setChannel(ChannelWrapper<?> channel);
 
   /**
    * Get the SSL engine manager associated with the channel.

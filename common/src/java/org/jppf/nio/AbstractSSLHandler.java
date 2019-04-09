@@ -92,16 +92,6 @@ public abstract class AbstractSSLHandler implements SSLHandler {
    * @param sslEngine performs the SSL-related operations before sending data/after receiving data.
    * @throws Exception if any error occurs.
    */
-  public AbstractSSLHandler(final ChannelWrapper<?> channel, final SSLEngine sslEngine) throws Exception {
-    this(channel.getSocketChannel(), sslEngine);
-  }
-
-  /**
-   * Instantiate this SSLHandler with the specified channel and SSL engine.
-   * @param channel the channel from which data is read or to which data is written.
-   * @param sslEngine performs the SSL-related operations before sending data/after receiving data.
-   * @throws Exception if any error occurs.
-   */
   public AbstractSSLHandler(final SocketChannel channel, final SSLEngine sslEngine) throws Exception {
     this.channel = channel;
     this.sslEngine = sslEngine;

@@ -180,7 +180,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
   }
 
   @Override
-  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
+  public void accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
     try {
       if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
       final AsyncNodeContext context = createContext(channel, ssl);
@@ -190,7 +190,6 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
       log.error(e.getMessage(), e);
     }
     driver.getStatistics().addValue(JPPFStatisticsHelper.NODES, 1);
-    return null;
   }
 
   /**
@@ -464,7 +463,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
     if (newStatus == ExecutorStatus.ACTIVE) jobScheduler.addIdleChannel(nodeContext);
     else {
       jobScheduler.removeIdleChannelAsync(nodeContext);
-      if (newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) transitionManager.execute(() -> queue.getBroadcastManager().cancelBroadcastJobs(nodeContext.getUuid()));
+      if (newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) NioHelper.getGlobalexecutor().execute(() -> queue.getBroadcastManager().cancelBroadcastJobs(nodeContext.getUuid()));
     }
     queue.updateWorkingConnections(oldStatus, newStatus);
   }

@@ -111,11 +111,6 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
   protected abstract void initReaderAndWriter();
 
   @Override
-  protected NioServerFactory<EmptyEnum, EmptyEnum> createFactory() {
-    return null;
-  }
-
-  @Override
   public void run() {
     try {
       final boolean hasTimeout = selectTimeout > 0L;
@@ -136,36 +131,11 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
     }
   }
 
-  /*
-  @Override
-  protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
-    final Iterator<SelectionKey> it = selectedKeys.iterator();
-    while (it.hasNext()) {
-      final SelectionKey key = it.next();
-      it.remove();
-      if (!isKeyValid(key)) {
-        if (log.isDebugEnabled()) log.debug("invalid key for {}", key.attachment());
-        continue;
-      }
-      try {
-        if (key.isAcceptable()) {
-          doAccept(key);
-        } else {
-          @SuppressWarnings("unchecked")
-          final CloseableContext context = (CloseableContext) key.attachment();
-          if (context.isClosed()) continue;
-          if (key.isReadable()) handleRead(key);
-          if (isKeyValid(key) && key.isWritable()) handleWrite(key);
-        }
-      } catch (final Exception e) {
-        key.cancel();
-        transitionManager.execute(() -> handleSelectionException(key, e));
-      }
-    }
-  }
-  */
-
-  @Override
+  /**
+   * Process the keys selected by the selector for IO operations.
+   * @param selectedKeys the set of keys that were selected by the latest <code>select()</code> invocation.
+   * @throws Exception if an error is raised while processing the keys.
+   */
   protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
     final List<Future<?>> futures = new ArrayList<>();
     try {
@@ -192,7 +162,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    * @throws Exception if any error occurs.
    */
   protected Future<?> doOperation(final Set<SelectionKey> selectedKeys, final KeysetHandler<C> handler) throws Exception {
-    return transitionManager.submit(() -> handler.handle(this, selectedKeys));
+    return NioHelper.getGlobalexecutor().submit(() -> handler.handle(this, selectedKeys));
   }
 
   /**
@@ -226,7 +196,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
         } catch (final Exception e) {
           key.cancel();
           if (log2.isDebugEnabled()) log2.debug("error on {}", StatelessNioServer.toString(key), e);
-          server.getTransitionManager().execute(() -> server.handleSelectionException(key, e));
+          NioHelper.getGlobalexecutor().execute(() -> server.handleSelectionException(key, e));
         }
       }
     }

@@ -49,14 +49,6 @@ public class ClassLoaderNioMessage extends AbstractNioMessage {
   }
 
   /**
-   * Initialize this nio message with the specified sll flag.
-   * @param channel the channel to read from or write to.
-   */
-  public ClassLoaderNioMessage(final ChannelWrapper<?> channel) {
-    super(channel);
-  }
-
-  /**
    * Actions to take after the first object in the message has been fully read.
    * @throws Exception if an IO error occurs.
    */

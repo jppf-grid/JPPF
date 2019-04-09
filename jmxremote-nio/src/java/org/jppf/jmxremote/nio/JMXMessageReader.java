@@ -21,6 +21,7 @@ package org.jppf.jmxremote.nio;
 import static org.jppf.jmx.JMXHelper.*;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 import javax.management.*;
 import javax.management.remote.JMXAuthenticator;
@@ -30,7 +31,7 @@ import org.jppf.jmx.JMXHelper;
 import org.jppf.jmxremote.JMXAuthorizationChecker;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -67,7 +68,7 @@ class JMXMessageReader {
    * @throws Exception if any error occurs.
    */
   private static void doRead(final JMXContext context) throws Exception {
-    final StateTransitionManager<EmptyEnum, EmptyEnum> mgr = context.getServer().getTransitionManager();
+    final ExecutorService executor = NioHelper.getGlobalexecutor();
     while (true) {
       boolean b = false;
       try {
@@ -81,7 +82,7 @@ class JMXMessageReader {
         final SimpleNioMessage message = (SimpleNioMessage) context.getMessage();
         if (debugEnabled) log.debug("read message from {}", context);
         context.setMessage(null);
-        mgr.execute(new HandlingTask(context, message));
+        executor.execute(new HandlingTask(context, message));
       } else if (context.byteCount <= 0L) break;
     }
   }

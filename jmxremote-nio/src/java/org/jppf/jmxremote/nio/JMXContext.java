@@ -163,7 +163,6 @@ public class JMXContext extends StatelessNioContext {
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("id=").append(id);
-    sb.append(", state=").append(getState());
     sb.append(", connectionID=").append(messageHandler == null ? "null" : getConnectionID());
     sb.append(", serverSide=").append(messageHandler == null ? "null" : getChannels().isServerSide());
     sb.append(", ssl=").append(ssl);

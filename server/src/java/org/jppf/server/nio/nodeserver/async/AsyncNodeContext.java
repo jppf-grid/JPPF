@@ -402,7 +402,7 @@ public class AsyncNodeContext extends BaseNodeContext {
    * Close and cleanup the resources used by the channel.
    */
   void cleanup() {
-    if (debugEnabled) log.debug("handling cleanup for {}", channel);
+    if (debugEnabled) log.debug("handling cleanup for {}", this);
     if (getReservationTansition() == NodeReservationHandler.Transition.REMOVE) server.getNodeReservationHandler().removeReservation(this);
     final Bundler<?> bundler = getBundler();
     if (bundler != null) {

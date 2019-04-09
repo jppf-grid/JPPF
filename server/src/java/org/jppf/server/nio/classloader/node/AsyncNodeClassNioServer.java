@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader.node.async;
+package org.jppf.server.nio.classloader.node;
 
 import java.io.EOFException;
 import java.net.InetSocketAddress;
@@ -103,7 +103,7 @@ public final class AsyncNodeClassNioServer extends StatelessNioServer<AsyncNodeC
   }
 
   @Override
-  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
+  public void accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
     try {
       if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
       final AsyncNodeClassContext context = createContext(channel, ssl);
@@ -112,7 +112,6 @@ public final class AsyncNodeClassNioServer extends StatelessNioServer<AsyncNodeC
       log.error(e.getMessage(), e);
     }
     driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, 1);
-    return null;
   }
 
   /**
@@ -200,7 +199,7 @@ public final class AsyncNodeClassNioServer extends StatelessNioServer<AsyncNodeC
    * @param uuid the uuid key to look up in the the map.
    * @return channel the corresponding channel.
    */
-  public AsyncLocalNodeClassloaderContext getNodeConnection(final String uuid) {
+  public AsyncNodeClassContext getNodeConnection(final String uuid) {
     return nodeConnections.get(uuid);
   }
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader.client.async;
+package org.jppf.server.nio.classloader.node;
 
 import org.jppf.classloader.*;
 import org.jppf.nio.*;
@@ -27,11 +27,11 @@ import org.slf4j.*;
  * to a global thread pool for deserialization and processing.
  * @author Laurent Cohen
  */
-public class AsyncClientClassMessageReader extends NioMessageReader<AsyncClientClassContext> {
+public class AsyncNodeClassMessageReader extends NioMessageReader<AsyncNodeClassContext> {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(AsyncClientClassMessageReader.class);
+  private static final Logger log = LoggerFactory.getLogger(AsyncNodeClassMessageReader.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
@@ -41,13 +41,13 @@ public class AsyncClientClassMessageReader extends NioMessageReader<AsyncClientC
    * Initialize this message reader.
    * @param server the nio server.
    */
-  public AsyncClientClassMessageReader(final AsyncClientClassNioServer server) {
+  public AsyncNodeClassMessageReader(final AsyncNodeClassNioServer server) {
     super(server);
   }
 
   @Override
-  protected MessageHandler<AsyncClientClassContext> createMessageHandler() {
-    return AsyncClientClassMessageReader::handleMessage;
+  protected MessageHandler<AsyncNodeClassContext> createMessageHandler() {
+    return this::handleMessage;
   }
 
   /**
@@ -56,26 +56,25 @@ public class AsyncClientClassMessageReader extends NioMessageReader<AsyncClientC
    * @param message the message to handle.
    * @throws Exception if any error occurs.
    */
-  private static void handleMessage(final AsyncClientClassContext context, final NioMessage message) throws Exception {
+  private void handleMessage(final AsyncNodeClassContext context, final NioMessage message) throws Exception {
     if (debugEnabled) log.debug("read message = {} from context = {}", message, context);
     final ClassLoaderNioMessage msg = (ClassLoaderNioMessage) message;
     final JPPFResourceWrapper resource = context.deserializeResource(msg);
-    final JPPFResourceWrapper.State state = resource.getState();
-    final AsyncClientClassMessageHandler handler = context.getServer().getMessageHandler();
-    final boolean peer = (Boolean) resource.getData(ResourceIdentifier.PEER, Boolean.FALSE);
-    if (debugEnabled) log.debug("read resource {} with PEER={}, from client {}", resource, peer, context);
-    if (peer && (state == JPPFResourceWrapper.State.NODE_INITIATION)) handler.peerHandshakeResponse(context, resource);
-    else {
-      switch(state) {
-        case PROVIDER_INITIATION:
-          handler.providerHandshakeRequest(context, resource);
-          break;
-  
-        case PROVIDER_RESPONSE:
-        case NODE_RESPONSE:
-          handler.providerResponse(context, resource);
-          break;
-      }
+    final AsyncNodeClassMessageHandler handler = context.getServer().getMessageHandler();
+    if (debugEnabled) log.debug("read resource {} from node {}", resource, context);
+    switch(resource.getState()) {
+      case NODE_INITIATION:
+        handler.handshakeRequest(context, resource);
+        break;
+
+      case PROVIDER_REQUEST:
+      case NODE_REQUEST:
+        handler.nodeRequest(context, resource);
+        break;
+
+      case CLOSE_CHANNEL:
+        handler.closeChannelRequest(context, resource);
+        break;
     }
   }
 }

@@ -36,10 +36,6 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    */
   private static Logger log = LoggerFactory.getLogger(AbstractNioContext.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * The current state of the channel this context is associated with.
    */
   protected S state;
@@ -51,10 +47,6 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Container for the current message data.
    */
   protected NioMessage message;
-  /**
-   * The associated channel.
-   */
-  protected ChannelWrapper<?> channel;
   /**
    * Unique ID for the corresponding connection on the remote peer.
    */
@@ -109,18 +101,6 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   private SelectionKey selectionKey;
 
   @Override
-  public S getState() {
-    return state;
-  }
-
-  @Override
-  public boolean setState(final S state) {
-    if (debugEnabled) log.debug("changing state from {} to {} for {}", this.state, state, this);
-    this.state = state;
-    return true;
-  }
-
-  @Override
   public String getUuid() {
     return uuid;
   }
@@ -144,17 +124,6 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    */
   public void setMessage(final NioMessage message) {
     this.message = message;
-  }
-
-  @Override
-  public ChannelWrapper<?> getChannel() {
-    return channel;
-  }
-
-  @Override
-  public void setChannel(final ChannelWrapper<?> channel) {
-    this.channel = channel;
-    this.socketChannel = channel.getSocketChannel();
   }
 
   /**
@@ -196,9 +165,6 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    if (channel != null) sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
-    else sb.append("channel=null");
-    sb.append(", state=").append(getState());
     sb.append(", uuid=").append(uuid);
     sb.append(", connectionUuid=").append(connectionUuid);
     sb.append(", peer=").append(peer);

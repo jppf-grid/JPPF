@@ -18,7 +18,7 @@
 
 package org.jppf.nio;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.SocketException;
 import java.nio.*;
 import java.nio.channels.SocketChannel;
@@ -41,16 +41,6 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
    * Determines whether TRACE logging level is enabled.
    */
   private static final boolean traceEnabled = log.isTraceEnabled();
-
-  /**
-   * Instantiate this SSLHandler with the specified channel and SSL engine.
-   * @param channel the channel from which data is read or to which data is written.
-   * @param sslEngine performs the SSL-related operations before sending data/after receiving data.
-   * @throws Exception if any error occurs.
-   */
-  public SSLHandlerImpl(final ChannelWrapper<?> channel, final SSLEngine sslEngine) throws Exception {
-    this(channel.getSocketChannel(), sslEngine);
-  }
 
   /**
    * Instantiate this SSLHandler with the specified channel and SSL engine.

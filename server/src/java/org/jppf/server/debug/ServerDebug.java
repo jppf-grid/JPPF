@@ -25,7 +25,7 @@ import org.jppf.JPPFRuntimeException;
 import org.jppf.nio.*;
 import org.jppf.scripting.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.nodeserver.*;
+import org.jppf.server.nio.nodeserver.BaseNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.StringUtils;
@@ -59,25 +59,12 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String clientClassLoaderChannels() {
-    return classLoaderChannels(clientClassLoaderSet());
+    return viewContexts(clientClassLoaderSet());
   }
 
   @Override
   public String nodeClassLoaderChannels() {
-    return classLoaderChannels(nodeClassLoaderSet());
-  }
-
-  /**
-   * Get the class loader channels for a client or node.
-   * @param set the set of channels to get a string representation of.
-   * @return the channels as as an array of strings.
-   */
-  private static String classLoaderChannels(final Set<ChannelWrapper<?>> set) {
-    final StringBuilder sb = new StringBuilder();
-    synchronized(set) {
-      for (ChannelWrapper<?> channel: set) sb.append(channel.toString()).append('\n');
-    }
-    return sb.toString();
+    return viewContexts(nodeClassLoaderSet());
   }
 
   @Override
@@ -197,23 +184,23 @@ public class ServerDebug implements ServerDebugMBean {
 
   /**
    * Get the set of client class loader connections.
-   * @return a set of {@link ChannelWrapper} instances.
+   * @return a set of {@link NioContext} instances.
    */
-  private Set<ChannelWrapper<?>> clientClassLoaderSet() {
-    return new HashSet<>(driver.getClientClassServer().getAllConnections());
+  private Set<NioContext<?>> clientClassLoaderSet() {
+    return new HashSet<>(driver.getAsyncClientClassServer().getAllProviderConnections());
   }
 
   /**
    * Get the set of client class loader connections.
-   * @return a set of {@link ChannelWrapper} instances.
+   * @return a set of {@link NioContext} instances.
    */
-  private Set<ChannelWrapper<?>> nodeClassLoaderSet() {
-    return new HashSet<>(driver.getNodeClassServer().getAllConnections());
+  private Set<NioContext<?>> nodeClassLoaderSet() {
+    return new HashSet<>(driver.getAsyncNodeClassServer().getAllNodeConnections());
   }
 
   /**
    * Get the set of client class loader connections.
-   * @return a set of {@link ChannelWrapper} instances.
+   * @return a set of {@link NioContext} instances.
    */
   private Set<NioContext<?>> nodeSet() {
     final List<BaseNodeContext> list = driver.getAsyncNodeNioServer().getAllChannels();

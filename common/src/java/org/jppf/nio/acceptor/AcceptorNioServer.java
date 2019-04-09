@@ -147,12 +147,11 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
    * @param ssl specifies whether an <code>SSLHandler</code> should be initialized for the channel.
    * @param peer specifiies whether the channel is for a peer driver.
    * @param params optional parameters.
-   * @return a wrapper for the newly registered channel.
    * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
   @Override
-  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
+  public void accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
     final boolean peer, final Object...params) throws Exception {
     if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", this, channel, ssl);
     final AcceptorContext context = (AcceptorContext) createNioContext(serverSocketChannel, channel);
@@ -169,7 +168,6 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
     context.setInterestOps(SelectionKey.OP_READ);
     selKey.interestOps(SelectionKey.OP_READ);
     if (debugEnabled) log.debug("{} channel {} accepted", this, channel);
-    return null;
   }
 
   @Override

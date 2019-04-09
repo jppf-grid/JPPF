@@ -28,7 +28,6 @@ import javax.net.ssl.*;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.client.*;
-import org.jppf.server.nio.classloader.client.async.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
@@ -113,7 +112,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
   }
 
   @Override
-  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
+  public void accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
     try {
       if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
       final AsyncClientContext context = createContext(channel, ssl);
@@ -122,7 +121,6 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
       log.error(e.getMessage(), e);
     }
     driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, 1);
-    return null;
   }
 
   /**
@@ -183,37 +181,12 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
       }
       final String uuid = context.getUuid();
       if (uuid != null) {
-        if (JPPFDriver.ASYNC) handleClassLoaderAsync(context, uuid);
-        else handleClassLoader(context, uuid);
+        handleClassLoaderAsync(context, uuid);
       }
     } catch (final Exception e) {
       log.error("error closing channel {}", context, e);
     } finally {
       driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, -1);
-    }
-  }
-
-  /**
-   * @param context the channel to close.
-   * @param uuid the uuid of the conenction to close.
-   * @throws Exception if any errort occurs.
-   */
-  private void handleClassLoader(final AsyncClientContext context, final String uuid) throws Exception {
-    final ClientClassNioServer classServer = driver.getClientClassServer();
-    final List<ClientClassContext> list = classServer.getProviderContexts(uuid);
-    if (debugEnabled) log.debug("found {} provider connections for clientUuid={}; context={}", list.size(), uuid, context);
-    if (!list.isEmpty()) {
-      for (final ClientClassContext ctx: list) {
-        if (ctx.getConnectionUuid().equals(context.getConnectionUuid())) {
-          if (debugEnabled) log.debug("found provider connection with connectionUuid={} : {}", context.getConnectionUuid(), ctx);
-          try {
-            classServer.closeConnection(ctx.getChannel(), false);
-          } catch (final Exception e) {
-            log.error(e.getMessage(), e);
-          }
-          break;
-        }
-      }
     }
   }
 

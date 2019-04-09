@@ -142,7 +142,7 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
   }
 
   @Override
-  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
+  public void accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
     final boolean peer, final Object... params) {
     try {
       // server-side connection
@@ -170,7 +170,6 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-    return null;
   }
 
   /**
