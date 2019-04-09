@@ -304,6 +304,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
       if (t instanceof NotSerializableException) {
         if (clientBundle != null) clientBundle.resultsReceived(t);
       } else {
+        reconnect();
         if (clientBundle != null) {
           if (debugEnabled) log.debug("resubmitting {}", clientBundle);
           resubmitBundle(clientBundle, null);
@@ -326,7 +327,6 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
             resubmitBundle(response.clientBundle, null);
           }
         });
-        reconnect();
       }
     } finally {
       if ((clientBundle != null)) {
