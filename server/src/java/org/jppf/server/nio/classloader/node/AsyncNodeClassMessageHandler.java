@@ -142,8 +142,12 @@ public class AsyncNodeClassMessageHandler {
       allDefinitionsFound &= b;
     }
     if (allDefinitionsFound) {
-      context.removeNodeRequest(resource);
-      context.sendResponse(resource);
+      if (context.isLocal()) {
+        context.setLocalResponse(resource);
+      } else {
+        context.removeNodeRequest(resource);
+        context.sendResponse(resource);
+      }
     }
     if (debugEnabled) log.debug("pending responses {} for node: {}", context.getNbPendingResponses(), context);
   }

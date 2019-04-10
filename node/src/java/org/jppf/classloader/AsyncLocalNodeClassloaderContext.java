@@ -23,13 +23,6 @@ package org.jppf.classloader;
  * @author Laurent Cohen
  */
 public interface AsyncLocalNodeClassloaderContext {
-
-  /**
-   * @return a request emmitted by a local node.
-   * @throws Exception if any error occurs.
-   */
-  JPPFResourceWrapper getLocalRequest() throws Exception;
-
   /**
    * @param localRequest a request emmitted by a local node.
    * @throws Exception if any error occurs.
@@ -40,7 +33,7 @@ public interface AsyncLocalNodeClassloaderContext {
    * @return a response to a local request.
    * @throws Exception if any error occurs.
    */
-  JPPFResourceWrapper getLocalResponse() throws Exception;
+  JPPFResourceWrapper awaitLocalResponse() throws Exception;
 
   /**
    * @param localResponse a response to a local request.

@@ -54,7 +54,7 @@ class AsyncLocalResourceRequest extends AbstractResourceRequest {
       throwable = null;
       if (debugEnabled) log.debug("channel {} sending request {}", channel, request);
       channel.setLocalRequest(request);
-      response = channel.getLocalResponse();
+      response = channel.awaitLocalResponse();
       if (debugEnabled) log.debug("channel {} got response {}", channel, response);
     } catch (final Throwable t) {
       throwable = t;

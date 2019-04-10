@@ -47,7 +47,7 @@ public class AsyncNodeClassMessageReader extends NioMessageReader<AsyncNodeClass
 
   @Override
   protected MessageHandler<AsyncNodeClassContext> createMessageHandler() {
-    return this::handleMessage;
+    return AsyncNodeClassMessageReader::handleMessage;
   }
 
   /**
@@ -56,12 +56,22 @@ public class AsyncNodeClassMessageReader extends NioMessageReader<AsyncNodeClass
    * @param message the message to handle.
    * @throws Exception if any error occurs.
    */
-  private void handleMessage(final AsyncNodeClassContext context, final NioMessage message) throws Exception {
+  private static void handleMessage(final AsyncNodeClassContext context, final NioMessage message) throws Exception {
     if (debugEnabled) log.debug("read message = {} from context = {}", message, context);
     final ClassLoaderNioMessage msg = (ClassLoaderNioMessage) message;
     final JPPFResourceWrapper resource = context.deserializeResource(msg);
-    final AsyncNodeClassMessageHandler handler = context.getServer().getMessageHandler();
+    handleResource(context, resource);
+  }
+
+  /**
+   * Deserialize the specified message and route it to the specialized handling method.
+   * @param context the context associated with the channel.
+   * @param resource the request to handle.
+   * @throws Exception if any error occurs.
+   */
+  static void handleResource(final AsyncNodeClassContext context, final JPPFResourceWrapper resource) throws Exception {
     if (debugEnabled) log.debug("read resource {} from node {}", resource, context);
+    final AsyncNodeClassMessageHandler handler = context.getServer().getMessageHandler();
     switch(resource.getState()) {
       case NODE_INITIATION:
         handler.handshakeRequest(context, resource);

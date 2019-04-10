@@ -55,11 +55,7 @@ public class AsyncNodeClassContext extends AbstractAsyncClassContext implements 
    */
   private final Lock lockResponse = new ReentrantLock();
   /**
-   * A request emmitted by a local node.
-   */
-  private JPPFResourceWrapper localRequest;
-  /**
-   * A response to a local request.
+   * A response to a request sent by a local node.
    */
   private JPPFResourceWrapper localResponse;
   /**
@@ -216,42 +212,18 @@ public class AsyncNodeClassContext extends AbstractAsyncClassContext implements 
   }
 
   @Override
-  public JPPFResourceWrapper getLocalRequest() throws Exception {
-    localLock.lock();
-    try {
-      return localRequest;
-    } finally {
-      localLock.unlock();
-    }
-  }
-
-  @Override
   public void setLocalRequest(final JPPFResourceWrapper localRequest) throws Exception {
     localLock.lock();
     try {
-      this.localRequest = localRequest;
       this.localResponse = null;
-      final AsyncNodeClassMessageHandler handler = getServer().getMessageHandler();
-      switch(localRequest.getState()) {
-        case NODE_INITIATION:
-          handler.handshakeRequest(this, localRequest);
-          break;
-
-        case NODE_REQUEST:
-          handler.nodeRequest(this, localRequest);
-          break;
-
-        case CLOSE_CHANNEL:
-          handler.closeChannelRequest(this, localRequest);
-          break;
-      }
+      AsyncNodeClassMessageReader.handleResource(this, localRequest);
     } finally {
       localLock.unlock();
     }
   }
 
   @Override
-  public JPPFResourceWrapper getLocalResponse() throws Exception {
+  public JPPFResourceWrapper awaitLocalResponse() throws Exception {
     localLock.lock();
     try {
       while (localResponse == null) responseSent.await();
