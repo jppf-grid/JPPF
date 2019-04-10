@@ -45,6 +45,7 @@ public class TestLocalNode extends AbstractNonStandardSetup {
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("localnode");
     config.driver.log4j = "classes/tests/config/localnode/log4j-driver.properties";
+    config.node.log4j = "classes/tests/config/localnode/log4j-node.properties";
     client = BaseSetup.setup(1, 0, true, false, config);
     try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1, false)) {
       assertTrue(jmx.connectAndWait(5_000L));
