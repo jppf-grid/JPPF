@@ -18,6 +18,8 @@
 
 package org.jppf.utils;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * A simple utility class to measure the elapsed time between two points in the code.
  * Typicaly it is used as follows:
@@ -59,6 +61,14 @@ public class TimeMarker {
    * @return this {@code TimeMarker}.
    */
   public TimeMarker stop() {
+    return markTime();
+  }
+
+  /**
+   * Take a measurement and recompute the last and total elapsed times.
+   * @return this {@code TimeMarker}.
+   */
+  public TimeMarker markTime() {
     lastElapsed = System.nanoTime() - start;
     totalElapsed += lastElapsed;
     count++;
@@ -74,10 +84,26 @@ public class TimeMarker {
   }
 
   /**
-   * Get the total elapsed time for all measurements.
+   * Get the elapsed time for the last measurement in milliseconds.
+   * @return the elapsed time as a {@code long} value.
+   */
+  public long getLastElapsedMillis() {
+    return TimeUnit.NANOSECONDS.toMillis(lastElapsed);
+  }
+
+  /**
+   * Get the total elapsed time for all measurements in milliseconds.
    * @return the elapsed time as a {@code long} value.
    */
   public long getTotalElapsed() {
+    return TimeUnit.NANOSECONDS.toMillis(totalElapsed);
+  }
+
+  /**
+   * Get the total elapsed time for all measurements.
+   * @return the elapsed time as a {@code long} value.
+   */
+  public long getTotalElapsedMillis() {
     return totalElapsed;
   }
 
