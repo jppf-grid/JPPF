@@ -23,6 +23,7 @@ import java.util.*;
 import javax.management.remote.JMXServiceURL;
 
 import org.apache.log4j.Level;
+import org.jppf.JPPFTimeoutException;
 import org.jppf.client.*;
 import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.management.*;
@@ -46,6 +47,10 @@ public class BaseSetup {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(BaseSetup.class);
+  /**
+   * Default timeout when checking that the grid is up.
+   */
+  private static final long DEFAULT_GRID_CHECK_TIMEOUT = 15_000L;
   /**
    * The default configuratin used when none is specified.
    */
@@ -335,28 +340,46 @@ public class BaseSetup {
    * @throws Exception if any error occurs.
    */
   public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes, final boolean printEpilogue) throws Exception {
+    checkDriverAndNodesInitialized(client, nbDrivers, nbNodes, printEpilogue, DEFAULT_GRID_CHECK_TIMEOUT);
+  }
+
+  /**
+   * Check that the driver and all nodes have been started and are accessible.
+   * @param client the JPPF client to use for the checks.
+   * @param nbDrivers the number of drivers that were started.
+   * @param nbNodes the number of nodes that were started.
+   * @param printEpilogue whether to print a message once the initialization is confirmed.
+   * @param timeout the maximlum time in millis during to check for the gridd state.
+   * @throws Exception if any error occurs.
+   */
+  public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes, final boolean printEpilogue, final long timeout) throws Exception {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
     final Map<Integer, JPPFConnectionPool> connectionMap = new HashMap<>();
     boolean allConnected = false;
-    while (!allConnected) {
+    final TimeMarker time = new TimeMarker().start();
+    while (!allConnected && (time.markTime().getLastElapsedMillis() < timeout)) {
       final List<JPPFConnectionPool> list = client.getConnectionPools();
       if (list != null) {
         for (final JPPFConnectionPool pool: list) {
           if (!connectionMap.containsKey(pool.getDriverPort())) connectionMap.put(pool.getDriverPort(), pool);
         }
       }
-      if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
+      if (connectionMap.size() < nbDrivers) Thread.sleep(100L);
       else allConnected = true;
     }
+    if (!allConnected) throw new JPPFTimeoutException(String.format("exceeded tiemeout of %,d ms", timeout));
     final Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<>();
     for (final Map.Entry<Integer, JPPFConnectionPool> entry: connectionMap.entrySet()) {
-      final JMXDriverConnectionWrapper wrapper = entry.getValue().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
-      if (!wrapperMap.containsKey(wrapper.getURL())) {
-        wrapperMap.put(wrapper.getURL(), wrapper);
-      }
+      final long remainingTime = timeout - time.markTime().getLastElapsedMillis();
+      if (remainingTime <= 0L) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d ms", timeout));
+      final List<JMXDriverConnectionWrapper> jmxConnections = entry.getValue().awaitJMXConnections(Operator.AT_LEAST, 1, remainingTime, true);
+      if (!jmxConnections.isEmpty()) {
+        final JMXDriverConnectionWrapper wrapper = jmxConnections.get(0);
+        if (!wrapperMap.containsKey(wrapper.getURL())) wrapperMap.put(wrapper.getURL(), wrapper);
+      } else throw new JPPFTimeoutException(String.format("exceeded timeout of %,d ms", timeout));
     }
     int sum = 0;
-    while (sum < nbNodes) {
+    while ((sum < nbNodes) && (time.markTime().getLastElapsedMillis() < timeout)) {
       sum = 0;
       for (final Map.Entry<JMXServiceURL, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
         final Integer n = entry.getValue().nbNodes();
@@ -364,6 +387,7 @@ public class BaseSetup {
         else break;
       }
     }
+    if (sum < nbNodes) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d ms", timeout));
     if (printEpilogue) TestUtils.printf("%d drivers and %d nodes successfully initialized", nbDrivers, nbNodes);
   }
 
