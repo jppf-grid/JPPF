@@ -22,12 +22,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.classloader.*;
-import org.jppf.nio.ClassLoaderNioMessage;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.classloader.client.*;
 import org.jppf.server.nio.nodeserver.BaseNodeContext;
-import org.jppf.utils.TraversalList;
+import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
@@ -96,12 +95,7 @@ public class AsyncNodeClassMessageHandler {
     resource.setState(context.isPeer() ? JPPFResourceWrapper.State.NODE_INITIATION : JPPFResourceWrapper.State.NODE_RESPONSE);
     resource.setProviderUuid(driver.getUuid());
     if (debugEnabled) log.debug("sending handshake response {} to {}, providerUuid={}", resource, context, resource.getProviderUuid());
-    if (context.isLocal()) {
-      context.setLocalResponse(resource);
-    } else {
-      final ClassLoaderNioMessage message = context.serializeResource(resource);
-      context.offerMessageToSend(message);
-    }
+    context.sendResponse(resource);
   }
 
   /**
@@ -129,6 +123,7 @@ public class AsyncNodeClassMessageHandler {
   void nodeRequest(final AsyncNodeClassContext context, final JPPFResourceWrapper resource) throws Exception {
     if (debugEnabled) log.debug("read resource request {} from node: {}", resource, context);
     resource.setRequestStartTime(System.nanoTime());
+    if (context.isLocal()) Thread.sleep(10L);
     final long id = resourceSequence.incrementAndGet();
     final String uuid = driver.getUuid();
     resource.setResourceId(uuid, id);
@@ -142,12 +137,8 @@ public class AsyncNodeClassMessageHandler {
       allDefinitionsFound &= b;
     }
     if (allDefinitionsFound) {
-      if (context.isLocal()) {
-        context.setLocalResponse(resource);
-      } else {
-        context.removeNodeRequest(resource);
-        context.sendResponse(resource);
-      }
+      if (!context.isLocal()) context.removeNodeRequest(resource);
+      context.sendResponse(resource);
     }
     if (debugEnabled) log.debug("pending responses {} for node: {}", context.getNbPendingResponses(), context);
   }
@@ -255,7 +246,7 @@ public class AsyncNodeClassMessageHandler {
   }
 
   /**
-   * Called when a repsonse has been sent to a node.
+   * Called when a response has been sent to a node.
    * @param context represents the node channel.
    * @param resource the response that was sent.
    * @throws Exception if any error occurs.

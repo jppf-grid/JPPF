@@ -180,6 +180,7 @@ public class AsyncNodeClassContext extends AbstractAsyncClassContext implements 
   public void sendResponse(final JPPFResourceWrapper response) throws Exception {
     if (local) {
       setLocalResponse(response);
+      AsyncNodeClassMessageWriter.handleResponseSent(this, response);
     } else {
       final ClassLoaderNioMessage message = serializeResource(response);
       offerMessageToSend(message);
@@ -203,11 +204,23 @@ public class AsyncNodeClassContext extends AbstractAsyncClassContext implements 
    * 
    */
   void close() {
-    lockResponse.lock();
-    try {
-      pendingResponses.clear();
-    } finally {
-      lockResponse.unlock();
+    if (closed.compareAndSet(false, true)) {
+      lockResponse.lock();
+      try {
+        pendingResponses.clear();
+        currentNodeRequests.clear();
+      } finally {
+        lockResponse.unlock();
+      }
+      sendQueue.clear();
+      if (local) {
+        localLock.lock();
+        try {
+          responseSent.signalAll();
+        } finally {
+          localLock.unlock();
+        }
+      }
     }
   }
 
@@ -226,7 +239,7 @@ public class AsyncNodeClassContext extends AbstractAsyncClassContext implements 
   public JPPFResourceWrapper awaitLocalResponse() throws Exception {
     localLock.lock();
     try {
-      while (localResponse == null) responseSent.await();
+      while ((localResponse == null) && !closed.get()) responseSent.await();
       return localResponse;
     } finally {
       localLock.unlock();

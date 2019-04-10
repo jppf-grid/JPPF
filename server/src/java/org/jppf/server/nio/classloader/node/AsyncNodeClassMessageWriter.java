@@ -49,10 +49,20 @@ public class AsyncNodeClassMessageWriter extends NioMessageWriter<AsyncNodeClass
     final ClassLoaderNioMessage msg = (ClassLoaderNioMessage) data;
     final JPPFResourceWrapper resource = msg.getResource();
     if (debugEnabled) log.debug("fully sent message {} for resource = {} from context {}", data, resource, context);
+    handleResponseSent(context, resource);
+  }
+
+  /**
+   * 
+   * @param context the node channel.
+   * @param resource the repsosnse that was sent.
+   * @throws Exception if any error occurs.
+   */
+  static void handleResponseSent(final AsyncNodeClassContext context, final JPPFResourceWrapper resource) throws Exception {
     if ((resource != null) && (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)) {
       NioHelper.getGlobalexecutor().execute(() -> {
         try {
-          ((AsyncNodeClassNioServer) server).getMessageHandler().responseSent(context, resource);
+          context.getServer().getMessageHandler().responseSent(context, resource);
         } catch (final Exception e) {
           context.handleException(e);
         }
