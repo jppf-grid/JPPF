@@ -27,7 +27,7 @@ import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManager;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
-import org.jppf.nio.StatelessNioContext;
+import org.jppf.nio.AbstractNioContext;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.async.AsyncNodeNioServer;
 import org.jppf.server.protocol.ServerTaskBundleNode;
@@ -37,7 +37,7 @@ import org.slf4j.*;
 /**
  * @author Laurent Cohen
  */
-public abstract class BaseNodeContext extends StatelessNioContext implements  ExecutorChannel<ServerTaskBundleNode>  {
+public abstract class BaseNodeContext extends AbstractNioContext implements  ExecutorChannel<ServerTaskBundleNode>  {
   /**
    * Logger for this class.
    */

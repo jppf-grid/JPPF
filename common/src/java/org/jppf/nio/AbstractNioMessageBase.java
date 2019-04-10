@@ -65,7 +65,7 @@ public abstract class AbstractNioMessageBase implements NioMessage {
   /**
    * The channel to read from or write to.
    */
-  protected final NioContext<?> channel;
+  protected final NioContext channel;
   /**
    * Reusable buffer for reading/writing serialized object lengths.
    */
@@ -79,7 +79,7 @@ public abstract class AbstractNioMessageBase implements NioMessage {
    * Initialize this nio message.
    * @param channel the channel to read from or write to.
    */
-  protected AbstractNioMessageBase(final NioContext<?> channel) {
+  protected AbstractNioMessageBase(final NioContext channel) {
     this.channel = channel;
     if (channel != null) {
       this.sslHandler = channel.getSSLHandler();

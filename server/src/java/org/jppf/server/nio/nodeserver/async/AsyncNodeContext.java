@@ -207,17 +207,17 @@ public class AsyncNodeContext extends BaseNodeContext {
 
   @Override
   public boolean readMessage() throws Exception {
-    if (message == null) message = newMessage();
-    byteCount = message.getChannelReadCount();
+    if (readMessage == null) readMessage = newMessage();
+    readByteCount = readMessage.getChannelReadCount();
     boolean b = false;
     try {
-      b = message.read();
+      b = readMessage.read();
     } catch (final Exception e) {
-      updateTrafficStats((AbstractTaskBundleMessage) message);
+      updateTrafficStats((AbstractTaskBundleMessage) readMessage);
       throw e;
     }
-    byteCount = message.getChannelReadCount() - byteCount;
-    if (b) updateTrafficStats((AbstractTaskBundleMessage) message);
+    readByteCount = readMessage.getChannelReadCount() - readByteCount;
+    if (b) updateTrafficStats((AbstractTaskBundleMessage) readMessage);
     return b;
   }
 
@@ -410,7 +410,7 @@ public class AsyncNodeContext extends BaseNodeContext {
       if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(null);
     }
     if (getOnClose() != null) getOnClose().run();
-    setMessage(null);
+    setReadMessage(null);
   }
 
   /**

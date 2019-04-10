@@ -31,7 +31,7 @@ import org.jppf.server.JPPFDriver;
  * Context object associated with a socket channel used by the class server of the JPPF driver.
  * @author Laurent Cohen
  */
-public abstract class AbstractAsynClassContext extends StatelessNioContext {
+public abstract class AbstractAsyncClassContext extends AbstractNioContext {
   /**
    * Reference to the driver.
    */
@@ -39,7 +39,7 @@ public abstract class AbstractAsynClassContext extends StatelessNioContext {
   /**
    * 
    */
-  private final StatelessNioServer<? extends AbstractAsynClassContext> server;
+  private final StatelessNioServer<? extends AbstractAsyncClassContext> server;
   /**
    * This queue contains all the result bundles to send back to the node.
    */
@@ -49,7 +49,7 @@ public abstract class AbstractAsynClassContext extends StatelessNioContext {
    * @param driver reference to the JPPF driver.
    * @param server the server handling this context.
    */
-  public AbstractAsynClassContext(final JPPFDriver driver, final StatelessNioServer<? extends AbstractAsynClassContext> server) {
+  public AbstractAsyncClassContext(final JPPFDriver driver, final StatelessNioServer<? extends AbstractAsyncClassContext> server) {
     this.server = server;
     this.driver = driver;
   }
@@ -98,16 +98,16 @@ public abstract class AbstractAsynClassContext extends StatelessNioContext {
 
   @Override
   public boolean readMessage() throws Exception {
-    if (message == null) message = new ClassLoaderNioMessage(this);
-    byteCount = message.getChannelReadCount();
+    if (readMessage == null) readMessage = new ClassLoaderNioMessage(this);
+    readByteCount = readMessage.getChannelReadCount();
     boolean b = false;
     try {
-      b = message.read();
+      b = readMessage.read();
     } catch (final Exception e) {
       updateInTrafficStats();
       throw e;
     }
-    byteCount = message.getChannelReadCount() - byteCount;
+    readByteCount = readMessage.getChannelReadCount() - readByteCount;
     if (b) updateInTrafficStats();
     return b;
   }
@@ -131,9 +131,9 @@ public abstract class AbstractAsynClassContext extends StatelessNioContext {
    * Update the inbound and outbound traffic statistics.
    */
   private void updateInTrafficStats() {
-    if (message != null) {
+    if (readMessage != null) {
       if (inSnapshot == null) inSnapshot = driver.getStatistics().getSnapshot(peer ? PEER_IN_TRAFFIC : (isProvider() ? CLIENT_IN_TRAFFIC : NODE_IN_TRAFFIC));
-      final double value = message.getChannelReadCount();
+      final double value = readMessage.getChannelReadCount();
       if (value > 0d) inSnapshot.addValues(value, 1L);
     }
   }
@@ -173,7 +173,7 @@ public abstract class AbstractAsynClassContext extends StatelessNioContext {
   /**
    * @return the Nio server handling this context.
    */
-  public StatelessNioServer<? extends AbstractAsynClassContext> getServer() {
+  public StatelessNioServer<? extends AbstractAsyncClassContext> getServer() {
     return server;
   }
 

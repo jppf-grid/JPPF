@@ -36,7 +36,7 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage {
    * Initialize this nio message with the specified context.
    * @param context the context to read from or write to.
    */
-  public AbstractTaskBundleMessage(final NioContext<?> context) {
+  public AbstractTaskBundleMessage(final NioContext context) {
     super(context);
   }
 

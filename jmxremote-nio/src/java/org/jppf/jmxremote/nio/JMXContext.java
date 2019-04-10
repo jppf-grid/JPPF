@@ -34,7 +34,7 @@ import org.slf4j.*;
  * Context associated with a {@link JMXChannelWrapper}.
  * @author Laurent Cohen
  */
-public class JMXContext extends StatelessNioContext {
+public class JMXContext extends AbstractNioContext {
   /**
    * Logger for this class.
    */
@@ -189,33 +189,33 @@ public class JMXContext extends StatelessNioContext {
 
   @Override
   public boolean readMessage() throws Exception {
-    if (message == null) message = new SimpleNioMessage(this);
-    byteCount = message.getChannelReadCount();
+    if (readMessage == null) readMessage = new SimpleNioMessage(this);
+    readByteCount = readMessage.getChannelReadCount();
     boolean b = false;
     try {
-      b = message.read();
+      b = readMessage.read();
     } catch (final Exception e) {
       updateTrafficStats();
       throw e;
     }
-    byteCount = message.getChannelReadCount() - byteCount;
-    if (debugEnabled) log.debug("read {} bytes", byteCount);
+    readByteCount = readMessage.getChannelReadCount() - readByteCount;
+    if (debugEnabled) log.debug("read {} bytes", readByteCount);
     if (b) updateTrafficStats();
     return b;
   }
 
   @Override
   public boolean writeMessage() throws Exception {
-    byteCount = message.getChannelWriteCount();
+    readByteCount = readMessage.getChannelWriteCount();
     boolean b = false;
     try {
-      b = message.write();
+      b = readMessage.write();
     } catch (final Exception e) {
       updateTrafficStats();
       throw e;
     }
-    byteCount = message.getChannelWriteCount() - byteCount;
-    if (debugEnabled) log.debug("wrote {} bytes", byteCount);
+    readByteCount = readMessage.getChannelWriteCount() - readByteCount;
+    if (debugEnabled) log.debug("wrote {} bytes", readByteCount);
     if (b) updateTrafficStats();
     return b;
   }
@@ -224,12 +224,12 @@ public class JMXContext extends StatelessNioContext {
    * Update the inbound and outbound traffic statistics.
    */
   private void updateTrafficStats() {
-    if ((message != null) && (server.getStats() != null)) {
+    if ((readMessage != null) && (server.getStats() != null)) {
       if (inSnapshot == null) inSnapshot = server.getStats().getSnapshot(JMX_IN_TRAFFIC);
       if (outSnapshot == null) outSnapshot = server.getStats().getSnapshot(JMX_OUT_TRAFFIC);
-      double value = message.getChannelReadCount();
+      double value = readMessage.getChannelReadCount();
       if (value > 0d) inSnapshot.addValues(value, 1L);
-      value = message.getChannelWriteCount();
+      value = readMessage.getChannelWriteCount();
       if (value > 0d) outSnapshot.addValues(value, 1L);
     }
   }

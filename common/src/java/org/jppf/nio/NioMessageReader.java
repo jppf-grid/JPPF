@@ -26,7 +26,7 @@ import org.slf4j.*;
  * @param <C> the type of connection context.
  * @author Laurent Cohen
  */
-public abstract class NioMessageReader<C extends StatelessNioContext> {
+public abstract class NioMessageReader<C extends AbstractNioContext> {
   /**
    * Logger for this class.
    */
@@ -70,11 +70,11 @@ public abstract class NioMessageReader<C extends StatelessNioContext> {
     while (true) {
       final boolean b = context.readMessage();
       if (b) {
-        final NioMessage message = context.getMessage();
+        final NioMessage message = context.getReadMessage();
         if (debugEnabled) log.debug("read message {} from {}", message, context);
-        context.setMessage(null);
+        context.setReadMessage(null);
         NioHelper.getGlobalexecutor().execute(new HandlingTask<>(context, message, createMessageHandler()));
-      } else if (context.byteCount <= 0L) break;
+      } else if (context.readByteCount <= 0L) break;
     }
   }
 
@@ -88,7 +88,7 @@ public abstract class NioMessageReader<C extends StatelessNioContext> {
    * @param <C> the type of connection context.
    */
   @FunctionalInterface
-  protected static interface MessageHandler<C extends StatelessNioContext> {
+  protected static interface MessageHandler<C extends AbstractNioContext> {
     /**
      * Execute this task.
      * @param context the context associated with the channel.
@@ -102,7 +102,7 @@ public abstract class NioMessageReader<C extends StatelessNioContext> {
    * Instances of this task deserialize and process a NioMessage that was read from the network channel.
    * @param <C> the type of connection context.
    */
-  private static final class HandlingTask<C extends StatelessNioContext> implements Runnable {
+  private static final class HandlingTask<C extends AbstractNioContext> implements Runnable {
     /**
      * The context associated with the channel.
      */

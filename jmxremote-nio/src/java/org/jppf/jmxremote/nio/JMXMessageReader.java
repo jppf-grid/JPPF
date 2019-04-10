@@ -79,11 +79,11 @@ class JMXMessageReader {
         else throw e;
       }
       if (b) {
-        final SimpleNioMessage message = (SimpleNioMessage) context.getMessage();
+        final SimpleNioMessage message = (SimpleNioMessage) context.getReadMessage();
         if (debugEnabled) log.debug("read message from {}", context);
-        context.setMessage(null);
+        context.setReadMessage(null);
         executor.execute(new HandlingTask(context, message));
-      } else if (context.byteCount <= 0L) break;
+      } else if (context.readByteCount <= 0L) break;
     }
   }
 

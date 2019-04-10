@@ -237,7 +237,7 @@ abstract class AbstractJPPFDriver {
    * @param nioServer the nio server to start.
    * @return started nioServer
    */
-  static <T extends NioServer<?, ?>> T startServer(final T nioServer) {
+  static <T extends NioServer> T startServer(final T nioServer) {
     if (nioServer == null) throw new IllegalArgumentException("nioServer is null");
     if (debugEnabled) log.debug("starting nio server {}", nioServer);
     nioServer.start();

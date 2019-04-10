@@ -22,10 +22,9 @@ import java.nio.channels.SocketChannel;
 
 /**
  * Context associated with an open communication channel.
- * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public interface NioContext<S extends Enum<S>> extends NioChannelHandler, CloseableContext {
+public interface NioContext extends NioChannelHandler, CloseableContext {
   /**
    * Read data from a channel.
    * @return true if all the data has been read, false otherwise.

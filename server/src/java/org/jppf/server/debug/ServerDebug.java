@@ -102,10 +102,10 @@ public class ServerDebug implements ServerDebugMBean {
    * @param set the set to view.
    * @return an array of state strings for each channel.
    */
-  private static String viewContexts(final Set<NioContext<?>> set) {
+  private static String viewContexts(final Set<NioContext> set) {
     final StringBuilder sb = new StringBuilder().append(set.size()).append(" channels\n");
     synchronized(set) {
-      for (NioContext<?> channel: set) sb.append(channel.toString()).append('\n');
+      for (NioContext channel: set) sb.append(channel.toString()).append('\n');
     }
     return sb.toString();
   }
@@ -186,7 +186,7 @@ public class ServerDebug implements ServerDebugMBean {
    * Get the set of client class loader connections.
    * @return a set of {@link NioContext} instances.
    */
-  private Set<NioContext<?>> clientClassLoaderSet() {
+  private Set<NioContext> clientClassLoaderSet() {
     return new HashSet<>(driver.getAsyncClientClassServer().getAllProviderConnections());
   }
 
@@ -194,7 +194,7 @@ public class ServerDebug implements ServerDebugMBean {
    * Get the set of client class loader connections.
    * @return a set of {@link NioContext} instances.
    */
-  private Set<NioContext<?>> nodeClassLoaderSet() {
+  private Set<NioContext> nodeClassLoaderSet() {
     return new HashSet<>(driver.getAsyncNodeClassServer().getAllNodeConnections());
   }
 
@@ -202,9 +202,9 @@ public class ServerDebug implements ServerDebugMBean {
    * Get the set of client class loader connections.
    * @return a set of {@link NioContext} instances.
    */
-  private Set<NioContext<?>> nodeSet() {
+  private Set<NioContext> nodeSet() {
     final List<BaseNodeContext> list = driver.getAsyncNodeNioServer().getAllChannels();
-    final Set<NioContext<?>> set = new HashSet<>(list);
+    final Set<NioContext> set = new HashSet<>(list);
     return set;
   }
 

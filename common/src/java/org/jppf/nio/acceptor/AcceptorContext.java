@@ -30,7 +30,7 @@ import org.slf4j.*;
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-public class AcceptorContext extends StatelessNioContext {
+public class AcceptorContext extends AbstractNioContext {
   /**
    * Logger for this class.
    */
@@ -85,10 +85,10 @@ public class AcceptorContext extends StatelessNioContext {
     if (nioObject == null) nioObject = new PlainNioObject(socketChannel, 4);
     boolean b = false;
     try {
-      byteCount = nioObject.getChannelCount();
+      readByteCount = nioObject.getChannelCount();
       b = nioObject.read();
-      byteCount = nioObject.getChannelCount() - byteCount;
-      if (debugEnabled) log.debug("read {} bytes from {}", byteCount, this);
+      readByteCount = nioObject.getChannelCount() - readByteCount;
+      if (debugEnabled) log.debug("read {} bytes from {}", readByteCount, this);
     } catch (final Exception e) {
       updateStats(JPPFIdentifiers.UNKNOWN, nioObject.getChannelCount());
       nioObject = null;

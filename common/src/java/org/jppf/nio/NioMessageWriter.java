@@ -23,7 +23,7 @@ package org.jppf.nio;
  * @param <C> the type of connection context.
  * @author Laurent Cohen
  */
-public abstract class NioMessageWriter<C extends StatelessNioContext> {
+public abstract class NioMessageWriter<C extends AbstractNioContext> {
   /**
    * The server handling the connections.
    */

@@ -39,12 +39,10 @@ import org.slf4j.*;
  * The design of this class enforces the use of typesafe enumerations for the states
  * and transitions, so the developers must think ahead of how to implement their server
  * as a state machine.
- * @param <S> the type of the states to use.
- * @param <T> the type of the transitions to use.
  * @author Laurent Cohen
  * @author Lane Schwartz (dynamically allocated server port)
  */
-public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Thread {
+public abstract class NioServer extends Thread {
   /**
    * Logger for this class.
    */
@@ -270,7 +268,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param params optional parameters.
    * @return an <code>NioContext</code> instance.
    */
-  public abstract NioContext<S> createNioContext(final Object...params);
+  public abstract NioContext createNioContext(final Object...params);
 
   /**
    * Close the underlying server socket and stop this socket server.
@@ -345,7 +343,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param context the channel context for which to configure SSL.
    * @throws Exception if any error occurs.
    */
-  public void configurePeerSSL(final NioContext<?> context) throws Exception {
+  public void configurePeerSSL(final NioContext context) throws Exception {
     final SocketChannel socketChannel = context.getSocketChannel();
     final Socket socket = socketChannel.socket();
     final SSLEngine engine = sslContext.createSSLEngine(socket.getInetAddress().getHostAddress(), socket.getPort());

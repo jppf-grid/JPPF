@@ -47,7 +47,7 @@ public abstract class AbstractNioMessage extends AbstractNioMessageBase {
    * Initialize this nio message.
    * @param channel the channel to read from or write to.
    */
-  protected AbstractNioMessage(final NioContext<?> channel) {
+  protected AbstractNioMessage(final NioContext channel) {
     super(channel);
   }
 

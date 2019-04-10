@@ -34,7 +34,7 @@ public class ClassLoaderNioMessage extends AbstractNioMessage {
    * Initialize this nio message with the specified sll flag.
    * @param channel the channel to read from or write to.
    */
-  public ClassLoaderNioMessage(final NioContext<?> channel) {
+  public ClassLoaderNioMessage(final NioContext channel) {
     super(channel);
   }
 
@@ -43,7 +43,7 @@ public class ClassLoaderNioMessage extends AbstractNioMessage {
    * @param channel the channel to read from or write to.
    * @param resource the associated class loader resource.
    */
-  public ClassLoaderNioMessage(final NioContext<?> channel, final JPPFResourceWrapper resource) {
+  public ClassLoaderNioMessage(final NioContext channel, final JPPFResourceWrapper resource) {
     super(channel);
     this.resource = resource;
   }

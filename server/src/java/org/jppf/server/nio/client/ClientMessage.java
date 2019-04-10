@@ -39,7 +39,7 @@ public class ClientMessage extends AbstractTaskBundleMessage {
    * @param context the context to read from or write to.
    * @param clientBundle the actual client task bundle from which this message is created.
    */
-  public ClientMessage(final NioContext<?> context, final ServerTaskBundleClient clientBundle) {
+  public ClientMessage(final NioContext context, final ServerTaskBundleClient clientBundle) {
     super(context);
     this.clientBundle = clientBundle;
   }

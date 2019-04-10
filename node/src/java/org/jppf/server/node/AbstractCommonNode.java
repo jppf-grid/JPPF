@@ -417,7 +417,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
       try {
         if (providerManager != null) providerManager.unregisterProviderMBeans();
         if (jmxServer != null) jmxServer.stop();
-        final NioServer<?, ?> acceptor = NioHelper.removeServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
+        final NioServer acceptor = NioHelper.removeServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
         if (acceptor != null) acceptor.shutdown();
       } catch(final Exception e) {
         log.error(e.getMessage(), e);

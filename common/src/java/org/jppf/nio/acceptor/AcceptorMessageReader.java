@@ -64,7 +64,7 @@ class AcceptorMessageReader {
       if (context.readMessage()) {
         final int id = context.getId();
         if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), context);
-        final NioServer<?, ?> server = NioHelper.getServer(id);
+        final NioServer server = NioHelper.getServer(id);
         if (server == null) {
           final String name = JPPFIdentifiers.asString(id);
           if ((name == null) || "UNKNOWN".equalsIgnoreCase(name))
@@ -81,7 +81,7 @@ class AcceptorMessageReader {
         if (debugEnabled) log.debug("channel accepted: {}", socketChannel);
         context.setSSLHandler(null);
         break;
-      } else if (context.byteCount <= 0L) break;
+      } else if (context.readByteCount <= 0L) break;
     }
   }
 }

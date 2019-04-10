@@ -27,10 +27,10 @@ import org.slf4j.*;
 
 /**
  * 
- * @param <C> the type of connection context, a subclass of {@link StatelessNioContext}.
+ * @param <C> the type of connection context, a subclass of {@link AbstractNioContext}.
  * @author Laurent Cohen
  */
-public abstract class StatelessNioServer<C extends StatelessNioContext> extends NioServer<EmptyEnum, EmptyEnum> {
+public abstract class StatelessNioServer<C extends AbstractNioContext> extends NioServer {
   /**
    * Logger for this class.
    */
@@ -170,7 +170,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    * @param <C> the type of context associated with the channels.
    */
   @FunctionalInterface
-  protected interface KeysetHandler<C extends StatelessNioContext> {
+  protected interface KeysetHandler<C extends AbstractNioContext> {
     /**
      * Logger for this class.
      */
@@ -353,7 +353,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    * Interface for context filtering.
    * @param <C> the type of connection context.
    */
-  public interface ContextFilter<C extends StatelessNioContext> {
+  public interface ContextFilter<C extends AbstractNioContext> {
     /**
      * @param context the context to check.
      * @return {@code true} if the context is accepted, {@code false} otherwise.
@@ -365,7 +365,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    * An action ot execute on a context.
    * @param <C> the type of connection context.
    */
-  public interface ContextAction<C extends StatelessNioContext> {
+  public interface ContextAction<C extends AbstractNioContext> {
     /**
      * @param context the context on which to execute the action.
      */

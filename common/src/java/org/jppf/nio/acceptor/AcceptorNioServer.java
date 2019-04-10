@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.channels.*;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 import javax.net.ssl.SSLEngine;
 
@@ -171,7 +170,7 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
   }
 
   @Override
-  public NioContext<EmptyEnum> createNioContext(final Object...params) {
+  public NioContext createNioContext(final Object...params) {
     return new AcceptorContext(this, (ServerSocketChannel) params[0], (SocketChannel) params[1], stats);
   }
 
@@ -197,12 +196,7 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
       final ServerSocketChannel server = ServerSocketChannel.open().setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
       final InetSocketAddress addr = new InetSocketAddress(port);
       if (debugEnabled) log.debug("binding server socket channel to address {}", addr);
-      RetryUtils.runWithRetry(maxBindRetries, retryDelay, new Callable<ServerSocketChannel>() {
-        @Override
-        public ServerSocketChannel call() throws Exception {
-          return server.bind(addr);
-        }
-      });
+      RetryUtils.runWithRetry(maxBindRetries, retryDelay, () ->  server.bind(addr));
       if (debugEnabled) log.debug("server socket channel bound to address {}", addr);
       // If the user specified port zero, the operating system should dynamically allocate a port number.
       // we store the actual assigned port number so that it can be broadcast.

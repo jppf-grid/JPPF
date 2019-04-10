@@ -66,20 +66,20 @@ public class JMXMessageWriter {
         if (msg == null) return false;
         if (debugEnabled) log.debug("about to send message {} from context {}", msg, context);
         context.setCurrentMessageWrapper(msg);
-        context.setMessage(msg.nioMessage);
+        context.setReadMessage(msg.nioMessage);
       }
       final MessageWrapper msg = context.getCurrentMessageWrapper();
       try {
         if (context.writeMessage()) {
           if (debugEnabled) log.debug("fully sent message {} from context {}", msg, context);
-          context.setMessage(null);
+          context.setReadMessage(null);
           context.setCurrentMessageWrapper(null);
           if (msg.jmxMessage.getMessageType() == JMXHelper.CLOSE) {
             if (debugEnabled) log.debug("handling CLOSE for context {}", context);
             context.getMessageHandler().messageSent(msg.jmxMessage);
             return false;
           }
-        } else if (context.byteCount <= 0L) {
+        } else if (context.readByteCount <= 0L) {
           return true;
         }
       } catch (final Exception e) {

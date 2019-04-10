@@ -27,7 +27,7 @@ import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.node.AsyncNodeClassContext;
 import org.jppf.server.nio.client.AsyncClientNioServer;
-import org.jppf.server.nio.nodeserver.*;
+import org.jppf.server.nio.nodeserver.BaseNodeContext;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -36,7 +36,7 @@ import org.slf4j.*;
  * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node or client.
  * @author Laurent Cohen
  */
-class HeartbeatContext extends StatelessNioContext {
+class HeartbeatContext extends AbstractNioContext {
   /**
    * Logger for this class.
    */
@@ -69,10 +69,10 @@ class HeartbeatContext extends StatelessNioContext {
 
   @Override
   public boolean readMessage() throws Exception {
-    if (message == null) message = new SimpleNioMessage(this);
-    byteCount = message.getChannelReadCount();
-    final boolean b = message.read();
-    byteCount = message.getChannelReadCount() - byteCount;
+    if (readMessage == null) readMessage = new SimpleNioMessage(this);
+    readByteCount = readMessage.getChannelReadCount();
+    final boolean b = readMessage.read();
+    readByteCount = readMessage.getChannelReadCount() - readByteCount;
     return b;
   }
 

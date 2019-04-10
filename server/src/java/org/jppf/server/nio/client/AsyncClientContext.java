@@ -26,11 +26,11 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.io.*;
-import org.jppf.nio.StatelessNioContext;
+import org.jppf.nio.AbstractNioContext;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -40,7 +40,7 @@ import com.sun.xml.internal.ws.api.policy.PolicyResolver.ClientContext;
  * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node or client.
  * @author Laurent Cohen
  */
-public class AsyncClientContext extends StatelessNioContext {
+public class AsyncClientContext extends AbstractNioContext {
   /**
    * Logger for this class.
    */
@@ -140,17 +140,17 @@ public class AsyncClientContext extends StatelessNioContext {
 
   @Override
   public boolean readMessage() throws Exception {
-    if (message == null) message = newMessage(null);
-    byteCount = message.getChannelReadCount();
+    if (readMessage == null) readMessage = newMessage(null);
+    readByteCount = readMessage.getChannelReadCount();
     boolean b = false;
     try {
-      b = message.read();
+      b = readMessage.read();
     } catch (final Exception e) {
-      updateTrafficStats((ClientMessage) message);
+      updateTrafficStats((ClientMessage) readMessage);
       throw e;
     }
-    byteCount = message.getChannelReadCount() - byteCount;
-    if (b) updateTrafficStats((ClientMessage) message);
+    readByteCount = readMessage.getChannelReadCount() - readByteCount;
+    if (b) updateTrafficStats((ClientMessage) readMessage);
     return b;
   }
 

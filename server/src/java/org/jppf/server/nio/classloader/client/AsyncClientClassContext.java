@@ -34,7 +34,7 @@ import org.slf4j.*;
  * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node or client.
  * @author Laurent Cohen
  */
-public class AsyncClientClassContext extends AbstractAsynClassContext {
+public class AsyncClientClassContext extends AbstractAsyncClassContext {
   /**
    * Logger for this class.
    */

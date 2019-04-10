@@ -43,7 +43,7 @@ public class AcceptChannelTask implements Runnable {
   /**
    * The related nio server.
    */
-  private final NioServer<?, ?> server;
+  private final NioServer server;
   /**
    * The newly accepted socket channel.
    */
@@ -64,7 +64,7 @@ public class AcceptChannelTask implements Runnable {
    * @param channel the newly accepted socket channel.
    * @param ssl determines whether ssl is enabled for the channel.
    */
-  public AcceptChannelTask(final NioServer<?, ?> server, final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final boolean ssl) {
+  public AcceptChannelTask(final NioServer server, final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final boolean ssl) {
     this.server = server;
     this.channel = channel;
     this.ssl = ssl;

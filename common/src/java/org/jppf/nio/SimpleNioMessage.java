@@ -32,7 +32,7 @@ public class SimpleNioMessage extends AbstractNioMessageBase {
    * Initialize this nio message.
    * @param channel the channel to read from or write to.
    */
-  public SimpleNioMessage(final NioContext<?> channel) {
+  public SimpleNioMessage(final NioContext channel) {
     super(channel);
   }
 

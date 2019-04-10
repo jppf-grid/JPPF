@@ -33,7 +33,7 @@ import org.slf4j.*;
  * 
  * @author Laurent Cohen
  */
-public class AsyncNodeClassContext extends AbstractAsynClassContext implements AsyncLocalNodeClassloaderContext {
+public class AsyncNodeClassContext extends AbstractAsyncClassContext implements AsyncLocalNodeClassloaderContext {
   /**
    * Logger for this class.
    */
@@ -283,12 +283,13 @@ public class AsyncNodeClassContext extends AbstractAsynClassContext implements A
     sb.append("uuid=").append(uuid);
     sb.append(", peer=").append(peer);
     sb.append(", ssl=").append(ssl);
-    lockResponse.lock();
-    try {
-      sb.append(", currentRequests=").append(currentNodeRequests.size());
-      sb.append(", pendingResponses=").append(pendingResponses.size());
-    } finally {
-      lockResponse.unlock();
+    if (lockResponse.tryLock()) {
+      try {
+        sb.append(", currentRequests=").append(currentNodeRequests.size());
+        sb.append(", pendingResponses=").append(pendingResponses.size());
+      } finally {
+        lockResponse.unlock();
+      }
     }
     sb.append(", sendQueueSize=").append(sendQueue.size());
     sb.append(", interestOps=").append(getInterestOps());

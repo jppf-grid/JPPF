@@ -27,18 +27,13 @@ import org.slf4j.*;
 
 /**
  * Context associated with an open communication channel.
- * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public abstract class AbstractNioContext<S extends Enum<S>> implements NioContext<S> {
+public abstract class AbstractNioContext implements NioContext {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(AbstractNioContext.class);
-  /**
-   * The current state of the channel this context is associated with.
-   */
-  protected S state;
   /**
    * Uuid of the remote client or node.
    */
@@ -46,7 +41,11 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   /**
    * Container for the current message data.
    */
-  protected NioMessage message;
+  protected NioMessage readMessage;
+  /**
+   * The message to write, if any.
+   */
+  protected NioMessage writeMessage;
   /**
    * Unique ID for the corresponding connection on the remote peer.
    */
@@ -76,9 +75,13 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    */
   protected Runnable onCloseAction;
   /**
-   * 
+   * The number of bytes read by this channel.
    */
-  public long byteCount;
+  public long readByteCount;
+  /**
+   * The number of bytes written by this channel.
+   */
+  public long writeByteCount;
   /**
    * The associated socket channel.
    */
@@ -99,6 +102,10 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Selection key for the associated socket channel and nio server selector.
    */
   private SelectionKey selectionKey;
+  /**
+   * Whether this is a local channel.
+   */
+  protected boolean local;
 
   @Override
   public String getUuid() {
@@ -114,16 +121,39 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Get the container for the current message data.
    * @return an <code>NioMessage</code> instance.
    */
-  public NioMessage getMessage() {
-    return message;
+  public NioMessage getReadMessage() {
+    return readMessage;
   }
 
   /**
    * Set the container for the current message data.
    * @param message an <code>NioMessage</code> instance.
    */
-  public void setMessage(final NioMessage message) {
-    this.message = message;
+  public void setReadMessage(final NioMessage message) {
+    this.readMessage = message;
+  }
+
+  /**
+   * @return the message to write, if any.
+   */
+  public NioMessage getWriteMessage() {
+    return writeMessage;
+  }
+
+  /**
+   * 
+   * @param writeMessage the message to write, if any.
+   */
+  public void setWriteMessage(final NioMessage writeMessage) {
+    this.writeMessage = writeMessage;
+  }
+
+  /**
+   * Get the next messge to send, if any.
+   * @return the next message in the send queue, or {@code null} if the queue is empty.
+   */
+  protected NioMessage nextMessageToSend() {
+    return null;
   }
 
   /**
@@ -266,5 +296,20 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   @Override
   public void setSelectionKey(final SelectionKey selectionKey) {
     this.selectionKey = selectionKey;
+  }
+
+  /**
+   * @return whether this is a local channel.
+   */
+  public boolean isLocal() {
+    return local;
+  }
+
+  /**
+   * 
+   * @param local whether this is a local channel.
+   */
+  public void setLocal(final boolean local) {
+    this.local = local;
   }
 }

@@ -48,7 +48,7 @@ public class NioHelper {
   /**
    * Mapping of NIO servers to their identifier.
    */
-  private static final Map<Integer, NioServer<?, ?>> identifiedServers = new HashMap<>();
+  private static final Map<Integer, NioServer> identifiedServers = new HashMap<>();
   /**
    * Global thread pool used by all NIO servers.
    */
@@ -63,7 +63,7 @@ public class NioHelper {
    * @param identifier the JPPF identifier to mao to.
    * @param server the server to map.
    */
-  public static void putServer(final int identifier, final NioServer<?, ?> server) {
+  public static void putServer(final int identifier, final NioServer server) {
     synchronized(identifiedServers) {
       identifiedServers.put(identifier, server);
     }
@@ -74,7 +74,7 @@ public class NioHelper {
    * @param identifier the JPPF identifier to mao to.
    * @return the server that was removed, or {@code null} if there was no server for the specified identifier.
    */
-  public static NioServer<?, ?> removeServer(final int identifier) {
+  public static NioServer removeServer(final int identifier) {
     synchronized(identifiedServers) {
       return identifiedServers.remove(identifier);
     }
@@ -86,11 +86,11 @@ public class NioHelper {
    * @return a {@link NioServer} instance.
    * @throws Exception if any error occurs.
    */
-  public static NioServer<?, ?> getServer(final int identifier) throws Exception {
+  public static NioServer getServer(final int identifier) throws Exception {
     synchronized(identifiedServers) {
       if (identifier == JPPFIdentifiers.JMX_REMOTE_CHANNEL) {
         if (getJMXServerMethod == null) initializeJMXServerPool();
-        return (NioServer<?, ?>) getJMXServerMethod.invoke(null); 
+        return (NioServer) getJMXServerMethod.invoke(null); 
       }
       return identifiedServers.get(identifier);
     }
@@ -101,9 +101,9 @@ public class NioHelper {
    * @return a {@link NioServer} instance.
    * @throws Exception if any error occurs.
    */
-  public static NioServer<?, ?> getAcceptorServer() throws Exception {
+  public static NioServer getAcceptorServer() throws Exception {
     synchronized(identifiedServers) {
-      NioServer<?, ?> acceptor = identifiedServers.get(JPPFIdentifiers.ACCEPTOR_CHANNEL);
+      NioServer acceptor = identifiedServers.get(JPPFIdentifiers.ACCEPTOR_CHANNEL);
       if (acceptor == null) {
         if (debugEnabled) log.debug("starting acceptor");
         acceptor = new AcceptorNioServer(null, null);
