@@ -18,15 +18,27 @@
 
 package test.org.jppf.classloader;
 
-import org.junit.BeforeClass;
+import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
- * Unit tests for the disabling of resources lookup in the file system.
+ * Unit tests for {@link org.jppf.classloader.AbstractJPPFClassLoader}.
  * @author Laurent Cohen
  */
-public class TestResourceLookup extends AbstractResourceLookupTest {
+public class TestRemoteJPPFClassLoader extends AbstractClassLoaderTest {
+  /** */
+  @Rule
+  public TestWatcher testRemoteJPPFClassLoaderWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      BaseTestHelper.printToAll(client, false, false, true, true, true, "start of method %s()", description.getMethodName());
+    }
+  };
+
   /**
    * Launches a driver and 1 node and start the client.
    * @throws Exception if a process could not be started.
@@ -34,7 +46,6 @@ public class TestResourceLookup extends AbstractResourceLookupTest {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("classloader");
-    config.driver.classpath.add("test-resources/driver1");
     client = BaseSetup.setup(1, 1, true, config);
   }
 }

@@ -26,23 +26,43 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.client.taskwrapper.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
-import org.junit.Test;
+import org.jppf.utils.stats.*;
+import org.junit.*;
 
-import test.org.jppf.test.setup.Setup1D1N1C;
+import test.org.jppf.test.setup.AbstractNonStandardSetup;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Unit tests for {@link org.jppf.classloader.AbstractJPPFClassLoader}.
  * @author Laurent Cohen
  */
-public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
+public class AbstractClassLoaderTest extends AbstractNonStandardSetup {
   /**
    * Test timeout.
    */
-  private static final long TEST_TIMEOUT = 10_000L;
+  private static final long TEST_TIMEOUT = 20_000L;
+
+  /**
+   * Launches a driver and 1 node and start the client.
+   * @throws Exception if a process could not be started.
+   */
+  @AfterClass
+  public static void displayStats() throws Exception {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11101, false)) {
+      assertTrue(jmx.connectAndWait(5_000L));
+      print(false, false, "***** class loading statistics *****");
+      final JPPFStatistics stats = jmx.statistics();
+      final JPPFSnapshot[] snapshots = { stats.getSnapshot(JPPFStatisticsHelper.NODE_CLASS_REQUESTS_TIME), stats.getSnapshot(JPPFStatisticsHelper.CLIENT_CLASS_REQUESTS_TIME)};
+      for (final JPPFSnapshot snapshot: snapshots) {
+        print(false, false, "%-26s: avg time = %,.3f ms; count: %,d; total time: %,.3f ms", snapshot.getLabel(), snapshot.getAvg(), snapshot.getValueCount(), snapshot.getTotal());
+      }
+    }
+  }
 
   /**
    * Test that no exception is raised upon calling AbstractJPPFClassloader.getResources() from 2 jobs in sequence.
@@ -143,16 +163,25 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    * @throws Exception if any error occurs
    */
   private static void testInterruption(final boolean callable) throws Exception {
-    final String name = ReflectionUtils.getCurrentMethodName() + "(" + (callable ? "Callable" : "task") + " ";
+    final String name = ReflectionUtils.getCurrentMethodName() + "(" + (callable ? "callable" : "task") + " %d)";
     for (int i=1; i<=10; i++) {
       final JPPFJob job = new JPPFJob();
-      job.setName(name + i);
-      if (callable) job.add(new MyCallable(i));
+      job.setName(String.format(name, i));
+      if (callable) {
+        final JPPFAnnotatedTask task = (JPPFAnnotatedTask) job.add(new MyCallable(i));
+        final int n = i;
+        task.setCancelCallback(new JPPFTaskCallback<Object>() {
+          @Override
+          public void run() {
+            System.out.printf("callable task %d cancelled%n", n);
+          }
+        });
+      }
       else job.add(new MyTask2(i));
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
       final Task<?> task = client.submit(job).get(0);
       final Throwable t = task.getThrowable();
-      assertNull(t);
+      assertNull(String.format("got exception in task %d: %s", i, ExceptionUtils.getStackTrace(t)), t);
       if (i == 1) {
         assertNull(task.getResult());
         assertTrue(job.isCancelled());
@@ -236,6 +265,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
       return classLoaderMatch;
     }
   }
+
   /** */
   public static class MyCallable implements Callable<String>, Serializable, Interruptibility {
     /**
@@ -260,7 +290,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
         Class.forName("scala.Predef$");
         return "result of job " + index;
       } finally {
-        System.out.printf("job %d time=%,d ms%n", index, (System.nanoTime() - start) / 1_000_000L);
+        System.out.printf("[%s] job %d time=%,d ms%n", getClass().getSimpleName(), index, (System.nanoTime() - start) / 1_000_000L);
       }
     }
 
@@ -295,16 +325,26 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
         new Test3();
         setResult("result of job " + index);
       } catch(final Error e) {
-        System.out.printf("job %d has exception: %s%n", index, ExceptionUtils.getStackTrace(e));
+        System.out.printf("[%s] job %d has exception: %s%n", getClass().getSimpleName(), index, ExceptionUtils.getStackTrace(e));
         throw e;
       } finally {
-        System.out.printf("job %d time=%,d ms%n", index, (System.nanoTime() - start) / 1_000_000L);
+        System.out.printf("[%s] job %d time=%,d ms%n", getClass().getSimpleName(), index, (System.nanoTime() - start) / 1_000_000L);
       }
     }
 
     @Override
     public boolean isInterruptible() {
       return false;
+    }
+
+    @Override
+    public void onCancel() {
+      System.out.printf("[%s] job %d cancelled%n", getClass().getSimpleName(), index);
+    }
+
+    @Override
+    public void onTimeout() {
+      System.out.printf("[%s] job %d timed out%n", getClass().getSimpleName(), index);
     }
   }
 

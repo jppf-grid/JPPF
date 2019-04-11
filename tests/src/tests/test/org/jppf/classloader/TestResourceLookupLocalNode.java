@@ -18,6 +18,11 @@
 
 package test.org.jppf.classloader;
 
+import static org.junit.Assert.assertTrue;
+
+import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.BeforeClass;
 
 import test.org.jppf.test.setup.*;
@@ -26,7 +31,7 @@ import test.org.jppf.test.setup.*;
  * Unit tests for the disabling of resources lookup in the file system.
  * @author Laurent Cohen
  */
-public class TestResourceLookup extends AbstractResourceLookupTest {
+public class TestResourceLookupLocalNode extends AbstractResourceLookupTest {
   /**
    * Launches a driver and 1 node and start the client.
    * @throws Exception if a process could not be started.
@@ -34,7 +39,12 @@ public class TestResourceLookup extends AbstractResourceLookupTest {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("classloader");
+    config.driver.jppf = "classes/tests/config/classloader/driver_local_node.properties";
     config.driver.classpath.add("test-resources/driver1");
-    client = BaseSetup.setup(1, 1, true, config);
+    client = BaseSetup.setup(1, 0, true, config);
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11101, false)) {
+      assertTrue(jmx.connectAndWait(5_000L));
+      assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() >= 1, 5_000L, 500L, false));
+    }
   }
 }
