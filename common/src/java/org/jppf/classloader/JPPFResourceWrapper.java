@@ -125,6 +125,10 @@ public class JPPFResourceWrapper implements Serializable {
    * The time at which the request is received by the server.
    */
   private transient long requestStartTime;
+  /**
+   * Whether this is a handshake request.
+   */
+  private transient boolean handshaking;
 
   /**
    * Default constructor.
@@ -449,5 +453,19 @@ public class JPPFResourceWrapper implements Serializable {
    */
   public void setRequestStartTime(final long requestStartTime) {
     this.requestStartTime = requestStartTime;
+  }
+
+  /**
+   * @return whether this is a handshake request.
+   */
+  public boolean isHandshaking() {
+    return handshaking;
+  }
+
+  /**
+   * @param handshaking whether this is a handshake request.
+   */
+  public void setHandshaking(final boolean handshaking) {
+    this.handshaking = handshaking;
   }
 }

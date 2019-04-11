@@ -178,6 +178,7 @@ public class AsyncNodeClassContext extends AbstractAsyncClassContext implements 
    * @throws Exception if any error occurs.
    */
   public void sendResponse(final JPPFResourceWrapper response) throws Exception {
+    if (response.getState() == JPPFResourceWrapper.State.NODE_REQUEST) response.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
     if (local) {
       setLocalResponse(response);
       AsyncNodeClassMessageWriter.handleResponseSent(this, response);

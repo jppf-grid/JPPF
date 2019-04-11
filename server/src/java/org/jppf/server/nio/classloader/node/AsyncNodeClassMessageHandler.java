@@ -83,6 +83,7 @@ public class AsyncNodeClassMessageHandler {
    */
   void handshakeRequest(final AsyncNodeClassContext context, final JPPFResourceWrapper resource) throws Exception {
     if (debugEnabled) log.debug("read initial request from node {}", context);
+    resource.setHandshaking(true);
     context.setPeer((Boolean) resource.getData(ResourceIdentifier.PEER, Boolean.FALSE));
     if (debugEnabled) log.debug("initiating node {}", context);
     final String uuid = (String) resource.getData(ResourceIdentifier.NODE_UUID);
@@ -123,7 +124,6 @@ public class AsyncNodeClassMessageHandler {
   void nodeRequest(final AsyncNodeClassContext context, final JPPFResourceWrapper resource) throws Exception {
     if (debugEnabled) log.debug("read resource request {} from node: {}", resource, context);
     resource.setRequestStartTime(System.nanoTime());
-    if (context.isLocal()) Thread.sleep(10L);
     final long id = resourceSequence.incrementAndGet();
     final String uuid = driver.getUuid();
     resource.setResourceId(uuid, id);
@@ -254,6 +254,6 @@ public class AsyncNodeClassMessageHandler {
   void responseSent(final AsyncNodeClassContext context, final JPPFResourceWrapper resource) throws Exception {
     final long elapsed = (System.nanoTime() - resource.getRequestStartTime()) / 1_000_000L;
     driver.getStatistics().addValues(JPPFStatisticsHelper.NODE_CLASS_REQUESTS_TIME, elapsed, resource.getResources().length);
-    if (debugEnabled) log.debug("node {} sent response {}", context, resource);
+    if (debugEnabled) log.debug("node {} sent response {} ({} ms for {} requests)", context, resource, elapsed, resource.getResources().length);
   }
 }

@@ -62,7 +62,7 @@ public class ClassLoaderRequestHandler {
    * A task run at constant intervals, which runs the class loading send/receive tto the server and notifies
    * waiting threads when the reponse is received.
    */
-  private PeriodicTask periodicTask = new PeriodicTask();
+  private final PeriodicTask periodicTask = new PeriodicTask();
   /**
    * A thread wrapping the periodic task.
    */
@@ -70,7 +70,7 @@ public class ClassLoaderRequestHandler {
   /**
    * 
    */
-  private int maxBatchSize = 0;
+  private int peakBatchSize;
 
   /**
    * Initialize this request handler.
@@ -109,7 +109,6 @@ public class ClassLoaderRequestHandler {
     final ResourceRequestRunner tmp = requestRunner;
     requestRunner = null;
     periodicThread = null;
-    periodicTask = null;
     return tmp;
   }
 
@@ -135,9 +134,9 @@ public class ClassLoaderRequestHandler {
           }
           final Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = request.getFutureMap();
           final int n = futureMap.size();
-          if (n > maxBatchSize) {
-            maxBatchSize = n;
-            log.info(build("maxBatchSize = ", maxBatchSize));
+          if (n > peakBatchSize) {
+            peakBatchSize = n;
+            log.info(build("peakBatchSize = ", peakBatchSize));
           }
           if (debugEnabled) log.debug(build("sending batch of ", futureMap.size(), " class loading requests: ", request));
           if (isStopped()) return;

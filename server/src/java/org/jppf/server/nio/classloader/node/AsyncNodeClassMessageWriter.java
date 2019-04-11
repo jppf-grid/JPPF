@@ -59,14 +59,8 @@ public class AsyncNodeClassMessageWriter extends NioMessageWriter<AsyncNodeClass
    * @throws Exception if any error occurs.
    */
   static void handleResponseSent(final AsyncNodeClassContext context, final JPPFResourceWrapper resource) throws Exception {
-    if ((resource != null) && (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)) {
-      NioHelper.getGlobalexecutor().execute(() -> {
-        try {
-          context.getServer().getMessageHandler().responseSent(context, resource);
-        } catch (final Exception e) {
-          context.handleException(e);
-        }
-      });
+    if ((resource != null) && !resource.isHandshaking() && (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)) {
+      context.getServer().getMessageHandler().responseSent(context, resource);
     }
   }
 }
