@@ -34,7 +34,7 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * Unit tests for the disabling of resources lookup in the file system.
  * @author Laurent Cohen
  */
-public class AbstractResourceLookupTest extends AbstractNonStandardSetup {
+public abstract class AbstractResourceLookupTest extends AbstractNonStandardSetup {
   /**
    * Test timeout.
    */

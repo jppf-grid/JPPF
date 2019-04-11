@@ -41,7 +41,7 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * Unit tests for {@link org.jppf.classloader.AbstractJPPFClassLoader}.
  * @author Laurent Cohen
  */
-public class AbstractClassLoaderTest extends AbstractNonStandardSetup {
+public abstract class AbstractClassLoaderTest extends AbstractNonStandardSetup {
   /**
    * Test timeout.
    */
