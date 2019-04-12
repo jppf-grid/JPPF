@@ -230,10 +230,10 @@ public class AsyncNodeClassContext extends AbstractAsyncClassContext implements 
     localLock.lock();
     try {
       this.localResponse = null;
-      AsyncNodeClassMessageReader.handleResource(this, localRequest);
     } finally {
       localLock.unlock();
     }
+    AsyncNodeClassMessageReader.handleResource(this, localRequest);
   }
 
   @Override
