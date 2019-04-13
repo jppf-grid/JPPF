@@ -43,11 +43,11 @@ public class AsyncNodeClassContext extends AbstractAsyncClassContext implements 
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
   /**
-   * 
+   * Contains the requests emitted by a node which have not been fully answered.
    */
   private final Map<Long, JPPFResourceWrapper> currentNodeRequests = new HashMap<>();
   /**
-   * 
+   * Contains the requests awaiting a response from the client-side.
    */
   private final CollectionMap<Long, AsyncResourceRequest> pendingResponses = new SetHashMap<>();
   /**
@@ -59,11 +59,11 @@ public class AsyncNodeClassContext extends AbstractAsyncClassContext implements 
    */
   private JPPFResourceWrapper localResponse;
   /**
-   * 
+   * Used to synchronize on requests from a local node.
    */
   private final Lock localLock = new ReentrantLock();
   /**
-   * 
+   * Used to synchronize on requests from a local node.
    */
   private final Condition responseSent = localLock.newCondition();
 
@@ -202,7 +202,7 @@ public class AsyncNodeClassContext extends AbstractAsyncClassContext implements 
   }
 
   /**
-   * 
+   * Close this context and clear all requests, responses and message queues.
    */
   void close() {
     if (closed.compareAndSet(false, true)) {
