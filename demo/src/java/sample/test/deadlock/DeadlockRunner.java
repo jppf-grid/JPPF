@@ -255,6 +255,7 @@ public class DeadlockRunner {
         writer, nbNodes, jobProvider.getJobCount(), marker.getLastElapsed() / 1_000_000L, meanDev, lbi.getAlgorithm(), new TreeMap<>(props).toString(), Boolean.toString(computed));
       writer.write("\n");
     }
+    print("client classpath cahche stats: %s", ClasspathCache.getInstance());
   }
 
   /**

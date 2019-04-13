@@ -64,7 +64,7 @@ public final class AsyncNodeClassNioServer extends StatelessNioServer<AsyncNodeC
   /**
    * Reads resource files from the classpath.
    */
-  private final ResourceProvider resourceProvider = ResourceProvider.Factory.initResourceProvider();
+  private final ResourceProvider resourceProvider = new ResourceProviderImpl();
 
   /**
    * @param driver reference to the driver.

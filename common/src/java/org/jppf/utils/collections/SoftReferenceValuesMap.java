@@ -117,6 +117,11 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V> {
     map.clear();
   }
 
+  @Override
+  public Set<K> keySet() {
+    return map.keySet();
+  }
+
   /**
    * Cleanup the reference queue, by removing entries whose value was garbage collected.
    */

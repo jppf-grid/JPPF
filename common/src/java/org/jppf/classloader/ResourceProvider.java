@@ -20,10 +20,6 @@ package org.jppf.classloader;
 
 import java.util.*;
 
-import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
-import org.slf4j.*;
-
 /**
  * Instances of this interface are dedicated to reading resource files form the JVM's classpath and converting them into arrays of bytes.
  * @author Laurent Cohen
@@ -101,37 +97,4 @@ public interface ResourceProvider {
    * @return A mapping of each resource names with a list of the byte content of corresponding resources in the classpath.
    */
   Map<String, List<byte[]>> getMultipleResourcesAsBytes(Collection<ClassLoader> classLoaders, boolean lookupInFileSystem, String...names);
-
-  /**
-   * Factory class for {@link ResourceProvider} implementations.
-   * The implementation must have a public no-arg constructor and is specified
-   * with the configuration property {@code "jppf.resource.provider.class"}.
-   * @since 5.0
-   * @exclude
-   */
-  public static class Factory {
-    /**
-     * Logger for this class.
-     */
-    private static Logger log = LoggerFactory.getLogger(Factory.class);
-    /**
-     * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-     */
-    private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-    /**
-     * Construct a resource provider based on the JPPF configuration.
-     * @return an {@link AbstractResourceProvider} implementation.
-     */
-    public static ResourceProvider initResourceProvider() {
-      final String name = JPPFConfiguration.get(JPPFProperties.RESOURCE_PROVIDER_CLASS);
-      if (debugEnabled) log.debug("jppf.resource.provider.class = {}", name);
-      try {
-        final Class<?> clazz = Class.forName(name);
-        return (ResourceProvider) clazz.newInstance();
-      } catch (final Exception e) {
-        if (debugEnabled) log.debug(e.getMessage(), e);
-      }
-      return new ResourceProviderImpl();
-    }
-  }
 }

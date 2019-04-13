@@ -52,7 +52,8 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   /**
    * Reads resource files from the classpath.
    */
-  protected final ResourceProvider resourceProvider = ResourceProvider.Factory.initResourceProvider();
+  protected final ResourceProvider resourceProvider = new ClientResourceProvider();
+  //protected final ResourceProvider resourceProvider = new ResourceProviderImpl();
   /**
    * Unique identifier for this class server delegate, obtained from the local JPPF client.
    */
@@ -170,7 +171,9 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
       byte[] b;
       final byte[] callable = resource.getCallable();
       if (callable != null) b = resourceProvider.computeCallable(callable);
-      else b = resourceProvider.getResource(name, loaders, fileLookup);
+      else {
+        b = resourceProvider.getResource(name, loaders, fileLookup);
+      }
       if (b == null) found = false;
       if (callable == null) resource.setDefinition(b);
       else resource.setCallable(b);
@@ -185,7 +188,6 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 
   /**
    * Close the socket connection.
-   * @see org.jppf.client.ClassServerDelegate#close()
    */
   @Override
   public void close() {

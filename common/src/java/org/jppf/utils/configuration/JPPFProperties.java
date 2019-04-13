@@ -262,8 +262,6 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> RESOURCE_CACHE_ENABLED = new BooleanProperty("jppf.resource.cache.enabled", true);
   /** Type of cache storage: either 'file' or 'memory'. */
   public static final JPPFProperty<String> RESOURCE_CACHE_STORAGE = new StringProperty("jppf.resource.cache.storage", "file").setPossibleValues("file", "memory");
-  /** @exclude . */
-  public static final JPPFProperty<String> RESOURCE_PROVIDER_CLASS = new StringProperty("jppf.resource.provider.class", "org.jppf.classloader.ResourceProviderImpl");
   /** Enable/disable the screen saver. */
   public static final JPPFProperty<Boolean> SCREENSAVER_ENABLED = new BooleanProperty("jppf.screensaver.enabled", false);
   /** Class name of an implementation of {@code org.jppf.node.screensaver.JPPFScreenSaver}. */

@@ -25,7 +25,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.client.taskwrapper.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.*;
@@ -45,7 +45,7 @@ public abstract class AbstractClassLoaderTest extends AbstractNonStandardSetup {
   /**
    * Test timeout.
    */
-  private static final long TEST_TIMEOUT = 20_000L;
+  private static final long TEST_TIMEOUT = 15_000L;
 
   /**
    * Launches a driver and 1 node and start the client.
@@ -53,6 +53,7 @@ public abstract class AbstractClassLoaderTest extends AbstractNonStandardSetup {
    */
   @AfterClass
   public static void displayStats() throws Exception {
+    print(false, false, "classpath cache stats: %s", ClasspathCache.getInstance());
     try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11101, false)) {
       assertTrue(jmx.connectAndWait(5_000L));
       print(false, false, "***** class loading statistics *****");
