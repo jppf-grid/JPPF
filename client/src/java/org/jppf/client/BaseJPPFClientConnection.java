@@ -274,7 +274,6 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @throws Exception if an error is raised while reading the results from the server.
    */
   public List<Task<?>> receiveTasks(final TaskBundle bundle, final ObjectSerializer ser, final ClassLoader cl) throws Exception {
-    final List<Task<?>> taskList = new LinkedList<>();
     final ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();
     try {
       final ClassLoader loader = (cl == null) ? getClass().getClassLoader() : cl;
@@ -282,6 +281,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       final SocketWrapper socketClient = taskServerConnection.getSocketClient();
       final int count = bundle.getTaskCount();
       final int[] positions = bundle.getParameter(BundleParameter.TASK_POSITIONS);
+      final List<Task<?>> taskList = new ArrayList<>(count);
       if (debugEnabled) log.debug("{} : received bundle {},  positions={}", toDebugString(), bundle, StringUtils.buildString(positions));
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
       try {
