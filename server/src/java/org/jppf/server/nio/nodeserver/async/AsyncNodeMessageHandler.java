@@ -323,7 +323,7 @@ public class AsyncNodeMessageHandler {
         }
         int count = 0;
         for (final ServerTask task: nodeBundle.getTaskList()) {
-          if ((resubmitSet != null) && resubmitSet.contains(task.getJobPosition())) {
+          if ((resubmitSet != null) && resubmitSet.contains(task.getPosition())) {
             if (task.incResubmitCount() <= task.getMaxResubmits()) {
               task.resubmit();
               count++;

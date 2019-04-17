@@ -44,14 +44,14 @@ public final class DebugHelper {
     synchronized(resultsMap) {
       final Collection<Integer> positions = resultsMap.getValues(jobUuid);
       if (positions == null) {
-        for (ServerTask task: results) resultsMap.putValue(jobUuid, task.getJobPosition());
+        for (ServerTask task: results) resultsMap.putValue(jobUuid, task.getPosition());
       } else {
         for (ServerTask task: results) {
-          if (positions.contains(task.getJobPosition())) {
+          if (positions.contains(task.getPosition())) {
             if (list == null) list = new ArrayList<>(results.size());
             list.add(task);
           } else {
-            resultsMap.putValue(jobUuid, task.getJobPosition());
+            resultsMap.putValue(jobUuid, task.getPosition());
           }
         }
       }
@@ -96,7 +96,7 @@ public final class DebugHelper {
       final Collection<Integer> positions = resultsMap.getValues(jobUuid);
       if (positions != null) {
         for (ServerTask task: results) {
-          if (positions.contains(task.getJobPosition())) {
+          if (positions.contains(task.getPosition())) {
             if (list == null) list = new ArrayList<>(results.size());
             list.add(task);
           }

@@ -207,7 +207,7 @@ public class ServerTaskBundleClient {
   private int[] computeTasksPositions() {
     final int[] positions = new int[taskList.size()];
     int count = 0;
-    for (final ServerTask task: taskList) positions[count++] = task.getJobPosition();
+    for (final ServerTask task: taskList) positions[count++] = task.getPosition();
     return positions;
   }
 

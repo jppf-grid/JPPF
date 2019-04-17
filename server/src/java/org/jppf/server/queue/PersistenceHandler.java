@@ -79,7 +79,7 @@ public class PersistenceHandler {
       }
       for (final ServerTask task: taskList) {
         final DataLocation dl = IOHelper.serializeData(task);
-        infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.TASK, task.getJobPosition(), dl));
+        infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.TASK, task.getPosition(), dl));
       }
       persistence.store(infos);
     } catch (final Exception e) {
@@ -116,7 +116,7 @@ public class PersistenceHandler {
       if (debugEnabled) log.debug("persisting {} results for job {}", tasks.size(), job);
       final List<PersistenceInfo> infos = new ArrayList<>(tasks.size());
       for (final ServerTask task: tasks) {
-        infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.TASK_RESULT, task.getJobPosition(), task.getResult()));
+        infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.TASK_RESULT, task.getPosition(), task.getResult()));
       }
       persistence.store(infos);
     } catch (final Exception e) {

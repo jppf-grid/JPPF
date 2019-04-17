@@ -126,7 +126,7 @@ public class ServerJob extends AbstractServerJobBase {
           if (traceEnabled) log.trace("task to resubmit: {}", task);
           task.setState(TaskState.PENDING);
           nbResubmits++;
-          final int pos = task.getJobPosition();
+          final int pos = task.getPosition();
           if (pos > maxPos) maxPos = pos;
           if (pos < minPos) minPos = pos;
         } else {
@@ -159,7 +159,7 @@ public class ServerJob extends AbstractServerJobBase {
           if (traceEnabled) log.trace("task to resubmit: {}", task);
           task.setState(TaskState.PENDING);
           nbResubmits++;
-          final int pos = task.getJobPosition();
+          final int pos = task.getPosition();
           if (pos > maxPos) maxPos = pos;
           if (pos < minPos) minPos = pos;
         } else {

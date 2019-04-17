@@ -104,7 +104,7 @@ public class AsyncClientContext extends AbstractNioContext {
     final List<ServerTask> tasks = (header.isHandshake()) ? null : bundle.getTaskList();
     if (!header.isHandshake()) {
       final int[] positions = new int[tasks.size()];
-      for (int i=0; i<tasks.size(); i++) positions[i] = tasks.get(i).getJobPosition();
+      for (int i=0; i<tasks.size(); i++) positions[i] = tasks.get(i).getPosition();
       //if (traceEnabled) log.trace("serializing bundle with tasks postions={}", StringUtils.buildString(positions));
       header.setParameter(BundleParameter.TASK_POSITIONS, positions);
       header.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);

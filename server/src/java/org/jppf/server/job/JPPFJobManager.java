@@ -363,7 +363,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     final List<ServerTask> tasks = nodeBundle.getTaskList();
     final List<ServerTaskInformation> taskInfos = new ArrayList<>(tasks.size());
     for (final ServerTask task: tasks) taskInfos.add(new ServerTaskInformation(
-      task.getJobPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount(), task.getResult()));
+      task.getPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount(), task.getResult()));
     final TaskBundle job = nodeBundle.getJob();
     return new JobTasksEvent(job.getUuid(), job.getName(), job.getSLA(), job.getMetadata(), taskInfos, nodeBundle.getJobReturnReason(), channel.getManagementInfo());
   }
@@ -378,7 +378,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   private static JobTasksEvent createJobTasksEvent(final ExecutorChannel<?> channel, final ServerJob job, final Collection<ServerTask> tasks) {
     final List<ServerTaskInformation> taskInfos = new ArrayList<>(tasks.size());
     for (final ServerTask task: tasks) taskInfos.add(new ServerTaskInformation(
-      task.getJobPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount(), task.getResult()));
+      task.getPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount(), task.getResult()));
     return new JobTasksEvent(job.getUuid(), job.getName(), job.getSLA(), job.getMetadata(), taskInfos, JobReturnReason.RESULTS_RECEIVED, channel.getManagementInfo());
   }
 
