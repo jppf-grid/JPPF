@@ -121,7 +121,7 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
 
   /**
    * Returns the position of this task in the job in which it was submitted.
-   * @return the position of this task as an <code>int</code>.
+   * @return the position of this task as an {@code int}.
    * @exclude
    */
   int getPosition();

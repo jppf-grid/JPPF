@@ -514,7 +514,7 @@ public final class SystemUtils {
   }
 
   /**
-   * Get a name for an object in the form simple_class_name@hex_identity_hashcode.
+   * Get a name for an object in the form class_fqn@hex_identity_hashcode.
    * @param o the object for which to get a name.
    * @return the object's identity name.
    */

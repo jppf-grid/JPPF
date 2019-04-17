@@ -58,7 +58,7 @@ public class AbstractTask<T> implements Task<T> {
    */
   private T result;
   /**
-   * The <code>Throwable</code> that was raised by this task's execution.
+   * The {@code Throwable} that was raised by this task's execution.
    */
   private Throwable throwable;
   /**
@@ -321,6 +321,10 @@ public class AbstractTask<T> implements Task<T> {
     return job;
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public Task<T> setJob(final JPPFDistributedJob job) {
     this.job = job;
