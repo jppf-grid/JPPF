@@ -67,7 +67,7 @@ public class TestTaskDependencies extends BaseTest {
   }
   
   /**
-   * Test building a graph of tasks.
+   * Test building and visiting a graph of tasks.
    * @throws Exception if any error occurs.
    */
   @Test
@@ -100,7 +100,7 @@ public class TestTaskDependencies extends BaseTest {
   }
 
   /**
-   * Test a simulated execution of a job graph.
+   * Test the simulated execution of a task graph.
    * @throws Exception if any error occurs.
    */
   @Test
@@ -108,31 +108,31 @@ public class TestTaskDependencies extends BaseTest {
     final MyTask t0 = new MyTask("T0", 0), t1 = new MyTask("T1", 1), t2 = new MyTask("T2", 2), t3 = new MyTask("T3", 3);
     t0.dependsOn(t1.dependsOn(t3), t2.dependsOn(t3));
     final JobTaskGraph graph = JobGraphHelper.graphOf(Arrays.asList(t0, t1, t2, t3));
-    assertFalse(graph.isDone());
+    checkExecution(graph, -1, false, 3);
+    checkExecution(graph,  3, false, 1, 2);
+    checkExecution(graph,  2, false, 1);
+    checkExecution(graph,  1, false, 0);
+    checkExecution(graph,  0, true);
+  }
 
-    graph.nodeDone(t3.getPosition());
-    Set<Integer> positions = graph.getAvailableNodes();
-    assertEquals(2, positions.size());
-    assertTrue(positions.contains(1));
-    assertTrue(positions.contains(2));
-    assertFalse(graph.isDone());
-
-    graph.nodeDone(t2.getPosition());
-    positions = graph.getAvailableNodes();
-    assertEquals(1, positions.size());
-    assertTrue(positions.contains(1));
-    assertFalse(graph.isDone());
-
-    graph.nodeDone(t1.getPosition());
-    positions = graph.getAvailableNodes();
-    assertEquals(1, positions.size());
-    assertTrue(positions.contains(0));
-    assertFalse(graph.isDone());
-
-    graph.nodeDone(t0.getPosition());
-    positions = graph.getAvailableNodes();
-    assertTrue(positions.isEmpty());
-    assertTrue(graph.isDone());
+  /**
+   * Simulate the execution of a task in a grpah and chech thze resulting state of the graph.
+   * @param graph the graph to check.
+   * @param taskPosition the position of the task whose execution is simulated, if < 0 then no simulated execution, just check he graph.
+   * @param expectGraphDone whether to expect the graph execution to be complete.
+   * @param expectedPositions the expected positions of the task that no longer have pending dependencies.
+   */
+  private static void checkExecution(final JobTaskGraph graph, final int taskPosition, final boolean expectGraphDone, final int...expectedPositions) {
+    final int expectedSize = ((expectedPositions == null) || (expectedPositions.length <= 0)) ? 0 : expectedPositions.length;
+    if (taskPosition >= 0) graph.nodeDone(taskPosition);
+    final Set<Integer> positions = graph.getAvailableNodes();
+    assertEquals(expectedSize, positions.size());
+    if (expectedSize > 0) {
+      for (final int n: expectedPositions) {
+        if (!positions.contains(n)) fail(String.format("expected position '%d' not found, expected %s but got %st ", n, Arrays.toString(expectedPositions), positions));
+      }
+    }
+    assertTrue(expectGraphDone ? graph.isDone() : !graph.isDone());
   }
 
   /**
