@@ -409,7 +409,6 @@ public class AsyncNodeContext extends BaseNodeContext {
       bundler.dispose();
       if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(null);
     }
-    if (getOnClose() != null) getOnClose().run();
     setReadMessage(null);
   }
 

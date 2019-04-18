@@ -63,10 +63,6 @@ public abstract class BaseNodeContext extends AbstractNioContext implements  Exe
    */
   private final List<ExecutorChannelStatusListener> executorChannelListeners = new CopyOnWriteArrayList<>();
   /**
-   * The {@code Runnable} called when node context is closed.
-   */
-  private Runnable onClose;
-  /**
    * Determines whether the node is active or inactive.
    */
   private final AtomicBoolean active = new AtomicBoolean(true);
@@ -206,20 +202,6 @@ public abstract class BaseNodeContext extends AbstractNioContext implements  Exe
     if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
     this.managementInfo = managementInfo;
     if ((managementInfo.getIpAddress() != null) && (managementInfo.getPort() >= 0)) initializeJmxConnection();
-  }
-
-  /**
-   * @return the {@code Runnable} called when node context is closed.
-   */
-  public Runnable getOnClose() {
-    return onClose;
-  }
-
-  /**
-   * @param onClose the {@code Runnable} called when node context is closed.
-   */
-  public void setOnClose(final Runnable onClose) {
-    this.onClose = onClose;
   }
 
   /**
