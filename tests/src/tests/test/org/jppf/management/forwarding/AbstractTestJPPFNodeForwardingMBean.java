@@ -27,6 +27,8 @@ import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.utils.TypedProperties;
+import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -43,11 +45,11 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
   /**
    * Connection to the driver's JMX server.
    */
-  protected static JMXDriverConnectionWrapper driverJmx = null;
+  protected static JMXDriverConnectionWrapper driverJmx;
   /**
    * The driver mbean which delegates operations to specified nodes.
    */
-  protected static JPPFNodeForwardingMBean nodeForwarder = null;
+  protected static JPPFNodeForwardingMBean nodeForwarder;
   /**
    * The uuids of all nodes.
    */
@@ -55,7 +57,7 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
   /**
    * 
    */
-  protected static LoadBalancingInformation oldLbi = null;
+  protected static LoadBalancingInformation oldLbi;
   /** */
   @Rule
   public TestWatcher setup1D2N1CWatcher = new TestWatcher() {
@@ -73,23 +75,10 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
   public static void setup() throws Exception {
     final int nbNodes = 2;
     client = BaseSetup.setup(2);
-    for (int i = 1; i <= nbNodes; i++) allNodes.add("n" + i);
     driverJmx = BaseSetup.getJMXConnection(client);
+    assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> driverJmx.nbNodes() == nbNodes, 5000L, 250L, false));
+    for (int i = 1; i <= nbNodes; i++) allNodes.add("n" + i);
     nodeForwarder = driverJmx.getNodeForwarder();
-    boolean ready = false;
-    final NodeSelector selector = new AllNodesSelector();
-    final String[] array = new String[nbNodes];
-    while (!ready) {
-      try {
-        final Map<String, Object> result = nodeForwarder.state(selector);
-        checkNodes(result, JPPFNodeState.class, allNodes.toArray(array));
-        ready = true;
-      } catch (@SuppressWarnings("unused") final Exception e) {
-        Thread.sleep(100L);
-      } catch (@SuppressWarnings("unused") final AssertionError e) {
-        Thread.sleep(100L);
-      }
-    }
   }
 
   /**
