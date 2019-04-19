@@ -37,7 +37,7 @@ public class FileReplacerEx {
   /**
    * 
    */
-  private static String hr = StringUtils.padRight("", '*', 120);
+  private static final String hr = StringUtils.padRight("", '*', 120);
 
   /**
    * 

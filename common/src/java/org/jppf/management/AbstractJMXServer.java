@@ -51,11 +51,11 @@ public abstract class AbstractJMXServer implements JMXServer {
   /**
    * The mbean server.
    */
-  protected MBeanServer mbeanServer = null;
+  protected MBeanServer mbeanServer;
   /**
    * The JMX connector server.
    */
-  protected JMXConnectorServer connectorServer = null;
+  protected JMXConnectorServer connectorServer;
   /**
    * Determines whether this JMX server is stopped.
    */
@@ -67,7 +67,7 @@ public abstract class AbstractJMXServer implements JMXServer {
   /**
    * The host interface on which the JMX server is listeneing for connections.
    */
-  protected String managementHost = null;
+  protected String managementHost;
   /**
    * The port on which the connector is listening for connections from remote clients.
    */
@@ -75,7 +75,7 @@ public abstract class AbstractJMXServer implements JMXServer {
   /**
    * Determines whether JMX should be used over an SSL/TLS connection.
    */
-  protected boolean ssl = false;
+  protected boolean ssl;
   /**
    * An optional {@link MBeanServerForwarder} associated with the {@code JMXConnectorServer}.
    */

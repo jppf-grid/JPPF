@@ -36,11 +36,11 @@ class Serializer {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(Serializer.class);
+  private static final Logger log = LoggerFactory.getLogger(Serializer.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * The stream header ('JPPF' in ascii, '4A 50 50 46' in hexadecimal).
    */
@@ -80,7 +80,7 @@ class Serializer {
   /**
    * Holds all class and object descriptors.
    */
-  SerializationCaches caches = new SerializationCaches();
+  final SerializationCaches caches = new SerializationCaches();
   /**
    * Descriptor the class of the object currently being written.
    */
@@ -92,7 +92,7 @@ class Serializer {
   /**
    * Temporary buffer used to write arrays of primitive values to the stream.
    */
-  private byte[] buf = new byte[SerializationUtils.TEMP_BUFFER_SIZE];
+  private final byte[] buf = new byte[SerializationUtils.TEMP_BUFFER_SIZE];
 
   /**
    * Initialize this serializer with the specified output stream, and write the header.

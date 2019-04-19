@@ -27,8 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Laurent Cohen
  * @exclude
  */
-abstract class AbstractJPPFFuture<V> implements Future<V>
-{
+abstract class AbstractJPPFFuture<V> implements Future<V> {
   /**
    * The completion status of the task represented by this future.
    */
@@ -44,11 +43,11 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
   /**
    * The execution result.
    */
-  protected V result = null;
+  protected V result;
   /**
    * An exception that may be raised by the execution of the task.
    */
-  protected Throwable throwable = null;
+  protected Throwable throwable;
 
   /**
    * Attempts to cancel execution of this task. This attempt will fail if the task has already completed,
@@ -57,11 +56,9 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
    * @param mayInterruptIfRunning true if the thread executing this task should be interrupted;
    * otherwise, in-progress tasks are allowed to complete.
    * @return this method always returns false.
-   * @see java.util.concurrent.Future#cancel(boolean)
    */
   @Override
-  public boolean cancel(final boolean mayInterruptIfRunning)
-  {
+  public boolean cancel(final boolean mayInterruptIfRunning) {
     return false;
   }
 
@@ -70,11 +67,9 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
    * @return the computed result.
    * @throws InterruptedException if the current thread was interrupted while waiting.
    * @throws ExecutionException if the computation threw an exception.
-   * @see java.util.concurrent.Future#get()
    */
   @Override
-  public V get() throws InterruptedException, ExecutionException
-  {
+  public V get() throws InterruptedException, ExecutionException {
     return null;
   }
 
@@ -87,22 +82,18 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
    * @throws InterruptedException if the current thread was interrupted while waiting.
    * @throws ExecutionException if the computation threw an exception.
    * @throws TimeoutException if the wait timed out.
-   * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
    */
   @Override
-  public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
-  {
+  public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     return null;
   }
 
   /**
    * Determine whether this task was cancelled before it completed normally.
    * @return true if this task was cancelled before it completed normally.
-   * @see java.util.concurrent.Future#isCancelled()
    */
   @Override
-  public boolean isCancelled()
-  {
+  public boolean isCancelled() {
     return cancelled.get();
   }
 
@@ -110,11 +101,9 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
    * Returns true if this task completed. Completion may be due to normal termination,
    * an exception, or cancellation. In all of these cases, this method will return true.
    * @return true if the task completed.
-   * @see java.util.concurrent.Future#isDone()
    */
   @Override
-  public boolean isDone()
-  {
+  public boolean isDone() {
     return done.get();
   }
 }

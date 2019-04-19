@@ -34,7 +34,7 @@ public class IdleDetector implements Runnable {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(IdleDetector.class);
+  private static final Logger log = LoggerFactory.getLogger(IdleDetector.class);
   /**
    * A timer that runs a periodic task that determines whether the computer is idle or not.
    */

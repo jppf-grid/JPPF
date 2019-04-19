@@ -34,7 +34,7 @@ public class SortedSetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V> 
   /**
    * Comparator used to sort the keys.
    */
-  protected Comparator<V> valueComparator = null;
+  protected Comparator<V> valueComparator;
 
   /**
    * Default cosntructor.

@@ -71,7 +71,7 @@ public final class JPPFIdentifiers {
   /**
    * Mapping of ids to readable names.
    */
-  private static Map<Integer, String> idMap = new HashMap<>();
+  private static final Map<Integer, String> idMap = new HashMap<>();
   static {
     idMap.put(ACCEPTOR_CHANNEL, "ACCEPTOR_CHANNEL");
     idMap.put(CLIENT_JOB_DATA_CHANNEL, "CLIENT_JOB_DATA_CHANNEL");
@@ -85,7 +85,7 @@ public final class JPPFIdentifiers {
   /**
    * Mapping of ids to server names.
    */
-  private static Map<Integer, String> serverMap = new HashMap<>();
+  private static final Map<Integer, String> serverMap = new HashMap<>();
   static {
     serverMap.put(ACCEPTOR_CHANNEL, NioConstants.ACCEPTOR);
     serverMap.put(CLIENT_JOB_DATA_CHANNEL, NioConstants.CLIENT_SERVER);

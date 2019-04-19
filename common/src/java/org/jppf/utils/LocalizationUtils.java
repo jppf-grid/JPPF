@@ -34,11 +34,11 @@ public final class LocalizationUtils {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(LocalizationUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(LocalizationUtils.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Whether to log the {@link MissingResourceException}s.
    */

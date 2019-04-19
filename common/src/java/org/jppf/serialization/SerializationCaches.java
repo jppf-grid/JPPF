@@ -32,11 +32,11 @@ class SerializationCaches {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SerializationCaches.class);
+  private static final Logger log = LoggerFactory.getLogger(SerializationCaches.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * List of all primitive types.
    */
@@ -48,23 +48,23 @@ class SerializationCaches {
   /**
    * Mapping of primitive types to their descriptor.
    */
-  static Map<Class<?>, ClassDescriptor> globalTypesMap = initGlobalTypes();
+  final static Map<Class<?>, ClassDescriptor> globalTypesMap = initGlobalTypes();
   /**
    * Mapping of classes to their descriptor.
    */
-  Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap<>();
+  final Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap<>();
   /**
    * Mapping of objects to their handle.
    */
-  Map<Object, Integer> objectHandleMap = new IdentityHashMap<>(256);
+  final Map<Object, Integer> objectHandleMap = new IdentityHashMap<>(256);
   /**
    * Counter for the class handles.
    */
-  private AtomicInteger classHandleCount = new AtomicInteger(0);
+  private final AtomicInteger classHandleCount = new AtomicInteger(0);
   /**
    * Counter for the object handles.
    */
-  private AtomicInteger objectHandleCount = new AtomicInteger(0);
+  private final AtomicInteger objectHandleCount = new AtomicInteger(0);
 
   /**
    * Initialize the descriptors for all primitive types.

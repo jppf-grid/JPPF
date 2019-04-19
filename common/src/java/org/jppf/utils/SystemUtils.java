@@ -38,28 +38,27 @@ public final class SystemUtils {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SystemUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(SystemUtils.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  //private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  private static boolean debugEnabled = true;
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Singleton holding the unchanging system properties.
    */
-  private static TypedProperties systemProps = null;
+  private static TypedProperties systemProps;
   /**
    * A map of the environment properties.
    */
-  private static TypedProperties env = null;
+  private static TypedProperties env;
   /**
    * A map of the network configuration.
    */
-  private static TypedProperties network = null;
+  private static TypedProperties network;
   /**
    * A map of the physical RAM information.
    */
-  private static TypedProperties os = null;
+  private static TypedProperties os;
   /**
    * Windows OS.
    */

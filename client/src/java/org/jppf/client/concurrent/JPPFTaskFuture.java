@@ -63,7 +63,6 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
    * Returns true if this task completed. Completion may be due to normal termination,
    * an exception, or cancellation. In all of these cases, this method will return true.
    * @return true if the task completed.
-   * @see org.jppf.client.concurrent.AbstractJPPFFuture#isDone()
    */
   @Override
   public boolean isDone() {
@@ -75,7 +74,6 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
    * @return the computed result.
    * @throws InterruptedException if the current thread was interrupted while waiting.
    * @throws ExecutionException if the computation threw an exception.
-   * @see java.util.concurrent.Future#get()
    */
   @Override
   public V get() throws InterruptedException, ExecutionException {
@@ -97,7 +95,6 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
    * @throws InterruptedException if the current thread was interrupted while waiting.
    * @throws ExecutionException if the computation threw an exception.
    * @throws TimeoutException if the wait timed out.
-   * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
    */
   @Override
   public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {

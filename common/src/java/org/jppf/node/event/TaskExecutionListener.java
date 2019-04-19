@@ -24,8 +24,7 @@ import java.util.EventListener;
  * Interface for all classes that wish to listen to events occurring during the life span of individual JPPF tasks.
  * @author Laurent Cohen
  */
-public interface TaskExecutionListener extends EventListener
-{
+public interface TaskExecutionListener extends EventListener {
   /**
    * Called to notify a listener that a task was executed.
    * @param event the event encapsulating the task-related data.

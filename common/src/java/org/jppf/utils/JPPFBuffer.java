@@ -33,11 +33,11 @@ public class JPPFBuffer {
   /**
    * The length of the buffer.
    */
-  public int length = 0;
+  public int length;
   /**
    * Current position in this buffer.
    */
-  public int pos = 0;
+  public int pos;
 
   /**
    * Initialize this buffer.

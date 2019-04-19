@@ -28,11 +28,11 @@ public abstract class PropertiesTableFormat {
   /**
    * Contains the formatted text.
    */
-  protected StringBuffer sb = new StringBuffer();
+  protected final StringBuffer sb = new StringBuffer();
   /**
    * The title of the whole document.
    */
-  protected String docTitle = null;
+  protected final String docTitle;
 
   /**
    * Initialize this formatter with the specified title.

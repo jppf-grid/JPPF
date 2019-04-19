@@ -32,7 +32,7 @@ public class ConfigurationUtils {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ConfigurationUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(ConfigurationUtils.class);
 
   /**
    * Get the list of all predefined configuration properties in the specified class.

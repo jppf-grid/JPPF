@@ -46,7 +46,7 @@ public class AcceptorContext extends AbstractNioContext {
   /**
    * Contains the data read from the socket channel.
    */
-  private NioObject nioObject = null;
+  private NioObject nioObject;
   /**
    * The acceptor server.
    */

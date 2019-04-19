@@ -39,11 +39,11 @@ public class HeapDumpCollectorOracle implements HeapDumpCollector {
   /**
    * The hotspot diagnostic MBean
    */
-  private static Object hotspotDiagnosticsMXBean = getHotspotDiagnosticsMXBean();
+  private static final Object hotspotDiagnosticsMXBean = getHotspotDiagnosticsMXBean();
   /**
    * COunt of heap dumps taken, used to proivde unique file names.
    */
-  private static AtomicLong dumpCount = new AtomicLong(0L);
+  private static final AtomicLong dumpCount = new AtomicLong(0L);
 
   @Override
   public String dumpHeap() throws Exception {

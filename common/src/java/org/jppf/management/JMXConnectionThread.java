@@ -31,11 +31,11 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(JMXConnectionThread.class);
+  private static final Logger log = LoggerFactory.getLogger(JMXConnectionThread.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The connection that holds this thread.
    */

@@ -39,7 +39,7 @@ public class ScriptedNodeSelector extends BaseScriptEvaluator implements NodeSel
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ScriptedNodeSelector.class);
+  private static final Logger log = LoggerFactory.getLogger(ScriptedNodeSelector.class);
 
   /**
    * Initialize this selector with the specfied language and script.

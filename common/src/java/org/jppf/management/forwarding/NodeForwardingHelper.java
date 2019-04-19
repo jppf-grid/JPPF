@@ -40,7 +40,7 @@ public final class NodeForwardingHelper {
   /**
    * The object which implements the node selection logic, based on a {@link NodeSelector}.
    */
-  private NodeSelectionProvider selectionProvider = null;
+  private NodeSelectionProvider selectionProvider;
 
   /**
    * This class can only be instantiated here.

@@ -45,7 +45,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
   /**
    *
    */
-  protected AtomicInteger latestMaxSize = new AtomicInteger(0);
+  protected final AtomicInteger latestMaxSize = new AtomicInteger(0);
   /**
    * The list of registered listeners.
    */

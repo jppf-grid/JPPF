@@ -22,8 +22,7 @@ package org.jppf.server.protocol;
  * An enumeration of the possible statuses of a job on the server side.
  * @author Laurent Cohen
  */
-public enum ServerJobStatus
-{
+public enum ServerJobStatus {
   /**
    * Job status is new (just submitted).
    */

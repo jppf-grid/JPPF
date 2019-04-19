@@ -31,7 +31,7 @@ public class SendResultsStrategyManager {
   /**
    * A mapping of strategy names to {@link SendResultsStrategy} instances.
    */
-  private static Map<String, SendResultsStrategy> strategyMap = initializeMap();
+  private static final Map<String, SendResultsStrategy> strategyMap = initializeMap();
   /**
    * The default strategy to use when a strategy with a given name cannot be found.
    */

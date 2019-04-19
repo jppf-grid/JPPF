@@ -34,11 +34,11 @@ public class Hook<E> {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(Hook.class);
+  private static final Logger log = LoggerFactory.getLogger(Hook.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The hook's interface.
    */

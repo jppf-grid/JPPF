@@ -157,7 +157,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     final JPPFResourceWrapper resource = readResource();
     final String name = resource.getName();
     if (debugEnabled) log.debug("{} resource requested: {}, requestUuid={}, resourceIds={}", formattedName, resource, resource.getRequestUuid(), resource.getResourceIds());
-    final Collection<ClassLoader> loaders = ((AbstractJPPFClientConnection) owner).getClient().getRegisteredClassLoaders(resource.getRequestUuid());
+    final Collection<ClassLoader> loaders = owner.getConnectionPool().getClient().getRegisteredClassLoaders(resource.getRequestUuid());
     if (debugEnabled) log.debug("{} using classloaders={}", formattedName, loaders);
     final boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && FILE_LOOKUP;
     if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {

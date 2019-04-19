@@ -47,7 +47,7 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
   /**
    * The channel to the driver to use.
    */
-  final JPPFClientConnectionImpl channel;
+  final JPPFClientConnection channel;
   /**
    * Unique identifier of the client.
    */
@@ -59,7 +59,7 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
    */
   public AbstractChannelWrapperRemote(final JPPFClientConnection channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
-    this.channel = (JPPFClientConnectionImpl) channel;
+    this.channel = channel;
     final JPPFConnectionPool pool = channel.getConnectionPool();
     this.uuid = pool.getDriverUuid();
     priority = pool.getPriority();
@@ -82,18 +82,18 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
       if ((uuid != null) && uuid.isEmpty()) uuid = null;
     }
     try {
-      final TaskServerConnectionHandler handler = channel.getTaskServerConnection();
+      final TaskServerConnectionHandler handler = ((JPPFClientConnectionImpl) channel).getTaskServerConnection();
       final SocketWrapper socketClient = handler.getSocketClient();
       if (socketClient != null) {
         final StringBuilder sb = new StringBuilder();
-        final String ip = channel.getPool().getDriverIPAddress();
+        final String ip = channel.getConnectionPool().getDriverIPAddress();
         sb.append(channel.getName());
         sb.append('[').append(ip == null ? "localhost" : ip).append(']');
         final InetSocketAddress sa = (InetSocketAddress) socketClient.getSocket().getRemoteSocketAddress();
         sb.append(sa.getAddress().getHostAddress()).append(':').append(socketClient.getPort());
         sb.append(channel.isSSLEnabled());
         final String s = sb.toString();
-        channelID = new Pair<>(s, CryptoUtils.computeHash(s, channel.getPool().getClient().getBundlerFactory().getHashAlgorithm()));
+        channelID = new Pair<>(s, CryptoUtils.computeHash(s, channel.getConnectionPool().getClient().getBundlerFactory().getHashAlgorithm()));
         if (debugEnabled) log.debug("computed channelID for {} : {}", this, channelID);
       }
     } catch (final Exception e) {
@@ -154,7 +154,7 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
       return;
     }
     channel.setStatus(JPPFClientConnectionStatus.DISCONNECTED);
-    channel.submitInitialization();
+    ((JPPFClientConnectionImpl) channel).submitInitialization();
   }
 
   @Override
@@ -168,7 +168,7 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
 
   @Override
   LoadBalancerPersistenceManager getLoadBalancerPersistenceManager() {
-    return (LoadBalancerPersistenceManager) channel.getClient().getLoadBalancerPersistenceManagement();
+    return (LoadBalancerPersistenceManager) channel.getConnectionPool().getClient().getLoadBalancerPersistenceManagement();
   }
 
   @Override
@@ -229,7 +229,7 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
     if (job == null) throw new IllegalArgumentException("job is null");
     final Set<ClassLoader> result = new HashSet<>();
     if (!job.getJobTasks().isEmpty()) {
-      final JPPFClient client = channel.getClient();
+      final JPPFClient client = channel.getConnectionPool().getClient();
       for (final Task<?> task: job.getJobTasks()) {
         if (task != null) {
           final Object o = task.getTaskObject();

@@ -48,11 +48,11 @@ class ScriptRunnerImpl implements ScriptRunner {
   /**
    * The script engine provided by the {@code javax.script} APIs.
    */
-  protected ScriptEngine engine = null;
+  protected ScriptEngine engine;
   /**
    * Flag inidicating whether the engine lookup has already failed.
    */
-  protected boolean engineNotFound = false;
+  protected boolean engineNotFound;
   /**
    * The language supported by this script engine.
    */
@@ -60,15 +60,15 @@ class ScriptRunnerImpl implements ScriptRunner {
   /**
    * 
    */
-  private AtomicInteger cacheHits = new AtomicInteger(0);
+  private final AtomicInteger cacheHits = new AtomicInteger(0);
   /**
    * 
    */
-  private AtomicInteger cacheMisses = new AtomicInteger(0);
+  private final AtomicInteger cacheMisses = new AtomicInteger(0);
   /**
    * 
    */
-  private AtomicInteger cacheRequests = new AtomicInteger(0);
+  private final AtomicInteger cacheRequests = new AtomicInteger(0);
 
   /**
    * Create a script runner witht he specified language.

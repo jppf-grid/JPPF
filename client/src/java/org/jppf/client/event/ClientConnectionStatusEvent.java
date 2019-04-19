@@ -34,7 +34,7 @@ public class ClientConnectionStatusEvent extends EventObject {
   /**
    * The connection status before the change.
    */
-  private JPPFClientConnectionStatus oldStatus = null;
+  private JPPFClientConnectionStatus oldStatus;
 
   /**
    * Initialize this event with a client connection as source.

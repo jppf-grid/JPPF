@@ -42,7 +42,7 @@ public class ServerTask implements Serializable, PositionalTask {
   /**
    * Determines whether trace-level logging is enabled.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * Client bundle that owns this task.
    */

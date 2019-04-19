@@ -35,11 +35,11 @@ public class QueueEvent<T, U, V> extends EventObject {
   /**
    * Represents part or the totality of a job that was submitted.
    */
-  private transient T job = null;
+  private transient T job;
   /**
    * Determines if the event is a requeued bundle, following a node failure for instance.
    */
-  private boolean requeued = false;
+  private boolean requeued;
 
   /**
    * Initialize this event with the specified queue and bundle.

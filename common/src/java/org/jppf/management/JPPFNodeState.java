@@ -119,11 +119,11 @@ public class JPPFNodeState implements Serializable {
   /**
    * The number of tasks executed by the node.
    */
-  private int nbTasksExecuted = 0;
+  private int nbTasksExecuted;
   /**
    * The total cpu time used by the task processing threads.
    */
-  private long cpuTime = 0L;
+  private long cpuTime;
   /**
    * Size of the node's thread pool.
    */

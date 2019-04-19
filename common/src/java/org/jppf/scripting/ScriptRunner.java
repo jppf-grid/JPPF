@@ -25,8 +25,7 @@ import java.util.Map;
  * @author Laurent Cohen
  * @exclude
  */
-public interface ScriptRunner
-{
+public interface ScriptRunner {
   /**
    * Get the script language this script runner is intended for. 
    * @return the short name of this runner's script language.

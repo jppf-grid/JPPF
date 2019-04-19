@@ -30,7 +30,7 @@ public class CryptoUtils {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(CryptoUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(CryptoUtils.class);
 
   /**
    * Compute a hash string from a soruce string.

@@ -63,11 +63,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   /**
    * The pool of threads used for submitting execution requests.
    */
-  private ThreadPoolExecutor executor = null;
+  private ThreadPoolExecutor executor;
   /**
    * Performs server discovery.
    */
-  private JPPFMulticastReceiverThread receiverThread = null;
+  private JPPFMulticastReceiverThread receiverThread;
   /**
    * The job manager.
    */
@@ -239,7 +239,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   protected void submitNewConnection(final JPPFConnectionPool pool) {
-    final AbstractJPPFClientConnection c = createConnection(pool.getName() + "-" + pool.nextSequence(), pool);
+    final JPPFClientConnectionImpl c = createConnection(pool.getName() + "-" + pool.nextSequence(), pool);
     newConnection(c);
   }
 
@@ -247,12 +247,12 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * Create a new driver connection based on the specified parameters.
    * @param name the name of the connection.
    * @param pool id of the connection pool the connection belongs to.
-   * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
+   * @return an instance of a subclass of {@link JPPFClientConnectionImpl}.
    */
-  abstract AbstractJPPFClientConnection createConnection(String name, final JPPFConnectionPool pool);
+  abstract JPPFClientConnectionImpl createConnection(String name, final JPPFConnectionPool pool);
 
   @Override
-  void newConnection(final AbstractJPPFClientConnection c) {
+  void newConnection(final JPPFClientConnectionImpl c) {
     if (isClosed()) return;
     log.info("connection [" + c.getName() + "] created");
     c.addClientConnectionStatusListener(this);

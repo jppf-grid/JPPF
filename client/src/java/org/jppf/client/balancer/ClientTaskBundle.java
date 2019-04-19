@@ -51,23 +51,23 @@ public class ClientTaskBundle extends JPPFTaskBundle {
   /**
    * The shared data provider for this task bundle.
    */
-  private transient DataProvider dataProvider = null;
+  private transient DataProvider dataProvider;
   /**
    * The tasks to be executed by the node.
    */
-  private transient List<Task<?>> tasks = null;
+  private transient List<Task<?>> tasks;
   /**
    * The broadcast UUID.
    */
-  private transient String broadcastUUID = null;
+  private transient String broadcastUUID;
   /**
    * Job requeue indicator.
    */
-  private boolean requeued = false;
+  private boolean requeued;
   /**
    * Job cancel indicator.
    */
-  private boolean cancelled = false;
+  private boolean cancelled;
 
   /**
    * Initialize this task bundle and set its build number.

@@ -30,11 +30,11 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(CumulativeSnapshot.class);
+  private static final Logger log = LoggerFactory.getLogger(CumulativeSnapshot.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Explicit serialVersionUID.
    */

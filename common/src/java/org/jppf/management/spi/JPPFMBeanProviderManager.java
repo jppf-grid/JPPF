@@ -36,19 +36,19 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFMBeanProviderManager.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFMBeanProviderManager.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Keeps a list of MBeans registered with the MBean server.
    */
-  private List<String> registeredMBeanNames = new Vector<>();
+  private final List<String> registeredMBeanNames = new Vector<>();
   /**
    * The mbean server with which all mbeans are registered.
    */
-  private MBeanServer server = null;
+  private MBeanServer server;
 
   /**
    * Initialize this mbean provider manager and register the MBeans implementing the specified provider interface.

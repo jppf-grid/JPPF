@@ -31,12 +31,11 @@ public class JPPFDefaultUncaughtExceptionHandler implements UncaughtExceptionHan
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFDefaultUncaughtExceptionHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFDefaultUncaughtExceptionHandler.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
-  //private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  private static boolean debugEnabled = true;
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   @Override
   public void uncaughtException(final Thread t, final Throwable e) {

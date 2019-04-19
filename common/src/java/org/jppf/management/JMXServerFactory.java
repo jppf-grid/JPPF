@@ -32,11 +32,11 @@ public class JMXServerFactory {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JMXServerFactory.class);
+  private static final Logger log = LoggerFactory.getLogger(JMXServerFactory.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Create a JMXServer instance based on the specified parameters.

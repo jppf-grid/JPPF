@@ -67,6 +67,7 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
    * The object that receives information on the jobs and publishes it a job monitoring events.
    */
   final AutoCloseable refreshHandler;
+
   /**
    * Initialize this job manager with the specified topology manager in {@link JobMonitorUpdateMode#IMMEDIATE_NOTIFICATIONS IMMEDIATE_NOTFICATIONS} mode.
    * @param topologyManager the topology manager to use.

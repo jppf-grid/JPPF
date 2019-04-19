@@ -33,7 +33,7 @@ public abstract class AbstractBoundedObjectPoolQueue<T> extends AbstractObjectPo
   /**
    * The current size of the pool.
    */
-  protected AtomicInteger size = new AtomicInteger(0);
+  protected final AtomicInteger size = new AtomicInteger(0);
   /**
    * The pool max size.
    */

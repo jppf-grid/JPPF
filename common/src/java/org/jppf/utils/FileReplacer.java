@@ -41,35 +41,34 @@ public class FileReplacer {
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  //private boolean debugEnabled = true;
   /**
    * File containing the content to replace.
    */
-  private String src = null;
+  private String src;
   /**
    * File containing the replacement content.
    */
-  private String dest = null;
+  private String dest;
   /**
    * Determines whether only the search is performed (no replacement).
    */
-  private boolean searchOnly = true;
+  private boolean searchOnly;
   /**
    * The pattern to using for matching the source string.
    */
-  private Pattern pattern = null;
+  private Pattern pattern;
   /**
    * The filter to use when looking for files to process.
    */
-  private ReplacerFilter filter = null;
+  private ReplacerFilter filter;
   /**
    * Number of replacements actually performed.
    */
-  private int nbReplacements = 0;
+  private int nbReplacements;
   /**
    * Number of files actually changed.
    */
-  private int nbFilesChanged = 0;
+  private int nbFilesChanged;
 
   /**
    * Replace, in a set of specified files, a piece of text with another. The text can be multi-lines.

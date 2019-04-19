@@ -29,6 +29,7 @@ import org.jppf.client.persistence.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.graph.TaskNode;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -138,6 +139,24 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    */
   public Task<?> add(final Task<?> task) throws JPPFException {
     return add(task, (Object[]) null);
+  }
+
+  /**
+   * Add a {@link Task} to this job.
+   * @param task the task to add to this job.
+   * @return an instance of {@code Task} that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
+   * or a wrapper around the input object in the other cases.
+   * @throws JPPFException if one of the tasks is neither a {@code Task} or a JPPF-annotated class.
+   * @since 6.2
+   */
+  public Task<?> addWithDpendencies(final TaskNode<?> task) throws JPPFException {
+    final Task<?> result = add(task);
+    if (task.hasDependency()) {
+      for (final TaskNode<?> dep: task.getDependencies()) {
+        if (!tasks.contains(dep)) addWithDpendencies(dep);
+      }
+    }
+    return result;
   }
 
   /**

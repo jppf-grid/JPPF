@@ -33,11 +33,11 @@ public final class ReflectionHelper {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ReflectionHelper.class);
+  private static final Logger log = LoggerFactory.getLogger(ReflectionHelper.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Invoke a method using reflection.

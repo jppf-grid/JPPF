@@ -34,11 +34,11 @@ public class LauncherListener extends Thread {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(LauncherListener.class);
+  private static final Logger log = LoggerFactory.getLogger(LauncherListener.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The port on which to listen for the launcher signals.
    */

@@ -22,8 +22,7 @@ package org.jppf.node.idle;
  * Factory for creating {@link IdleTimeDetector} instances.
  * @author Laurent Cohen
  */
-interface IdleTimeDetectorFactory
-{
+interface IdleTimeDetectorFactory {
   /**
    * Create a new detector for system idle time.
    * @return an {@link IdleTimeDetector} instance.

@@ -42,7 +42,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * The socket client uses to communicate over a socket connection.
    */
-  SocketWrapper socketClient = null;
+  SocketWrapper socketClient;
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
@@ -54,7 +54,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * The name or IP address of the host the class server is running on.
    */
-  String host = null;
+  String host;
   /**
    * The TCP port the class server is listening to.
    */
@@ -62,11 +62,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * The client connection which owns this connection handler.
    */
-  JPPFClientConnection owner = null;
+  JPPFClientConnection owner;
   /**
    * The name given to this connection handler.
    */
-  String name = null;
+  String name;
 
   /**
    * Initialize this connection with the specified owner.

@@ -43,7 +43,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The list of the tasks.
    */

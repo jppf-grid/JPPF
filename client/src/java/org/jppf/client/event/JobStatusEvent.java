@@ -35,7 +35,7 @@ public class JobStatusEvent extends EventObject {
   /**
    * The status of the job.
    */
-  private JobStatus status = null;
+  private JobStatus status;
 
   /**
    * Initialize this event with the specified job uuid and status.

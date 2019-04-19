@@ -40,7 +40,7 @@ public final class JPPFConfiguration {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFConfiguration.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFConfiguration.class);
   /**
    * Name of the system property holding the location of the JPPF configuration file.
    */
@@ -56,7 +56,7 @@ public final class JPPFConfiguration {
   /**
    * Holds the JPPF configuration properties.
    */
-  private static TypedProperties props = null;
+  private static TypedProperties props;
   /**
    * Used to synchronize propertie loading.
    */

@@ -40,7 +40,7 @@ public class ServerTaskBundleClient {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Count of instances of this class.
    */

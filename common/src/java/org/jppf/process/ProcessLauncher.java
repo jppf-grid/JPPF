@@ -69,11 +69,11 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   /**
    * Specifies whether the subprocess is launched only when the system is idle.
    */
-  private boolean idleMode = false;
+  private boolean idleMode;
   /**
    * Detects system idle state changes.
    */
-  private IdleDetector idleDetector = null;
+  private IdleDetector idleDetector;
   /**
    * Whether the node is configured for immediate shutdown.
    */

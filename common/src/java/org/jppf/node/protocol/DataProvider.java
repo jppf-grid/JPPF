@@ -25,6 +25,5 @@ import org.jppf.utils.collections.Metadata;
  * which can cause crashes due to insufficient available memory in a node.
  * @author Laurent Cohen
  */
-public interface DataProvider extends Metadata
-{
+public interface DataProvider extends Metadata {
 }

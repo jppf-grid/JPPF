@@ -73,7 +73,6 @@ public class TaskStateMap extends TreeMap<Integer, TaskState> {
   @Override
   public void clear() {
     super.clear();
-    for (TaskState state: TaskState.values())
-      stateCounts.get(state).set(0);
+    for (TaskState state: TaskState.values()) stateCounts.get(state).set(0);
   }
 }

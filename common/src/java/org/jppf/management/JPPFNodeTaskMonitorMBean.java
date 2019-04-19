@@ -25,8 +25,7 @@ import javax.management.NotificationEmitter;
  * MBean interface for task-level monitoring on each node.
  * @author Laurent Cohen
  */
-public interface JPPFNodeTaskMonitorMBean extends NotificationEmitter
-{
+public interface JPPFNodeTaskMonitorMBean extends NotificationEmitter {
   /**
    * Name of the node's task monitor MBean.
    */

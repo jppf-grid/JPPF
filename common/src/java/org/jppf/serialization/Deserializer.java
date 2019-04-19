@@ -37,11 +37,11 @@ class Deserializer {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(Deserializer.class);
+  private static final Logger log = LoggerFactory.getLogger(Deserializer.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * Count of instances of this class, used for debugging.
    */

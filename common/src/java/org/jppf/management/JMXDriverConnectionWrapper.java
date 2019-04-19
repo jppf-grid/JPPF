@@ -45,7 +45,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JMXDriverConnectionWrapper.class);
+  private static final Logger log = LoggerFactory.getLogger(JMXDriverConnectionWrapper.class);
   /**
    * Signature of the method that registers a node forwarding listener.
    */
@@ -53,7 +53,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   /**
    *
    */
-  private static Map<String, Map<String, ListenerWrapper>> forwardingListeners = new HashMap<>();
+  private static final Map<String, Map<String, ListenerWrapper>> forwardingListeners = new HashMap<>();
 
   /**
    * Initialize a local connection to the MBean server.

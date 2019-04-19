@@ -52,7 +52,7 @@ public class ClientJob extends AbstractClientJob {
   /**
    * The broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
    */
-  private transient String broadcastUUID = null;
+  private transient String broadcastUUID;
   /**
    * Map of all futures in this job.
    */
@@ -76,7 +76,7 @@ public class ClientJob extends AbstractClientJob {
   /**
    * The requeue handler.
    */
-  private Runnable onRequeue = null;
+  private Runnable onRequeue;
   /**
    * State map for tasks on which resultReceived was called.
    */

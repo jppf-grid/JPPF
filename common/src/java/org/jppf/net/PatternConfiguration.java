@@ -26,8 +26,7 @@ import org.jppf.utils.Range;
  * Instances of this class represent the configuration parameters for a specific IP address pattern implementation.
  * @author Laurent Cohen
  */
-public final class PatternConfiguration
-{
+public final class PatternConfiguration {
   /**
    * Configuration for IPv4 address patterns.
    */
@@ -73,8 +72,7 @@ public final class PatternConfiguration
    * @param compSeparator the separator for the components of an address.
    * @param valuePrefix the prefix indicating in which base the numbers are represented, i.e. "" for decimal, "0X" for hexadecimal.
    */
-  public PatternConfiguration(final int nbComponents, final int minValue, final int maxValue, final char compSeparator, final String valuePrefix)
-  {
+  public PatternConfiguration(final int nbComponents, final int minValue, final int maxValue, final char compSeparator, final String valuePrefix) {
     this.nbComponents = nbComponents;
     this.minValue = minValue;
     this.maxValue = maxValue;
@@ -88,8 +86,7 @@ public final class PatternConfiguration
    * Get the separator for the components of an address.
    * @return the separator character.
    */
-  protected char getCompSeparator()
-  {
+  protected char getCompSeparator() {
     return compSeparator;
   }
 }

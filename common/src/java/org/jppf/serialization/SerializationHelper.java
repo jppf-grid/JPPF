@@ -24,8 +24,7 @@ package org.jppf.serialization;
  * @author Laurent Cohen
  * @exclude
  */
-public interface SerializationHelper
-{
+public interface SerializationHelper {
   /**
    * Get a reference to the <code>ObjectSerializer</code> used by this helper.
    * @return an <code>ObjectSerializer</code> instance.

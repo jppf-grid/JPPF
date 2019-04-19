@@ -26,11 +26,11 @@ public class Range<T extends Comparable<T>> {
   /**
    * The lower bound.
    */
-  private T lower;
+  private final T lower;
   /**
    * The upper bound.
    */
-  private T upper;
+  private final T upper;
 
   /**
    * Initialize this range with the specified single value used as both lower and upper bounds.

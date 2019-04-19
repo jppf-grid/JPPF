@@ -24,8 +24,7 @@ import java.util.concurrent.Callable;
  * A password source which uses a plain text string
  * @author Laurent Cohen
  */
-public class PlainTextPassword implements Callable<char[]>
-{
+public class PlainTextPassword implements Callable<char[]> {
   /**
    * Optional arguments that may be specified in the configuration.
    */
@@ -36,15 +35,13 @@ public class PlainTextPassword implements Callable<char[]>
    * @param args the first argument represents a plain text password.
    * @throws Exception if any error occurs.
    */
-  public PlainTextPassword(final String... args) throws Exception
-  {
+  public PlainTextPassword(final String... args) throws Exception {
     this.args = args;
     if ((args == null) || (args.length == 0)) throw new SSLConfigurationException("missing plain text password");
   }
 
   @Override
-  public char[] call() throws Exception
-  {
+  public char[] call() throws Exception {
     return args[0].toCharArray();
   }
 }

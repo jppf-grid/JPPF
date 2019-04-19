@@ -250,7 +250,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @param c the connection that was created.
    * @exclude
    */
-  void newConnection(final AbstractJPPFClientConnection c) {
+  void newConnection(final JPPFClientConnectionImpl c) {
     fireConnectionAdded(c);
   }
 

@@ -40,7 +40,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AbstractProcessLauncher.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractProcessLauncher.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */

@@ -64,11 +64,11 @@ public abstract class AbstractClientJob {
   /**
    * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
    */
-  private long jobReceivedTime = 0L;
+  private long jobReceivedTime;
   /**
    * The time at which this wrapper was added to the queue.
    */
-  private transient long queueEntryTime = 0L;
+  private transient long queueEntryTime;
   /**
    * Instance of parent broadcast job.
    */

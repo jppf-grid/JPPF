@@ -36,7 +36,7 @@ public class JobGraphHelper {
   public static JobTaskGraph graphOf(final Collection<Task<?>> tasks) {
     final Map<Integer, JobTaskNode> nodesMap = new HashMap<>();
     for (final Task<?> task: tasks) addNode(nodesMap, task);
-    return new JobTaskGraph(nodesMap.values());
+    return new JobTaskGraph(nodesMap);
   }
 
   /**

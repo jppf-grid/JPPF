@@ -42,47 +42,89 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /** Logger for this class. */
-  private static Logger log = LoggerFactory.getLogger(AbstractJMXConnectionWrapper.class);
-  /** Determines whether debug log statements are enabled. */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /** Prefix for the name given to the connection thread. */
-  public static String CONNECTION_NAME_PREFIX = "jmx@";
-  /** The timeout in millis for JMX connection attempts. A value of 0 or less means no timeout. */
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(AbstractJMXConnectionWrapper.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * Prefix for the name given to the connection thread.
+   */
+  public static final String CONNECTION_NAME_PREFIX = "jmx@";
+  /**
+   * The timeout in millis for JMX connection attempts. A value of 0 or less means no timeout.
+   */
   static final long CONNECTION_TIMEOUT = JPPFConfiguration.get(JPPFProperties.MANAGEMENT_CONNECTION_TIMEOUT);
-  /** URL of the MBean server, in a JMX-compliant format. */
+  /**
+   * URL of the MBean server, in a JMX-compliant format.
+   */
   protected JMXServiceURL url;
-  /** The JMX client. */
+  /**
+   * The JMX client.
+   */
   protected JMXConnector jmxc;
-  /** A connection to the MBean server. */
+  /**
+   * A connection to the MBean server.
+   */
   protected AtomicReference<MBeanServerConnection> mbeanConnection = new AtomicReference<>(null);
-  /** The host the server is running on. */
+  /**
+   * The host the server is running on.
+   */
   protected String host;
-  /** The RMI port used by the server. */
+  /**
+   * The port used by the server.
+   */
   protected int port;
-  /** The connection thread that performs the connection to the management server. */
+  /**
+   * The connection thread that performs the connection to the management server.
+   */
   protected AtomicReference<JMXConnectionThread> connectionThread = new AtomicReference<>(null);
-  /** A string representing this connection, used for logging purposes. */
+  /**
+   * A string representing this connection, used for logging purposes.
+   */
   protected String idString;
-  /** A string representing this connection, used for displaying in the admin conosle. */
+  /**
+   * A string representing this connection, used for displaying in the admin conosle.
+   */
   protected String displayName;
-  /** Determines whether the connection to the JMX server has been established. */
+  /**
+   * Determines whether the connection to the JMX server has been established.
+   */
   protected AtomicBoolean connected = new AtomicBoolean(false);
-  /** Determines whether this connection has been closed by a all to the {@link #close()} method. */
+  /**
+   * Determines whether this connection has been closed by a all to the {@link #close()} method.
+   */
   protected AtomicBoolean closed = new AtomicBoolean(false);
-  /** Determines whether the connection to the JMX server has been established. */
+  /**
+   * Determines whether the connection to the JMX server has been established.
+   */
   protected boolean local;
-  /** JMX properties used for establishing the connection. */
+  /**
+   * JMX properties used for establishing the connection.
+   */
   protected Map<String, Object> env = new HashMap<>();
-  /** Determines whether the JMX connection should be secure or not. */
+  /**
+   * Determines whether the JMX connection should be secure or not.
+   */
   protected boolean sslEnabled;
-  /** Used to synchronize during the connection process. */
+  /**
+   * Used to synchronize during the connection process.
+   */
   final Object connectionLock = new Object();
-  /** The list of listeners to this connection wrapper. */
+  /**
+   * The list of listeners to this connection wrapper.
+   */
   final List<JMXWrapperListener> listeners = new CopyOnWriteArrayList<>();
-  /** The time at which connection attempts started. */
+  /**
+   * The time at which connection attempts started.
+   */
   long connectionStart;
-  /** Whether to try to reconnect upon error. */
+  /**
+   * Whether to try to reconnect upon error.
+   */
   boolean reconnectOnError = true;
   /**
    * The JMX remote protocol.
@@ -297,7 +339,6 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
         for (JMXWrapperListener listener: listeners) listener.jmxWrapperConnected(event);
       }
     };
-    //new Thread(r, getDisplayName() + " connection notifier").start();
     r.run();
   }
 

@@ -34,11 +34,11 @@ public class ServiceFinder {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ServiceFinder.class);
+  private static final Logger log = LoggerFactory.getLogger(ServiceFinder.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Find the classes of all providers implementing or extending the specified provider interface or class, using the specified class loader.

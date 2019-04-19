@@ -45,11 +45,11 @@ class JobConfigurationImpl implements JobConfiguration {
   /**
    * The persistence manager that enables saving and restoring the state of this job.
    */
-  private JobPersistence<?> persistenceManager = null;
+  private JobPersistence<?> persistenceManager;
   /**
    * The data provider to set onto the job.
    */
-  private DataProvider dataProvider = null;
+  private DataProvider dataProvider;
   /**
    * The list of listeners to register with the job.
    */

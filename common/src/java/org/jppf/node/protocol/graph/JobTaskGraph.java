@@ -18,7 +18,7 @@
 
 package org.jppf.node.protocol.graph;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 
 import org.jppf.utils.collections.*;
@@ -33,19 +33,19 @@ public class JobTaskGraph implements Serializable {
   /**
    * Mapping of nodes to their position.
    */
-  private final Map<Integer, JobTaskNode> nodesMap;
+  private Map<Integer, JobTaskNode> nodesMap;
   /**
    * Mapping of node positions to the positions of their dependants.
    */
-  private final transient CollectionMap<Integer, JobTaskNode> dependantsMap = new ArrayListHashMap<>();
+  private transient CollectionMap<Integer, JobTaskNode> dependantsMap = new ArrayListHashMap<>();
   /**
    * Mapping of node positions to the positions of their remaining unexecute dependencies.
    */
-  private final transient CollectionMap<Integer, Integer> remainingDependenciesMap = new ArrayListHashMap<>();
+  private transient CollectionMap<Integer, Integer> remainingDependenciesMap = new ArrayListHashMap<>();
   /**
    * The set of non-executed tasks that no longer have pending dependencies.
    */
-  private final transient Set<Integer> availableNodes = new HashSet<>();
+  private transient Set<Integer> availableNodes = new HashSet<>();
   /**
    * The count of completed tasks.
    */
@@ -56,18 +56,38 @@ public class JobTaskGraph implements Serializable {
    * @param nodes the nodes that constitute the graph.
    */
   public JobTaskGraph(final Collection<JobTaskNode> nodes) {
-    nodesMap = new HashMap<>(nodes.size());
-    for (final JobTaskNode node: nodes) {
-      final int pos = node.getPosition();
-      nodesMap.put(pos, node);
+    final Map<Integer, JobTaskNode> map = new HashMap<>(nodes.size());
+    for (final JobTaskNode node: nodes) map.put(node.getPosition(), node);
+    buildGraph(map);
+  }
+
+  /**
+   * Create this graph form the specified collection of nodes.
+   * @param nodes the nodes that constitute the graph.
+   */
+  public JobTaskGraph(final Map<Integer, JobTaskNode> nodes) {
+    buildGraph(nodes);
+  }
+
+  /**
+   * Create this graph form the specified collection of nodes.
+   * @param nodes the nodes that constitute the graph.
+   */
+  private void buildGraph(final Map<Integer, JobTaskNode> nodes) {
+    nodesMap = nodes;
+    for (final Map.Entry<Integer, JobTaskNode> entry: nodesMap.entrySet()) {
+      final int pos = entry.getKey();
+      final JobTaskNode node = entry.getValue();
       final List<JobTaskNode> dependencies = node.getDependencies();
-      if (dependencies.isEmpty()) availableNodes.add(pos);
-      else {
-        for (final JobTaskNode dep: dependencies) {
-          dependantsMap.putValue(dep.getPosition(), node);
+      int remaining = 0;
+      for (final JobTaskNode dep: dependencies) {
+        dependantsMap.putValue(dep.getPosition(), node);
+        if (!dep.isDone()) {
           remainingDependenciesMap.putValue(pos, dep.getPosition());
-        }
+          remaining++;
+        } else doneCount++;
       }
+      if (remaining <= 0) availableNodes.add(pos);
     }
   }
 
@@ -142,5 +162,57 @@ public class JobTaskGraph implements Serializable {
       if (Visit(child, visitor, visitedPositions) == TaskNodeVisitResult.STOP) return TaskNodeVisitResult.STOP;
     }
     return result;
+  }
+
+  /**
+   * Save the state of this object to a stream (i.e.,serialize it).
+   * @param out the output stream to which to write this object. 
+   * @throws IOException if any I/O error occurs.
+   */
+  private void writeObject(final ObjectOutputStream out) throws IOException {
+    out.writeInt(nodesMap.size());
+    for (final Map.Entry<Integer, JobTaskNode> entry: nodesMap.entrySet()) {
+      final JobTaskNode node = entry.getValue();
+      out.writeInt(node.getPosition());
+      out.writeBoolean(node.isDone());
+      final List<JobTaskNode> deps = node.getDependencies();
+      out.writeInt(deps.size());
+      for (final JobTaskNode dep: deps) out.writeInt(dep.getPosition());
+    }
+  }
+
+  /**
+   * Reconstitute this object from a stream (i.e., deserialize it).
+   * @param in the input stream from which to read the object. 
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if the class of an object in the object graph could not be found.
+   */
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+    final int nbNodes = in.readInt();
+    final Map<Integer, JobTaskNode> nodesMap = new HashMap<>(nbNodes);
+    final CollectionMap<Integer, Integer> dependenciesMap = new ArrayListHashMap<>();
+    for (int i=0; i<nbNodes; i++) {
+      final int pos = in.readInt();
+      final boolean done = in.readBoolean();
+      final JobTaskNode node = new JobTaskNode(pos, done, null);
+      nodesMap.put(pos, node);
+      final int nbDeps = in.readInt();
+      if (nbDeps > 0) {
+        final List<Integer> deps = new ArrayList<>(nbDeps);
+        for (int j=0; j<nbDeps; j++) deps.add(in.readInt());
+        dependenciesMap.addValues(pos, deps);
+      }
+    }
+    for (Map.Entry<Integer, Collection<Integer>> entry: dependenciesMap.entrySet()) {
+      final Collection<Integer> depsPositions = entry.getValue();
+      final List<JobTaskNode> deps = new ArrayList<>(depsPositions.size());
+      for (final int p: depsPositions) deps.add(nodesMap.get(p));
+      nodesMap.get(entry.getKey()).getDependencies().addAll(deps);
+    }
+    dependenciesMap.clear();
+    if (remainingDependenciesMap == null) remainingDependenciesMap = new ArrayListHashMap<>();
+    if (dependantsMap == null) dependantsMap = new ArrayListHashMap<>();
+    if (availableNodes == null) availableNodes = new HashSet<>();
+    buildGraph(nodesMap);
   }
 }

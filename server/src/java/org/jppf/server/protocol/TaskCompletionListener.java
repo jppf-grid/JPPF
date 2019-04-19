@@ -17,15 +17,12 @@
  */
 package org.jppf.server.protocol;
 
-
-
 /**
  * Listener providing a callback to invoke when a task's execution has completed.
  * @author Laurent Cohen
  * @exclude
  */
-public interface TaskCompletionListener
-{
+public interface TaskCompletionListener {
   /**
    * Callback method invoked when the execution of a task has completed.
    * @param result the result of the task's execution.

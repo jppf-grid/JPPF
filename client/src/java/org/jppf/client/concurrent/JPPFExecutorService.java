@@ -70,7 +70,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   /**
    * The {@link JPPFClient} to which tasks executions are delegated.
    */
-  JPPFClient client = null;
+  JPPFClient client;
   /**
    * Maintains a list of the jobs submitted by this executor.
    */
@@ -86,7 +86,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   /**
    * Handles the batching of tasks.
    */
-  private BatchHandler batchHandler = null;
+  private BatchHandler batchHandler;
 
   /**
    * Initialize this executor service with the specified JPPF client.
@@ -118,7 +118,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @throws InterruptedException if interrupted while waiting, in which case unfinished tasks are cancelled.
    * @throws NullPointerException if tasks or any of its elements are null.
    * @throws RejectedExecutionException if any task cannot be scheduled for execution.
-   * @see java.util.concurrent.ExecutorService#invokeAll(java.util.Collection)
    */
   @Override
   public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks) throws InterruptedException {
@@ -137,7 +136,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @throws InterruptedException if interrupted while waiting, in which case unfinished tasks are cancelled.
    * @throws NullPointerException if tasks or any of its elements are null.
    * @throws RejectedExecutionException if any task cannot be scheduled for execution.
-   * @see java.util.concurrent.ExecutorService#invokeAll(java.util.Collection, long, java.util.concurrent.TimeUnit)
    */
   @Override
   public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException {
@@ -190,7 +188,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @throws IllegalArgumentException if tasks empty.
    * @throws ExecutionException if no task successfully completes.
    * @throws RejectedExecutionException if tasks cannot be scheduled for execution.
-   * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection)
    */
   @Override
   public <T> T invokeAny(final Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
@@ -215,8 +212,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @throws ExecutionException if no task successfully completes.
    * @throws RejectedExecutionException if tasks cannot be scheduled for execution.
    * @throws TimeoutException if the given timeout elapses before any task successfully completes.
-   * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection)
-   * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection, long, java.util.concurrent.TimeUnit)
    */
   @Override
   public <T> T invokeAny(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
@@ -233,7 +228,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @param <T> the type of result returned by the task.
    * @param task the task to execute.
    * @return a Future representing pending completion of the task.
-   * @see java.util.concurrent.ExecutorService#submit(java.util.concurrent.Callable)
    */
   @Override
   public <T> Future<T> submit(final Callable<T> task) {
@@ -245,7 +239,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   /**
    * Submits a Runnable task for execution and returns a Future representing that task.
    * @param task the task to execute.
-   * @return a future representing the status of the task completion.
    * @see java.util.concurrent.ExecutorService#submit(java.lang.Runnable)
    */
   @Override
@@ -261,7 +254,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @param task the task to execute.
    * @param result the result to return .
    * @return a Future representing pending completion of the task, and whose get() method will return the given result upon completion.
-   * @see java.util.concurrent.ExecutorService#submit(java.lang.Runnable, java.lang.Object)
    */
   @Override
   public <T> Future<T> submit(final Runnable task, final T result) {
@@ -288,7 +280,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @param unit the time unit of the timeout argument.
    * @return true if this executor terminated and false if the timeout elapsed before termination.
    * @throws InterruptedException if interrupted while waiting.
-   * @see java.util.concurrent.ExecutorService#awaitTermination(long, java.util.concurrent.TimeUnit)
    */
   @Override
   public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException {
@@ -300,7 +291,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   /**
    * Determine whether this executor has been shut down.
    * @return true if this executor has been shut down, false otherwise.
-   * @see java.util.concurrent.ExecutorService#isShutdown()
    */
   @Override
   public boolean isShutdown() {
@@ -311,7 +301,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Determine whether all tasks have completed following shut down.
    * Note that isTerminated is never true unless either shutdown or shutdownNow was called first.
    * @return true if all tasks have completed following shut down.
-   * @see java.util.concurrent.ExecutorService#isTerminated()
    */
   @Override
   public boolean isTerminated() {
@@ -320,7 +309,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
 
   /**
    * Set the terminated status for this executor.
-   * @see java.util.concurrent.ExecutorService#isTerminated()
    */
   private void setTerminated() {
     terminated.set(true);
@@ -331,7 +319,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
 
   /**
    * Initiates an orderly shutdown in which previously submitted tasks are executed, but no new tasks will be accepted.
-   * @see java.util.concurrent.ExecutorService#shutdown()
    */
   @Override
   public void shutdown() {
@@ -348,7 +335,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * and returns a list of the tasks that were awaiting execution.<br>
    * This implementation simply waits for all submitted tasks to terminate, due to the complexity of stopping remote tasks.
    * @return a list of tasks that never commenced execution.
-   * @see java.util.concurrent.ExecutorService#shutdownNow()
    */
   @Override
   public List<Runnable> shutdownNow() {
@@ -399,7 +385,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   /**
    * Called when all results from a job have been received.
    * @param event the event object.
-   * @see org.jppf.client.concurrent.FutureResultCollectorListener#resultsComplete(org.jppf.client.concurrent.FutureResultCollectorEvent)
    * @exclude
    */
   @Override

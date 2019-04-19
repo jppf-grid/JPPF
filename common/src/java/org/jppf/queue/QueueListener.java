@@ -28,8 +28,7 @@ import java.util.EventListener;
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-public interface QueueListener<T, U, V> extends EventListener
-{
+public interface QueueListener<T, U, V> extends EventListener {
   /**
    * Notify a listener that a bundle was added to the queue.
    * @param event a queue event.

@@ -29,8 +29,7 @@ import org.jppf.utils.JPPFBuffer;
  * @author Laurent Cohen
  * @exclude
  */
-public interface ObjectSerializer
-{
+public interface ObjectSerializer {
   /**
    * Serialize an object into an array of bytes.
    * @param o the object to Serialize.

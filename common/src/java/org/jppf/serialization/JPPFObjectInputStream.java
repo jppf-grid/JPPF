@@ -47,7 +47,7 @@ public class JPPFObjectInputStream extends ObjectInputStream {
   /**
    * Determines whether the stream is already reading an object graph.
    */
-  private boolean readingObject = false;
+  private boolean readingObject;
   /**
    * Temporary buffer.
    */

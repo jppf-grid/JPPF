@@ -48,7 +48,7 @@ public class JPPFSchedule implements Serializable {
   /**
    * Format describing the schedule date.
    */
-  private transient SimpleDateFormat dateFormat = null;
+  private transient SimpleDateFormat dateFormat;
 
   /**
    * Initialize this schedule configuration with the specified duration.

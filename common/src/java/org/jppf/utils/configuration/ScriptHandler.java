@@ -93,7 +93,7 @@ public class ScriptHandler {
   /**
    * The properties to evaluate.
    */
-  private Properties config = null;
+  private Properties config;
   /**
    * The default script language.
    */

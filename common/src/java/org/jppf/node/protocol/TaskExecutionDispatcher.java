@@ -47,7 +47,7 @@ public class TaskExecutionDispatcher {
   /**
    * Class loader used to discover listeners via SPI.
    */
-  private ClassLoader loader = null;
+  private ClassLoader loader;
 
   /**
    * Intialize this dispatcher with the specified class loader.

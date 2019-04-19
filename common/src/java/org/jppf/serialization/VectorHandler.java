@@ -30,11 +30,11 @@ public class VectorHandler extends AbstractSerializationHandler {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(Serializer.class);
+  private static final Logger log = LoggerFactory.getLogger(Serializer.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
 
   @Override
   public void writeDeclaredFields(final Serializer serializer, final ClassDescriptor cd, final Object obj) throws Exception {

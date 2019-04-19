@@ -27,8 +27,7 @@ import java.io.IOException;
  * @see org.jppf.utils.streams.NotifyingOutputStream
  * @author Laurent Cohen
  */
-public interface NotifyingStreamCallback
-{
+public interface NotifyingStreamCallback {
   /**
    * Notify that some bytes were read, written or skipped.
    * @param length the number of bytes.

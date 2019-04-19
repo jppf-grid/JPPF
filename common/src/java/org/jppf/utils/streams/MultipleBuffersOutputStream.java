@@ -34,11 +34,11 @@ public class MultipleBuffersOutputStream extends OutputStream {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(MultipleBuffersOutputStream.class);
+  private static final Logger log = LoggerFactory.getLogger(MultipleBuffersOutputStream.class);
   /**
    * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * Contains the data written to this output stream, as a sequence of {@link JPPFBuffer} instances.
    */

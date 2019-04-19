@@ -29,19 +29,19 @@ public class JPPFErrorReporter {
   /**
    * A list of collected warnings.
    */
-  public List<String> warnings = new ArrayList<>();
+  public final List<String> warnings = new ArrayList<>();
   /**
    * A list of collected errors.
    */
-  public List<String> errors = new ArrayList<>();
+  public final List<String> errors = new ArrayList<>();
   /**
    * A list of fatal (non recoverable) errors.
    */
-  public List<String> fatalErrors = new ArrayList<>();
+  public final List<String> fatalErrors = new ArrayList<>();
   /**
    * A name used to identify this error reporter.
    */
-  public String name = null;
+  public final String name;
 
   /**
    * Initialize this error reporter with the specified name.

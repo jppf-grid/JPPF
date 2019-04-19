@@ -40,11 +40,11 @@ public class OffloadableNotification extends Notification {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(OffloadableNotification.class);
+  private static final Logger log = LoggerFactory.getLogger(OffloadableNotification.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Heap usage, in bytes, beyond which offloading is triggered.
    */
@@ -56,7 +56,7 @@ public class OffloadableNotification extends Notification {
   /**
    * Whether the user data is offloaded to file.
    */
-  private boolean userDataOffloaded = false;
+  private boolean userDataOffloaded;
 
   /**
    * Initialize this notification with the specified parameters.

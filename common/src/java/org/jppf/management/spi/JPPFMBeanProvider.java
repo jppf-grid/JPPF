@@ -23,8 +23,7 @@ package org.jppf.management.spi;
  * Service provider interface for pluggable management beans.
  * @author Laurent Cohen
  */
-public interface JPPFMBeanProvider
-{
+public interface JPPFMBeanProvider {
   /**
    * Return the fully qualified name of the management interface defined by this provider.
    * @return the fully qualified interface name as a string.

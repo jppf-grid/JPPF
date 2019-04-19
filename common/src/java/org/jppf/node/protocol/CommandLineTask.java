@@ -49,7 +49,7 @@ public abstract class CommandLineTask<T> extends AbstractTask<T> implements Proc
   /**
    * The directory to start the command in.
    */
-  private String startDir = null;
+  private String startDir;
   /**
    * Content of the standard output for the process.
    */
@@ -61,7 +61,7 @@ public abstract class CommandLineTask<T> extends AbstractTask<T> implements Proc
   /**
    * Determines whether the process output should be captured.
    */
-  private boolean captureOutput = false;
+  private boolean captureOutput;
   /**
    * The exit code returned by the sub-process.
    */
@@ -69,7 +69,7 @@ public abstract class CommandLineTask<T> extends AbstractTask<T> implements Proc
   /**
    * The process that is launched.
    */
-  private transient Process process = null;
+  private transient Process process;
 
   /**
    * Default constructor.

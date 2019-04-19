@@ -24,8 +24,7 @@ import java.util.EventListener;
  * Listener interface for receiving job started and job ended event notifications.
  * @author Laurent Cohen
  */
-public interface JobListener extends EventListener
-{
+public interface JobListener extends EventListener {
   /**
    * Called when the execution of a job is starting.
    * This method may be called multiple times, in the case where the job is resubmitted,

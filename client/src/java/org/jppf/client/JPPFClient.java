@@ -105,7 +105,7 @@ public class JPPFClient extends AbstractGenericClient {
   }
 
   @Override
-  AbstractJPPFClientConnection createConnection(final String name, final JPPFConnectionPool pool) {
+  JPPFClientConnectionImpl createConnection(final String name, final JPPFConnectionPool pool) {
     return new JPPFClientConnectionImpl(this, name, pool);
   }
 

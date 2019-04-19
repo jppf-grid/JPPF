@@ -28,7 +28,7 @@ public class TexFileSplitter {
   /**
    * A map of the specified options and their values.
    */
-  private static TypedProperties props = new TypedProperties();
+  private static final TypedProperties props = new TypedProperties();
 
   /**
    * Split the input text files into output text files according to the specified options.

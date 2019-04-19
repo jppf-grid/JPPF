@@ -27,8 +27,7 @@ import org.jppf.management.JPPFManagementInfo;
  * Instances of this cass hold temporary information about a sub-job and the nodes it was dispatched to
  * @author Laurent Cohen
  */
-public class NodeJobInformation implements Serializable
-{
+public class NodeJobInformation implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -36,7 +35,7 @@ public class NodeJobInformation implements Serializable
   /**
    * Empty array
    */
-  public static final NodeJobInformation[]    EMPTY_ARRAY = new NodeJobInformation[0];
+  public static final NodeJobInformation[] EMPTY_ARRAY = new NodeJobInformation[0];
   /**
    * The information about the node.
    */
@@ -51,8 +50,7 @@ public class NodeJobInformation implements Serializable
    * @param nodeInfo the information about the node.
    * @param jobInfo the information about the sub-job.
    */
-  public NodeJobInformation(final JPPFManagementInfo nodeInfo, final JobInformation jobInfo)
-  {
+  public NodeJobInformation(final JPPFManagementInfo nodeInfo, final JobInformation jobInfo) {
     this.nodeInfo = nodeInfo;
     this.jobInfo = jobInfo;
   }

@@ -37,11 +37,11 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(Diagnostics.class);
+  private static final Logger log = LoggerFactory.getLogger(Diagnostics.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Reference to the platform's {@link ThreadMXBean} instance.
    */
@@ -49,11 +49,11 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
   /**
    * Collects regular snapshots of the total CPU time.
    */
-  private CPUTimeCollector cpuTimeCollector = null;
+  private CPUTimeCollector cpuTimeCollector;
   /**
    * Triggers a heap dump based on the JVM implementation.
    */
-  private HeapDumpCollector heapDumpCollector = null;
+  private HeapDumpCollector heapDumpCollector;
   /**
    * Whether the full operating system MXBean features are available or not.
    */
@@ -61,7 +61,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
   /**
    * The object name of the operating system MXBean.
    */
-  private static ObjectName osMXBeanName = null;
+  private static ObjectName osMXBeanName;
   /**
    * The platform MBean server.
    */

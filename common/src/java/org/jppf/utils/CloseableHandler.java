@@ -41,15 +41,15 @@ public class CloseableHandler {
   /**
    * Name for the set of driver closeables.
    */
-  public static String DRIVER = "driver";
+  public static final String DRIVER = "driver";
   /**
    * Name for the set of node closeables.
    */
-  public static String NODE = "node";
+  public static final String NODE = "node";
   /**
    * Map of named handlers.
    */
-  private static CollectionMap<String, Closeable> handlerMap = new CopyOnWriteListConcurrentMap<>();
+  private static final CollectionMap<String, Closeable> handlerMap = new CopyOnWriteListConcurrentMap<>();
 
   /**
    * Close() all the closeables.

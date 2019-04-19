@@ -30,7 +30,7 @@ public class HookFactory {
   /**
    * Mapping of the hooks to their interface name.
    */
-  private static Map<String, Hook<?>> hookMap = new Hashtable<>();
+  private static final Map<String, Hook<?>> hookMap = new Hashtable<>();
 
   /**
    * Register a hook defined via a configuration property, of which a single instance is discovered and invoked.

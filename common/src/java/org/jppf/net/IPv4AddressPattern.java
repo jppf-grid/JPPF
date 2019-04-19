@@ -60,9 +60,6 @@ public class IPv4AddressPattern extends AbstractIPAddressPattern {
     super(source, PatternConfiguration.IPV4_CONFIGURATION);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean matches(final InetAddress ip) {
     if (!(ip instanceof Inet4Address)) return false;

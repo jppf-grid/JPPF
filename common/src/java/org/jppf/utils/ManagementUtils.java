@@ -32,11 +32,11 @@ public class ManagementUtils {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ManagementUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(ManagementUtils.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
@@ -44,63 +44,63 @@ public class ManagementUtils {
   /**
    * The the thread MXBean iself.
    */
-  private static Object THREAD_MXBEAN = null;
+  private static Object THREAD_MXBEAN;
   /**
    * Whether getting the cpu time is supported.
    */
-  private static boolean CPU_TIME_ENABLED = false;
+  private static boolean CPU_TIME_ENABLED;
   /**
    * The method that gets the thread cpu time from the {@code ThreadMXBean}.
    */
-  private static Method GET_THREAD_CPU_TIME_METHOD = null;
+  private static Method GET_THREAD_CPU_TIME_METHOD;
   /**
    * The method that gets the user time from the {@code ThreadMXBean}.
    */
-  private static Method GET_THREAD_USER_TIME_METHOD = null;
+  private static Method GET_THREAD_USER_TIME_METHOD;
   /**
    * The name of the operating system MXBean.
    */
-  private static Object PLATFORM_SERVER = null;
+  private static Object PLATFORM_SERVER;
   /**
    * The name of the operating system MXBean.
    */
-  private static Method GET_ATTRIBUTE_METHOD = null;
+  private static Method GET_ATTRIBUTE_METHOD;
   /**
    * The name of the operating system MXBean.
    */
-  private static Method SET_ATTRIBUTE_METHOD = null;
+  private static Method SET_ATTRIBUTE_METHOD;
   /**
    * Constructor for {@code javax.management.Attribute.Attribute(String, Object)}.
    */
-  private static Constructor<?> ATTRIBUTE_CONSTRUCTOR = null;
+  private static Constructor<?> ATTRIBUTE_CONSTRUCTOR;
   /**
    * The name of the operating system MXBean.
    */
-  private static Method INVOKE_METHOD = null;
+  private static Method INVOKE_METHOD;
   /**
    * Method {@code javax.management.MBeanServerConnection.isRegistered(ObjectName)}.
    */
-  private static Method IS_MBEAN_REGISTERED_METHOD = null;
+  private static Method IS_MBEAN_REGISTERED_METHOD;
   /**
    * Method {@code javax.management.JMX.newMBeanProxy(MBeanServerConnection, ObjectName, CLass<?>, boolean)}.
    */
-  private static Method NEW_PROXY_METHOD = null;
+  private static Method NEW_PROXY_METHOD;
   /**
    * Method {@code javax.management.MBeanServerConnection.addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)}.
    */
-  private static Method ADD_NOTIFICATION_LISTENER_METHOD = null;
+  private static Method ADD_NOTIFICATION_LISTENER_METHOD;
   /**
    * Method {@code javax.management.MBeanServerConnection.removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)}.
    */
-  private static Method REMOVE_NOTIFICATION_LISTENER_METHOD = null;
+  private static Method REMOVE_NOTIFICATION_LISTENER_METHOD;
   /**
    * Method {@code javax.management.MBeanServerConnection.getMBeanInfo(ObjectName)}.
    */
-  private static Method GET_MBEAN_INFO_METHOD = null;
+  private static Method GET_MBEAN_INFO_METHOD;
   /**
    * Method {@code javax.management.MBeanInfo.getNotifications()}.
    */
-  private static Method GET_MBEAN_NOTIFICATIONS_INFO_METHOD = null;
+  private static Method GET_MBEAN_NOTIFICATIONS_INFO_METHOD;
   /**
    * The class object {@code for javax.management.ObjectName}.
    */
@@ -108,7 +108,7 @@ public class ManagementUtils {
   /**
    * Constructor for {@code javax.management.ObjectName.ObjectName(String)}.
    */
-  private static Constructor<?> OBJECT_NAME_CONSTRUCTOR = null;
+  private static Constructor<?> OBJECT_NAME_CONSTRUCTOR;
   /**
    *
    */

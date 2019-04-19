@@ -46,11 +46,11 @@ public final class SSLHelper2 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SSLHelper2.class);
+  private static final Logger log = LoggerFactory.getLogger(SSLHelper2.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The SSL configuration properties.
    */

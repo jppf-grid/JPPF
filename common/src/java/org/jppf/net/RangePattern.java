@@ -33,11 +33,11 @@ public class RangePattern {
   /**
    * The list of ranges constituting this address pattern.
    */
-  protected List<Range<Integer>> ranges = new ArrayList<>();
+  protected final List<Range<Integer>> ranges = new ArrayList<>();
   /**
    * The configuration used for this pattern.
    */
-  protected PatternConfiguration config = null;
+  protected final PatternConfiguration config;
 
   /**
    * Initialize this object with the specified string pattern.

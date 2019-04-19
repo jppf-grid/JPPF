@@ -33,11 +33,11 @@ public class MemoryInformation implements Serializable {
   /**
    * The heap memory usage.
    */
-  private MemoryUsageInformation heapMemoryUsage = null;
+  private MemoryUsageInformation heapMemoryUsage;
   /**
    * The non-heap memory usage.
    */
-  private MemoryUsageInformation nonHeapMemoryUsage = null;
+  private MemoryUsageInformation nonHeapMemoryUsage;
 
   /**
    * Create this object and initialize its data.

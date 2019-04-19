@@ -55,7 +55,7 @@ public final class SerializationUtils {
   /**
    *
    */
-  public static int TEMP_BUFFER_SIZE = 4096;
+  public static final int TEMP_BUFFER_SIZE = 4096;
 
   /**
    * Instantiation of this class is not permitted.

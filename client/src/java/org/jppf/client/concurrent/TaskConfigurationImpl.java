@@ -30,15 +30,15 @@ class TaskConfigurationImpl implements TaskConfiguration {
   /**
    * A delegate for the <code>onCancel()</code> method.
    */
-  private JPPFTaskCallback<Object> cancelCallback = null;
+  private JPPFTaskCallback<Object> cancelCallback;
   /**
    * A delegate for the <code>onTimeout()</code> method.
    */
-  private JPPFTaskCallback<Object> timeoutCallback = null;
+  private JPPFTaskCallback<Object> timeoutCallback;
   /**
    * The task timeout schedule configuration.
    */
-  private JPPFSchedule timeoutSchedule = null;
+  private JPPFSchedule timeoutSchedule;
 
   /**
    * Default constructor.

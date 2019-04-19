@@ -49,11 +49,11 @@ public class ServerJob extends AbstractServerJobBase {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether trace-level logging is enabled.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.

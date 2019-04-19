@@ -43,11 +43,11 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
+  private static final Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize a local connection (same JVM) to the MBean server.

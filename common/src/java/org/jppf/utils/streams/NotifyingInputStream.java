@@ -31,11 +31,11 @@ public class NotifyingInputStream extends InputStream {
   /**
    * The input stream to which operations are delegated.
    */
-  private InputStream delegate;
+  private final InputStream delegate;
   /**
    * The callback to notify of stream operations.
    */
-  private NotifyingStreamCallback callback;
+  private final NotifyingStreamCallback callback;
 
   /**
    * Initialize this stream with the specified input stream.

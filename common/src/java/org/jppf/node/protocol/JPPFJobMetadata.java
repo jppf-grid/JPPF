@@ -27,8 +27,7 @@ import org.jppf.utils.collections.MetadataImpl;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFJobMetadata extends MetadataImpl implements JobMetadata
-{
+public class JPPFJobMetadata extends MetadataImpl implements JobMetadata {
   /**
    * Explicit serialVersionUID.
    */

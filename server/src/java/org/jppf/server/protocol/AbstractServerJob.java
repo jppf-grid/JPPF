@@ -42,7 +42,7 @@ public abstract class AbstractServerJob {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Count of instances of this class.
    */

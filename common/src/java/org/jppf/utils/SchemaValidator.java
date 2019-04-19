@@ -36,11 +36,11 @@ public class SchemaValidator {
   /**
    * Schema factory instance used to load XML schemas.
    */
-  private static SchemaFactory sf = null;
+  private static SchemaFactory sf;
   /**
    * Used to collect validation error and warning messages.
    */
-  private JPPFErrorReporter reporter = null;
+  private JPPFErrorReporter reporter;
 
   /**
    * Entry point to test this class.
@@ -204,15 +204,15 @@ public class SchemaValidator {
     /**
      * Number of recoverable errors.
      */
-    public int errorCount = 0;
+    public int errorCount;
     /**
      * Number of non-recoverable errors.
      */
-    public int fatalCount = 0;
+    public int fatalCount;
     /**
      * Used to collect validation error and warning messages.
      */
-    public JPPFErrorReporter handlerReporter = null;
+    public JPPFErrorReporter handlerReporter;
 
     /**
      * Initialize this error handler with the specified error reporter.

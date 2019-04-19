@@ -25,8 +25,7 @@ import java.util.Map;
  * A generic dictionary of metadata.
  * @author Laurent Cohen
  */
-public interface Metadata extends Serializable
-{
+public interface Metadata extends Serializable {
   /**
    * Retrieve a parameter in the metadata.
    * @param key the parameter's key.

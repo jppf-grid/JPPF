@@ -65,19 +65,19 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Handler for the connection to the task server.
    */
-  TaskServerConnectionHandler taskServerConnection = null;
+  TaskServerConnectionHandler taskServerConnection;
   /**
    * Enables loading local classes onto remote nodes.
    */
-  ClassServerDelegate delegate = null;
+  ClassServerDelegate delegate;
   /**
    * Configuration name for this local client.
    */
-  String name = null;
+  String name;
   /**
    * Unique ID for this connection and its two channels.
    */
-  String connectionUuid = null;
+  String connectionUuid;
   /**
    * Status of the connection.
    */
@@ -400,21 +400,5 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     sb.append(", status=").append(status);
     sb.append(']');
     return sb.toString();
-  }
-
-  /**
-   * Get the pool this connection belongs to.
-   * @return a {@link JPPFConnectionPool} instance.
-   */
-  public JPPFConnectionPool getPool() {
-    return pool;
-  }
-
-  /**
-   * Get the class server connection.
-   * @return a {@link ClassServerDelegate} instance.
-   */
-  public ClassServerDelegate getDelegate() {
-    return delegate;
   }
 }

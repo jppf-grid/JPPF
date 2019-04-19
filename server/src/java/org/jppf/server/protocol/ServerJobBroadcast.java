@@ -49,7 +49,7 @@ public class ServerJobBroadcast extends ServerJob {
   /**
    * The broadcast UUID.
    */
-  private transient String broadcastUUID = null;
+  private transient String broadcastUUID;
   /**
    * Map of all dispatched broadcast jobs.
    */
@@ -61,7 +61,7 @@ public class ServerJobBroadcast extends ServerJob {
   /**
    * Number of remaining tasks that have not completed.
    */
-  protected int pendingTasksCount = 0;
+  protected int pendingTasksCount;
 
   /**
    * Initialized broadcast job with task bundle and data provider.

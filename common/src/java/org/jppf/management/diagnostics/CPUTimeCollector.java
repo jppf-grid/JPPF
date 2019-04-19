@@ -40,7 +40,7 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable 
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(CPUTimeCollector.class);
+  private static final Logger log = LoggerFactory.getLogger(CPUTimeCollector.class);
   /**
    * The interval between two computations in milliseconds.
    * Taken from the value of configuration property "jppf.cpu.load.compuation.interval".

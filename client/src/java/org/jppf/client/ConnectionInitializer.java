@@ -38,13 +38,13 @@ public class ConnectionInitializer implements Runnable {
   /**
    * The client connection to initialize.
    */
-  private AbstractJPPFClientConnection connection = null;
+  private JPPFClientConnectionImpl connection;
 
   /**
    * Instantiate this connection initializer with the specified client connection.
    * @param connection the client connection to initialize.
    */
-  public ConnectionInitializer(final AbstractJPPFClientConnection connection) {
+  public ConnectionInitializer(final JPPFClientConnectionImpl connection) {
     this.connection = connection;
   }
 

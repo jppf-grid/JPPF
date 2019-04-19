@@ -31,7 +31,7 @@ public final class ProcessWrapper {
   /**
    * The process to handle.
    */
-  private Process process = null;
+  private Process process;
   /**
    * The list of registered listeners.
    */

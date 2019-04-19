@@ -53,7 +53,7 @@ public class BaseScriptEvaluator implements Serializable {
   /**
    * Flag set if an error is raised while executing the script, to avoid evaluating the script again.
    */
-  private transient boolean evaluationError = false;
+  private transient boolean evaluationError;
 
   /**
    * Initialize this selector with the specfied language and script.

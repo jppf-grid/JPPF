@@ -26,14 +26,14 @@ import org.jppf.server.submission.SubmissionStatus;
  * @author Martin JANDA
  * @exclude
  */
-public interface ServerJobChangeListener
-{
+public interface ServerJobChangeListener {
   /**
    * Called when a job is added to the server queue.
    * @param source the updated job.
    * @param headerUpdated whether the job header(a {@link org.jppf.node.protocol.TaskBundle TaskBundle} instance) has been updated.
    */
   void jobUpdated(final AbstractServerJob source, boolean headerUpdated);
+
   /**
    * Called when job submission status is changed.
    * @param source the updated job.
@@ -41,6 +41,7 @@ public interface ServerJobChangeListener
    * @param newValue value after change.
    */
   void jobStatusChanged(final AbstractServerJob source, final SubmissionStatus oldValue, final SubmissionStatus newValue);
+
   /**
    * Called when all or part of a job is dispatched to a node.
    * @param source the dispatched job.
@@ -48,6 +49,7 @@ public interface ServerJobChangeListener
    * @param bundleNode the bundle for job event.
    */
   void jobDispatched(final AbstractServerJob source, final ExecutorChannel<?> channel, final ServerTaskBundleNode bundleNode);
+
   /**
    * Called when all or part of a job has returned from a node.
    * @param source the returned job.

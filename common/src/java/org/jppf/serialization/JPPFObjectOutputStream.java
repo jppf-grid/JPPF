@@ -41,11 +41,11 @@ public class JPPFObjectOutputStream extends ObjectOutputStream {
   /**
    * Determines whether the stream is already writing an object graph.
    */
-  private boolean writingObject = false;
+  private boolean writingObject;
   /**
    * The object graph serializer.
    */
-  private Serializer serializer = null;
+  private Serializer serializer;
   /**
    * Temporary buffer to write primitive types.
    */
@@ -53,7 +53,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream {
   /**
    * The latest generated PutField instance.
    */
-  private PutField currentPutField = null;
+  private PutField currentPutField;
 
   /**
    * Initialize this object stream.

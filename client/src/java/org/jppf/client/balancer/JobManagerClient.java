@@ -94,7 +94,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   /**
    * Wrapper for local execution node.
    */
-  private ChannelWrapperLocal wrapperLocal = null;
+  private ChannelWrapperLocal wrapperLocal;
   /**
    * Holds the current connections with ACTIVE or EXECUTING status.
    */

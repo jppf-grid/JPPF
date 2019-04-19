@@ -23,19 +23,17 @@ import java.util.*;
  * Wraps an Iterator as an Enumeration
  * @param <T> the type of the enumerated objects.
  */
-public class IteratorEnumeration<T> implements Enumeration<T>
-{
+public class IteratorEnumeration<T> implements Enumeration<T> {
   /**
    * The iterator to wrap as an enumeration.
    */
-  private Iterator<T> iterator = null;
+  private Iterator<T> iterator;
 
   /**
    * Initialize this enumeration with the specified iterator.
    * @param iterator the iterator to wrap as an enumeration.
    */
-  public IteratorEnumeration(final Iterator<T> iterator)
-  {
+  public IteratorEnumeration(final Iterator<T> iterator) {
     this.iterator = iterator;
   }
 
@@ -45,8 +43,7 @@ public class IteratorEnumeration<T> implements Enumeration<T>
    * @see java.util.Enumeration#hasMoreElements()
    */
   @Override
-  public boolean hasMoreElements()
-  {
+  public boolean hasMoreElements() {
     return iterator.hasNext();
   }
 
@@ -57,8 +54,7 @@ public class IteratorEnumeration<T> implements Enumeration<T>
    * @see java.util.Enumeration#nextElement()
    */
   @Override
-  public T nextElement()
-  {
+  public T nextElement() {
     if (!iterator.hasNext()) throw new NoSuchElementException("this enumeration has no more element to provide");
     return iterator.next();
   }

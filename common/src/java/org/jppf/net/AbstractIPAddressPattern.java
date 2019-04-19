@@ -27,16 +27,14 @@ import org.jppf.utils.NetworkUtils;
  * A pattern represents a single value or a range of values for each component of an IP address.<br/>
  * @author Laurent Cohen
  */
-public abstract class AbstractIPAddressPattern extends RangePattern
-{
+public abstract class AbstractIPAddressPattern extends RangePattern {
   /**
    * Initialize this object with the specified string pattern.
    * @param source the source pattern as a string.
    * @param config the configuration used for this pattern.
    * @throws IllegalArgumentException if the pattern is null or invalid.
    */
-  public AbstractIPAddressPattern(final String source, final PatternConfiguration config) throws IllegalArgumentException
-  {
+  public AbstractIPAddressPattern(final String source, final PatternConfiguration config) throws IllegalArgumentException {
     super(source, config);
   }
 
@@ -46,8 +44,7 @@ public abstract class AbstractIPAddressPattern extends RangePattern
    * @param ip the ip to match as a string.
    * @return true if the address matches this pattern, false otherwise.
    */
-  public boolean matches(final InetAddress ip)
-  {
+  public boolean matches(final InetAddress ip) {
     return matches(NetworkUtils.toIntArray(ip));
   }
 }

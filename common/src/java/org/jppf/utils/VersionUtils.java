@@ -31,11 +31,11 @@ public final class VersionUtils {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(VersionUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(VersionUtils.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The singleton instance holding the version information.
    */

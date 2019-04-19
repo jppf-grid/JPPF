@@ -28,11 +28,11 @@ class RemoveBundleAction implements Runnable {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(RemoveBundleAction.class);
+  private static final Logger log = LoggerFactory.getLogger(RemoveBundleAction.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Reference to the job queue.
    */

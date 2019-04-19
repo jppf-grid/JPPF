@@ -65,11 +65,11 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   /**
    * The priority assigned to this channel.
    */
-  int priority = 0;
+  int priority;
   /**
    * Whether the client is resetting.
    */
-  boolean resetting = false;
+  boolean resetting;
   /**
    * A channel id coupled with its hash, resuable over driver/client restarts.
    */

@@ -63,7 +63,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
   /**
    * The thread that executes the <code>run()</code> method.
    */
-  private Thread runningThread = null;
+  private Thread runningThread;
 
   /**
    * Initialize this discovery thread with the specified JPPF client.

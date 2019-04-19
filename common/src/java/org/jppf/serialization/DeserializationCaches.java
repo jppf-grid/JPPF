@@ -29,15 +29,15 @@ class DeserializationCaches {
   /**
    * Mapping of handles to corresponding classes.
    */
-  Map<String, Class<?>> handleToClassMap = new HashMap<>();
+  final Map<String, Class<?>> handleToClassMap = new HashMap<>();
   /**
    * Mapping of classes to their descriptor.
    */
-  Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap<>();
+  final Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap<>();
   /**
    * Mapping of handles to corresponding objects.
    */
-  Map<Integer, Object> handleToObjectMap = new HashMap<>();
+  final Map<Integer, Object> handleToObjectMap = new HashMap<>();
 
   /**
    * Default constructor.

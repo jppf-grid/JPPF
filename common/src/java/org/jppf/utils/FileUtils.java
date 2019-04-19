@@ -33,7 +33,7 @@ public final class FileUtils {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(FileUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
   /**
    * The root folder for JPPF temporary files.
    */

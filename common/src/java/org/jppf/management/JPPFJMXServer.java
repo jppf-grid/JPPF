@@ -36,11 +36,11 @@ public class JPPFJMXServer extends AbstractJMXServer {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFJMXServer.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFJMXServer.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * An ordered set of configuration properties to use for looking up the desired management port.
    */

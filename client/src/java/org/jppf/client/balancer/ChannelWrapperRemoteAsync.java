@@ -84,7 +84,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
     super.initChannelID();
     if (!initDone) {
       initDone = true;
-      final ExecutorService executor = this.channel.getClient().getExecutor();
+      final ExecutorService executor = this.channel.getConnectionPool().getClient().getExecutor();
       futures.add(executor.submit(new RemoteSender()));
       futures.add(executor.submit(new RemoteReceiver()));
     }
@@ -124,6 +124,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
     @Override
     public void run() {
       if (debugEnabled) log.debug("entering sender loop for {}", ChannelWrapperRemoteAsync.this);
+      final JPPFClientConnectionImpl connection = (JPPFClientConnectionImpl) channel;
       while (!channel.isClosed()) {
         ClientTaskBundle clientBundle = null;
         try {
@@ -143,13 +144,13 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           bundle.setUuid(uuid);
           bundle.setInitialTaskCount(clientBundle.getClientJob().initialTaskCount);
           final ClassLoader cl = loaders.isEmpty() ? null : loaders.iterator().next();
-          final ObjectSerializer ser = channel.makeHelper(cl).getSerializer();
+          final ObjectSerializer ser = connection.makeHelper(cl).getSerializer();
           final long start = System.nanoTime();
           final RemoteResponse response = new RemoteResponse(clientBundle, 0, cl, ser, start);
           synchronized(response) {
             if (response.currentCount < response.taskCount) responseMap.put(bundleId, response);
             if (thisDebugEnabled) thisLog.debug("{} sending {}", ChannelWrapperRemoteAsync.this, clientBundle);
-            final List<Task<?>> notSerializableTasks = channel.sendTasks(ser, cl, bundle, newJob);
+            final List<Task<?>> notSerializableTasks = connection.sendTasks(ser, cl, bundle, newJob);
             clientBundle.jobDispatched(ChannelWrapperRemoteAsync.this);
             if (!notSerializableTasks.isEmpty()) {
               if (thisDebugEnabled) thisLog.debug("got {} non-serializable tasks for {}", notSerializableTasks.size(), clientBundle);
@@ -182,13 +183,14 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
     @Override
     public void run() {
       if (debugEnabled) log.debug("entering receiver loop for {}", ChannelWrapperRemoteAsync.this);
+      final JPPFClientConnectionImpl connection = (JPPFClientConnectionImpl) channel;
       while (!channel.isClosed()) {
         ClientTaskBundle clientBundle = null;
         Exception exception = null;
         boolean complete = false;
         try {
           awaitStatus();
-          final TaskBundle bundle = channel.receiveHeader(null, null);
+          final TaskBundle bundle = connection.receiveHeader(null, null);
           if (thisDebugEnabled) thisLog.debug("received bundle {}", bundle);
           final long bundleId = bundle.getParameter(BundleParameter.CLIENT_BUNDLE_ID);
           final RemoteResponse response = responseMap.remove(bundleId);
@@ -198,7 +200,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           }
           synchronized(response) {
             clientBundle = response.clientBundle;
-            final List<Task<?>> tasks = channel.receiveTasks(bundle, response.ser, response.cl);
+            final List<Task<?>> tasks = connection.receiveTasks(bundle, response.ser, response.cl);
             if (thisDebugEnabled) thisLog.debug("received {} tasks for {}", tasks.size(), clientBundle);
             response.handleResults(tasks);
             if (response.currentCount < response.taskCount) {
@@ -416,7 +418,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
 
   @Override
   public int getMaxJobs() {
-    return channel.getPool().getMaxJobs();
+    return channel.getConnectionPool().getMaxJobs();
   }
 
   @Override

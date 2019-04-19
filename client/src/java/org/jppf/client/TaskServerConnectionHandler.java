@@ -70,7 +70,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
         if (debugEnabled) log.debug("sending JPPF identifier {}", JPPFIdentifiers.asString(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL));
         socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
         if (owner.isSSLEnabled()) createSSLConnection();
-        final TaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
+        final TaskBundle bundle = ((JPPFClientConnectionImpl) owner).sendHandshakeJob();
         final int plainJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT, -1);
         final int sslJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT_SSL, -1);
         owner.getConnectionPool().setJmxPort(owner.isSSLEnabled() ? sslJmxPort : plainJmxPort);

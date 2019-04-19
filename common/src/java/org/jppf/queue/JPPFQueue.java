@@ -25,8 +25,7 @@ package org.jppf.queue;
  * @param <V> the type of resulting bundles the jobs are split into.
  * @author Laurent Cohen
  */
-public interface JPPFQueue<T, U, V> extends Iterable<T>
-{
+public interface JPPFQueue<T, U, V> extends Iterable<T> {
   /**
    * Add an object to the queue, and notify all listeners about it.
    * @param bundleWrapper the object to add to the queue.

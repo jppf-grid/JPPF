@@ -29,8 +29,7 @@ import java.util.function.BiConsumer;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public interface CollectionMap<K, V> extends Iterable<V>, Serializable
-{
+public interface CollectionMap<K, V> extends Iterable<V>, Serializable {
   /**
    * Add a value for the specified key.
    * @param key the key for which to add a value.

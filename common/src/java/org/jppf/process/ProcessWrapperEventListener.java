@@ -24,8 +24,7 @@ import java.util.EventListener;
  * Listener interface for receiving event notifications from a process wrapper.
  * @author Laurent Cohen
  */
-public interface ProcessWrapperEventListener extends EventListener
-{
+public interface ProcessWrapperEventListener extends EventListener {
   /**
    * Notification that the process has written to its output stream.
    * @param event encapsulate the output stream's content.

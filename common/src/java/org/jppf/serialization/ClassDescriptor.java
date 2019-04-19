@@ -83,7 +83,7 @@ class ClassDescriptor {
   /**
    * 
    */
-  boolean populated = false;
+  boolean populated;
 
   /**
    * Initialize an empty class descriptor.

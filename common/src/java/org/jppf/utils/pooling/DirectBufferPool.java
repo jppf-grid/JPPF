@@ -32,10 +32,6 @@ public class DirectBufferPool {
    * 
    */
   private static final ThreadLocal<ByteBuffer> threadLocalBuffer = new ThreadLocal<>();
-  /**
-   * 
-   */
-  //private static final ObjectPool<ByteBuffer> pool = new DirectBufferPoolQueue().init(100);
 
   /**
    * Get a buffer from the pool, or a new buffer if the pool is empty.
@@ -45,7 +41,6 @@ public class DirectBufferPool {
     ByteBuffer bb = threadLocalBuffer.get();
     if (bb == null) {
       threadLocalBuffer.set(bb = ByteBuffer.allocateDirect(IO.TEMP_BUFFER_SIZE));
-      //threadLocalBuffer.set(bb = pool.get());
     }
     return bb;
   }
@@ -57,17 +52,4 @@ public class DirectBufferPool {
   public static void releaseBuffer(final ByteBuffer buffer) {
     buffer.clear();
   }
-
-  /**
-   * Release a buffer into the pool and make it available.
-   */
-  /*
-  public static void removeBuffer() {
-    ByteBuffer bb = threadLocalBuffer.get();
-    if (bb != null) {
-      threadLocalBuffer.remove();
-      pool.put(bb);
-    }
-  }
-  */
 }

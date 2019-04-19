@@ -34,11 +34,11 @@ class IdleDetectionTask extends TimerTask {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(IdleDetectionTask.class);
+  private static final Logger log = LoggerFactory.getLogger(IdleDetectionTask.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The time of inactivity after which the system is considered idle, in milliseconds.
    */

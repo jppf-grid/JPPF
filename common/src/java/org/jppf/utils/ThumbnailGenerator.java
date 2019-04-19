@@ -34,39 +34,39 @@ public class ThumbnailGenerator {
   /**
    * The name prefix for the generated thumbnails.
    */
-  private  static final String TH_PREFIX = "_th_";
+  private static final String TH_PREFIX = "_th_";
   /**
    * The name prefix for the generated thumbnails.
    */
-  private  static final String DEFAULT_INCLUDE_PATH = "../JPPF/docs/home/templates";
+  private static final String DEFAULT_INCLUDE_PATH = "../JPPF/docs/home/templates";
   /**
    * Default number of thumbnails per row.
    */
-  private  static final int DEFAULT_ROW_LENGTH = 10;
+  private static final int DEFAULT_ROW_LENGTH = 10;
   /**
    * Number of thumbnails per row.
    */
-  private  int rowLength = 10;
+  private int rowLength = 10;
   /**
    * The path to the directory in which to find the images.
    */
-  private String path = null;
+  private String path;
   /**
    * The width of the generated thumbnails.
    */
-  private int width = 0;
+  private int width;
   /**
    * The height of the generated thumbnails.
    */
-  private int height = 0;
+  private int height;
   /**
    * Generated file to include in the screenshots php page.
    */
-  private String includePath = null;
+  private String includePath;
   /**
    * Mapping of image files to their corresponding thumbnail.
    */
-  private Map<File, ImageAttributes> fileMap = new TreeMap<>();
+  private final Map<File, ImageAttributes> fileMap = new TreeMap<>();
 
   /**
    * Initialize this thumbnail generator with the specified root dir, width and height.

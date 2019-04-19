@@ -32,7 +32,7 @@ public class IdleStateEvent extends EventObject {
   /**
    * The idle state when this event was emitted.
    */
-  private IdleState state = null;
+  private IdleState state;
 
   /**
    * Initialize this event with the task as source.

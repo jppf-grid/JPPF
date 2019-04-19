@@ -24,6 +24,5 @@ import org.jppf.utils.collections.Metadata;
  * Instances of this interface hold metadata about a job, that can be used from a driver or node extension or plugin.
  * @author Laurent Cohen
  */
-public interface JobMetadata extends Metadata
-{
+public interface JobMetadata extends Metadata {
 }
