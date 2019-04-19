@@ -23,7 +23,8 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.jppf.node.protocol.graph.*;
-import org.jppf.utils.ExceptionThrowingRunnable;
+import org.jppf.serialization.ObjectSerializer;
+import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.BaseTest;
@@ -105,14 +106,38 @@ public class TestTaskDependencies extends BaseTest {
    */
   @Test
   public void testGraphExecution() throws Exception {
-    final MyTask t0 = new MyTask("T0", 0), t1 = new MyTask("T1", 1), t2 = new MyTask("T2", 2), t3 = new MyTask("T3", 3);
-    t0.dependsOn(t1.dependsOn(t3), t2.dependsOn(t3));
-    final JobTaskGraph graph = JobGraphHelper.graphOf(Arrays.asList(t0, t1, t2, t3));
+    final JobTaskGraph graph = createDiamondGraph();
     checkExecution(graph, -1, false, 3);
     checkExecution(graph,  3, false, 1, 2);
     checkExecution(graph,  2, false, 1);
     checkExecution(graph,  1, false, 0);
     checkExecution(graph,  0, true);
+  }
+
+  /**
+   * Test the simulated execution of a task graph.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testGraphSerialization() throws Exception {
+    final JobTaskGraph graph = createDiamondGraph();
+    final ObjectSerializer ser = new ObjectSerializerImpl();
+    final JobTaskGraph graph2 = (JobTaskGraph) ser.deserialize(ser.serialize(graph));
+    checkExecution(graph2, -1, false, 3);
+    checkExecution(graph2,  3, false, 1, 2);
+    checkExecution(graph2,  2, false, 1);
+    checkExecution(graph2,  1, false, 0);
+    checkExecution(graph2,  0, true);
+  }
+
+  /**
+   * @return  agraph with diamonfd dependencies.
+   * @throws Exception if any error occurs.
+   */
+  private static JobTaskGraph createDiamondGraph() throws Exception {
+    final MyTask t0 = new MyTask("T0", 0), t1 = new MyTask("T1", 1), t2 = new MyTask("T2", 2), t3 = new MyTask("T3", 3);
+    t0.dependsOn(t1.dependsOn(t3), t2.dependsOn(t3));
+    return JobGraphHelper.graphOf(Arrays.asList(t0, t1, t2, t3));
   }
 
   /**
