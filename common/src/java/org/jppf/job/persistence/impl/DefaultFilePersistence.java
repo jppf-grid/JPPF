@@ -20,10 +20,12 @@ package org.jppf.job.persistence.impl;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.locks.*;
 
 import org.jppf.job.persistence.*;
 import org.jppf.persistence.AbstractFilePersistence;
 import org.jppf.utils.*;
+import org.jppf.utils.FileUtils.DeleteFileVisitor;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -69,6 +71,11 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
    * Prefix format for a task result file name.
    */
   private static final String RESULT_PREFIX = "result-";
+  /**
+   * Mapping of job uuids to a corresponding lock, to prevent concurrent fie operations on the same job.
+   * See bug <a href="https://www.jppf.org/tracker/tbg/jppf/issues/JPPF-588">JPPF-588 Concurrent operations with DefaultFilePersistence job persistence result in exceptions</a>.
+   */
+  private final Map<String, Lock> jobLocks = new HashMap<>();
 
   /**
    * Initialize this persistence with the root path {@link #DEFAULT_ROOT} under the current user directory.
@@ -93,9 +100,12 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
    */
   @Override
   public void store(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
+    final String uuid = infos.iterator().next().getJobUuid();
+    final Lock lock = getJobLock(uuid);
+    lock.lock();
     try {
       if (debugEnabled) log.debug("storing {}", infos);
-      final Path jobDir = getSubDir(infos.iterator().next().getJobUuid());
+      final Path jobDir = getSubDir(uuid);
       checkDirectory(jobDir);
       for (final PersistenceInfo info: infos) {
         final Path path = getPathFor(jobDir, info, false);
@@ -108,15 +118,20 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
       }
     } catch (final Exception e) {
       throw new JobPersistenceException(e);
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
   public List<InputStream> load(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
     if ((infos == null) || infos.isEmpty()) return null;
+    final String uuid = infos.iterator().next().getJobUuid();
+    final Lock lock = getJobLock(uuid);
+    lock.lock();
     try {
       if (debugEnabled) log.debug("loading {}", infos);
-      final Path jobDir = getSubDir(infos.iterator().next().getJobUuid());
+      final Path jobDir = getSubDir(uuid);
       final List<InputStream> result = new ArrayList<>(infos.size());
       if (Files.exists(jobDir)) {
         for (PersistenceInfo info: infos) {
@@ -127,6 +142,8 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
       return result;
     } catch (final Exception e) {
       throw new JobPersistenceException(e);
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -164,22 +181,31 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
 
   @Override
   public void deleteJob(final String jobUuid) throws JobPersistenceException {
+    final Lock lock = getJobLock(jobUuid);
+    lock.lock();
     try {
       if (debugEnabled) log.debug("deleting job with uuid = {}", jobUuid);
       final Path jobDir = getSubDir(jobUuid);
-      if (Files.exists(jobDir)) Files.walkFileTree(jobDir, new FileUtils.DeleteFileVisitor());
+      if (Files.exists(jobDir)) Files.walkFileTree(jobDir, new DeleteFileVisitor());
     } catch (final Exception e) {
       throw new JobPersistenceException(e);
+    } finally {
+      lock.unlock();
+      removeJobLock(jobUuid);
     }
   }
 
   @Override
   public boolean isJobPersisted(final String jobUuid) throws JobPersistenceException {
+    final Lock lock = getJobLock(jobUuid);
+    lock.lock();
     try {
       final Path path = getPathFor(getSubDir(jobUuid), PersistenceObjectType.JOB_HEADER, -1, false);
       return (path != null) && Files.exists(path);
     } catch (final IOException e) {
       throw new JobPersistenceException(e);
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -193,6 +219,8 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
    */
   private int[] getPositions(final String jobUuid, final PersistenceObjectType type) throws JobPersistenceException {
     int[] positions = null;
+    final Lock lock = getJobLock(jobUuid);
+    lock.lock();
     try {
       final Path jobDir = getSubDir(jobUuid);
       if (!Files.exists(jobDir)) positions = new int[0];
@@ -200,7 +228,7 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
         final List<Path> list = getPathsFor(jobDir, type);
         positions = new int[list.size()];
         int count = 0;
-        for (Path path : list) {
+        for (final Path path : list) {
           final String s = pathname(path.getFileName());
           final String prefix = getPrefixForType(type);
           final String s2 = s.substring(prefix.length(), s.length() - DEFAULT_EXTENSION.length());
@@ -214,6 +242,8 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
       }
     } catch (final Exception e) {
       throw new JobPersistenceException(e);
+    } finally {
+      lock.unlock();
     }
     return positions;
   }
@@ -294,5 +324,29 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
   @Override
   protected JobPersistenceException convertException(final Exception e) {
     return (e instanceof JobPersistenceException) ? (JobPersistenceException) e : new JobPersistenceException(e);
+  }
+
+  /**
+   * @param uuid uuid of the job to lock.
+   * @return a lock for the specified job.
+   */
+  private Lock getJobLock(final String uuid) {
+    synchronized(jobLocks) {
+      Lock lock = jobLocks.get(uuid);
+      if (lock == null) {
+        lock = new ReentrantLock();
+        jobLocks.put(uuid, lock);
+      }
+      return lock;
+    }
+  }
+
+  /**
+   * @param uuid uuid of the job to lock.
+   */
+  private void removeJobLock(final String uuid) {
+    synchronized(jobLocks) {
+      jobLocks.remove(uuid);
+    }
   }
 }
