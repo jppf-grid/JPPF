@@ -155,7 +155,7 @@ public class JobTaskGraph implements Serializable {
   }
 
   /*
-  L ← Empty list that will contain the sorted nodes
+  L - Empty list that will contain the sorted nodes
   while exists nodes without a permanent mark do
     select an unmarked node n
     visit(n)
