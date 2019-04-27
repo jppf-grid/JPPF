@@ -19,7 +19,7 @@
 package test.org.jppf.test.setup;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.utils.*;
+import org.jppf.utils.ReflectionUtils;
 import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;

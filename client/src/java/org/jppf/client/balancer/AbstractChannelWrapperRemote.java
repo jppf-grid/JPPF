@@ -185,57 +185,35 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
 
 
   /**
-   * Create a new job based on the initial one.
-   * @param job   initial job.
-   * @param tasks the tasks to execute.
-   * @return a new {@link JPPFJob} with the same characteristics as the initial one, except for the tasks.
-   * @throws Exception if any error occurs.
-   */
-  static JPPFJob createNewJob(final ClientTaskBundle job, final List<Task<?>> tasks) throws Exception {
-    final JPPFJob newJob = new JPPFJob(job.getClientJob().getUuid());
-    newJob.setDataProvider(job.getJob().getDataProvider());
-    newJob.setSLA(job.getSLA());
-    newJob.setClientSLA(job.getJob().getClientSLA());
-    newJob.setMetadata(job.getMetadata());
-    newJob.setName(job.getName());
-    for (final Task<?> task : tasks) {
-      // needed as JPPFJob.addTask() resets the position
-      final int pos = task.getPosition();
-      newJob.add(task);
-      task.setPosition(pos);
-    }
-    return newJob;
-  }
-
-  /**
    * Create a task bundle for the specified job.
-   * @param job the job to use as a base.
+   * @param clientBundle the job to send.
    * @param bundleId the id of the bundle to send.
    * @return a JPPFTaskBundle instance.
    */
-  static TaskBundle createBundle(final JPPFJob job, final long bundleId) {
+  static TaskBundle createBundle(final ClientTaskBundle clientBundle, final long bundleId) {
     final TaskBundle bundle = new JPPFTaskBundle();
-    bundle.setUuid(job.getUuid());
+    bundle.setUuid(clientBundle.getUuid());
     bundle.setParameter(BundleParameter.CLIENT_BUNDLE_ID, bundleId);
     return bundle;
   }
 
   /**
    * Return class loader for the specified job.
-   * @param job the job used to determine class loader.
+   * @param jobUuid uuid of the job used to determine class loader.
+   * @param tasks the tasks for which to register the class loaders.
    * @return a list of ClassLoader instances, possibly empty.
    */
-  Collection<ClassLoader> registerClassLoaders(final JPPFJob job) {
-    if (job == null) throw new IllegalArgumentException("job is null");
+  Collection<ClassLoader> registerClassLoaders(final String jobUuid, final List<Task<?>> tasks) {
+    if (jobUuid == null) throw new IllegalArgumentException("jobUuid is null");
     final Set<ClassLoader> result = new HashSet<>();
-    if (!job.getJobTasks().isEmpty()) {
+    if (!tasks.isEmpty()) {
       final JPPFClient client = channel.getConnectionPool().getClient();
-      for (final Task<?> task: job.getJobTasks()) {
+      for (final Task<?> task: tasks) {
         if (task != null) {
           final Object o = task.getTaskObject();
           final ClassLoader cl = (o != null) ? o.getClass().getClassLoader() : task.getClass().getClassLoader();
           if ((cl != null) && !result.contains(cl)) {
-            client.registerClassLoader(cl, job.getUuid());
+            client.registerClassLoader(cl, jobUuid);
             result.add(cl);
           }
         }

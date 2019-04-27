@@ -18,7 +18,7 @@
 
 package test.org.jppf.test.setup;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Used to launch a driver.

@@ -132,15 +132,14 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           clientBundle = bundleQueue.take();
           final long bundleId = clientBundle.getBundleId();
           final List<Task<?>> tasks = clientBundle.getTasksL();
-          final JPPFJob newJob = createNewJob(clientBundle, tasks);
           if (thisDebugEnabled) {
             final int size = tasks.size();
             final int[] positions = new int[size];
             for (int i=0; i<size; i++) positions[i] = tasks.get(i).getPosition();
-            thisLog.debug("{} executing {} tasks of job {} with bundleId = {}, positions={}", ChannelWrapperRemoteAsync.this, size, newJob, bundleId, Arrays.toString(positions));
+            thisLog.debug("{} executing {} tasks of job {} with bundleId = {}, positions={}", ChannelWrapperRemoteAsync.this, size, clientBundle, bundleId, Arrays.toString(positions));
           }
-          final Collection<ClassLoader> loaders = registerClassLoaders(newJob);
-          final TaskBundle bundle = createBundle(newJob, bundleId);
+          final Collection<ClassLoader> loaders = registerClassLoaders(clientBundle.getUuid(), tasks);
+          final TaskBundle bundle = createBundle(clientBundle, bundleId);
           bundle.setUuid(uuid);
           bundle.setInitialTaskCount(clientBundle.getClientJob().initialTaskCount);
           final ClassLoader cl = loaders.isEmpty() ? null : loaders.iterator().next();
@@ -150,7 +149,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           synchronized(response) {
             if (response.currentCount < response.taskCount) responseMap.put(bundleId, response);
             if (thisDebugEnabled) thisLog.debug("{} sending {}", ChannelWrapperRemoteAsync.this, clientBundle);
-            final List<Task<?>> notSerializableTasks = connection.sendTasks(ser, cl, bundle, newJob);
+            final List<Task<?>> notSerializableTasks = connection.sendTasks(ser, cl, bundle, clientBundle);
             clientBundle.jobDispatched(ChannelWrapperRemoteAsync.this);
             if (!notSerializableTasks.isEmpty()) {
               if (thisDebugEnabled) thisLog.debug("got {} non-serializable tasks for {}", notSerializableTasks.size(), clientBundle);

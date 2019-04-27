@@ -24,7 +24,7 @@ import java.util.*;
 
 import javax.management.*;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ReflectionUtils;

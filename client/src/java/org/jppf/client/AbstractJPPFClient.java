@@ -99,7 +99,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 
   /**
    * Get JPPF configuration properties. These properties are unmodifiable.
-   * @return <code>TypedProperties</code> instance. With JPPF configuration.
+   * @return {@code TypedProperties} instance. With JPPF configuration.
    */
   public TypedProperties getConfig() {
     return config;
@@ -108,14 +108,13 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Read all client connection information from the configuration and initialize
    * the connection pools accordingly.
-   * @param config The JPPF configuration properties.
-   * @exclude
+   * @param config the JPPF configuration properties.
    */
-  protected abstract void initPools(final TypedProperties config);
+  abstract void initPools(final TypedProperties config);
 
   /**
    * Get count of all client connections handled by this JPPFClient.
-   * @return count of <code>JPPFClientConnection</code> instances.
+   * @return count of {@link JPPFClientConnection} instances.
    */
   public int getAllConnectionsCount() {
     int count = 0;
@@ -154,17 +153,15 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   }
 
   /**
-   * Invoked when the status of a connection has changed to <code>JPPFClientConnectionStatus.FAILED</code>.
+   * Invoked when the status of a connection has changed to {@link JPPFClientConnectionStatus#FAILED}.
    * @param c the connection that failed.
-   * @exclude
    */
-  protected abstract void connectionFailed(final JPPFClientConnection c);
+  abstract void connectionFailed(final JPPFClientConnection c);
 
   /**
    * Remove a connection from the set of connections handled by this client.
    * @param connection the connection to remove.
    * @return {@code true} if the pool holding the connection became empty and was also removed, {@code false} otherwise.
-   * @exclude
    */
   boolean removeClientConnection(final JPPFClientConnection connection) {
     if (connection == null) throw new IllegalArgumentException("connection is null");
@@ -264,7 +261,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 
   /**
    * Determine whether this JPPF client is closed.
-   * @return <code>true</code> if this client is closed, <code>false</code> otherwise.
+   * @return {@code true} if this client is closed, {@code false} otherwise.
    */
   public boolean isClosed() {
     return closed.get();
@@ -272,7 +269,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 
   /**
    * Get the name of the serialization helper implementation class name to use.
-   * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
+   * @return the fully qualified class name of a {@code SerializationHelper} implementation.
    * @exclude
    */
   protected String getSerializationHelperClassName() {

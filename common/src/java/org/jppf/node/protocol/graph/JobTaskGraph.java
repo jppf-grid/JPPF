@@ -21,11 +21,14 @@ package org.jppf.node.protocol.graph;
 import java.io.*;
 import java.util.*;
 
+import org.jppf.serialization.SerializationUtils;
 import org.jppf.utils.collections.*;
 
 /**
- * A graph of the tasks in a job, representing the "depended on" relationships between tasks.
+ * A graph of the tasks in a job, representing the "depends on" relationships between tasks.
  * Each task is represented by its position in the job.
+ * <p>Dependency cycles are not allowed, making this graph effectively a Directed Acyclic Graph (DAG).
+ * This allows, among other things to compute one or more topological orders for the tasks.
  * @author Laurent Cohen
  * @exclude
  */
@@ -33,7 +36,11 @@ public class JobTaskGraph implements Serializable {
   /**
    * Mapping of nodes to their position.
    */
-  private Map<Integer, JobTaskNode> nodesMap;
+  private transient Map<Integer, JobTaskNode> nodesMap;
+  /**
+   * Mapping of not done nodes to their position.
+   */
+  private transient Map<Integer, JobTaskNode> notDoneMap;
   /**
    * Mapping of node positions to the positions of their dependants.
    */
@@ -49,10 +56,16 @@ public class JobTaskGraph implements Serializable {
   /**
    * The count of completed tasks.
    */
-  private int doneCount;
+  private transient int doneCount;
 
   /**
-   * Create this graph form the specified collection of nodes.
+   * No-arg constrcutor used for custom (de)serialization.
+   */
+  public JobTaskGraph() {
+  }
+
+  /**
+   * Create this graph from the specified collection of nodes.
    * @param nodes the nodes that constitute the graph.
    */
   public JobTaskGraph(final Collection<JobTaskNode> nodes) {
@@ -75,9 +88,11 @@ public class JobTaskGraph implements Serializable {
    */
   private void buildGraph(final Map<Integer, JobTaskNode> nodes) {
     nodesMap = nodes;
+    notDoneMap = new HashMap<>(nodes.size());
     for (final Map.Entry<Integer, JobTaskNode> entry: nodesMap.entrySet()) {
       final int pos = entry.getKey();
       final JobTaskNode node = entry.getValue();
+      if (!node.isDone()) notDoneMap.put(pos, node);
       final List<JobTaskNode> dependencies = node.getDependencies();
       int remaining = 0;
       for (final JobTaskNode dep: dependencies) {
@@ -85,13 +100,17 @@ public class JobTaskGraph implements Serializable {
         if (!dep.isDone()) {
           remainingDependenciesMap.putValue(pos, dep.getPosition());
           remaining++;
-        } else doneCount++;
+        }
       }
-      if (remaining <= 0) availableNodes.add(pos);
+      if (!node.isDone()) {
+        if (remaining <= 0) availableNodes.add(pos);
+      }
+      else doneCount++;
     }
   }
 
   /**
+   * Perform a depth-first search topological sort.
    * @param position the position of the node to lookup.
    * @return the {@link JobTaskNode} at the specified position, or {@link null} if there isn't one.
    */
@@ -108,6 +127,7 @@ public class JobTaskGraph implements Serializable {
     if (node != null) {
       doneCount++;
       availableNodes.remove(position);
+      notDoneMap.remove(position);
       node.setDone(true);
       final Collection<JobTaskNode> dependants = dependantsMap.getValues(position);
       if (dependants != null) {
@@ -134,14 +154,73 @@ public class JobTaskGraph implements Serializable {
     return doneCount >= nodesMap.size();
   }
 
+  /*
+  L ← Empty list that will contain the sorted nodes
+  while exists nodes without a permanent mark do
+    select an unmarked node n
+    visit(n)
+
+  function visit(node n)
+    if n has a permanent mark then return
+    for each node m with an edge from n to m do
+        visit(m)
+    mark n with a permanent mark
+    add n to head of L
+  */
+
   /**
-   * Start the visit of the graph.
+   * @return a list of node positions in topological order.
+   * @see <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological sorting</a> on Wikipedia.
+   */
+  public List<Integer> topologicalSortDFS() {
+    final LinkedList<Integer> result = new LinkedList<>();
+    final Map<Integer, JobTaskNode> p = new HashMap<>(notDoneMap);
+    while (!p.isEmpty()) {
+      startVisitNotDone(new TaskNodeVisitor() {
+        @Override
+        public TaskNodeVisitResult visitTaskNode(final JobTaskNode node) {
+          if (node.isDone()) return TaskNodeVisitResult.SKIP;
+          return TaskNodeVisitResult.CONTINUE;
+        }
+  
+        @Override
+        public void postVisitNode(final JobTaskNode node) {
+          p.remove(node.getPosition());
+          result.addLast(node.getPosition());
+        }
+      });
+    }
+    return result;
+  }
+
+  /**
+   * Start the visit of all the nodes in the graph.
    * @param visitor the visitor function to use.
    */
   public void startVisit(final TaskNodeVisitor visitor) {
+    startVisit(visitor, nodesMap, true);
+  }
+
+  /**
+   * Start the visit of the graph nodes that are not done.
+   * @param visitor the visitor function to use.
+   */
+  public void startVisitNotDone(final TaskNodeVisitor visitor) {
+    startVisit(visitor, notDoneMap, false);
+  }
+
+  /**
+   * Start the visit of the graph.
+   * @param visitor the visitor function to use.
+   * @param map the nodes to visit.
+   * @param visitDoneNodes whether to visit the nodes that are done.
+   */
+  private void startVisit(final TaskNodeVisitor visitor, final Map<Integer, JobTaskNode> map, final boolean visitDoneNodes) {
     final Set<Integer> visitedPositions = new HashSet<>();
-    for (final Map.Entry<Integer, JobTaskNode> entry: nodesMap.entrySet()) {
-      if (Visit(entry.getValue(), visitor, visitedPositions) == TaskNodeVisitResult.STOP) break;
+    for (final Map.Entry<Integer, JobTaskNode> entry: map.entrySet()) {
+      final JobTaskNode taskNode = entry.getValue();
+      if (taskNode.isDone() && !visitDoneNodes) continue; 
+      if (Visit(taskNode, visitor, visitDoneNodes, visitedPositions) == TaskNodeVisitResult.STOP) break;
     }
   }
 
@@ -149,18 +228,22 @@ public class JobTaskGraph implements Serializable {
    * Visit the specified task node.
    * @param taskNode the node to visit.
    * @param visitor the visitor function to use.
+   * @param visitDoneNodes whether to visit the nodes that are done.
    * @param visitedPositions the set of already visited positions.
    * @return the result of the node's visit as a {@link TaskNodeVisitResult} enum element.
    */
-  private TaskNodeVisitResult Visit(final JobTaskNode taskNode, final TaskNodeVisitor visitor, final Set<Integer> visitedPositions) {
+  private TaskNodeVisitResult Visit(final JobTaskNode taskNode, final TaskNodeVisitor visitor, final boolean visitDoneNodes, final Set<Integer> visitedPositions) {
     if (visitedPositions.contains(taskNode.getPosition())) return TaskNodeVisitResult.CONTINUE;
+    visitor.preVisitNode(taskNode);
     visitedPositions.add(taskNode.getPosition());
     final TaskNodeVisitResult result = visitor.visitTaskNode(taskNode);
     if (result == TaskNodeVisitResult.STOP) return result;
     else if (result == TaskNodeVisitResult.SKIP) return TaskNodeVisitResult.CONTINUE;
     for (final JobTaskNode child: taskNode.getDependencies()) {
-      if (Visit(child, visitor, visitedPositions) == TaskNodeVisitResult.STOP) return TaskNodeVisitResult.STOP;
+      if (child.isDone() && !visitDoneNodes) continue; 
+      if (Visit(child, visitor, visitDoneNodes, visitedPositions) == TaskNodeVisitResult.STOP) return TaskNodeVisitResult.STOP;
     }
+    visitor.postVisitNode(taskNode);
     return result;
   }
 
@@ -170,15 +253,7 @@ public class JobTaskGraph implements Serializable {
    * @throws IOException if any I/O error occurs.
    */
   private void writeObject(final ObjectOutputStream out) throws IOException {
-    out.writeInt(nodesMap.size());
-    for (final Map.Entry<Integer, JobTaskNode> entry: nodesMap.entrySet()) {
-      final JobTaskNode node = entry.getValue();
-      out.writeInt(node.getPosition());
-      out.writeBoolean(node.isDone());
-      final List<JobTaskNode> deps = node.getDependencies();
-      out.writeInt(deps.size());
-      for (final JobTaskNode dep: deps) out.writeInt(dep.getPosition());
-    }
+    serialize(out);
   }
 
   /**
@@ -188,18 +263,47 @@ public class JobTaskGraph implements Serializable {
    * @throws ClassNotFoundException if the class of an object in the object graph could not be found.
    */
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-    final int nbNodes = in.readInt();
-    final Map<Integer, JobTaskNode> nodesMap = new HashMap<>(nbNodes);
+    deserialize(in);
+  }
+
+  /**
+   * Save the state of this object to a stream (i.e.,serialize it).
+   * @param out the output stream to which to write this object. 
+   * @throws IOException if any I/O error occurs.
+   */
+  public void serialize(final OutputStream out) throws IOException {
+    final byte[] buf = new byte[8];
+    SerializationUtils.writeVarInt(out, nodesMap.size(), buf);
+    for (final Map.Entry<Integer, JobTaskNode> entry: nodesMap.entrySet()) {
+      final JobTaskNode node = entry.getValue();
+      SerializationUtils.writeVarInt(out, node.getPosition(), buf);
+      out.write(node.isDone() ? 1 : 0);
+      final List<JobTaskNode> deps = node.getDependencies();
+      SerializationUtils.writeVarInt(out, deps.size(), buf);
+      for (final JobTaskNode dep: deps) SerializationUtils.writeVarInt(out, dep.getPosition(), buf);
+    }
+  }
+
+  /**
+   * Reconstitute this object from a stream (i.e., deserialize it).
+   * @param in the input stream from which to read the object. 
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if the class of an object in the object graph could not be found.
+   */
+  public void deserialize(final InputStream in) throws IOException, ClassNotFoundException {
+    final byte[] buf = new byte[8];
+    final int nbNodes = SerializationUtils.readVarInt(in, buf);
+    nodesMap = new HashMap<>(nbNodes);
     final CollectionMap<Integer, Integer> dependenciesMap = new ArrayListHashMap<>();
     for (int i=0; i<nbNodes; i++) {
-      final int pos = in.readInt();
-      final boolean done = in.readBoolean();
+      final int pos = SerializationUtils.readVarInt(in, buf);
+      final boolean done = in.read() != 0;
       final JobTaskNode node = new JobTaskNode(pos, done, null);
       nodesMap.put(pos, node);
-      final int nbDeps = in.readInt();
+      final int nbDeps = SerializationUtils.readVarInt(in, buf);
       if (nbDeps > 0) {
         final List<Integer> deps = new ArrayList<>(nbDeps);
-        for (int j=0; j<nbDeps; j++) deps.add(in.readInt());
+        for (int j=0; j<nbDeps; j++) deps.add(SerializationUtils.readVarInt(in, buf));
         dependenciesMap.addValues(pos, deps);
       }
     }
@@ -214,5 +318,23 @@ public class JobTaskGraph implements Serializable {
     if (dependantsMap == null) dependantsMap = new ArrayListHashMap<>();
     if (availableNodes == null) availableNodes = new HashSet<>();
     buildGraph(nodesMap);
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("nodes=").append(nodesMap.size())
+      .append(", doneCount=").append(doneCount)
+      .append(", nodesWithDependant=").append(dependantsMap.keySet().size())
+      .append(", nodesWithDependencies=").append(remainingDependenciesMap.keySet().size())
+      .append(", availableNodes=").append(availableNodes.size())
+      .append(']').toString();
+  }
+
+  /**
+   * @return the count of completed tasks.
+   */
+  public int getDoneCount() {
+    return doneCount;
   }
 }

@@ -25,8 +25,8 @@ import java.util.*;
 import javax.management.*;
 import javax.management.remote.*;
 
-import org.jppf.jmxremote.*;
-import org.jppf.utils.*;
+import org.jppf.jmxremote.JPPFJMXConnectorServer;
+import org.jppf.utils.ExceptionUtils;
 import org.junit.*;
 
 /**

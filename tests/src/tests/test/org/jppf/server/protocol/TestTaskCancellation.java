@@ -33,7 +33,7 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.test.setup.BaseTest;
-import test.org.jppf.test.setup.common.*;
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Unit tests for {@link Task} canellation.

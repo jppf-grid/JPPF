@@ -26,7 +26,7 @@ import java.util.*;
 import javax.management.*;
 import javax.management.remote.*;
 
-import org.jppf.jmxremote.*;
+import org.jppf.jmxremote.JPPFMBeanServerConnection;
 import org.jppf.nio.NioHelper;
 import org.jppf.utils.StringUtils;
 import org.jppf.utils.collections.*;

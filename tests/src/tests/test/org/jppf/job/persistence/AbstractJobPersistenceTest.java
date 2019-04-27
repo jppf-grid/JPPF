@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 
 import java.nio.file.*;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.h2.tools.Script;
 import org.jppf.client.*;
@@ -35,7 +35,6 @@ import org.jppf.management.diagnostics.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.test.addons.common.AddonSimpleTask;
 import org.jppf.utils.*;
-import org.jppf.utils.Operator;
 import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;

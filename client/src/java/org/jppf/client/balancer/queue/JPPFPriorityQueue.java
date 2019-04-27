@@ -27,7 +27,7 @@ import org.jppf.client.*;
 import org.jppf.client.balancer.*;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.JobSLA;
 import org.jppf.queue.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -119,23 +119,25 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   }
 
   @Override
-  public ClientTaskBundle nextBundle(final ClientJob bundleWrapper, final int nbTasks) {
+  public ClientTaskBundle nextBundle(final ClientJob job, final int nbTasks) {
     final ClientTaskBundle result;
     lock.lock();
     try {
-      if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundleWrapper.getTaskCount() + " tasks");
-      final int size = getSize(bundleWrapper);
+      if (debugEnabled) log.debug("requesting bundle with {} tasks, next bundle has {} tasks", nbTasks, job.getTaskCount());
+      final int size = getSize(job);
       decrementSizeCount(size);
-      if (nbTasks >= bundleWrapper.getTaskCount()) {
-        bundleWrapper.setOnRequeue(() -> requeue(bundleWrapper));
-        result = bundleWrapper.copy(bundleWrapper.getTaskCount());
-        removeBundle(bundleWrapper);
+      int effectiveNbTasks = nbTasks;
+      if (job.getTaskGraph() != null) effectiveNbTasks = job.getAvvailableGraphNodeCount();
+      if (effectiveNbTasks >= job.getTaskCount()) {
+        job.setOnRequeue(() -> requeue(job));
+        result = job.copy(job.getTaskCount());
+        removeBundle(job);
       } else {
-        if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
-        result = bundleWrapper.copy(nbTasks);
+        if (debugEnabled) log.debug("removing {} tasks from bundle", effectiveNbTasks);
+        result = job.copy(effectiveNbTasks);
         incrementSizeCount(size);
         // to ensure that other jobs with same priority are also processed without waiting
-        priorityMap.moveToEndOfList(bundleWrapper.getSLA().getPriority(), bundleWrapper);
+        priorityMap.moveToEndOfList(job.getSLA().getPriority(), job);
       }
       updateLatestMaxSize();
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap));
@@ -157,13 +159,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
 
   /**
    * Get the bundle size to use for bundle size tuning.
-   * @param bundleWrapper the bundle to get the size from.
+   * @param job the bundle to get the size from.
    * @return the bundle size as an int.
    */
   @Override
-  protected int getSize(final ClientJob bundleWrapper) {
-    //return bundle.getTaskCount();
-    return bundleWrapper.getJob().getJobTasks().size();
+  protected int getSize(final ClientJob job) {
+    return job.getJob().getJobTasks().size();
   }
 
   @Override
@@ -245,16 +246,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   private void prepareClientJob(final ClientJob clientJob) {
     final ClientJob other = jobMap.get(clientJob.getUuid());
     if (other != null) throw new IllegalStateException("Job " + clientJob.getUuid() + " already enqueued");
-    clientJob.addOnDone(new Runnable() {
-      @Override
-      public void run() {
-        lock.lock();
-        try {
-          jobMap.remove(clientJob.getUuid());
-          removeBundle(clientJob);
-        } finally {
-          lock.unlock();
-        }
+    clientJob.addOnDone(() -> {
+      lock.lock();
+      try {
+        jobMap.remove(clientJob.getUuid());
+        removeBundle(clientJob);
+      } finally {
+        lock.unlock();
       }
     });
     clientJob.setJobStatus(JobStatus.PENDING);

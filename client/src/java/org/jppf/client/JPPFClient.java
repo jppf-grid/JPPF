@@ -86,7 +86,6 @@ public class JPPFClient extends AbstractGenericClient {
    * Initialize this client with the specified configuration and connection listeners.
    * @param config the JPPF configuration to use for this client.
    * @param listeners the optional listeners to add to this JPPF client to receive notifications of new connections.
-   * @exclude
    */
   public JPPFClient(final TypedProperties config, final ConnectionPoolListener... listeners) {
     this(null, config, listeners);
@@ -97,7 +96,6 @@ public class JPPFClient extends AbstractGenericClient {
    * @param uuid the unique identifier for this local client.
    * @param config the JPPF configuration to use for this client.
    * @param listeners the optional listeners to add to this JPPF client to receive notifications of new connections.
-   * @exclude
    */
   public JPPFClient(final String uuid, final TypedProperties config, final ConnectionPoolListener... listeners) {
     super(uuid, config, listeners);
@@ -297,11 +295,7 @@ public class JPPFClient extends AbstractGenericClient {
    */
   public List<JPPFConnectionPool> awaitConnectionPools(final long timeout, final JPPFClientConnectionStatus...statuses) {
     final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
-    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
-      @Override public boolean evaluate() {
-        return !ref.setSynchronized(findConnectionPools(statuses), pools).isEmpty();
-      }
-    }, timeout);
+    ConcurrentUtils.awaitCondition(() -> !ref.setSynchronized(findConnectionPools(statuses), pools).isEmpty(), timeout);
     return ref.get();
   }
 
@@ -339,20 +333,17 @@ public class JPPFClient extends AbstractGenericClient {
    */
   public List<JPPFConnectionPool> awaitConnectionPools(final ComparisonOperator poolOperator, final int expectedPools, final ComparisonOperator connectionOperator, final int expectedConnections,
     final long timeout, final JPPFClientConnectionStatus...statuses) {
-    final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
-    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
-      @Override public boolean evaluate() {
-        final List<JPPFConnectionPool> result = new ArrayList<>();
-        final List<JPPFConnectionPool> temp = findConnectionPools(statuses);
-        for (final JPPFConnectionPool pool: temp) {
-          final List<JPPFClientConnection> list = pool.getConnections(statuses);
-          if (connectionOperator.evaluate(list.size(), expectedConnections)) result.add(pool);
-        }
-        ref.setSynchronized(result, pools);
-        return poolOperator.evaluate(result.size(), expectedPools);
+    final List<JPPFConnectionPool> result = new ArrayList<>();
+    ConcurrentUtils.awaitCondition(() -> {
+      if (!result.isEmpty()) result.clear();
+      final List<JPPFConnectionPool> temp = findConnectionPools(statuses);
+      for (final JPPFConnectionPool pool: temp) {
+        final List<JPPFClientConnection> list = pool.getConnections(statuses);
+        if (connectionOperator.evaluate(list.size(), expectedConnections)) result.add(pool);
       }
+      return poolOperator.evaluate(result.size(), expectedPools);
     }, timeout);
-    return ref.get();
+    return result;
   }
 
   /**
@@ -364,18 +355,15 @@ public class JPPFClient extends AbstractGenericClient {
    * @since 5.0
    */
   public List<JPPFConnectionPool> awaitConnectionPools(final long timeout, final ConnectionPoolFilter<JPPFConnectionPool> filter) {
-    final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
-    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
-      @Override public boolean evaluate() {
-        final List<JPPFConnectionPool> result = new ArrayList<>();
-        final List<JPPFConnectionPool> temp = getConnectionPools();
-        for (final JPPFConnectionPool pool: temp) {
-          if (filter.accepts(pool)) result.add(pool);
-        }
-        return !ref.setSynchronized(result, pools).isEmpty();
+    final List<JPPFConnectionPool> result = new ArrayList<>();
+    ConcurrentUtils.awaitCondition(() -> {
+      final List<JPPFConnectionPool> temp = getConnectionPools();
+      for (final JPPFConnectionPool pool: temp) {
+        if ((filter == null) || filter.accepts(pool)) result.add(pool);
       }
+      return !result.isEmpty();
     }, timeout);
-    return ref.get();
+    return result;
   }
 
   @Override
@@ -438,12 +426,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @return an {@link ExecutionPolicy}, or {@code null} if none was specified.
    */
   public ExecutionPolicy getDefaultPolicy() {
-    defaultPolicyLock.lock();
-    try {
-      return defaultPolicy;
-    } finally {
-      defaultPolicyLock.unlock();
-    }
+    return defaultPolicy.get();
   }
 
   /**
@@ -451,12 +434,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @param defaultPolicy the execution policy to set as default, may be {@code null}.
    */
   public void setDefaultPolicy(final ExecutionPolicy defaultPolicy) {
-    defaultPolicyLock.lock();
-    try {
-      this.defaultPolicy = defaultPolicy;
-    } finally {
-      defaultPolicyLock.unlock();
-    }
+    this.defaultPolicy.set(defaultPolicy);
   }
 
   /**
@@ -464,12 +442,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @return an {@link ExecutionPolicy}, or {@code null} if none was specified.
    */
   public ExecutionPolicy getDefaultClientPolicy() {
-    defaultPolicyLock.lock();
-    try {
-      return defaultClientPolicy;
-    } finally {
-      defaultPolicyLock.unlock();
-    }
+    return defaultClientPolicy.get();
   }
 
   /**
@@ -477,11 +450,6 @@ public class JPPFClient extends AbstractGenericClient {
    * @param defaultClientPolicy the execution policy to set as default, may be {@code null}.
    */
   public void setDefaultClientPolicy(final ExecutionPolicy defaultClientPolicy) {
-    defaultPolicyLock.lock();
-    try {
-      this.defaultClientPolicy = defaultClientPolicy;
-    } finally {
-      defaultPolicyLock.unlock();
-    }
+    this.defaultClientPolicy.set(defaultClientPolicy);
   }
 }

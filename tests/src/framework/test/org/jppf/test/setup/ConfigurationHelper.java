@@ -21,7 +21,7 @@ package test.org.jppf.test.setup;
 import java.io.*;
 import java.util.*;
 
-import org.jppf.scripting.*;
+import org.jppf.scripting.ScriptDefinition;
 import org.jppf.utils.*;
 
 /**

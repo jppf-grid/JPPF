@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.configuration.JPPFProperties;
-import org.junit.*;
+import org.junit.BeforeClass;
 
 import test.org.jppf.test.setup.*;
 

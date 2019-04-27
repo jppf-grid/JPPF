@@ -74,7 +74,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
    * @param job the job to execute.
    * @param tasks the tasks to execute.
    */
-  public ClientTaskBundle(final ClientJob job, final List<Task<?>> tasks) {
+  public ClientTaskBundle(final ClientJob job, final Collection<Task<?>> tasks) {
     if (job == null) throw new IllegalArgumentException("job is null");
     this.job = job;
     this.setSLA(job.getSLA());
@@ -103,7 +103,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
 
   /**
    * Get shared data provider for this task.
-   * @return a <code>DataProvider</code> instance.
+   * @return a {@code DataProvider} instance.
    */
   public DataProvider getDataProviderL() {
     return dataProvider;
@@ -111,7 +111,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
 
   /**
    * Set shared data provider for this task.
-   * @param dataProvider a <code>DataProvider</code> instance.
+   * @param dataProvider a {@code DataProvider} instance.
    */
   public void setDataProviderL(final DataProvider dataProvider) {
     this.dataProvider = dataProvider;
@@ -119,7 +119,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
 
   /**
    * Get the tasks to be executed by the node.
-   * @return the tasks as a <code>List</code> of arrays of bytes.
+   * @return the tasks as a {@code List} of arrays of bytes.
    */
   public List<Task<?>> getTasksL() {
     return tasks;
@@ -127,7 +127,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
 
   /**
    * Make a copy of this bundle.
-   * @return a new <code>ClientTaskBundle</code> instance.
+   * @return a new {@code ClientTaskBundle} instance.
    */
   @Override
   public ClientTaskBundle copy() {
@@ -136,7 +136,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
 
   /**
    * Get the broadcast UUID.
-   * @return an <code>String</code> instance.
+   * @return the broadcast UUID as a {@code String}.
    */
   public String getBroadcastUUID() {
     return broadcastUUID;
@@ -144,7 +144,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
 
   /**
    * Set the broadcast UUID.
-   * @param broadcastUUID the broadcast UUID.
+   * @param broadcastUUID the broadcast UUID as a {@code String}.
    */
   public void setBroadcastUUID(final String broadcastUUID) {
     this.broadcastUUID = broadcastUUID;
@@ -176,7 +176,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
 
   /**
    * Called to notify that the execution of a task has completed.
-   * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
+   * @param exception the {@link Exception} thrown during job execution or {@code null}.
    */
   public void taskCompleted(final Exception exception) {
     job.taskCompleted(this, exception);
@@ -192,7 +192,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
 
   /**
    * Get the requeued indicator.
-   * @return <code>true</code> if job is requeued, <code>false</code> otherwise.
+   * @return {@code true} if job is requeued, {@code false} otherwise.
    */
   public synchronized boolean isRequeued() {
     return requeued;
@@ -207,7 +207,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
 
   /**
    * Get the cancelled indicator.
-   * @return <code>true</code> if job is cancelled, <code>false</code> otherwise.
+   * @return <{@code true} if job is cancelled, {@code false} otherwise.
    */
   public synchronized boolean isCancelled() {
     return cancelled;

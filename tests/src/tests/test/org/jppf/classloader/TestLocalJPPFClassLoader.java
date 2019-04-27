@@ -18,7 +18,7 @@
 
 package test.org.jppf.classloader;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.concurrent.ConcurrentUtils;

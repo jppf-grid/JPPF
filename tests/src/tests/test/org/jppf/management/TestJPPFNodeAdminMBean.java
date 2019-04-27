@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.jppf.classloader.DelegationModel;
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;

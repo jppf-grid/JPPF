@@ -31,4 +31,18 @@ public interface TaskNodeVisitor {
    * @return the result of the node's visit as a {@link TaskNodeVisitResult} enum element.
    */
   TaskNodeVisitResult visitTaskNode(JobTaskNode node);
+
+  /**
+   * Called before visiting the specified node.
+   * @param node the node to visit.
+   */
+  default void preVisitNode(JobTaskNode node) {
+  }
+
+  /**
+   * Called after visiting the specified node.
+   * @param node the node to visit.
+   */
+  default void postVisitNode(JobTaskNode node) {
+  }
 }

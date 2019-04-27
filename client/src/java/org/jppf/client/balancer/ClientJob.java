@@ -29,6 +29,7 @@ import org.jppf.client.event.JobEvent;
 import org.jppf.client.event.JobEvent.Type;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -48,13 +49,14 @@ public class ClientJob extends AbstractClientJob {
   /**
    * The list of the tasks.
    */
-  private final List<Task<?>> tasks;
+  private final SortedMap<Integer, Task<?>> tasks;
+  //private final List<Task<?>> tasks;
   /**
    * The broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
    */
   private transient String broadcastUUID;
   /**
-   * Map of all futures in this job.
+   * Mapping of task bundles to the channel they are sent to.
    */
   private final Map<ClientTaskBundle, ChannelWrapper> bundleMap = new LinkedHashMap<>();
   /**
@@ -70,10 +72,6 @@ public class ClientJob extends AbstractClientJob {
    */
   private final Set<ClientJob> broadcastSet = new LinkedHashSet<>();
   /**
-   * Indicator whether this job is executing.
-   */
-  private boolean executing = false;
-  /**
    * The requeue handler.
    */
   private Runnable onRequeue;
@@ -85,13 +83,21 @@ public class ClientJob extends AbstractClientJob {
    * The original number of tasks in the job.
    */
   protected final int initialTaskCount;
+  /**
+   * The graph of tasks in the job, if any.
+   */
+  private final JobTaskGraph taskGraph;
+  /**
+   * Position of taskss sent tot he server.
+   */
+  private final Set<Integer> dispatchedTasks = new HashSet<>();
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
    * @param job   underlying task bundle.
    * @param tasks list of tasks to execute.
    */
-  public ClientJob(final JPPFJob job, final List<Task<?>> tasks) {
+  public ClientJob(final JPPFJob job, final Collection<Task<?>> tasks) {
     this(job, tasks, null, null);
   }
 
@@ -102,35 +108,24 @@ public class ClientJob extends AbstractClientJob {
    * @param parentJob instance of parent broadcast job.
    * @param broadcastUUID the broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
    */
-  protected ClientJob(final JPPFJob job, final List<Task<?>> tasks, final ClientJob parentJob, final String broadcastUUID) {
+  protected ClientJob(final JPPFJob job, final Collection<Task<?>> tasks, final ClientJob parentJob, final String broadcastUUID) {
     super(job);
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
     this.parentJob = parentJob;
     this.broadcastUUID = broadcastUUID;
     this.initialTaskCount = tasks.size();
-    if (broadcastUUID == null) {
-      if (job.getSLA().isBroadcastJob()) this.broadcastMap = new LinkedHashMap<>();
-      else this.broadcastMap = Collections.emptyMap();
-    } else {
-      this.broadcastMap = Collections.emptyMap();
-    }
+    if ((broadcastUUID == null) && job.getSLA().isBroadcastJob()) this.broadcastMap = new LinkedHashMap<>();
+    else this.broadcastMap = Collections.emptyMap();
     final JobStatus s = job.getStatus();
     this.jobStatus = s == null ? JobStatus.SUBMITTED : s;
-    this.tasks = new ArrayList<>(tasks);
+    //this.tasks = new ArrayList<>(tasks);
+    this.tasks = new TreeMap<>();
+    for (final Task<?> task: tasks) this.tasks.put(task.getPosition(), task);
     for (final Task<?> result : job.getResults().getAllResults()) {
       if (result != null) taskStateMap.put(result.getPosition(), TaskState.RESULT);
     }
-  }
-
-  /**
-   * Sets indicator whether is job is executing. Job start or job end is notified when state changes.
-   * @param executing <code>true</code> when this client job is executing. <code>false</code> otherwise.
-   */
-  protected void setExecuting(final boolean executing) {
-    synchronized (tasks) {
-      if (this.executing == executing) return;
-      this.executing = executing;
-    }
+    this.taskGraph = job.hasTaskGraph() ? JobGraphHelper.graphOf(tasks) : null;
+    if (debugEnabled && (taskGraph != null)) log.debug("taskGraph = {}", taskGraph);
   }
 
   /**
@@ -144,25 +139,15 @@ public class ClientJob extends AbstractClientJob {
   }
 
   /**
-   * Get the list of of the tasks.
-   * @return a list of <code>JPPFTask</code> instances.
-   */
-  public List<Task<?>> getTasks() {
-    synchronized (tasks) {
-      return Collections.unmodifiableList(new ArrayList<>(tasks));
-    }
-  }
-
-  /**
    * Make a copy of this client job wrapper.
    * @param broadcastUUID the broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
-   * @return a new <code>ClientJob</code> instance.
+   * @return a new {@code ClientJob} instance.
    */
   public ClientJob createBroadcastJob(final String broadcastUUID) {
     if (broadcastUUID == null || broadcastUUID.isEmpty()) throw new IllegalArgumentException("broadcastUUID is blank");
     final ClientJob clientJob;
     synchronized (tasks) {
-      clientJob = new ClientJob(job, this.tasks, this, broadcastUUID);
+      clientJob = new ClientJob(job, tasks.values(), this, broadcastUUID);
     }
     synchronized (bundleMap) {
       broadcastSet.add(clientJob);
@@ -173,26 +158,51 @@ public class ClientJob extends AbstractClientJob {
   /**
    * Make a copy of this client job wrapper containing only the first nbTasks tasks it contains.
    * @param nbTasks the number of tasks to include in the copy.
-   * @return a new <code>ClientJob</code> instance.
+   * @return a new {@code ClientJob} instance.
    */
   public ClientTaskBundle copy(final int nbTasks) {
-    final List<Task<?>> list = (nbTasks >= this.tasks.size()) ? this.tasks : this.tasks.subList(0, nbTasks);
-    final ClientTaskBundle bundle = new ClientTaskBundle(this, list); // constructor makes a copy of the list
-    list.clear();
-    return bundle;
+    Collection<Task<?>> list = null;
+    synchronized (tasks) {
+      if (this.taskGraph == null) {
+        if (nbTasks >= this.tasks.size()) list = new ArrayList<>(this.tasks.values());
+        else {
+          list = new ArrayList<>(nbTasks);
+          final Iterator<Map.Entry<Integer, Task<?>>> it = tasks.entrySet().iterator();
+          for (int i=0; i<nbTasks; i++) {
+            final Map.Entry<Integer, Task<?>> entry = it.next();
+            list.add(entry.getValue());
+          }
+        }
+      } else {
+        final Set<Integer> availablePos = taskGraph.getAvailableNodes();
+        final int effectiveNbTasks = Math.min(nbTasks, availablePos.size());
+        final Iterator<Integer> it = availablePos.iterator();
+        list = new ArrayList<>(effectiveNbTasks);
+        for (int i=0; i<effectiveNbTasks; i++) {
+          final int pos = it.next();
+          if (!dispatchedTasks.contains(pos)) {
+            dispatchedTasks.add(pos);
+            list.add(tasks.get(pos));
+          }
+        }
+        if (debugEnabled) log.debug("taskGraph = {}, sentTasks = {}", taskGraph, dispatchedTasks);
+      }
+      final ClientTaskBundle bundle = new ClientTaskBundle(this, list); // constructor makes a copy of the list
+      for (final Task<?> task: list) tasks.remove(task.getPosition());
+      //list.clear();
+      return bundle;
+    }
   }
 
   /**
    * Merge this client job wrapper with another.
    * @param taskList list of tasks to merge.
-   * @param after determines whether the tasks from other should be added first or last.
-   * @return <code>true</code> when this client job needs to be requeued.
+   * @return {@code true} when this client job needs to be requeued.
    */
-  protected boolean merge(final List<Task<?>> taskList, final boolean after) {
+  protected boolean merge(final List<Task<?>> taskList) {
     synchronized (tasks) {
       final boolean requeue = this.tasks.isEmpty() && !taskList.isEmpty();
-      if (!after) this.tasks.addAll(0, taskList);
-      if (after) this.tasks.addAll(taskList);
+      for (final Task<?> task: taskList) tasks.put(task.getPosition(), task);
       return requeue;
     }
   }
@@ -222,7 +232,6 @@ public class ClientJob extends AbstractClientJob {
     if (empty) {
       updateStatus(NEW, EXECUTING);
       setJobStatus(JobStatus.EXECUTING);
-      setExecuting(true);
     }
     if (!isParentBroadcastJob()) job.fireJobEvent(JobEvent.Type.JOB_DISPATCH, channel, bundle.getTasksL());
     if (parentJob != null) parentJob.broadcastDispatched(this);
@@ -232,6 +241,9 @@ public class ClientJob extends AbstractClientJob {
    * Notify that this job was requeued.
    */
   public void jobRequeued() {
+    synchronized (tasks) {
+      dispatchedTasks.clear();
+    }
     updateStatus(EXECUTING, NEW);
     if (debugEnabled) log.debug("job requeued: {}", this);
   }
@@ -242,15 +254,20 @@ public class ClientJob extends AbstractClientJob {
    * @param results the list of tasks whose results have been received from the server.
    */
   public void resultsReceived(final ClientTaskBundle bundle, final List<Task<?>> results) {
-    if (debugEnabled) log.debug("received " + results.size() + " results for bundle " + bundle);
+    if (debugEnabled) log.debug("received {} results for bundle {}", results.size(), bundle);
     if (results.isEmpty()) return;
     synchronized (tasks) {
       for (int i=0; i<results.size(); i++) {
         final Task<?> task = results.get(i);
-        taskStateMap.put(task.getPosition(), TaskState.RESULT);
+        final int position = task.getPosition();
+        taskStateMap.put(position, TaskState.RESULT);
+        if (taskGraph != null) {
+          dispatchedTasks.remove(position);
+          taskGraph.nodeDone(position);
+        }
         if (task instanceof JPPFExceptionResult) {
           Throwable t = null;
-          final Task<?> originalTask = job.getJobTasks().get(task.getPosition());
+          final Task<?> originalTask = job.getJobTasks().get(position);
           if (task instanceof JPPFExceptionResultEx) {
             final JPPFExceptionResultEx result = (JPPFExceptionResultEx) task;
             final String message = String.format("[%s: %s]", result.getThrowableClassName(), result.getThrowableMessage());
@@ -261,6 +278,7 @@ public class ClientJob extends AbstractClientJob {
           results.set(i, originalTask);
         }
       }
+      if (debugEnabled && (taskGraph != null)) log.debug("taskGraph = {}, sentTasks = {}", taskGraph, dispatchedTasks);
     }
     callResultListener(results, null);
   }
@@ -272,17 +290,23 @@ public class ClientJob extends AbstractClientJob {
    */
   public void resultsReceived(final ClientTaskBundle bundle, final Throwable throwable) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    if (debugEnabled) log.debug("received  throwable " + throwable + " for bundle " + bundle);
+    if (debugEnabled) log.debug("received  throwable {} for bundle ", throwable, bundle);
     final boolean ioe = (throwable instanceof IOException) && !(throwable instanceof NotSerializableException);
     final Exception e = throwable instanceof Exception ? (Exception) throwable : new JPPFException(throwable);
     synchronized (tasks) {
       for (final Task<?> task : bundle.getTasksL()) {
-        final TaskState oldState = taskStateMap.get(task.getPosition());
+        final int position = task.getPosition();
+        if (taskGraph != null) {
+          dispatchedTasks.remove(position);
+          taskGraph.nodeDone(position);
+        }
+        final TaskState oldState = taskStateMap.get(position);
         if (!ioe && (oldState != TaskState.RESULT)) {
           taskStateMap.put(task.getPosition(), TaskState.EXCEPTION);
           task.setThrowable(e);
         }
       }
+      if (debugEnabled && (taskGraph != null)) log.debug("taskGraph = {}, sentTasks = {}", taskGraph, dispatchedTasks);
     }
     callResultListener(bundle.getTasksL(), throwable);
   }
@@ -291,14 +315,13 @@ public class ClientJob extends AbstractClientJob {
    * Invoke the job's {@link TaskResultListener} callback and log any exception that may result from the invocation.
    * @param results the tasks to provide as results.
    * @param throwable an eventual {@link Throwable} that may have been raised while the tasks were executing.
-   * @see <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-257">JPPF-257 Better exception handling for overriden or custom TaskResultListener implementations</a>
    */
   private void callResultListener(final List<Task<?>> results, final Throwable throwable) {
     if (job != null) {
       try {
         job.resultsReceived(results, throwable, !isParentBroadcastJob());
       } catch(final Exception e) {
-        log.error("error while calling the TaskResultListener for job [name={}, uuid={}] : {}", new Object[] {job.getName(), job.getUuid(), ExceptionUtils.getStackTrace(e)});
+        log.error("error while calling the TaskResultListener for job [name={}, uuid={}] : {}", job.getName(), job.getUuid(), ExceptionUtils.getStackTrace(e));
       }
     } else if (isChildBroadcastJob()) {
       job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, results);
@@ -312,70 +335,72 @@ public class ClientJob extends AbstractClientJob {
    */
   public void taskCompleted(final ClientTaskBundle bundle, final Exception exception) {
     if (debugEnabled) log.debug("bundle={}, exception={} for {}", bundle, exception, this);
-    final boolean empty;
     synchronized (bundleMap) {
       final ChannelWrapper channel = bundleMap.remove(bundle);
       if (debugEnabled) log.debug("removed channel {} from bundleMap of {}", channel, this);
       if ((bundle != null) && (channel == null)) throw new IllegalStateException("future already removed");
-      empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
     }
     boolean requeue = false;
     if (getSLA().isBroadcastJob()) {
+      if (debugEnabled) log.debug("processing broadcast job {}", this);
       final List<Task<?>> list = new ArrayList<>();
       synchronized (tasks) {
         if (bundle != null) {
-          for (Task<?> task : bundle.getTasksL()) {
+          for (final Task<?> task : bundle.getTasksL()) {
             if (taskStateMap.put(task.getPosition(), TaskState.RESULT) != TaskState.RESULT) list.add(task);
           }
         }
         if (isCancelled() || getBroadcastUUID() == null) {
-          list.addAll(this.tasks);
+          list.addAll(tasks.values());
           this.tasks.clear();
         }
       }
       resultsReceived(bundle, list);
     } else if (bundle == null) {
+      if (debugEnabled) log.debug("processing null bundle for job {}", this);
       if (isCancelled()) {
         final List<Task<?>> list = new ArrayList<>();
         synchronized (tasks) {
-          list.addAll(this.tasks);
+          list.addAll(tasks.values());
           this.tasks.clear();
         }
         resultsReceived(bundle, list);
       }
     } else {
       if (bundle.isCancelled()) {
+        if (debugEnabled) log.debug("processing cancelled job {}", this);
         final List<Task<?>> list = new ArrayList<>();
         synchronized (tasks) {
-          for (Task<?> task : bundle.getTasksL()) {
+          for (final Task<?> task : bundle.getTasksL()) {
             if (taskStateMap.get(task.getPosition()) != TaskState.RESULT) list.add(task);
           }
-          list.addAll(this.tasks);
+          list.addAll(tasks.values());
           this.tasks.clear();
         }
         resultsReceived(bundle, list);
       }
       if (bundle.isRequeued()) {
+        if (debugEnabled) log.debug("processing requeued job {}", this);
         final List<Task<?>> list = new ArrayList<>();
         synchronized (tasks) {
-          for (Task<?> task : bundle.getTasksL()) {
+          for (final Task<?> task : bundle.getTasksL()) {
             if (taskStateMap.get(task.getPosition()) != TaskState.RESULT) list.add(task);
           }
-          requeue = merge(list, false);
+          requeue = merge(list);
           if (debugEnabled) log.debug("requeue = {}, resubmit list = {}", requeue, list.size());
         }
       }
     }
     if (hasPending()) {
+      if (debugEnabled) log.debug("processing hasPending for {}", this);
       if (exception != null) setJobStatus(exception instanceof NotSerializableException ? JobStatus.COMPLETE : JobStatus.FAILED);
-      if (empty) setExecuting(false);
       if (requeue && onRequeue != null) {
         onRequeue.run();
         updateStatus(NEW, EXECUTING);
       }
     } else {
+      if (debugEnabled) log.debug("processing cancelled or done for job {}", this);
       final boolean callDone = updateStatus(isCancelled() ? CANCELLED : EXECUTING, DONE);
-      if (empty) setExecuting(false);
       try {
         if (callDone) done();
       } finally {
@@ -388,7 +413,7 @@ public class ClientJob extends AbstractClientJob {
 
   /**
    * Get indicator whether job has pending tasks.
-   * @return <code>true</code> when job has some pending tasks.
+   * @return {@code true} when job has some pending tasks.
    */
   protected boolean hasPending() {
     synchronized (tasks) {
@@ -413,7 +438,7 @@ public class ClientJob extends AbstractClientJob {
     if (this.jobStatus == jobStatus) return;
     this.jobStatus = jobStatus;
     if (job != null) job.setStatus(this.jobStatus);
-    else if (((jobStatus == JobStatus.COMPLETE) || (jobStatus == JobStatus.FAILED)) && isChildBroadcastJob()) job.fireJobEvent(Type.JOB_END, null, tasks);
+    else if (((jobStatus == JobStatus.COMPLETE) || (jobStatus == JobStatus.FAILED)) && isChildBroadcastJob()) job.fireJobEvent(Type.JOB_END, null, new ArrayList<>(tasks.values()));
   }
 
   @Override
@@ -435,7 +460,7 @@ public class ClientJob extends AbstractClientJob {
         try {
           final ChannelWrapper wrapper = entry.getValue();
           wrapper.cancel(entry.getKey());
-          if (wrapper instanceof AbstractChannelWrapperRemote) {
+          if (!wrapper.isLocal()) {
             final JPPFConnectionPool pool = ((AbstractChannelWrapperRemote) wrapper).getChannel().getConnectionPool();
             final String driverUuid = pool.getDriverUuid();
             if (!uuids.contains(driverUuid)) {
@@ -444,7 +469,7 @@ public class ClientJob extends AbstractClientJob {
                 if (debugEnabled) log.debug("sending cancel request for jobId={} to driver={}", this.getUuid(), driverUuid);
                 final JMXDriverConnectionWrapper jmx = pool.getJmxConnection();
                 if (jmx != null) jmx.cancelJob(this.getUuid());
-            } catch(final Exception e) {
+              } catch(final Exception e) {
                 if (debugEnabled) log.debug(e.getMessage(), e);
                 else log.warn(ExceptionUtils.getMessage(e));
               }
@@ -468,7 +493,7 @@ public class ClientJob extends AbstractClientJob {
 
   /**
    * Called when all or part of broadcast job is dispatched to a driver.
-   * @param broadcastJob    the dispatched job.
+   * @param broadcastJob the dispatched job.
    */
   protected void broadcastDispatched(final ClientJob broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
@@ -481,17 +506,15 @@ public class ClientJob extends AbstractClientJob {
     if (empty) {
       updateStatus(NEW, EXECUTING);
       setJobStatus(JobStatus.EXECUTING);
-      setExecuting(true);
     }
   }
 
   /**
    * Called to notify that the execution of broadcast job has completed.
-   * @param broadcastJob    the completed job.
+   * @param broadcastJob the completed job.
    */
   protected void broadcastCompleted(final ClientJob broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
-    //    if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
     final boolean empty;
     synchronized (bundleMap) {
       if ((broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob) && !broadcastSet.contains(broadcastJob)) {
@@ -523,15 +546,39 @@ public class ClientJob extends AbstractClientJob {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("uuid=").append(job.getUuid());
-    sb.append(", jobName=").append(job.getName());
-    sb.append(", jobStatus=").append(jobStatus);
-    sb.append(", broadcastUUID=").append(broadcastUUID);
-    sb.append(", executing=").append(executing);
-    sb.append(", nbTasks=").append(tasks.size());
-    //sb.append(", taskStateMap=").append(taskStateMap);
-    sb.append(']');
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("uuid=").append(job.getUuid())
+      .append(", jobName=").append(job.getName())
+      .append(", jobStatus=").append(jobStatus)
+      .append(", broadcastUUID=").append(broadcastUUID)
+      .append(", nbTasks=").append(tasks.size())
+      .append(", taskGraph=").append(taskGraph)
+      .append(']').toString();
+  }
+
+  /**
+   * @return the graph of tasks in the job, if any.
+   */
+  public JobTaskGraph getTaskGraph() {
+    return taskGraph;
+  }
+
+  /**
+   * @return {@code true} if there is a graph and an available node in the graph, {@code false} otherwise.
+   */
+  public boolean hasAvvailableGraphNode() {
+    synchronized (tasks) {
+      if (taskGraph == null) return false;
+      return taskGraph.getAvailableNodes().size() - dispatchedTasks.size() > 0;
+    }
+  }
+
+  /**
+   * @return the number of nodes int he graph that can be executed.
+   */
+  public int getAvvailableGraphNodeCount() {
+    synchronized (tasks) {
+      return (taskGraph != null) ? taskGraph.getAvailableNodes().size() - dispatchedTasks.size() : -1;
+    }
   }
 }

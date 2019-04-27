@@ -21,8 +21,6 @@ package org.jppf.node.protocol.graph;
 import java.io.Serializable;
 import java.util.*;
 
-import org.jppf.node.protocol.Task;
-
 /**
  * A node in the graph of the tasks in a job which represents a task and its dependants.
  * @author Laurent Cohen
@@ -52,21 +50,6 @@ public class JobTaskNode implements Serializable {
     this.position = position;
     this.done = done;
     if (dependencies != null) this.dependencies.addAll(dependencies);
-  }
-
-  /**
-   * Initialize this node with the specified task.
-   * @param task the task represented by this node.
-   */
-  public JobTaskNode(final Task<?> task) {
-    this.position = task.getPosition();
-    if (task instanceof TaskNode) {
-      final TaskNode<?> taskNode = (TaskNode<?>) task;
-      final Collection<TaskNode<?>> dependencies = taskNode.getDependencies();
-      if (dependencies != null) {
-        for (final TaskNode<?> dep: dependencies) this.dependencies.add(new JobTaskNode(dep));
-      }
-    }
   }
 
   /**

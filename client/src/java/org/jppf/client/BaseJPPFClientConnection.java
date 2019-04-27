@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
+import org.jppf.client.balancer.ClientTaskBundle;
 import org.jppf.comm.socket.*;
 import org.jppf.io.IOHelper;
 import org.jppf.node.protocol.*;
@@ -111,20 +112,21 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @param ser the serializer to use.
    * @param cl classloader used for serialization.
    * @param header the task bundle to send to the driver.
-   * @param job the job to execute remotely.
+   * @param clientBundle the job to execute remotely.
    * @return a list of tasks that couldn't be serialized, possibly empty.
    * @throws Exception if an error occurs while sending the request.
    */
-  public List<Task<?>> sendTasks(final ObjectSerializer ser, final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
+  public List<Task<?>> sendTasks(final ObjectSerializer ser, final ClassLoader cl, final TaskBundle header, final ClientTaskBundle clientBundle) throws Exception {
+    final JPPFJob job = clientBundle.getClientJob().getJob();
     final TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
-    header.setTaskCount(job.unexecutedTaskCount());
+    header.setTaskCount(clientBundle.getTasksL().size());
     header.setName(job.getName());
     header.setUuid(job.getUuid());
     header.setSLA(job.getSLA());
     header.setMetadata(job.getMetadata());
-    final Task<?>[] tasks = prepareTasksToSend(header, job);
+    final Task<?>[] tasks = prepareTasksToSend(header, clientBundle);
 
     final SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
@@ -152,16 +154,18 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Prepare the job header for the remaining tasks to send in the job.
    * @param header the job header sent to the driver.
-   * @param job the job whose taskss are to be sent.
+   * @param clientBundle the job whose taskss are to be sent.
    * @return an array of the tasks to send.
    */
-  private Task<?>[] prepareTasksToSend(final TaskBundle header, final JPPFJob job) {
-    final int count = job.unexecutedTaskCount();
+  private Task<?>[] prepareTasksToSend(final TaskBundle header, final ClientTaskBundle clientBundle) {
+    final List<Task<?>> allTasks = clientBundle.getTasksL();
+    final int count = allTasks.size();
     final int[] positions = new int[count];
     final int[] maxResubmits = new int[count];
     final Task<?>[] tasks = new Task<?>[count];
     int i = 0;
-    for (final Task<?> task : job) {
+    final JPPFJob job = clientBundle.getClientJob().getJob();
+    for (final Task<?> task : allTasks) {
       final int pos = task.getPosition();
       if (!job.getResults().hasResult(pos)) {
         tasks[i] = task;

@@ -26,6 +26,7 @@ import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -101,9 +102,13 @@ public class MatrixRunner {
       }
       if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
       else jppfClient = new JPPFClient();
-      final JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
-      pool.setSize(nbChannels);
-      pool.awaitWorkingConnections(Operator.AT_LEAST, nbChannels);
+      final Runnable r = () -> {
+        final JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
+        pool.setSize(nbChannels);
+        pool.awaitWorkingConnections(Operator.AT_LEAST, nbChannels);
+      };
+      if (jppfClient.isLocalExecutionEnabled()) ThreadUtils.startDaemonThread(r, "pool init");
+      else r.run();
       // initialize the 2 matrices to multiply
       final Matrix a = new Matrix(size).assignRandomValues();
       final Matrix b = new Matrix(size).assignRandomValues();

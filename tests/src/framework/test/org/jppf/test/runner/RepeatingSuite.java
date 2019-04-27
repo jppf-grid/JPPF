@@ -21,7 +21,7 @@ package test.org.jppf.test.runner;
 import java.lang.annotation.*;
 import java.util.*;
 
-import org.junit.runner.*;
+import org.junit.runner.Runner;
 import org.junit.runners.*;
 import org.junit.runners.model.*;
 

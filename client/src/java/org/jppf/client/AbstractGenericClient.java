@@ -19,7 +19,7 @@ package org.jppf.client;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.sql.DataSource;
 
@@ -98,17 +98,13 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    */
   LoadBalancerPersistenceManager loadBalancerPersistenceManager;
   /**
-   * Synchronizes access to the default client and server side job sla execution policy. 
-   */
-  final Lock defaultPolicyLock = new ReentrantLock();
-  /**
    * The default server-side job sla execution policy.
    */
-  ExecutionPolicy defaultPolicy;
+  final AtomicReference<ExecutionPolicy> defaultPolicy = new AtomicReference<>(null);
   /**
    * The default client-side job sla execution policy.
    */
-  ExecutionPolicy defaultClientPolicy;
+  final AtomicReference<ExecutionPolicy> defaultClientPolicy = new AtomicReference<>(null);
 
   /**
    * Initialize this client with a specified application UUID.
@@ -155,13 +151,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
     if (jobManager == null) jobManager = createJobManager();
-    defaultPolicyLock.lock();
-    try {
-      defaultPolicy = retrieveDefaultPolicy(JPPFProperties.JOB_SLA_DEFAULT_POLICY);
-      defaultClientPolicy = retrieveDefaultPolicy(JPPFProperties.JOB_CLIENT_SLA_DEFAULT_POLICY);
-    } finally {
-      defaultPolicyLock.unlock();
-    }
+    defaultPolicy.set(retrieveDefaultPolicy(JPPFProperties.JOB_SLA_DEFAULT_POLICY));
+    defaultClientPolicy.set(retrieveDefaultPolicy(JPPFProperties.JOB_CLIENT_SLA_DEFAULT_POLICY));
     ThreadUtils.startThread(() -> initPools(config), "InitPools");
   }
 
@@ -185,21 +176,20 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   /**
    * Initialize this client's configuration.
    * @param configuration an object holding the JPPF configuration.
-   * @return <code>TypedProperties</code> instance holding JPPF configuration. Never be <code>null</code>.
-   * @exclude
+   * @return {@link TypedProperties} instance holding JPPF configuration. Never {@code null}.
    */
-  protected TypedProperties initConfig(final Object configuration) {
+  TypedProperties initConfig(final Object configuration) {
     if (configuration instanceof TypedProperties) return (TypedProperties) configuration;
     return JPPFConfiguration.getProperties();
   }
 
-  /**
-   * @exclude
-   */
   @Override
-  protected void initPools(final TypedProperties config) {
+  void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
-    if (config.get(JPPFProperties.LOCAL_EXECUTION_ENABLED)) setLocalExecutionEnabled(true);
+    if (config.get(JPPFProperties.LOCAL_EXECUTION_ENABLED)) {
+      System.out.println("local execution enabled");
+      setLocalExecutionEnabled(true);
+    }
     discoveryHandler.register(discoveryListener.open()).start();
     if (config.get(JPPFProperties.REMOTE_EXECUTION_ENABLED)) addDriverDiscovery(new ClientConfigDriverDiscovery(config));
   }
@@ -236,9 +226,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   /**
    * Called to submit the initialization of a new connection.
    * @param pool thez connection pool to which the connection belongs.
-   * @exclude
    */
-  protected void submitNewConnection(final JPPFConnectionPool pool) {
+  void submitNewConnection(final JPPFConnectionPool pool) {
     final JPPFClientConnectionImpl c = createConnection(pool.getName() + "-" + pool.nextSequence(), pool);
     newConnection(c);
   }
@@ -262,12 +251,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   }
 
   /**
-   * Invoked when the status of a connection has changed to <code>JPPFClientConnectionStatus.FAILED</code>.
+   * Invoked when the status of a connection has changed to {@link JPPFClientConnectionStatus#FAILED}.
    * @param connection the connection that failed.
-   * @exclude
    */
   @Override
-  protected void connectionFailed(final JPPFClientConnection connection) {
+  void connectionFailed(final JPPFClientConnection connection) {
     if (debugEnabled) log.debug("Connection [{}] {}", connection.getName(), connection.getStatus());
     final JPPFConnectionPool pool = connection.getConnectionPool();
     connection.close();
@@ -291,10 +279,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
 
   /**
    * Close this client.
-   * @param reset if <code>true</code>, then this client is left in a state where it can be reopened.
-   * @exclude
+   * @param reset if {@code true}, then this client is left in a state where it can be reopened.
    */
-  protected void close(final boolean reset) {
+  void close(final boolean reset) {
     try {
       log.info("closing JPPF client with uuid={}, PID={}", getUuid(), SystemUtils.getPID());
       if (!closed.compareAndSet(false, true)) return;
@@ -333,7 +320,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
 
   /**
    * Determine whether local execution is enabled on this client.
-   * @return <code>true</code> if local execution is enabled, <code>false</code> otherwise.
+   * @return {@code true} if local execution is enabled, {@code false} otherwise.
    */
   public boolean isLocalExecutionEnabled() {
     final JobManager jobManager = getJobManager();
@@ -342,7 +329,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
 
   /**
    * Specify whether local execution is enabled on this client.
-   * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
+   * @param localExecutionEnabled {@code true} to enable local execution, {@code false} otherwise
    */
   public void setLocalExecutionEnabled(final boolean localExecutionEnabled) {
     final JobManager jobManager = getJobManager();
@@ -391,7 +378,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
 
   /**
    * Create the job manager for this JPPF client.
-   * @return a <code>JobManager</code> instance.
+   * @return a {@link JobManager} instance.
    */
   abstract JobManager createJobManager();
 
@@ -400,7 +387,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @param jobId the id of the job to cancel.
    * @throws Exception if any error occurs.
    * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
-   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
+   * @return a {@code true} when cancel was successful, {@code false} otherwise.
    */
   public boolean cancelJob(final String jobId) throws Exception {
     if (jobId == null || jobId.isEmpty()) throw new IllegalArgumentException("jobUUID is blank");

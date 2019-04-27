@@ -178,7 +178,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
       if (callable == null) resource.setDefinition(b);
       else resource.setCallable(b);
       if (debugEnabled) {
-        if (found) log.debug("{} found resource: [} ({} bytes)", formattedName, name, b.length);
+        if (found) log.debug("{} found resource: {} ({} bytes)", formattedName, name, b.length);
         else log.debug("{} resource not found: {}", formattedName, name);
       }
     }

@@ -254,7 +254,9 @@ public class JobScheduler extends ThreadSynchronization implements Runnable {
           final Iterator<ClientJob> jobIterator = queue.iterator();
           while ((channel == null) && jobIterator.hasNext() && !idleChannels.isEmpty()) {
             final ClientJob job = jobIterator.next();
+            if (debugEnabled) log.debug("looking for eligible channels for job {}", job);
             if (job.isCancellingOrCancelled()) continue;
+            if ((job.getTaskGraph() != null) && !job.hasAvvailableGraphNode()) continue;
             channel = findIdleChannel(job);
             if (job.isCancellingOrCancelled()) continue;
             if (channel != null) selectedBundle = job;

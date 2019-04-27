@@ -294,6 +294,7 @@ public abstract class AbstractClientJob {
    * Called when task was cancelled or finished.
    */
   protected void done() {
+    if (debugEnabled) log.debug("job done: {}", this);
     final Runnable[] runnables;
     synchronized (onDoneList) {
       runnables = onDoneList.toArray(new Runnable[onDoneList.size()]);

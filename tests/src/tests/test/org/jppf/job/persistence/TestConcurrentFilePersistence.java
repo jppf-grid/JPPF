@@ -40,24 +40,30 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public class TestConcurrentFilePersistence extends BaseTest {
-  /** */
+  /**
+   * The default file persistence manager
+   */
   DefaultFilePersistence persistence;
-  /** */
+  /**
+   * number of threads and tasks per thread.
+   */
   final int taskPerThread = 30, nbThreads = 10, nbTasks = taskPerThread * nbThreads;
-  /** */
+  /**
+   * The job to persist.
+   */
   JPPFJob job;
-  /** */
-  final DataLocation[] taskData = new DataLocation[nbTasks], resultData = new DataLocation[nbTasks];
-  /** */
+  /**
+   * The job tasks to persist and their results.
+   */
   final List<PersistenceInfo> taskInfos = new ArrayList<>(nbTasks), resultInfos = new ArrayList<>(nbTasks);
-  /** */
+  /**
+   * The job header expected by the persistence (normally sent by the client to the driver).
+   */
   final TaskBundle header = new JPPFTaskBundle();
-  /** */
-  DataLocation headerData;
-  /** */
-  PersistenceInfoImpl headerInfo;
-  /** */
-  PersistenceInfoImpl dpInfo;
+  /**
+   * The job header and DataProvider to persist.
+   */
+  PersistenceInfo headerInfo, dpInfo;
 
   /**
    * 
@@ -72,14 +78,13 @@ public class TestConcurrentFilePersistence extends BaseTest {
     header.setParameter(BundleParameter.CLIENT_BUNDLE_ID, 1L);
     header.setInitialTaskCount(job.getTaskCount());
     
-    headerData = IOHelper.serializeData(header);
-    headerInfo = new PersistenceInfoImpl(job.getUuid(), header, PersistenceObjectType.JOB_HEADER, -1, headerData);
+    headerInfo = new PersistenceInfoImpl(job.getUuid(), header, PersistenceObjectType.JOB_HEADER, -1, IOHelper.serializeData(header));
     dpInfo = new PersistenceInfoImpl(job.getUuid(), header, PersistenceObjectType.DATA_PROVIDER, -1, IOHelper.serializeData(null));
 
     for (int i=0; i<nbTasks; i++) {
-      taskData[i] = resultData[i] = IOHelper.serializeData(job.getJobTasks());
-      taskInfos.add(new PersistenceInfoImpl(job.getUuid(), header, PersistenceObjectType.TASK, i, taskData[i]));
-      resultInfos.add(new PersistenceInfoImpl(job.getUuid(), header, PersistenceObjectType.TASK_RESULT, i, taskData[i]));
+      final DataLocation taskData = IOHelper.serializeData(job.getJobTasks());
+      taskInfos.add(new PersistenceInfoImpl(job.getUuid(), header, PersistenceObjectType.TASK, i, taskData));
+      resultInfos.add(new PersistenceInfoImpl(job.getUuid(), header, PersistenceObjectType.TASK_RESULT, i, taskData));
     }
   }
 
@@ -104,10 +109,7 @@ public class TestConcurrentFilePersistence extends BaseTest {
     for (final BaseThread thread: threads) thread.start();
     for (final BaseThread thread: threads) thread.join();
     for (final BaseThread thread: threads) {
-      if (thread.exception != null) {
-        final String msg = String.format("thread '%s' failed with %s", thread.getName(), ExceptionUtils.getMessage(thread.exception));
-        fail(msg);
-      }
+      if (thread.exception != null) fail(String.format("thread '%s' failed with %s", thread.getName(), ExceptionUtils.getMessage(thread.exception)));
     }
   }
 
@@ -129,8 +131,7 @@ public class TestConcurrentFilePersistence extends BaseTest {
         execute();
       } catch (final Exception e) {
         exception = e;
-        final String msg = String.format("thread '%s' failed with exception:\n%s", getName(), ExceptionUtils.getStackTrace(e));
-        print(false, false, msg);
+        print(false, false, "thread '%s' failed with exception:\n%s", getName(), ExceptionUtils.getStackTrace(e));
       }
     }
 

@@ -89,7 +89,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    */
   public void addAll(final List<Task<?>> tasks)  throws JPPFException {
     int pos = this.tasks.size();
-    for (Task<?> task: tasks) task.setPosition(pos++);
+    for (final Task<?> task: tasks) task.setPosition(pos++);
     this.tasks.addAll(tasks);
   }
 
@@ -98,7 +98,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable}, or an instance of {@link java.lang.Runnable Runnable} or {@link java.util.concurrent.Callable Callable}.
    * @param taskObject the task to add to this job.
    * @param args arguments to use with a JPPF-annotated class.
-   * @return an instance of {@code Task} that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
+   * @return an instance of {@code Task} that is either the same as the input if the input is a subclass of {@code AbstractTask},
    * or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a {@code Task} or a JPPF-annotated class.
    */
@@ -142,7 +142,8 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
   }
 
   /**
-   * Add a {@link Task} to this job.
+   * Add a {@link TaskNode} to this job. The entire dependency graph rooted at this task is added as well.
+   * <br>If the task is already present in this job, nothing is added.
    * @param task the task to add to this job.
    * @return an instance of {@code Task} that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
    * or a wrapper around the input object in the other cases.
@@ -150,11 +151,11 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * @since 6.2
    */
   public Task<?> addWithDpendencies(final TaskNode<?> task) throws JPPFException {
+    if (tasks.contains(task)) return task;
+    taskGraph = true;
     final Task<?> result = add(task);
     if (task.hasDependency()) {
-      for (final TaskNode<?> dep: task.getDependencies()) {
-        if (!tasks.contains(dep)) addWithDpendencies(dep);
-      }
+      for (final TaskNode<?> dep: task.getDependencies()) addWithDpendencies(dep);
     }
     return result;
   }
@@ -431,5 +432,14 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
       client.unregisterClassLoaders(uuid);
     }
     results.wakeUp();
+  }
+
+  /**
+   * Determine whether the tasks in this job form a dependencies graph.
+   * @return {@code true} if the tasks form a graph, {@code false} if all the tasks are independant from each other.
+   * @since 6.2
+   */
+  public boolean hasTaskGraph() {
+    return taskGraph;
   }
 }

@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.*;

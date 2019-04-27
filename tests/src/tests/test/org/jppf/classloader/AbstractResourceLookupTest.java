@@ -21,13 +21,13 @@ package test.org.jppf.classloader;
 import static org.junit.Assert.*;
 
 import java.net.URL;
-import java.util.*;
+import java.util.List;
 
 import org.jppf.node.protocol.*;
 import org.jppf.utils.ReflectionUtils;
-import org.junit.*;
+import org.junit.Test;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.AbstractNonStandardSetup;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**

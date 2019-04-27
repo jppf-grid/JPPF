@@ -32,7 +32,7 @@ import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.Setup1D2N1C;
 import test.org.jppf.test.setup.common.*;
 
 /**

@@ -429,7 +429,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     final List<ChannelWrapper> idleChannels = jobScheduler.getIdleChannels();
     final Vector<JPPFClientConnection> availableConnections = new Vector<>(idleChannels.size());
     for (final ChannelWrapper idleChannel : idleChannels) {
-      if (idleChannel instanceof AbstractChannelWrapperRemote) {
+      if (!idleChannel.isLocal()) {
         final AbstractChannelWrapperRemote wrapperRemote = (AbstractChannelWrapperRemote) idleChannel;
         availableConnections.add(wrapperRemote.getChannel());
       }

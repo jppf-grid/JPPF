@@ -115,6 +115,10 @@ public abstract class AbstractJPPFJob<J extends AbstractJPPFJob<J>> implements S
    * List of listeners registered to receive this job's status change notifications.
    */
   private transient List<JobStatusListener> statusListeners = new ArrayList<>();
+  /**
+   * Whether the tasks form a graph.
+   */
+  boolean taskGraph;
 
   /**
    * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -307,7 +311,7 @@ public abstract class AbstractJPPFJob<J extends AbstractJPPFJob<J>> implements S
     sb.append(", blocking=").append(blocking);
     sb.append(", nbTasks=").append(tasks.size());
     sb.append(", nbResults=").append(results.size());
-    sb.append(", jobSLA=").append(jobSLA);
+    sb.append(", hasGraph=").append(taskGraph);
     sb.append(']');
     return sb.toString();
   }
