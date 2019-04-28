@@ -21,14 +21,15 @@ package test.org.jppf.server.protocol;
 import static org.junit.Assert.*;
 import static test.org.jppf.server.protocol.TaskDependenciesHelper.createDiamondTasks;
 
-import java.util.List;
+import java.util.*;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.junit.Test;
 
 import test.org.jppf.server.protocol.TaskDependenciesHelper.*;
 import test.org.jppf.test.setup.Setup1D2N1C;
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * 
@@ -41,26 +42,86 @@ public class TestTaskDependencies2 extends Setup1D2N1C {
    */
   @Test(timeout = 5000L)
   public void testGraphSubmission() throws Exception {
-    final MyTask[] tasks = createDiamondTasks();
-    final JPPFJob job = new JPPFJob();
-    job.addWithDpendencies(tasks[0]);
-    assertTrue(job.hasTaskGraph());
-    final DispatchListener listener = new DispatchListener();
-    job.addJobListener(listener);
-    final List<Task<?>> result = client.submit(job);
-    assertNotNull(result);
-    assertEquals(tasks.length, result.size());
-    for (final Task<?> task: result) {
-      assertTrue(task instanceof MyTask);
-      final MyTask myTask = (MyTask) task;
-      assertNull(myTask.getThrowable());
-      assertNotNull(myTask.getResult());
-      assertEquals("executed " + myTask.getId(), myTask.getResult());
+    int oldMaxJobs = 1;
+    JPPFConnectionPool pool = null;
+    try {
+      pool = client.awaitWorkingConnectionPool();
+      oldMaxJobs = pool.getMaxJobs();
+      pool.setMaxJobs(Integer.MAX_VALUE);
+      final MyTask[] tasks = createDiamondTasks();
+      final JPPFJob job = new JPPFJob();
+      job.addWithDpendencies(tasks[0]);
+      assertTrue(job.hasTaskGraph());
+      final DispatchListener listener = new DispatchListener();
+      job.addJobListener(listener);
+      final List<Task<?>> result = client.submit(job);
+      assertNotNull(result);
+      assertEquals(tasks.length, result.size());
+      for (final Task<?> task: result) {
+        assertTrue(task instanceof MyTask);
+        final MyTask myTask = (MyTask) task;
+        assertNull(myTask.getThrowable());
+        assertNotNull(myTask.getResult());
+        assertEquals("executed " + myTask.getId(), myTask.getResult());
+      }
+      final List<Integer> dispatches = listener.dispatches;
+      assertEquals(3, dispatches.size());
+      assertEquals(1, (int) dispatches.get(0));
+      assertEquals(2, (int) dispatches.get(1));
+      assertEquals(1, (int) dispatches.get(2));
+    } finally {
+      if (pool != null) pool.setMaxJobs(oldMaxJobs);
     }
-    final List<Integer> dispatches = listener.dispatches;
-    assertEquals(3, dispatches.size());
-    assertEquals(1, (int) dispatches.get(0));
-    assertEquals(2, (int) dispatches.get(1));
-    assertEquals(1, (int) dispatches.get(2));
+  }
+
+  /**
+   * Test the submission and cancellation of a job with tasks dependencies.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 5000L)
+  public void testCancelGraphSubmission() throws Exception {
+    int oldMaxJobs = 1;
+    JPPFConnectionPool pool = null;
+    try {
+      pool = client.awaitWorkingConnectionPool();
+      oldMaxJobs = pool.getMaxJobs();
+      pool.setMaxJobs(Integer.MAX_VALUE);
+      final MyTask[] tasks = createDiamondTasks();
+      final Map<String, MyTask> taskMap = new HashMap<>();
+      for (final MyTask task: tasks) taskMap.put(task.getId(), task);
+      taskMap.get("T1").setDuration(3000L);
+      taskMap.get("T2").setDuration(3000L);
+      final JPPFJob job = new JPPFJob();
+      job.addWithDpendencies(tasks[0]);
+      assertTrue(job.hasTaskGraph());
+      final DispatchListener listener = new DispatchListener();
+      job.addJobListener(listener);
+      BaseTestHelper.printToAll(client, false, "submitting job");
+      client.submitAsync(job);
+      Thread.sleep(1000L);
+      BaseTestHelper.printToAll(client, false, "cancelling job");
+      job.cancel();
+      BaseTestHelper.printToAll(client, false, "awaiting job results");
+      final List<Task<?>> result = job.awaitResults();
+      BaseTestHelper.printToAll(client, false, "got job results");
+      assertNotNull(result);
+      assertEquals(tasks.length, result.size());
+      for (final Task<?> task: result) {
+        print(false, "checking %s", task);
+        assertTrue(task instanceof MyTask);
+        final MyTask myTask = (MyTask) task;
+        assertNull(myTask.getThrowable());
+        if ("T3".equals(myTask.getId())) {
+          assertNotNull(myTask.getResult());
+          assertEquals("executed " + myTask.getId(), myTask.getResult());
+        } else assertNull(myTask.getResult());
+      }
+      final List<Integer> dispatches = listener.dispatches;
+      assertEquals(2, dispatches.size());
+      assertEquals(1, (int) dispatches.get(0));
+      assertEquals(2, (int) dispatches.get(1));
+    } finally {
+      if (pool != null) pool.setMaxJobs(oldMaxJobs);
+    }
   }
 }

@@ -57,6 +57,14 @@ public class TaskDependenciesHelper {
 
   /**
    * @return a graph with diamond dependencies.
+   * The graph is as follows:
+   * <pre>
+   *      T1 
+   *    /    \
+   * T0       T3
+   *    \    /
+   *      T2
+   * </pre>
    * @throws Exception if any error occurs.
    */
   static JobTaskGraph createDiamondGraph() throws Exception {
@@ -68,6 +76,14 @@ public class TaskDependenciesHelper {
 
   /**
    * @return an array of tasks with diamond dependencies.
+   * The graph is as follows:
+   * <pre>
+   *      T1 
+   *    /    \
+   * T0       T3
+   *    \    /
+   *      T2
+   * </pre>
    * @throws Exception if any error occurs.
    */
   static MyTask[] createDiamondTasks() throws Exception {
@@ -137,11 +153,14 @@ public class TaskDependenciesHelper {
    * A simple task implementation for testing.
    */
   public static class MyTask extends AbstractTaskNode<String> {
+    /** */
+    private long duration;
+
     /**
      * @param id the task id.
      */
     public MyTask(final String id) {
-      setId(id);
+      this(id, 0, -1L);
     }
 
     /**
@@ -149,8 +168,18 @@ public class TaskDependenciesHelper {
      * @param position the task position.
      */
     public MyTask(final String id, final int position) {
+      this(id, position, -1L);
+    }
+
+    /**
+     * @param id the task id.
+     * @param position the task position.
+     * @param duration how long the task wil sleep.
+     */
+    public MyTask(final String id, final int position, final long duration) {
       setId(id);
       setPosition(position);
+      this.duration = duration;
     }
 
     @Override
@@ -160,9 +189,34 @@ public class TaskDependenciesHelper {
 
     @Override
     public void run() {
-      final String result = "executed " + getId();
-      System.out.println(result);
-      setResult(result);
+      try {
+        //System.out.println("executing " + this);
+        if (duration > 0L) Thread.sleep(duration);
+        final String result = "executed " + getId();
+        System.out.println(result);
+        setResult(result);
+      } catch (final Exception e) {
+        setThrowable(e);
+      }
+    }
+
+    @Override
+    public void onCancel() {
+      System.out.println("task " + this + " cancelled");
+    }
+
+    /**
+     * @return how this task will sleep.
+     */
+    public long getDuration() {
+      return duration;
+    }
+
+    /**
+     * @param duration how this task will sleep.
+     */
+    public void setDuration(final long duration) {
+      this.duration = duration;
     }
   }
 
