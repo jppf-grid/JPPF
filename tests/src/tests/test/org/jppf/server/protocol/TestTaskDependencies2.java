@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import test.org.jppf.server.protocol.TaskDependenciesHelper.*;
 import test.org.jppf.test.setup.Setup1D2N1C;
-import test.org.jppf.test.setup.common.BaseTestHelper;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * 
@@ -89,16 +89,17 @@ public class TestTaskDependencies2 extends Setup1D2N1C {
       final MyTask[] tasks = createDiamondTasks();
       final Map<String, MyTask> taskMap = new HashMap<>();
       for (final MyTask task: tasks) taskMap.put(task.getId(), task);
-      taskMap.get("T1").setDuration(3000L);
-      taskMap.get("T2").setDuration(3000L);
+      taskMap.get("T1").setDuration(5000L).setStartNotif("start");
+      taskMap.get("T2").setDuration(5000L).setStartNotif("start");
       final JPPFJob job = new JPPFJob();
       job.addWithDpendencies(tasks[0]);
       assertTrue(job.hasTaskGraph());
       final DispatchListener listener = new DispatchListener();
       job.addJobListener(listener);
+      final AwaitTaskNotificationListener notifListener = new AwaitTaskNotificationListener(client, "start");
       BaseTestHelper.printToAll(client, false, "submitting job");
       client.submitAsync(job);
-      Thread.sleep(1000L);
+      notifListener.await();
       BaseTestHelper.printToAll(client, false, "cancelling job");
       job.cancel();
       BaseTestHelper.printToAll(client, false, "awaiting job results");

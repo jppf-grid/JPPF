@@ -155,6 +155,8 @@ public class TaskDependenciesHelper {
   public static class MyTask extends AbstractTaskNode<String> {
     /** */
     private long duration;
+    /** */
+    private String startNotif;
 
     /**
      * @param id the task id.
@@ -191,6 +193,7 @@ public class TaskDependenciesHelper {
     public void run() {
       try {
         //System.out.println("executing " + this);
+        if (startNotif != null) fireNotification(startNotif, true);
         if (duration > 0L) Thread.sleep(duration);
         final String result = "executed " + getId();
         System.out.println(result);
@@ -214,9 +217,27 @@ public class TaskDependenciesHelper {
 
     /**
      * @param duration how this task will sleep.
+     * @return this task, for methof call chaining.
      */
-    public void setDuration(final long duration) {
+    public MyTask setDuration(final long duration) {
       this.duration = duration;
+      return this;
+    }
+
+    /**
+     * @return the start notification to send.
+     */
+    public String getStartNotif() {
+      return startNotif;
+    }
+
+    /**
+     * @param startNotif the start notification to send.
+     * @return this task, for methof call chaining.
+     */
+    public MyTask setStartNotif(final String startNotif) {
+      this.startNotif = startNotif;
+      return this;
     }
   }
 
