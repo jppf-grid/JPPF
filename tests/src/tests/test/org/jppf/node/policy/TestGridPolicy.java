@@ -23,13 +23,13 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.jppf.JPPFException;
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
-import org.jppf.utils.Operator;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
 
@@ -228,6 +228,12 @@ public class TestGridPolicy extends Setup1D2N1C {
     } finally {
       // terminate the slave nodes
       jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
+      ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
+        @Override
+        public boolean evaluateWithException() throws Exception {
+          return jmx.nbIdleNodes() == 2;
+        }
+      }, 5000L, 250L, true);
     }
   }
 }
