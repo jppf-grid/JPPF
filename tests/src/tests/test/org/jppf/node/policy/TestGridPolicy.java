@@ -29,6 +29,8 @@ import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
 
@@ -232,6 +234,7 @@ public class TestGridPolicy extends Setup1D2N1C {
       // terminate the slave nodes
       BaseTestHelper.printToAll(client, true, true, true, true, false, "stopping slave nodes");
       jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
+      ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() == 2, 5000L, 250L, true);
     }
   }
 }
