@@ -40,24 +40,32 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingMBean {
+  /** */
+  private final Map<NodeSelector, String[]> selectorMap = new LinkedHashMap<NodeSelector, String[]>() {{
+    put(new AllNodesSelector(), new String[] {"n1", "n2"});
+    put(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), new String[] {"n1"});
+    put(new UuidSelector("n2"), new String[] {"n2"});
+    put(new ScriptedNodeSelector("javascript", "\"n1\".equals(nodeInfo.getSystemInfo().getJppf().getString(\"jppf.node.uuid\"))"), new String[] {"n1"});
+  }};
+
   /**
    * Test getting the node state.
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 15000)
   public void testState() throws Exception {
-    testState(new AllNodesSelector(), "n1", "n2");
-    testState(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), "n1");
-    testState(new UuidSelector("n2"), "n2");
+    for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testState(entry.getKey(), entry.getValue());
   }
 
   /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
-   * @param expectedNodes the set of nodes the selector is expected to resilve to.
+   * @param expectedNodes the set of nodes the selector is expected to resolve to.
    * @throws Exception if any error occurs
    */
   private static void testState(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final String selectorClass = selector.getClass().getSimpleName();
+    BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> testing with %s, expectedNodes=%s", selectorClass, Arrays.toString(expectedNodes));
     final int nbNodes = expectedNodes.length;
     try {
       configureLoadBalancer();
@@ -102,9 +110,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
   @Test(timeout = 5000)
   public void testUpdateThreadPoolSize() throws Exception {
     try {
-      testUpdateThreadPoolSize(new AllNodesSelector(), "n1", "n2");
-      testUpdateThreadPoolSize(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), "n1");
-      testUpdateThreadPoolSize(new UuidSelector("n2"), "n2");
+      for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testUpdateThreadPoolSize(entry.getKey(), entry.getValue());
     } catch(final Exception e) {
       throw new JPPFException(e);
     }
@@ -113,7 +119,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
   /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
-   * @param expectedNodes the set of nodes the selector is expected to resilve to.
+   * @param expectedNodes the set of nodes the selector is expected to resolve to.
    * @throws Exception if any error occurs.
    */
   private static void testUpdateThreadPoolSize(final NodeSelector selector, final String... expectedNodes) throws Exception {
@@ -135,18 +141,18 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    */
   @Test(timeout = 5000)
   public void testUpdateThreadPriority() throws Exception {
-    testUpdateThreadPriority(new AllNodesSelector(), "n1", "n2");
-    testUpdateThreadPriority(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n2")), "n2");
-    testUpdateThreadPriority(new UuidSelector("n1"), "n1");
+    for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testUpdateThreadPriority(entry.getKey(), entry.getValue());
   }
 
   /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
-   * @param expectedNodes the set of nodes the selector is expected to resilve to.
+   * @param expectedNodes the set of nodes the selector is expected to resolve to.
    * @throws Exception if any error occurs.
    */
   private static void testUpdateThreadPriority(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final String selectorClass = selector.getClass().getSimpleName();
+    BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> testing with %s, expectedNodes=%s", selectorClass, Arrays.toString(expectedNodes));
     try {
       checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getThreadPriority() == Thread.NORM_PRIORITY, expectedNodes);
       checkNoException(nodeForwarder.updateThreadsPriority(selector, Thread.MAX_PRIORITY), expectedNodes);
@@ -163,18 +169,18 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    */
   @Test(timeout = 5000)
   public void testResetTaskCounter() throws Exception {
-    testResetTaskCounter(new AllNodesSelector(), "n1", "n2");
-    testResetTaskCounter(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), "n1");
-    testResetTaskCounter(new UuidSelector("n2"), "n2");
+    for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testResetTaskCounter(entry.getKey(), entry.getValue());
   }
 
   /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
-   * @param expectedNodes the set of nodes the selector is expected to resilve to.
+   * @param expectedNodes the set of nodes the selector is expected to resolve to.
    * @throws Exception if any error occurs.
    */
   private static void testResetTaskCounter(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final String selectorClass = selector.getClass().getSimpleName();
+    BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> testing with %s, expectedNodes=%s", selectorClass, Arrays.toString(expectedNodes));
     final int nbNodes = expectedNodes.length;
     final int nbTasks = 5 * nbNodes;
     checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getNbTasksExecuted() == 0, expectedNodes);
@@ -192,18 +198,18 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    */
   @Test(timeout = 5000)
   public void testSetTaskCounter() throws Exception {
-    testSetTaskCounter(new AllNodesSelector(), "n1", "n2");
-    testSetTaskCounter(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), "n1");
-    testSetTaskCounter(new UuidSelector("n2"), "n2");
+    for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testSetTaskCounter(entry.getKey(), entry.getValue());
   }
 
   /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
-   * @param expectedNodes the set of nodes the selector is expected to resilve to.
+   * @param expectedNodes the set of nodes the selector is expected to resolve to.
    * @throws Exception if any error occurs.
    */
   private static void testSetTaskCounter(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final String selectorClass = selector.getClass().getSimpleName();
+    BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> testing with %s, expectedNodes=%s", selectorClass, Arrays.toString(expectedNodes));
     checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getNbTasksExecuted() == 0, expectedNodes);
     checkNullResults(nodeForwarder.setTaskCounter(selector, 12), expectedNodes);
     checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, state -> state.getNbTasksExecuted() == 12, expectedNodes);
@@ -217,18 +223,18 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    */
   @Test(timeout = 5000)
   public void testSystemInformation() throws Exception {
-    testSystemInformation(new AllNodesSelector(), "n1", "n2");
-    testSystemInformation(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), "n1");
-    testSystemInformation(new UuidSelector("n2"), "n2");
+    for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testSystemInformation(entry.getKey(), entry.getValue());
   }
 
   /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
-   * @param expectedNodes the set of nodes the selector is expected to resilve to.
+   * @param expectedNodes the set of nodes the selector is expected to resolve to.
    * @throws Exception if any error occurs.
    */
   private static void testSystemInformation(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final String selectorClass = selector.getClass().getSimpleName();
+    BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> testing with %s, expectedNodes=%s", selectorClass, Arrays.toString(expectedNodes));
     final Map<String, Object> result = nodeForwarder.systemInformation(selector);
     checkNodes(result, JPPFSystemInformation.class, expectedNodes);
     for (final Map.Entry<String, Object> entry : result.entrySet()) {
@@ -258,20 +264,20 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    */
   @Test(timeout = 5000)
   public void testUpdateConfiguration() throws Exception {
-    testUpdateConfiguration(new AllNodesSelector(), "n1", "n2");
-    testUpdateConfiguration(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), "n1");
-    testUpdateConfiguration(new UuidSelector("n2"), "n2");
+    for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testUpdateConfiguration(entry.getKey(), entry.getValue());
   }
 
   /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
-   * @param expectedNodes the set of nodes the selector is expected to resilve to.
+   * @param expectedNodes the set of nodes the selector is expected to resolve to.
    * @throws Exception if any error occurs.
    */
   private static void testUpdateConfiguration(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    TypedProperties oldConfig = null;
-    TypedProperties newConfig = null;
+    final String selectorClass = selector.getClass().getSimpleName();
+    BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> testing with %s, expectedNodes=%s", selectorClass, Arrays.toString(expectedNodes));
+    TypedProperties oldConfig = null, newConfig = null;
+    BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> getting system info");
     Map<String, Object> result = nodeForwarder.systemInformation(selector);
     checkNodes(result, JPPFSystemInformation.class, expectedNodes);
     for (final Map.Entry<String, Object> entry : result.entrySet()) {
@@ -286,8 +292,10 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       if (oldConfig == null) oldConfig = new TypedProperties(config);
       if (newConfig == null) newConfig = new TypedProperties(config).set(JPPFProperties.PROCESSING_THREADS, 8).setString("custom.property", "custom.value");
     }
+    BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> updating config");
     result = nodeForwarder.updateConfiguration(selector, newConfig, false);
     checkNoException(result, expectedNodes);
+    BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> getting new system info");
     result = nodeForwarder.systemInformation(selector);
     checkNodes(result, JPPFSystemInformation.class, expectedNodes);
     for (final Map.Entry<String, Object> entry : result.entrySet()) {
@@ -301,6 +309,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       assertEquals(uuid, newConfig.getString("jppf.node.uuid"));
       assertEquals("custom.value", newConfig.getString("custom.property"));
     }
+    BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> resetting config");
     nodeForwarder.updateConfiguration(selector, oldConfig, false);
   }
 
@@ -310,21 +319,19 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    */
   @Test(timeout = 10000)
   public void testCancelJob() throws Exception {
-    testCancelJob(new AllNodesSelector(), "n1", "n2");
-    testCancelJob(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), "n1");
-    testCancelJob(new UuidSelector("n2"), "n2");
+    for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testCancelJob(entry.getKey(), entry.getValue());
   }
 
   /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
-   * @param expectedNodes the set of nodes the selector is expected to resilve to.
+   * @param expectedNodes the set of nodes the selector is expected to resolve to.
    * @throws Exception if any error occurs.
    */
   private static void testCancelJob(final NodeSelector selector, final String... expectedNodes) throws Exception {
     final String methodName = ReflectionUtils.getCurrentMethodName();
     final String selectorClass = selector.getClass().getSimpleName();
-    BaseTestHelper.printToAll(client, false, true, true, true, false, ">>> start of %s(%s)", methodName, selectorClass);
+    BaseTestHelper.printToAll(client, false, true, true, true, false, ">>> testing with selector=%s,  expectedNodes=%s", selectorClass, Arrays.toString(expectedNodes));
     final int nbNodes = expectedNodes.length;
     final int nbTasks = 5 * nbNodes;
     final JPPFJob job = BaseTestHelper.createJob(methodName + "-" + selectorClass, false, nbTasks, LifeCycleTask.class, 5000L);
@@ -353,9 +360,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    */
   @Test(timeout = 5000)
   public void testGetDelegationModel() throws Exception {
-    testGetDelegationModel(new AllNodesSelector(), "n1", "n2");
-    testGetDelegationModel(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), "n1");
-    testGetDelegationModel(new UuidSelector("n2"), "n2");
+    for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testGetDelegationModel(entry.getKey(), entry.getValue());
   }
 
   /**
@@ -374,15 +379,13 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    */
   @Test(timeout = 5000)
   public void testSetDelegationModel() throws Exception {
-    testSetDelegationModel(new AllNodesSelector(), "n1", "n2");
-    testSetDelegationModel(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), "n1");
-    testSetDelegationModel(new UuidSelector("n2"), "n2");
+    for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testSetDelegationModel(entry.getKey(), entry.getValue());
   }
 
   /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
-   * @param expectedNodes the set of nodes the selector is expected to resilve to.
+   * @param expectedNodes the set of nodes the selector is expected to resolve to.
    * @throws Exception if any error occurs.
    */
   private static void testSetDelegationModel(final NodeSelector selector, final String... expectedNodes) throws Exception {

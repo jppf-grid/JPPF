@@ -76,7 +76,7 @@ public class ScriptedNodeSelector extends BaseScriptEvaluator implements NodeSel
     variables.put("nodeInfo", nodeInfo);
     final Object result = evaluate(variables);
     if (result instanceof Boolean) return (Boolean) result;
-    log.error("result of scripted node selector should be a boolean but instead is " + result);
+    log.error("result of scripted node selector should be a boolean but instead is {}", result);
     return false;
   }
 }

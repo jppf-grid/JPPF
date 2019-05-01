@@ -43,11 +43,11 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
   /**
    * Connection to the driver's JMX server.
    */
-  protected static JMXDriverConnectionWrapper driverJmx = null;
+  protected static JMXDriverConnectionWrapper driverJmx;
   /**
    * The driver mbean which delegates operations to specified nodes.
    */
-  protected static JPPFNodeForwardingMBean nodeForwarder = null;
+  protected static JPPFNodeForwardingMBean nodeForwarder;
   /**
    * The uuids of all nodes.
    */
@@ -55,13 +55,13 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
   /**
    * 
    */
-  protected static LoadBalancingInformation oldLbi = null;
+  protected static LoadBalancingInformation oldLbi;
   /** */
   @Rule
   public TestWatcher setup1D2N1CWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
-      BaseTestHelper.printToAll(client, false, false, true, true, false, "***** start of method %s() *****", description.getMethodName());
+      BaseTestHelper.printToAll(client, false, false, true, true, true, "start of method %s()", description.getMethodName());
     }
   };
 

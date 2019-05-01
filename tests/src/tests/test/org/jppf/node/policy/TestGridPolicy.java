@@ -29,6 +29,8 @@ import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
 
@@ -90,7 +92,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final String xml = FileUtils.readTextFile(RESOURCES_DIR + "/ValidTrueGridPolicy.xml");
     final String name = ReflectionUtils.getCurrentClassAndMethod();
     final ExecutionPolicy p = PolicyParser.parsePolicy(xml);
-    printOut("%s() grid policy:%n%s%n", name, p);
+    printOut("%s() grid policy:%n%s", name, p);
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
@@ -114,7 +116,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final String xml = FileUtils.readTextFile(RESOURCES_DIR + "/GridPolicyWithExpression.xml");
     final String name = ReflectionUtils.getCurrentClassAndMethod();
     final ExecutionPolicy p = PolicyParser.parsePolicy(xml);
-    printOut("%s() grid policy:%n%s%n", name, p);
+    printOut("%s() grid policy:%n%s", name, p);
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
@@ -159,7 +161,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final String name = ReflectionUtils.getCurrentClassAndMethod();
     // more than 1 node with at least 1 processing thread
     final ExecutionPolicy p = new NodesMatching(Operator.MORE_THAN, 1, new AtLeast(JPPFProperties.PROCESSING_THREADS.getName(), 1));
-    printOut("%s() grid policy:%n%s%n", name, p);
+    printOut("%s() grid policy:%n%s", name, p);
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
@@ -232,6 +234,7 @@ public class TestGridPolicy extends Setup1D2N1C {
       // terminate the slave nodes
       BaseTestHelper.printToAll(client, true, true, true, true, false, "stopping slave nodes");
       jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
+      ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() == 2, 5000L, 250L, true);
     }
   }
 }
