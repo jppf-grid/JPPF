@@ -162,7 +162,7 @@ public class ClientJob extends AbstractClientJob {
   public ClientTaskBundle copy(final int nbTasks) {
     Collection<Task<?>> list = null;
     synchronized (tasks) {
-      if ((taskGraph == null) || getJob().getClientSLA().isGraphTraversalInClient()) {
+      if ((taskGraph == null) || !getJob().getClientSLA().isGraphTraversalInClient()) {
         if ((nbTasks >= tasks.size()) || (taskGraph != null)) {
           list = new ArrayList<>(tasks.values());
         } else {
