@@ -99,6 +99,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
               if ((reservationHandler.getNbReservedNodes(job.getUuid()) >= job.getSLA().getMaxNodes()) &&
                 !reservationHandler.hasReadyNode(job.getUuid())) continue;
             }
+            if ((job.getTaskGraph() != null) && !job.hasAvvailableGraphNode()) continue;
             if (!checkGridPolicy(job)) continue;
             channel = checkJobState(job) ? findIdleChannelIndex(job) : null;
             if (channel == null) continue;
@@ -159,7 +160,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
       log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
       size = bundlerFactory.getFallbackBundler().getBundleSize();
     }
-    return queue.nextBundle(selectedJob, size);
+    return queue.nextBundle(selectedJob, size, channel);
   }
 
   /**

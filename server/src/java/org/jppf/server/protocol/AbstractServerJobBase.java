@@ -47,7 +47,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
   /**
    * The list of the tasks.
    */
-  protected final List<ServerTask> tasks = new ArrayList<>();
+  protected final Map<Integer, ServerTask> tasks = new TreeMap<>();
   /**
    * The list of the incoming bundles.
    */
@@ -127,8 +127,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
     lock.lock();
     try {
       final boolean requeue = this.tasks.isEmpty() && !taskList.isEmpty();
-      if (!after) this.tasks.addAll(0, taskList);
-      else this.tasks.addAll(taskList);
+      for (final ServerTask task: taskList) tasks.put(task.getPosition(), task);
       return requeue;
     } finally {
       lock.unlock();
@@ -280,7 +279,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
         throw new JPPFJobEndedException("Job " + submissionStatus);
       } else {
         clientBundles.add(bundle);
-        this.tasks.addAll(bundle.getTaskList());
+        for (final ServerTask task: bundle.getTaskList()) tasks.put(task.getPosition(), task);
         bundle.addCompletionListener(new BundleCompletionListener(driver, this));
         fireJobUpdated(false);
         return true;

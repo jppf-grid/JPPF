@@ -73,7 +73,7 @@ public class BundleCompletionListener implements ServerTaskBundleClient.Completi
       try {
         bundle.removeCompletionListener(BundleCompletionListener.this);
         serverJob.clientBundles.remove(bundle);
-        serverJob.tasks.removeAll(bundle.getTaskList());
+        for (final ServerTask task: bundle.getTaskList()) serverJob.tasks.remove(task.getPosition());
         if (serverJob.completionBundles != null) serverJob.completionBundles.remove(bundle);
         if (serverJob.clientBundles.isEmpty() && serverJob.tasks.isEmpty()) newStatus = SubmissionStatus.ENDED;
       } catch(final Exception e) {

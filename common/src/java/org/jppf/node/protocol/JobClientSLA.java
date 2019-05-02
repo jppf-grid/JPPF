@@ -28,6 +28,10 @@ public class JobClientSLA extends JobCommonSLA<JobClientSLA> {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * Whether the traversal of the graph of tasks, if any, should occur on the client side.
+   */
+  private boolean graphTraversalInClient;
 
   /**
    * Default constructor.
@@ -65,5 +69,24 @@ public class JobClientSLA extends JobCommonSLA<JobClientSLA> {
     copyTo(sla);
     sla.setMaxChannels(maxChannels);
     return sla;
+  }
+
+  /**
+   * Determine whether the traversal of the graph of tasks, if any, should occur on the client side.
+   * By default, as long as {@link #setGraphTraversalInClient(boolean) setGraphTraversalInClient(true)} hasn't been called, this method will return {@code false}.
+   * @return {@code true} if the graph traversal is performed on the client side, {@code false} otherwise.
+   * @since 6.2
+   */
+  public boolean isGraphTraversalInClient() {
+    return graphTraversalInClient;
+  }
+
+  /**
+   * Specify whether the traversal of the graph of tasks, if any, should occur on the client side.
+   * @param graphTraversalInClient {@code true} if the graph traversal is to be performed on the client side, {@code false} otherwise.
+   * @since 6.2
+   */
+  public void setGraphTraversalInClient(final boolean graphTraversalInClient) {
+    this.graphTraversalInClient = graphTraversalInClient;
   }
 }

@@ -112,7 +112,7 @@ public class ServerJobBroadcast extends ServerJob {
     lock.lock();
     try {
       broadcastJob = new ServerJobBroadcast(lock, notificationEmitter, job, getDataProvider(), this, broadcastUUID);
-      broadcastJob.tasks.addAll(tasks);
+      broadcastJob.tasks.putAll(tasks);
       broadcastJob.pendingTasksCount = tasks.size();
       broadcastSet.add(broadcastJob);
     } finally {
@@ -172,7 +172,7 @@ public class ServerJobBroadcast extends ServerJob {
     if (debugEnabled) log.debug("broadcast job ended {}", this);
     setSubmissionStatus(SubmissionStatus.ENDED);
     final CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
-    for (final ServerTask task: tasks) {
+    for (final ServerTask task: tasks.values()) {
       if (!task.isDone()) {
         task.broadcastResultReceived();
         clientMap.putValue(task.getBundle(), task);
@@ -229,7 +229,7 @@ public class ServerJobBroadcast extends ServerJob {
     } else if (broadcastJob.getSubmissionStatus() == SubmissionStatus.ENDED) throw new IllegalStateException("Job ENDED");
     else {
       broadcastJob.clientBundles.add(bundle);
-      broadcastJob.tasks.addAll(bundle.getTaskList());
+      for (final ServerTask task: bundle.getTaskList()) broadcastJob.tasks.put(task.getPosition(), task);
       fireJobUpdated(false);
       broadcastJob.pendingTasksCount += bundle.getTaskCount();
     }

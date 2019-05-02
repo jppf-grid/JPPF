@@ -23,7 +23,10 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.*;
 
+import javax.management.*;
+
 import org.jppf.client.event.*;
+import org.jppf.job.*;
 import org.jppf.node.protocol.graph.*;
 import org.jppf.serialization.JPPFSerialization;
 import org.jppf.utils.ExceptionThrowingRunnable;
@@ -94,7 +97,31 @@ public class TaskDependenciesHelper {
   }
 
   /**
-   * @return  agraph with diamonfd dependencies.
+   * Create a dependency graph of tasks organized in layers, where tasks in each layer depend on all the tasks in the next layer.
+   * @param nbLayers the number of layers.
+   * @param tasksPerLayer the number of tasks in each layer.
+   * @return an array of tasks with layered dependencies.
+   * @throws Exception if any error occurs.
+   */
+  static MyTask[] createLayeredTasks(final int nbLayers, final int tasksPerLayer) throws Exception {
+    final MyTask[] tasks = new MyTask[nbLayers * tasksPerLayer];
+    final int layerDigits = Integer.toString(nbLayers - 1).length(), taskDigits = Integer.toString(tasksPerLayer - 1).length();
+    final String idFormat = String.format("L%%%ddT%%%dd", layerDigits, taskDigits);
+    for (int i=0; i<nbLayers; i++) {
+      for (int j=0; j<tasksPerLayer; j++) {
+        final int pos = i * tasksPerLayer + j;
+        final MyTask task = new MyTask(String.format(idFormat, i, j), pos);
+        tasks[pos] = task;
+        if (i > 0) {
+          for (int k=0; k<tasksPerLayer; k++) tasks[(i - 1) * tasksPerLayer + k].dependsOn(task);
+        }
+      }
+    }
+    return tasks;
+  }
+
+  /**
+   * @return a graph with diamonfd dependencies.
    * @throws Exception if any error occurs.
    */
   static JobTaskGraph createGraph() throws Exception {
@@ -265,10 +292,53 @@ public class TaskDependenciesHelper {
 
     @Override
     public void jobDispatched(final JobEvent event) {
-      BaseTest.print(false, false, "dispatching tasks %s", event.getJobTasks());
+      final int size = event.getJobTasks().size();
+      BaseTest.print(false, false, "dispatching %d tasks %s", size, event.getJobTasks());
       synchronized (dispatches) {
-        dispatches.add(event.getJobTasks().size());
+        dispatches.add(size);
       }
+    }
+  }
+
+  /** */
+  public static class ServerDispatchListener implements NotificationListener {
+    /** */
+    final List<Integer> dispatches = new ArrayList<>();
+    /**
+     * Whether the job has ended.
+     */
+    boolean jobEnded;
+
+    @Override
+    public synchronized void handleNotification(final Notification notification, final Object handback) {
+      final JobNotification jobNotif = (JobNotification) notification;
+      final JobEventType eventType = jobNotif.getEventType();
+      switch(eventType) {
+        case JOB_DISPATCHED:
+          final JobInformation info = jobNotif.getJobInformation();
+          final int n = info.getTaskCount();
+          dispatches.add(n);
+          BaseTest.print(false, false, "server job %s dispatched %d tasks to node %s", info.getJobName(), n, jobNotif.getNodeInfo().getUuid());
+          break;
+
+        case JOB_ENDED:
+          jobEnded = true;
+          break;
+      }
+    }
+
+    /**
+     * @return whether the job has ended.
+     */
+    public synchronized boolean isJobEnded() {
+      return jobEnded;
+    }
+
+    /**
+     * @return the current number of dispatches.
+     */
+    public synchronized int getNbDispatches() {
+      return dispatches.size();
     }
   }
 }

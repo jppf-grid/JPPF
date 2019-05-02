@@ -49,7 +49,7 @@ public class ClientJob extends AbstractClientJob {
   /**
    * The list of the tasks.
    */
-  private final SortedMap<Integer, Task<?>> tasks;
+  private final Map<Integer, Task<?>> tasks;
   //private final List<Task<?>> tasks;
   /**
    * The broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
@@ -118,7 +118,6 @@ public class ClientJob extends AbstractClientJob {
     else this.broadcastMap = Collections.emptyMap();
     final JobStatus s = job.getStatus();
     this.jobStatus = s == null ? JobStatus.SUBMITTED : s;
-    //this.tasks = new ArrayList<>(tasks);
     this.tasks = new TreeMap<>();
     for (final Task<?> task: tasks) this.tasks.put(task.getPosition(), task);
     for (final Task<?> result : job.getResults().getAllResults()) {
@@ -163,15 +162,19 @@ public class ClientJob extends AbstractClientJob {
   public ClientTaskBundle copy(final int nbTasks) {
     Collection<Task<?>> list = null;
     synchronized (tasks) {
-      if (this.taskGraph == null) {
-        if (nbTasks >= this.tasks.size()) list = new ArrayList<>(this.tasks.values());
-        else {
+      if ((taskGraph == null) || getJob().getClientSLA().isGraphTraversalInClient()) {
+        if ((nbTasks >= tasks.size()) || (taskGraph != null)) {
+          list = new ArrayList<>(tasks.values());
+        } else {
           list = new ArrayList<>(nbTasks);
           final Iterator<Map.Entry<Integer, Task<?>>> it = tasks.entrySet().iterator();
           for (int i=0; i<nbTasks; i++) {
             final Map.Entry<Integer, Task<?>> entry = it.next();
             list.add(entry.getValue());
           }
+        }
+        if (taskGraph != null) {
+          for (final Task<?> task: list) dispatchedTasks.add(task.getPosition());
         }
       } else {
         final Set<Integer> availablePos = taskGraph.getAvailableNodes();

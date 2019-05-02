@@ -332,7 +332,7 @@ public class JobScheduler extends ThreadSynchronization implements Runnable {
         size = bundlerFactory.getFallbackBundler().getBundleSize();
       }
       if (job.isCancellingOrCancelled()) return false;
-      final ClientTaskBundle jobDispatch = queue.nextBundle(job, size);
+      final ClientTaskBundle jobDispatch = queue.nextBundle(job, size, channel);
       job.addChannel(channel);
       channel.submit(jobDispatch);
     }

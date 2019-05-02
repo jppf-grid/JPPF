@@ -18,6 +18,8 @@
 
 package org.jppf.queue;
 
+import org.jppf.execute.ExecutorChannel;
+
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.
  * @param <T> the type of jobs that are queued.
@@ -34,12 +36,13 @@ public interface JPPFQueue<T, U, V> extends Iterable<T> {
   T addBundle(U bundleWrapper);
 
   /**
-   * Get the next object in the queue.
+   * Get the next bundle in the queue.
    * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
-   * @param nbTasks       the maximum number of tasks to get out of the bundle.
+   * @param nbTasks the maximum number of tasks to get out of the bundle.
+   * @param channel the channel on which the bindle will be executed.
    * @return the most recent object that was added to the queue.
    */
-  V nextBundle(T bundleWrapper, int nbTasks);
+  V nextBundle(T bundleWrapper, int nbTasks, final ExecutorChannel<V> channel);
 
   /**
    * Determine whether the queue is empty or not.

@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.*;
 
-import org.jppf.execute.ExecutorStatus;
+import org.jppf.execute.*;
 import org.jppf.job.*;
 import org.jppf.node.protocol.*;
 import org.jppf.queue.*;
@@ -217,20 +217,23 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public ServerTaskBundleNode nextBundle(final ServerJob serverJob, final int nbTasks) {
+  public ServerTaskBundleNode nextBundle(final ServerJob serverJob, final int nbTasks, final ExecutorChannel<ServerTaskBundleNode> channel) {
     final ServerTaskBundleNode result;
     lock.lock();
     try {
       if (debugEnabled) log.debug("requesting bundle with {} tasks, next bundle has {} tasks", nbTasks, serverJob.getTaskCount());
       final int size = getSize(serverJob);
       decrementSizeCount(size);
-      if (nbTasks >= serverJob.getTaskCount()) {
+      int effectiveNbTasks = nbTasks;
+      if (serverJob.getTaskGraph() != null) effectiveNbTasks = Math.min(nbTasks, serverJob.getAvailableGraphNodeCount());
+      if (debugEnabled) log.debug("nbTasks={}, effectiveNbTasks={}", nbTasks, effectiveNbTasks);
+      if (effectiveNbTasks >= serverJob.getTaskCount()) {
         serverJob.setOnRequeue(new RequeueBundleAction(this, serverJob));
         result = serverJob.copy(serverJob.getTaskCount());
         removeBundle(serverJob, false);
       } else {
-        if (debugEnabled) log.debug("removing {} tasks from bundle", nbTasks);
-        result = serverJob.copy(nbTasks);
+        if (debugEnabled) log.debug("removing {} tasks from bundle", effectiveNbTasks);
+        result = serverJob.copy(effectiveNbTasks);
         incrementSizeCount(size);
         // to ensure that other jobs with same priority are also processed without waiting
         priorityMap.moveToEndOfList(serverJob.getSLA().getPriority(), serverJob);

@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.jppf.client.*;
 import org.jppf.client.balancer.*;
-import org.jppf.execute.ExecutorStatus;
+import org.jppf.execute.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.queue.*;
@@ -119,7 +119,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   }
 
   @Override
-  public ClientTaskBundle nextBundle(final ClientJob job, final int nbTasks) {
+  public ClientTaskBundle nextBundle(final ClientJob job, final int nbTasks, final ExecutorChannel<ClientTaskBundle> channel) {
     final ClientTaskBundle result;
     lock.lock();
     try {
@@ -127,7 +127,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
       final int size = getSize(job);
       decrementSizeCount(size);
       int effectiveNbTasks = nbTasks;
-      if (job.getTaskGraph() != null) effectiveNbTasks = job.getAvvailableGraphNodeCount();
+      if (job.getTaskGraph() != null)
+        effectiveNbTasks = job.getClientSLA().isGraphTraversalInClient() || channel.isLocal() ? job.getAvvailableGraphNodeCount() : job.getTaskCount();
       if (effectiveNbTasks >= job.getTaskCount()) {
         job.setOnRequeue(() -> requeue(job));
         result = job.copy(job.getTaskCount());

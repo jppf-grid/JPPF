@@ -109,7 +109,7 @@ public class ServerTaskBundleNode {
    * @param taskBundle the job.
    * @param taskList the tasks to execute.
    */
-  public ServerTaskBundleNode(final ServerJob job, final TaskBundle taskBundle, final List<ServerTask> taskList) {
+  public ServerTaskBundleNode(final ServerJob job, final TaskBundle taskBundle, final Collection<ServerTask> taskList) {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (taskBundle == null) throw new IllegalArgumentException("taskBundle is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");

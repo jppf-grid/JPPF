@@ -163,5 +163,9 @@ public enum BundleParameter {
   /**
    * Whether a node accepts new jobs.
    */
-  NODE_ACCEPTS_NEW_JOBS
+  NODE_ACCEPTS_NEW_JOBS,
+  /**
+   * Entry holding the dependency graph of the tasks in a job, if any.
+   */
+  JOB_TASK_GRAPH
 }

@@ -154,20 +154,6 @@ public class JobTaskGraph implements Serializable {
     return doneCount >= nodesMap.size();
   }
 
-  /*
-  L - Empty list that will contain the sorted nodes
-  while exists nodes without a permanent mark do
-    select an unmarked node n
-    visit(n)
-
-  function visit(node n)
-    if n has a permanent mark then return
-    for each node m with an edge from n to m do
-        visit(m)
-    mark n with a permanent mark
-    add n to head of L
-  */
-
   /**
    * @return a list of node positions in topological order.
    * @see <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological sorting</a> on Wikipedia.
