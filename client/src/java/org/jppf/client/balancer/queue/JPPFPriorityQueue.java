@@ -128,7 +128,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
       decrementSizeCount(size);
       int effectiveNbTasks = nbTasks;
       if (job.getTaskGraph() != null)
-        effectiveNbTasks = job.getClientSLA().isGraphTraversalInClient() || channel.isLocal() ? job.getAvvailableGraphNodeCount() : job.getTaskCount();
+        effectiveNbTasks = job.getClientSLA().isGraphTraversalInClient() || channel.isLocal() ? job.getAvailableGraphNodeCount() : job.getTaskCount();
+      if (debugEnabled) log.debug("nbTasks={}, effectiveNbTasks={}", nbTasks, effectiveNbTasks);
       if (effectiveNbTasks >= job.getTaskCount()) {
         job.setOnRequeue(() -> requeue(job));
         result = job.copy(job.getTaskCount());

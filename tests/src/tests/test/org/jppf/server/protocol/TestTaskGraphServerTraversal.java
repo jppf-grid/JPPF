@@ -59,7 +59,6 @@ public class TestTaskGraphServerTraversal extends Setup1D2N1C {
       for (int i=0; i<tasksPerLayer; i++) job.addWithDpendencies(tasks[i]);
       assertEquals(nbTasks, job.unexecutedTaskCount());
       assertTrue(job.hasTaskGraph());
-      job.getClientSLA().setGraphTraversalInClient(true);
       final DispatchListener listener = new DispatchListener();
       job.addJobListener(listener);
       final List<Task<?>> result = client.submit(job);
@@ -105,7 +104,6 @@ public class TestTaskGraphServerTraversal extends Setup1D2N1C {
       final JPPFJob job = new JPPFJob();
       job.addWithDpendencies(tasks[0]);
       assertTrue(job.hasTaskGraph());
-      job.getClientSLA().setGraphTraversalInClient(true);
       final DispatchListener listener = new DispatchListener();
       job.addJobListener(listener);
       final AwaitTaskNotificationListener notifListener = new AwaitTaskNotificationListener(client, "start");

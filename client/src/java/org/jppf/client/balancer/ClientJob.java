@@ -579,7 +579,7 @@ public class ClientJob extends AbstractClientJob {
   /**
    * @return the number of nodes int he graph that can be executed.
    */
-  public int getAvvailableGraphNodeCount() {
+  public int getAvailableGraphNodeCount() {
     synchronized (tasks) {
       return (taskGraph != null) ? taskGraph.getAvailableNodes().size() - dispatchedTasks.size() : -1;
     }
