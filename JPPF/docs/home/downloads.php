@@ -178,8 +178,8 @@
   <div class="column_right" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $tag1 = "v_6_0_2";
-        $ver1 = "6.0.2";
+        $tag1 = "v_6_0_3";
+        $ver1 = "6.0.3";
         $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
