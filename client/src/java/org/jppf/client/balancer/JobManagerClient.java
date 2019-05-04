@@ -341,6 +341,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       jobScheduler.removeIdleChannel(wrapper);
       if (newStatus.isTerminatedStatus() || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
     }
+    jobScheduler.wakeUp();
   }
 
   @Override
@@ -491,5 +492,12 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       final LoadBalancingInformation lbi = new LoadBalancingInformation(algorithm, props, currentLoadBalancingInformation.getAlgorithmNames());
       currentLoadBalancingInformation = bundlerFactory.setAndGetCurrentInfo(lbi);
     }
+  }
+
+  /**
+   * @return the job scheuler.
+   */
+  public JobScheduler getJobScheduler() {
+    return jobScheduler;
   }
 }

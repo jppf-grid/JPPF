@@ -20,7 +20,7 @@ package test.org.jppf.client;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.management.JMXDriverConnectionWrapper;
@@ -70,9 +70,11 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
    */
   @AfterClass
   public static void cleanupTestJobManyConnections() throws Exception {
-    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11103)) {
-      assertTrue(jmx.connectAndWait(5000L));
-      BaseSetup.generateDriverThreadDump(jmx);
+    for (int i=1; i<=BaseSetup.nbDrivers(); i++) {
+      try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11100 + i)) {
+        assertTrue(jmx.connectAndWait(5000L));
+        if (i > 2) BaseSetup.generateDriverThreadDump(jmx);
+      }
     }
   }
 
@@ -80,12 +82,18 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
    * Test job submission with pool size = 10 and getMachChannels() = 10.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10000)
+  @Test(timeout = 10000)
   public void testSubmitJobManyRemoteChannels() throws Exception {
     final int nbTasks = 100;
     for (int i=1; i<=3; i++) {
       BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> creating job %d", i);
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-" + i, false, nbTasks, LifeCycleTask.class, 1L);
+      final Set<Integer> set = new HashSet<>();
+      for (final Task<?> task: job.getJobTasks()) {
+        final int pos = task.getPosition();
+        assertFalse("position " + pos + " duplicated!!!!", set.contains(pos));
+        set.add(pos);
+      }
       BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> submitting job %d", i);
       final List<Task<?>> results = client.submitAsync(job).get();
       //final List<Task<?>> results = client.submit(job);
@@ -98,7 +106,7 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
    * Test that a job with maxDriverDepth = 1 is only processed by a single driver (i.e. never sent to a peer).
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10000)
+  @Test(timeout = 10000)
   public void testMaxDriverDepth() throws Exception {
     final int nbTasks = 100;
     BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> creating job");

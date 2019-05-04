@@ -200,11 +200,11 @@ public class ServerJobBroadcast extends ServerJob {
   }
 
   @Override
-  public boolean addBundle(final JPPFDriver driver, final ServerTaskBundleClient clientBundle) {
+  public boolean addBundle(final ServerTaskBundleClient clientBundle) {
     lock.lock();
     try {
       if (parentJob == null) {
-        final boolean b = super.addBundle(driver, clientBundle);
+        final boolean b = super.addBundle(clientBundle);
         final List<ServerJobBroadcast> list = new ArrayList<>(broadcastSet.size() + broadcastMap.size());
         list.addAll(broadcastMap.values());
         list.addAll(broadcastSet);

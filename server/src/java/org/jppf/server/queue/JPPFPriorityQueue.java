@@ -118,9 +118,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
             if (debugEnabled) log.debug("created new {}", serverJob);
             jobMap.put(jobUuid, serverJob);
             jobManager.jobQueued(serverJob);
-          } else if (debugEnabled) log.debug("job already queued");
+          } else {
+            if (debugEnabled) log.debug("job already queued");
+            clientBundle.getJob().removeParameter(BundleParameter.JOB_TASK_GRAPH);
+          }
           try {
-            added = serverJob.addBundle(driver, clientBundle);
+            added = serverJob.addBundle(clientBundle);
             done = true;
           } catch (final JPPFJobEndedException e) {
             if (debugEnabled) log.debug("caught {}, awaiting removal of {}", ExceptionUtils.getMessage(e), serverJob);
@@ -228,8 +231,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (serverJob.getTaskGraph() != null) effectiveNbTasks = Math.min(nbTasks, serverJob.getAvailableGraphNodeCount());
       if (debugEnabled) log.debug("nbTasks={}, effectiveNbTasks={}", nbTasks, effectiveNbTasks);
       if (effectiveNbTasks >= serverJob.getTaskCount()) {
+        final int taskCount = serverJob.getTaskCount();
+        if (taskCount <= 0) throw new IllegalStateException("no task to dispatch for job " + serverJob);
         serverJob.setOnRequeue(new RequeueBundleAction(this, serverJob));
-        result = serverJob.copy(serverJob.getTaskCount());
+        result = serverJob.copy(taskCount);
         removeBundle(serverJob, false);
       } else {
         if (debugEnabled) log.debug("removing {} tasks from bundle", effectiveNbTasks);

@@ -24,7 +24,6 @@ import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.TaskBundle;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -264,12 +263,11 @@ public class AbstractServerJobBase extends AbstractServerJob {
 
   /**
    * Add received bundle to this server job.
-   * @param driver reference to the JPPF driver.
    * @param bundle the bundle to add.
    * @return {@code true} when bundle was added to job. {@code false} when job is {@code COMPLETE}.
    * @throws JPPFJobEndedException if the job is already {@code ENDED}.
    */
-  public boolean addBundle(final JPPFDriver driver, final ServerTaskBundleClient bundle) throws JPPFJobEndedException {
+  public boolean addBundle(final ServerTaskBundleClient bundle) throws JPPFJobEndedException {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     lock.lock();
     try {
@@ -278,9 +276,23 @@ public class AbstractServerJobBase extends AbstractServerJob {
       if (hasCompleted()) {
         throw new JPPFJobEndedException("Job " + submissionStatus);
       } else {
+        if (log.isTraceEnabled()) {
+          final StringBuilder sb = new StringBuilder();
+          int count = 0;
+          for (final ServerTask task: bundle.getTaskList()) {
+            if (count > 0) sb.append(", ");
+            sb.append(task.getPosition());
+            count++;
+          }
+          log.trace("tasks positions in client bundle: {}", sb);
+        }
         clientBundles.add(bundle);
-        for (final ServerTask task: bundle.getTaskList()) tasks.put(task.getPosition(), task);
-        bundle.addCompletionListener(new BundleCompletionListener(driver, this));
+        for (final ServerTask task: bundle.getTaskList()) {
+          final int pos = task.getPosition();
+          if (tasks.containsKey(pos)) throw new IllegalStateException(String.format("position %d already in task map for %s, client bundle = %s", pos, this, bundle));
+          tasks.put(pos, task);
+        }
+        bundle.addCompletionListener(new BundleCompletionListener(this));
         fireJobUpdated(false);
         return true;
       }

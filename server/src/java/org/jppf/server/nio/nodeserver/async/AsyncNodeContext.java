@@ -171,7 +171,13 @@ public class AsyncNodeContext extends BaseNodeContext {
     taskBundle.setBundleId(bundle.getId());
     if (!taskBundle.isHandshake()) {
       if (!isPeer()) taskBundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
-      else if (bundle.getServerJob().isPersistent()) taskBundle.setParameter(BundleParameter.ALREADY_PERSISTED_P2P, true);
+      else {
+        if (bundle.getServerJob().isPersistent()) taskBundle.setParameter(BundleParameter.ALREADY_PERSISTED_P2P, true);
+        final int[] positions = new int[bundle.getTaskCount()];
+        int count = 0;
+        for (final ServerTask task: bundle.getTaskList()) positions[count++] = task.getPosition();
+        taskBundle.setParameter(BundleParameter.TASK_POSITIONS, positions);
+      }
     }
     message.addLocation(IOHelper.serializeData(taskBundle, server.getDriver().getSerializer()));
     message.addLocation(bundle.getDataProvider());

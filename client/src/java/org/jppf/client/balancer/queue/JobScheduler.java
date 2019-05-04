@@ -213,7 +213,8 @@ public class JobScheduler extends ThreadSynchronization implements Runnable {
   @Override
   public void run() {
     while (!isStopped()) {
-      if (!dispatch()) goToSleep(10L, 10000);
+      //if (!dispatch()) goToSleep(10L, 10000);
+      if (!dispatch()) goToSleep(1000L);
     }
     if (channelsExecutor != null) channelsExecutor.shutdownNow();
     clearChannels();

@@ -74,7 +74,6 @@ public class ServerJob extends AbstractServerJobBase {
   public ServerJob(final Lock lock, final ServerJobChangeListener notificationEmitter, final TaskBundle job, final DataLocation dataProvider) {
     super(lock, notificationEmitter, job, dataProvider);
     taskGraph = job.getParameter(BundleParameter.JOB_TASK_GRAPH);
-    if (taskGraph != null) job.removeParameter(BundleParameter.JOB_TASK_GRAPH);
   }
 
   /**
@@ -98,6 +97,7 @@ public class ServerJob extends AbstractServerJobBase {
               list.add(entry.getValue());
             }
           }
+          if (debugEnabled) log.debug("requested tasks={}, found tasks={}", nbTasks, list.size());
         } else {
           final Set<Integer> availablePos = taskGraph.getAvailableNodes();
           final int effectiveNbTasks = Math.min(nbTasks, availablePos.size());
@@ -114,11 +114,13 @@ public class ServerJob extends AbstractServerJobBase {
           }
           if (debugEnabled) log.debug("count={}, nbTasks={}, effectiveNbTasks={}, dispatchedTasks={} for {}", count, nbTasks, effectiveNbTasks, dispatchedTasks.size(), this);
         }
+        if (list.isEmpty() && !getJob().isHandshake()) throw new IllegalStateException("list of tasks to dispatch is empty");
         final TaskBundle newTaskBundle;
         final int taskCount = list.size();
         if (job.getCurrentTaskCount() > taskCount) {
           final int newSize = job.getCurrentTaskCount() - taskCount;
           newTaskBundle = job.copy();
+          newTaskBundle.removeParameter(BundleParameter.JOB_TASK_GRAPH);
           newTaskBundle.setTaskCount(taskCount);
           newTaskBundle.setCurrentTaskCount(taskCount);
           job.setCurrentTaskCount(newSize);
@@ -434,7 +436,7 @@ public class ServerJob extends AbstractServerJobBase {
   /**
    * @return {@code true} if there is a graph and an available node in the graph, {@code false} otherwise.
    */
-  public boolean hasAvvailableGraphNode() {
+  public boolean hasAvailableGraphNode() {
     synchronized (tasks) {
       if (taskGraph == null) return false;
       return taskGraph.getAvailableNodes().size() - dispatchedTasks.size() > 0;

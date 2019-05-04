@@ -20,8 +20,6 @@ package org.jppf.server.protocol;
 
 import java.util.List;
 
-import org.jppf.nio.NioHelper;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -33,7 +31,7 @@ public class BundleCompletionListener implements ServerTaskBundleClient.Completi
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(AbstractServerJobBase.class);
+  private static final Logger log = LoggerFactory.getLogger(BundleCompletionListener.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
@@ -42,18 +40,11 @@ public class BundleCompletionListener implements ServerTaskBundleClient.Completi
    * The job to handle.
    */
   final AbstractServerJobBase serverJob;
-  /**
-   * Reference to the driver.
-   */
-  final JPPFDriver driver;
 
   /**
-   * 
-   * @param driver reference to the JPPF driver.
    * @param serverJob the job to handle.
    */
-  BundleCompletionListener(final JPPFDriver driver, final AbstractServerJobBase serverJob) {
-    this.driver = driver;
+  BundleCompletionListener(final AbstractServerJobBase serverJob) {
     this.serverJob = serverJob;
   }
 
@@ -73,7 +64,7 @@ public class BundleCompletionListener implements ServerTaskBundleClient.Completi
       try {
         bundle.removeCompletionListener(BundleCompletionListener.this);
         serverJob.clientBundles.remove(bundle);
-        for (final ServerTask task: bundle.getTaskList()) serverJob.tasks.remove(task.getPosition());
+        //for (final ServerTask task: bundle.getTaskList()) serverJob.tasks.remove(task.getPosition());
         if (serverJob.completionBundles != null) serverJob.completionBundles.remove(bundle);
         if (serverJob.clientBundles.isEmpty() && serverJob.tasks.isEmpty()) newStatus = SubmissionStatus.ENDED;
       } catch(final Exception e) {
@@ -81,8 +72,10 @@ public class BundleCompletionListener implements ServerTaskBundleClient.Completi
       } finally {
         serverJob.lock.unlock();
       }
+      if (debugEnabled) log.debug("new status = {}", newStatus);
       if (newStatus != null) serverJob.setSubmissionStatus(newStatus);
     };
-    NioHelper.getGlobalexecutor().execute(r);
+    r.run();
+    //NioHelper.getGlobalexecutor().execute(r);
   }
 }

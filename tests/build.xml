@@ -195,7 +195,7 @@
     <mkdir dir="${report}"/>
     <delete dir="${basedir}/logs" quiet="true"/>
     <mkdir dir="${basedir}/logs"/>
-    <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed">
+    <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed" filtertrace="off">
       <classpath refid="tests.classpath"/>
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>
@@ -228,7 +228,7 @@
     <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}, pattern=${pattern}"/>
     <delete dir="${report}" quiet="true"/>
     <mkdir dir="${report}"/>
-    <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed" enableTestListenerEvents="true" showoutput="true" logfailedtests="true">
+    <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed" enableTestListenerEvents="true" showoutput="true" logfailedtests="true" filtertrace="off">
       <classpath refid="tests.classpath"/>
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>
@@ -252,7 +252,7 @@
     <mkdir dir="${report}"/>
     <delete dir="${report}" quiet="true" includes="**/*.*"/>
     <junit printsummary="yes" fork="yes" dir="${basedir}" enableTestListenerEvents="true" showoutput="true" logfailedtests="true"
-      failureproperty="tests.failed" errorproperty="tests.failed" >
+      failureproperty="tests.failed" errorproperty="tests.failed" filtertrace="off">
       <classpath refid="tests.classpath"/>
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>

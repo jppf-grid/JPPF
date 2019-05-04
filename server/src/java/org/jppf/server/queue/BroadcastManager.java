@@ -121,13 +121,13 @@ public class BroadcastManager {
       broadcastJob.setJobReceivedTime(broadcastJob.getQueueEntryTime());
       broadcastJob.addOnDone(new RemoveBundleAction(queue, broadcastJob));
       jobMap.put(jobUuid, broadcastJob);
-      broadcastJob.addBundle(queue.driver, clientBundle);
+      broadcastJob.addBundle(clientBundle);
       queue.scheduleManager.handleStartJobSchedule(broadcastJob);
       queue.scheduleManager.handleExpirationJobSchedule(queue.driver, broadcastJob);
       queue.jobManager.jobQueued(broadcastJob);
       pendingBroadcasts.put(jobUuid, broadcastJob);
       //processPendingBroadcasts();
-    } else serverJob.addBundle(queue.driver, clientBundle);
+    } else serverJob.addBundle(clientBundle);
   }
 
   /**

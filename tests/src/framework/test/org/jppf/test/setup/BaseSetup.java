@@ -293,6 +293,12 @@ public class BaseSetup {
         } catch (final Exception e) {
           log.error("failed to generate driver thread dump for {} : {}", jmx, ExceptionUtils.getStackTrace(e));
         }
+        try {
+          final String dump = (String) jmx.invoke("org.jppf:name=debug,type=driver", "all");
+          FileUtils.writeTextFile("server_debug_" + jmx.getPort() + ".log", dump);
+        } catch (@SuppressWarnings("unused") final Exception e) {
+          log.error("failed to get debug dump for {} : {}", jmx, ExceptionUtils.getStackTrace(e));
+        }
       }
       try {
         final Collection<JPPFManagementInfo> infos = jmx.nodesInformation();

@@ -99,7 +99,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
               if ((reservationHandler.getNbReservedNodes(job.getUuid()) >= job.getSLA().getMaxNodes()) &&
                 !reservationHandler.hasReadyNode(job.getUuid())) continue;
             }
-            if ((job.getTaskGraph() != null) && !job.hasAvvailableGraphNode()) continue;
+            if ((job.getTaskGraph() != null) && !job.hasAvailableGraphNode()) continue;
             if (!checkGridPolicy(job)) continue;
             channel = checkJobState(job) ? findIdleChannelIndex(job) : null;
             if (channel == null) continue;
@@ -171,6 +171,29 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    */
   private static void dispatchJobToChannel(final BaseNodeContext channel, final ServerTaskBundleNode nodeBundle) throws Exception {
     if (debugEnabled) log.debug("dispatching {} tasks of job '{}' to node {}", nodeBundle.getTaskCount(), nodeBundle.getJob().getName(), channel.getUuid());
+    if (log.isTraceEnabled()) {
+      final Set<Long> set = new TreeSet<>();
+      for (final ServerTask task: nodeBundle.getTaskList()) {
+        final long id = task.getBundle().getId();
+        if (!set.contains(id)) set.add(id);
+      }
+      StringBuilder sb = new StringBuilder();
+      int count = 0;
+      for (final long id: set) {
+        if (count > 0) sb.append(", ");
+        sb.append("ServerTaskBundleClient[id=").append(id).append(']');
+        count++;
+      }
+      log.trace("client bundles in dispatch: {}", sb);
+      sb = new StringBuilder();
+      count = 0;
+      for (final ServerTask task: nodeBundle.getTaskList()) {
+        if (count > 0) sb.append(", ");
+        sb.append(task.getPosition());
+        count++;
+      }
+      log.trace("tasks positions in dispatch: {}", sb);
+    }
     synchronized(channel.getMonitor()) {
       final Future<?> future = channel.submit(nodeBundle);
       nodeBundle.jobDispatched(channel, future);

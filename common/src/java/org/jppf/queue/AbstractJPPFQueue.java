@@ -96,7 +96,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
    */
   public void fireBundleAdded(final QueueEvent<T, U, V> event) {
     synchronized(queueListeners) {
-      for (QueueListener<T, U, V> listener : queueListeners) listener.bundleAdded(event);
+      for (final QueueListener<T, U, V> listener : queueListeners) listener.bundleAdded(event);
     }
   }
 

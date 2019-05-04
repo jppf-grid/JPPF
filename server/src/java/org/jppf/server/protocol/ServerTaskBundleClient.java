@@ -48,7 +48,7 @@ public class ServerTaskBundleClient {
   /**
    * A unique id for this client bundle.
    */
-  private final long id = INSTANCE_COUNT.incrementAndGet();
+  private final long id;
   /**
    * The job to execute.
    */
@@ -80,15 +80,15 @@ public class ServerTaskBundleClient {
   /**
    * Bundle cancel indicator.
    */
-  private boolean cancelled = false;
+  private boolean cancelled;
   /**
    * Bundle done indicator.
    */
-  private boolean done = false;
+  private boolean done;
   /**
    * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
    */
-  private long jobReceivedTime = 0L;
+  private long jobReceivedTime;
   /**
    * The strategy to use to send the results back to the client.
    */
@@ -106,31 +106,13 @@ public class ServerTaskBundleClient {
    * Initialize this task bundle and set its build number.
    * @param job the job to execute.
    * @param dataProvider the shared data provider for this task bundle.
-   */
-  public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider) {
-    this(job, dataProvider, Collections.<DataLocation>emptyList());
-  }
-
-  /**
-   * Initialize this task bundle and set its build number.
-   * @param job the job to execute.
-   * @param dataProvider the shared data provider for this task bundle.
-   * @param taskList the tasks to execute.
-   */
-  public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider, final List<DataLocation> taskList) {
-    this(job, dataProvider, taskList, false);
-  }
-
-  /**
-   * Initialize this task bundle and set its build number.
-   * @param job the job to execute.
-   * @param dataProvider the shared data provider for this task bundle.
    * @param taskList the tasks to execute.
    * @param forPeer whether the job comes from a peer driver.
    */
   public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider, final List<DataLocation> taskList, final boolean forPeer) {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
+    id = INSTANCE_COUNT.incrementAndGet();
     this.job = job;
     this.dataProvider = dataProvider;
     this.sourceBundleId = -1L;
@@ -138,14 +120,17 @@ public class ServerTaskBundleClient {
       final int[] positions = job.getParameter(BundleParameter.TASK_POSITIONS);
       final int[] maxResubmits = job.getParameter(BundleParameter.TASK_MAX_RESUBMITS);
       final int slaMaxResubmits = job.getSLA().getMaxTaskResubmits();
-      for (int index = 0; index < taskList.size(); index++) {
-        final DataLocation dataLocation = taskList.get(index);
-        final int pos = (positions == null) || (index > positions.length - 1) ? -1 : positions[index];
-        int maxResubmitCount = (maxResubmits == null) || (index > maxResubmits.length - 1) ? -1 : maxResubmits[index];
+      if (log.isTraceEnabled()) log.trace("id={}, nbTasks={}, nbPositions={} : {}", id, taskList.size(), (positions == null) ? -1 : positions.length, (positions == null) ? "null" : Arrays.toString(positions));
+      for (int i = 0; i < taskList.size(); i++) {
+        final DataLocation dataLocation = taskList.get(i);
+        if ((positions == null) && !job.isHandshake()) throw new IllegalStateException("positions is null for " + this);
+        if ((positions != null) &&  (i >= positions.length)) throw new IllegalStateException(i + " >= " + positions.length + " for " + this);
+        final int pos = (positions == null)  || (i >= positions.length) ? -1 : positions[i];
+        int maxResubmitCount = (maxResubmits == null) || (i > maxResubmits.length - 1) ? -1 : maxResubmits[i];
         if ((maxResubmitCount < 0) && (slaMaxResubmits >= 0)) maxResubmitCount = slaMaxResubmits;
         final ServerTask task = new ServerTask(this, dataLocation, pos, maxResubmitCount);
         if (dataLocation == null) {
-          if (debugEnabled) log.debug("got null task at index {} for {}", index, job);
+          if (debugEnabled) log.debug("got null task at index {} for {}", i, job);
           nullTasks.add(task);
           task.resultReceived(task.getInitialTask());
         } else {
@@ -168,10 +153,11 @@ public class ServerTaskBundleClient {
   public ServerTaskBundleClient(final Collection<ServerTask> tasks, final TaskBundle job, final DataLocation dataProvider) {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
+    id = INSTANCE_COUNT.incrementAndGet();
     this.job = job;
     this.dataProvider = dataProvider;
     this.taskList.addAll(tasks);
-    for (ServerTask task: tasks) task.setBundle(this);
+    for (final ServerTask task: tasks) task.setBundle(this);
     this.pendingTasksCount.set(tasks.size());
     this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
     this.sourceBundleId = -1L;
@@ -186,8 +172,10 @@ public class ServerTaskBundleClient {
   private ServerTaskBundleClient(final ServerTaskBundleClient source, final List<ServerTask> taskList) {
     if (source == null) throw new IllegalArgumentException("source is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
+    id = INSTANCE_COUNT.incrementAndGet();
     final int size = taskList.size();
     this.job = source.getJob().copy();
+    this.job.removeParameter(BundleParameter.JOB_TASK_GRAPH);
     this.job.setTaskCount(size);
     this.job.setInitialTaskCount(source.getJob().getInitialTaskCount());
     this.job.setCurrentTaskCount(size);

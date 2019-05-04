@@ -368,6 +368,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
     } finally {
       jobCount.decrementAndGet();
       if ((getStatus() == JPPFClientConnectionStatus.EXECUTING) && (getCurrentNbJobs() < getMaxJobs())) setStatus(JPPFClientConnectionStatus.ACTIVE);
+      ((JobManagerClient) channel.getConnectionPool().getClient().getJobManager()).getJobScheduler().wakeUp();
     }
   }
 

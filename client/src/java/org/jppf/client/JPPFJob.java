@@ -290,7 +290,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
   public List<Task<?>> awaitResults(final long timeout) {
     try {
       await(timeout, false);
-    } catch (@SuppressWarnings("unused") final TimeoutException ignore) {
+    } catch (@SuppressWarnings("unused") final TimeoutException|InterruptedException ignore) {
     }
     return results.getResultsList();
   }
@@ -362,7 +362,11 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    */
   @Override
   public List<Task<?>> get() throws InterruptedException, ExecutionException {
-    return awaitResults(Long.MAX_VALUE);
+    try {
+      await(Long.MAX_VALUE, false);
+    } catch (@SuppressWarnings("unused") final TimeoutException ignore) {
+    }
+    return results.getResultsList();
   }
 
   /**
@@ -379,9 +383,10 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * Wait until the job is complete or the timeout expires, whichever happens first.
    * @param timeout the maximum time to wait for the job completion.
    * @param raiseTimeoutException whether to raise a {@link TimeoutException} when the timeout expires.
-   * @throws TimeoutException if the tiemout expired and {@code raiseTimeoutException == true}.
+   * @throws TimeoutException if the timeout expired and {@code raiseTimeoutException == true}.
+   * @throws InterruptedException if the current thread is interrupted while wating for the results.
    */
-  void await(final long timeout, final boolean raiseTimeoutException) throws TimeoutException {
+  void await(final long timeout, final boolean raiseTimeoutException) throws TimeoutException, InterruptedException {
     final long start = System.nanoTime();
     long elapsed;
     final int nbTasks = tasks.size();
@@ -392,7 +397,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
         }
         if (!getStatus().isDone() && raiseTimeoutException) throw new TimeoutException("timeout expired");
       }
-    } catch (final TimeoutException e) {
+    } catch (final TimeoutException|InterruptedException e) {
       throw e;
     } catch (final Exception e) {
       log.error(e.getMessage(), e);

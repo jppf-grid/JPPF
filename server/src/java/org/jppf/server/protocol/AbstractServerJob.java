@@ -38,7 +38,7 @@ public abstract class AbstractServerJob {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(ServerJob.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractServerJob.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */

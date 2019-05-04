@@ -125,7 +125,7 @@ public class AsyncClientContext extends AbstractNioContext {
     final List<DataLocation> locations = message.getLocations();
     //if (traceEnabled) log.trace("deserializing {}", message);
     final TaskBundle bundle = message.getBundle();
-    if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1));
+    if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1), Collections.<DataLocation>emptyList(), false);
     return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()), isPeer());
   }
 
@@ -175,7 +175,7 @@ public class AsyncClientContext extends AbstractNioContext {
    */
   public void addEntry(final ServerTaskBundleClient bundle) {
     final String id = bundle.getUuid() + bundle.getId();
-    if (debugEnabled) log.debug("adding job entry '{}'", id);
+    if (debugEnabled) log.debug("adding job entry [jobUuid={}, bundleId={}]", bundle.getUuid(), bundle.getId());
     entryMap.put(id, new JobEntry(bundle));
   }
 
