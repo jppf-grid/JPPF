@@ -75,8 +75,8 @@ public class ServerJob extends AbstractServerJobBase {
     final TaskBundle newTaskBundle;
     lock.lock();
     try {
-      final int taskCount = (nbTasks > this.tasks.size()) ? this.tasks.size() : nbTasks;
-      final List<ServerTask> subList = this.tasks.subList(0, taskCount);
+      final int taskCount = (nbTasks > tasks.size()) ? tasks.size() : nbTasks;
+      final List<ServerTask> subList = tasks.subList(0, taskCount);
       try {
         if (job.getCurrentTaskCount() > taskCount) {
           final int newSize = job.getCurrentTaskCount() - taskCount;
@@ -100,7 +100,7 @@ public class ServerJob extends AbstractServerJobBase {
 
   /**
    * Called to notify that the results of a number of tasks have been received from the server.
-   * @param bundle  the executing job.
+   * @param bundle  the executing job dispatch.
    * @param results the list of tasks whose results have been received from the server.
    */
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
@@ -144,7 +144,7 @@ public class ServerJob extends AbstractServerJobBase {
 
   /**
    * Called to notify that throwable eventually raised while receiving the results.
-   * @param bundle    the finished job.
+   * @param bundle    the finished job dispatch.
    * @param throwable the throwable that was raised while receiving the results.
    */
   public void resultsReceived(final ServerTaskBundleNode bundle, final Throwable throwable) {
@@ -229,9 +229,11 @@ public class ServerJob extends AbstractServerJobBase {
     lock.lock();
     try {
       if (getSLA().isBroadcastJob()) {
+        if (debugEnabled) log.debug("processing broadcast job");
         if (bundle != null) addExcluded(list, bundle.getTaskList(), TaskState.RESULT);
         if (isCancelled() || getBroadcastUUID() == null) addAll(list, this.tasks);
       } else if (bundle != null) {
+        if (debugEnabled) log.debug("processing pending tasks");
         final List<ServerTask> taskList = new ArrayList<>();
         for (final ServerTask task : bundle.getTaskList()) {
           if (task.getState() == TaskState.RESUBMIT) task.setState(TaskState.PENDING);
@@ -244,9 +246,11 @@ public class ServerJob extends AbstractServerJobBase {
     }
     if (debugEnabled) log.debug("requeue = {} for bundle {}, job = {}", requeue, bundle, this);
     if (hasPending()) {
+      if (debugEnabled) log.debug("processing hasPedning=true");
       if ((throwable != null) && !requeue) setSubmissionStatus(SubmissionStatus.FAILED);
       if (!isCancelled() && requeue && (onRequeue != null)) onRequeue.run();
     } else {
+      if (debugEnabled) log.debug("processing hasPedning=false");
       setSubmissionStatus(SubmissionStatus.COMPLETE);
       updateStatus(ServerJobStatus.EXECUTING, ServerJobStatus.DONE);
     }
@@ -254,7 +258,8 @@ public class ServerJob extends AbstractServerJobBase {
     if (debugEnabled) log.debug("submissionStatus={}, clientBundles={} for {}", getSubmissionStatus(), clientBundles.size(), this);
   }
 
-  /**
+  /**    //NioHelper.getGlobalexecutor().execute(r);
+
    * Perform the necessary actions for when this job has been cancelled.
    */
   private void handleCancelledStatus() {
@@ -273,12 +278,8 @@ public class ServerJob extends AbstractServerJobBase {
   public void cancelDispatch(final ServerTaskBundleNode nodeBundle) {
     try {
       final Future<?> future = nodeBundle.getFuture();
-      if (future == null) {
-        nodeBundle.resultsReceived((List<DataLocation>) null);
-      } else if (!future.isDone()) {
-        future.cancel(false);
-        nodeBundle.resultsReceived((List<DataLocation>) null);
-      }
+      if ((future != null) && !future.isDone()) future.cancel(false);
+      nodeBundle.resultsReceived((List<DataLocation>) null);
     } catch (final Exception e) {
       log.error("Error cancelling job " + this, e);
     }

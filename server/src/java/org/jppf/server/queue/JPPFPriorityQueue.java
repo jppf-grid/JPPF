@@ -221,12 +221,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     final ServerTaskBundleNode result;
     lock.lock();
     try {
-      if (debugEnabled) log.debug("requesting bundle with {} tasks, next bundle has {} tasks", nbTasks, serverJob.getTaskCount());
+      final int taskCount = serverJob.getTaskCount();
+      if (debugEnabled) log.debug("requesting bundle with {} tasks, next bundle has {} tasks", nbTasks, taskCount);
       final int size = getSize(serverJob);
       decrementSizeCount(size);
-      if (nbTasks >= serverJob.getTaskCount()) {
+      if (nbTasks >= taskCount) {
         serverJob.setOnRequeue(new RequeueBundleAction(this, serverJob));
-        result = serverJob.copy(serverJob.getTaskCount());
+        result = serverJob.copy(taskCount);
         removeBundle(serverJob, false);
       } else {
         if (debugEnabled) log.debug("removing {} tasks from bundle", nbTasks);

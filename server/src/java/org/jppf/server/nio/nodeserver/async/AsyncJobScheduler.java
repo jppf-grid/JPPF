@@ -20,6 +20,7 @@ package org.jppf.server.nio.nodeserver.async;
 
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.*;
@@ -236,6 +237,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
     if (!toRemove.isEmpty()) {
       for (final BaseNodeContext c: toRemove) removeIdleChannel(c);
     }
+    if (!checkJobNotCancelled(job)) return null;
     if (!acceptableChannels.isEmpty() && (desiredConfiguration != null)) acceptableChannels = filterLowestDistances(job, acceptableChannels);
     return selectChannel(acceptableChannels);
   }
@@ -332,12 +334,33 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    * @return true if the job can be dispatched to at least one more node, false otherwise.
    */
   private static boolean checkJobState(final ServerJob job) {
-    if (job.isCancelled()) return false;
-    final JobSLA sla = job.getJob().getSLA();
-    if (debugEnabled) log.debug("job '{}', suspended={}, pending={}, expired={}", new Object[] {job.getName(), sla.isSuspended(), job.isPending(), job.isJobExpired()});
-    if (sla.isSuspended() || job.isPending() || job.isJobExpired()) return false;
-    if (debugEnabled) log.debug("current nodes = " + job.getNbChannels() + ", maxNodes = " + sla.getMaxNodes());
-    return job.getNbChannels() < sla.getMaxNodes();
+    if (!checkJobNotCancelled(job)) return false;
+    final Lock lock = job.getLock();
+    if (!lock.tryLock()) return false;
+    try {
+      final JobSLA sla = job.getJob().getSLA();
+      if (debugEnabled) log.debug("job '{}', suspended={}, pending={}, expired={}", new Object[] {job.getName(), sla.isSuspended(), job.isPending(), job.isJobExpired()});
+      if (sla.isSuspended() || job.isPending() || job.isJobExpired()) return false;
+      if (debugEnabled) log.debug("current nodes = " + job.getNbChannels() + ", maxNodes = " + sla.getMaxNodes());
+      return job.getNbChannels() < sla.getMaxNodes();
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Check that the job is not cancelled.
+   * @param job encapsulates the job information.
+   * @return {@code true} if the job is NOT cancelled, {@code false} otherwise.
+   */
+  private static boolean checkJobNotCancelled(final ServerJob job) {
+    final Lock lock = job.getLock();
+    lock.lock();
+    try {
+      return !job.isCancelled();
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**

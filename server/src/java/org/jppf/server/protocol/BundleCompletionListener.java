@@ -20,7 +20,6 @@ package org.jppf.server.protocol;
 
 import java.util.List;
 
-import org.jppf.nio.NioHelper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.LoggingUtils;
@@ -83,6 +82,6 @@ public class BundleCompletionListener implements ServerTaskBundleClient.Completi
       }
       if (newStatus != null) serverJob.setSubmissionStatus(newStatus);
     };
-    NioHelper.getGlobalexecutor().execute(r);
+    r.run();
   }
 }
