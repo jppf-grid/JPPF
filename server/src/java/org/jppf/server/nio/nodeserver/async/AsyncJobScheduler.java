@@ -20,6 +20,7 @@ package org.jppf.server.nio.nodeserver.async;
 
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.*;
@@ -260,6 +261,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
     if (!toRemove.isEmpty()) {
       for (final BaseNodeContext c: toRemove) removeIdleChannel(c);
     }
+    if (!checkJobNotCancelled(job)) return null;
     if (!acceptableChannels.isEmpty() && (desiredConfiguration != null)) acceptableChannels = filterLowestDistances(job, acceptableChannels);
     return selectChannel(acceptableChannels);
   }
@@ -362,6 +364,21 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
     if (sla.isSuspended() || job.isPending() || job.isJobExpired()) return false;
     if (debugEnabled) log.debug("current nodes = " + job.getNbChannels() + ", maxNodes = " + sla.getMaxNodes());
     return job.getNbChannels() < sla.getMaxNodes();
+  }
+
+  /**
+   * Check that the job is not cancelled.
+   * @param job encapsulates the job information.
+   * @return {@code true} if the job is NOT cancelled, {@code false} otherwise.
+   */
+  private static boolean checkJobNotCancelled(final ServerJob job) {
+    final Lock lock = job.getLock();
+    lock.lock();
+    try {
+      return !job.isCancelled();
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
