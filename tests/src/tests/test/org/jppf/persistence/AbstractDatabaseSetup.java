@@ -148,6 +148,18 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
    * @throws Exception if any error occurs.
    */
   protected void checkJobResults(final int nbTasks, final Collection<Task<?>> results, final boolean cancelled) throws Exception {
+    checkJobResults(nbTasks, results, cancelled, null);
+  }
+
+  /**
+   * Check the results of a job's execution.
+   * @param nbTasks the number of tasks in the job.
+   * @param results the execution results to check.
+   * @param cancelled whether the job was cancelled.
+   * @param resultFunction a function which computes the expected result for a task, can be {@code null} in which case the result is expected to be {@link BaseTestHelper#EXECUTION_SUCCESSFUL_MESSAGE}.
+   * @throws Exception if any error occurs.
+   */
+  protected void checkJobResults(final int nbTasks, final Collection<Task<?>> results, final boolean cancelled, final ExpectedResultFunction resultFunction) throws Exception {
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     for (final Task<?> task: results) {
@@ -155,8 +167,9 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
       final Throwable t = task.getThrowable();
       assertNull(String.format("task '%s' has a throwable: %s", task.getId(), (t == null) ? "none" : ExceptionUtils.getMessage(t)), t);
       if (!cancelled) {
-        assertNotNull(String.format("task %s has a null result", task.getId()), task.getResult());
-        assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+        final Object expectedResult = (resultFunction == null) ? BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE : resultFunction.getExpectedResult(task);
+        assertNotNull(String.format("task %s has a null result", task.getId()), expectedResult);
+        assertEquals(expectedResult, task.getResult());
       }
     }
   }
@@ -239,5 +252,16 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
    */
   protected void awaitNoMorePendingOperations(final LoadBalancerPersistenceManagement mgt) {
     ConcurrentUtils.awaitCondition((ConditionFalseOnException) (() -> mgt.getUncompletedOperations() <= 0), 5000L, 100L, false);
+  }
+
+  /** */
+  @FunctionalInterface
+  public static interface ExpectedResultFunction {
+    /**
+     * Get the task result.
+     * @param task the task from which to get the result.
+     * @return the task result.
+     */
+    Object getExpectedResult(Task<?> task);
   }
 }

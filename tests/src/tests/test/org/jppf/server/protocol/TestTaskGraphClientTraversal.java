@@ -19,7 +19,7 @@
 package test.org.jppf.server.protocol;
 
 import static org.junit.Assert.*;
-import static test.org.jppf.server.protocol.TaskDependenciesHelper.createDiamondTasks;
+import static test.org.jppf.test.setup.common.TaskDependenciesHelper.createDiamondTasks;
 
 import java.util.*;
 
@@ -27,9 +27,9 @@ import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.junit.Test;
 
-import test.org.jppf.server.protocol.TaskDependenciesHelper.*;
 import test.org.jppf.test.setup.Setup1D2N1C;
 import test.org.jppf.test.setup.common.*;
+import test.org.jppf.test.setup.common.TaskDependenciesHelper.*;
 
 /**
  * 

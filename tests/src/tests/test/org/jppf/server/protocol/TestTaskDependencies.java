@@ -19,7 +19,7 @@
 package test.org.jppf.server.protocol;
 
 import static org.junit.Assert.*;
-import static test.org.jppf.server.protocol.TaskDependenciesHelper.*;
+import static test.org.jppf.test.setup.common.TaskDependenciesHelper.*;
 
 import java.util.*;
 

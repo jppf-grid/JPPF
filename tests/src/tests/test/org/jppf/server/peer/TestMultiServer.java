@@ -19,6 +19,9 @@
 package test.org.jppf.server.peer;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assume.assumeThat;
+import static test.org.jppf.test.setup.common.TaskDependenciesHelper.createLayeredTasks;
 
 import java.util.*;
 
@@ -38,6 +41,7 @@ import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
+import test.org.jppf.test.setup.common.TaskDependenciesHelper.MyTask;
 
 /**
  * Test a multi-server topology with 2 servers, 1 node attached to each server and 1 client.
@@ -204,6 +208,49 @@ public class TestMultiServer extends AbstractNonStandardSetup {
         final LoadBalancingInformation driverLbi = entry.getValue();
         if (driverLbi != null) entry.getKey().changeLoadBalancerSettings(driverLbi.getAlgorithm(), driverLbi.getParameters());
       }
+    }
+  }
+
+  /**
+   * Test that a job with task dependencies and graph traversal in the server is dsitrubuted over the 2 drivers.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout = 15_000L)
+  public void testTaskGraph() throws Exception {
+    final LoadBalancingInformation lbi = BaseSetup.getJMXConnection(client).loadBalancerInformation();
+    assumeThat(lbi.getAlgorithm(), is("manual"));
+    assumeThat(lbi.getParameters().getInt("size"), is(5));
+    print(false, false, "driver load balancing config: %s", lbi);
+    final int tasksPerNode = 5;
+    final int nbNodes = getNbNodes();
+    final int layers = 3, tasksPerLayer = 10, nbTasks = layers * tasksPerLayer;
+    final String name = ReflectionUtils.getCurrentClassAndMethod();
+
+    final MyTask[] tasks = createLayeredTasks(layers, tasksPerLayer);
+    final JPPFJob job = new JPPFJob();
+    for (int i=0; i<tasksPerLayer; i++) job.addWithDpendencies(tasks[i]);
+    assertEquals(nbTasks, job.unexecutedTaskCount());
+    assertTrue(job.hasTaskGraph());
+
+    final List<Task<?>> results = client.submit(job);
+    assertNotNull(results);
+    assertEquals(nbTasks, results.size());
+    final CollectionMap<String, Task<?>> map = new ArrayListHashMap<>();
+    for (final Task<?> t: results) {
+      assertTrue("task = " + t, t instanceof MyTask);
+      final MyTask task = (MyTask) t;
+      map.putValue(task.getNodeUuid(), task);
+      final Throwable throwable = t.getThrowable();
+      assertNull("throwable for task '" + t.getId() + "' : " + ExceptionUtils.getStackTrace(throwable), throwable);
+      assertNotNull(t.getResult());
+      assertEquals("executed " + t.getId(), t.getResult());
+    }
+    printOut("%s : map = %s", name , CollectionUtils.prettyPrint(map));
+    assertEquals(nbNodes, map.keySet().size());
+    for (int i=0; i<nbNodes; i++) {
+      final String key = "n" + (i+1);
+      assertTrue(map.containsKey(key));
+      assertEquals(0, map.getValues(key).size() % tasksPerNode);
     }
   }
 }

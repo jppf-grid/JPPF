@@ -19,9 +19,10 @@
 package test.org.jppf.job.persistence;
 
 import static org.junit.Assert.*;
+import static test.org.jppf.test.setup.common.TaskDependenciesHelper.createDiamondTasks;
 
 import java.nio.file.*;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.h2.tools.Script;
@@ -44,9 +45,10 @@ import org.junit.runner.Description;
 import test.org.jppf.persistence.AbstractDatabaseSetup;
 import test.org.jppf.test.setup.BaseSetup;
 import test.org.jppf.test.setup.common.*;
+import test.org.jppf.test.setup.common.TaskDependenciesHelper.MyTask;
 
 /**
- *
+ * This abstract class contains the tests executed for each type of built-in job persistence.
  * @author Laurent Cohen
  */
 public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
@@ -345,6 +347,61 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
         pool.setSize(1);
         pool.awaitActiveConnections(Operator.EQUAL, 1);
       }
+    }
+  }
+
+  /**
+   * Test restarting the driver while executing a job.
+   * The client should recover gracefully and be able to retrieve the job from the persistent store.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 20_000L)
+  public void testTaskGraphAutoRecoveryOnDriverRestart() throws Exception {
+    final String method = ReflectionUtils.getCurrentMethodName();
+    
+    print(false, false, "creating job");
+    final MyTask[] tasks = createDiamondTasks();
+    final Map<String, MyTask> taskMap = new HashMap<>();
+    for (final MyTask task: tasks) taskMap.put(task.getId(), task);
+    taskMap.get("T1").setDuration(2500L).setStartNotif("start");
+    taskMap.get("T2").setDuration(2500L).setStartNotif("start");
+    final JPPFJob job = new JPPFJob().setName(method);
+    job.addWithDpendencies(tasks[0]);
+    assertTrue(job.hasTaskGraph());
+    final int nbTasks = job.getTaskCount();
+    assertEquals(4, nbTasks);
+    job.getSLA().setCancelUponClientDisconnect(false);
+    job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
+    print(false, false, "getting JMX connection");
+    try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {
+      jmx.setReconnectOnError(false);
+      final PersistedJobsManagerMBean mgr = jmx.getPersistedJobsManager();
+      final AwaitTaskNotificationListener notifListener = new AwaitTaskNotificationListener(client, "start");
+      print(false, false, "submitting job");
+      client.submitAsync(job);
+      print(false, false, "awaiting task start notification");
+      notifListener.await();
+      print(false, false, "waiting for job fully persisted");
+      assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> {
+        final int[][] positions = mgr.getPersistedJobPositions(job.getUuid());
+        return (positions != null) && (positions.length > 0) && (positions[0] != null) && (positions[0].length == nbTasks);
+      } , 6000L, 500L, false));
+      print(false, false, "requesting driver restart");
+      jmx.restartShutdown(100L, 1L);
+    }
+    print(false, false, "waiting for job results");
+    final List<Task<?>> results = job.awaitResults();
+    checkJobResults(nbTasks, results, false, task -> "executed " + task.getId());
+    try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {
+      print(false, false, "got 2nd jmx connection");
+      final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
+      assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L, 500L, false));
+      final List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
+      assertNotNull(persistedUuids);
+      assertEquals(1, persistedUuids.size());
+      assertNotNull(persistedUuids.get(0));
+      assertEquals(job.getUuid(), persistedUuids.get(0));
+      assertTrue(mgr.deleteJob(job.getUuid()));
     }
   }
 

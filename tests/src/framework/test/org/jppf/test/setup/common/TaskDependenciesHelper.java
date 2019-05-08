@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package test.org.jppf.server.protocol;
+package test.org.jppf.test.setup.common;
 
 import static org.junit.Assert.*;
 
@@ -45,7 +45,7 @@ public class TaskDependenciesHelper {
    * @return a copy of the input graph.
    * @throws Exception if any error occurs.
    */
-  static JobTaskGraph copyGraph(final JobTaskGraph graph, final JPPFSerialization ser) throws Exception {
+  public static JobTaskGraph copyGraph(final JobTaskGraph graph, final JPPFSerialization ser) throws Exception {
     BaseTest.print(false, false, "1: graph = %s", graph);
     try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
       ser.serialize(graph, os);
@@ -70,7 +70,7 @@ public class TaskDependenciesHelper {
    * </pre>
    * @throws Exception if any error occurs.
    */
-  static JobTaskGraph createDiamondGraph() throws Exception {
+  public static JobTaskGraph createDiamondGraph() throws Exception {
     final MyTask[] tasks = createDiamondTasks();
     final JobTaskGraph graph = JobGraphHelper.graphOf(Arrays.asList(tasks));
     BaseTest.print(false, false, "graph topological sort = %s", graph.topologicalSortDFS());
@@ -89,7 +89,7 @@ public class TaskDependenciesHelper {
    * </pre>
    * @throws Exception if any error occurs.
    */
-  static MyTask[] createDiamondTasks() throws Exception {
+  public static MyTask[] createDiamondTasks() throws Exception {
     final MyTask[] tasks = new MyTask[4];
     for (int i=0; i<tasks.length; i++) tasks[i] = new MyTask("T" + i, i);
     tasks[0].dependsOn(tasks[1].dependsOn(tasks[3]), tasks[2].dependsOn(tasks[3]));
@@ -103,7 +103,7 @@ public class TaskDependenciesHelper {
    * @return an array of tasks with layered dependencies.
    * @throws Exception if any error occurs.
    */
-  static MyTask[] createLayeredTasks(final int nbLayers, final int tasksPerLayer) throws Exception {
+  public static MyTask[] createLayeredTasks(final int nbLayers, final int tasksPerLayer) throws Exception {
     final MyTask[] tasks = new MyTask[nbLayers * tasksPerLayer];
     final int layerDigits = Integer.toString(nbLayers - 1).length(), taskDigits = Integer.toString(tasksPerLayer - 1).length();
     final String idFormat = String.format("L%%%ddT%%%dd", layerDigits, taskDigits);
@@ -124,7 +124,7 @@ public class TaskDependenciesHelper {
    * @return a graph with diamonfd dependencies.
    * @throws Exception if any error occurs.
    */
-  static JobTaskGraph createGraph() throws Exception {
+  public static JobTaskGraph createGraph() throws Exception {
     final MyTask[] tasks = new MyTask[6];
     for (int i=0; i<tasks.length; i++) tasks[i] = new MyTask("" + (char) ('A' + i), i);
     tasks[5].dependsOn(tasks[0], tasks[1], tasks[4]);
@@ -146,7 +146,7 @@ public class TaskDependenciesHelper {
    * @param expectGraphDone whether to expect the graph execution to be complete.
    * @param expectedPositions the expected positions of the task that no longer have pending dependencies.
    */
-  static void checkExecution(final JobTaskGraph graph, final int taskPosition, final int expectedDoneCount, final boolean expectGraphDone, final int...expectedPositions) {
+  public static void checkExecution(final JobTaskGraph graph, final int taskPosition, final int expectedDoneCount, final boolean expectGraphDone, final int...expectedPositions) {
     final int expectedSize = ((expectedPositions == null) || (expectedPositions.length <= 0)) ? 0 : expectedPositions.length;
     if (taskPosition >= 0) graph.nodeDone(taskPosition);
     final Set<Integer> positions = graph.getAvailableNodes();
@@ -165,7 +165,7 @@ public class TaskDependenciesHelper {
    * @param action the action to execute.
    * @throws Exception if any error occurs.
    */
-  static void testDependencyCycle(final ExceptionThrowingRunnable action) throws Exception {
+  public static void testDependencyCycle(final ExceptionThrowingRunnable action) throws Exception {
     try {
       action.run();
       fail("action did not raise an exception");
@@ -184,6 +184,8 @@ public class TaskDependenciesHelper {
     private long duration;
     /** */
     private String startNotif;
+    /** */
+    private String nodeUuid;
 
     /**
      * @param id the task id.
@@ -220,6 +222,7 @@ public class TaskDependenciesHelper {
     public void run() {
       try {
         //System.out.println("executing " + this);
+        nodeUuid = getNode().getUuid();
         if (startNotif != null) fireNotification(startNotif, true);
         if (duration > 0L) Thread.sleep(duration);
         final String result = "executed " + getId();
@@ -266,6 +269,13 @@ public class TaskDependenciesHelper {
       this.startNotif = startNotif;
       return this;
     }
+
+    /**
+     * @return the uuid of the node on which this task is executed.
+     */
+    public String getNodeUuid() {
+      return nodeUuid;
+    }
   }
 
   /** */
@@ -288,7 +298,7 @@ public class TaskDependenciesHelper {
   /** */
   public static class DispatchListener extends JobListenerAdapter {
     /** */
-    final List<Integer> dispatches = new ArrayList<>();
+    public final List<Integer> dispatches = new ArrayList<>();
 
     @Override
     public void jobDispatched(final JobEvent event) {
@@ -303,7 +313,7 @@ public class TaskDependenciesHelper {
   /** */
   public static class ServerDispatchListener implements NotificationListener {
     /** */
-    final List<Integer> dispatches = new ArrayList<>();
+    public final List<Integer> dispatches = new ArrayList<>();
     /**
      * Whether the job has ended.
      */
