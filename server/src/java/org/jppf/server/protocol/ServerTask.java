@@ -22,15 +22,14 @@ import java.io.*;
 
 import org.jppf.io.*;
 import org.jppf.node.protocol.TaskState;
-import org.jppf.node.protocol.graph.PositionalTask;
 import org.slf4j.*;
 
 /**
- *
+ * Representation of an individual task on the server side.
  * @author Martin JANDA
  * @exclude
  */
-public class ServerTask implements Serializable, PositionalTask {
+public class ServerTask implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -224,7 +223,6 @@ public class ServerTask implements Serializable, PositionalTask {
    * Get the position of this task within the job submitted by the client.
    * @return the position as an int.
    */
-  @Override
   public int getPosition() {
     return jobPosition;
   }

@@ -56,7 +56,7 @@ public class TestTaskGraphServerTraversal extends Setup1D2N1C {
       pool.setMaxJobs(Integer.MAX_VALUE);
       final MyTask[] tasks = createLayeredTasks(layers, tasksPerLayer);
       final JPPFJob job = new JPPFJob();
-      for (int i=0; i<tasksPerLayer; i++) job.addWithDpendencies(tasks[i]);
+      for (int i=0; i<tasksPerLayer; i++) job.add(tasks[i]);
       assertEquals(nbTasks, job.unexecutedTaskCount());
       assertTrue(job.hasTaskGraph());
       final DispatchListener listener = new DispatchListener();
@@ -105,7 +105,7 @@ public class TestTaskGraphServerTraversal extends Setup1D2N1C {
       taskMap.get("T1").setDuration(5000L).setStartNotif("start");
       taskMap.get("T2").setDuration(5000L).setStartNotif("start");
       final JPPFJob job = new JPPFJob().setName(ReflectionUtils.getCurrentMethodName());
-      job.addWithDpendencies(tasks[0]);
+      job.add(tasks[0]);
       assertTrue(job.hasTaskGraph());
       final DispatchListener listener = new DispatchListener();
       job.addJobListener(listener);

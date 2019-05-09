@@ -20,7 +20,7 @@ package org.jppf.serialization.kryo;
 
 import java.io.IOException;
 
-import org.jppf.node.protocol.graph.JobTaskGraph;
+import org.jppf.node.protocol.graph.TaskGraph;
 
 import com.esotericsoftware.kryo.*;
 import com.esotericsoftware.kryo.io.*;
@@ -29,10 +29,10 @@ import com.esotericsoftware.kryo.io.*;
  *
  * @author Laurent Cohen
  */
-public class JobTaskGraphSerializer extends Serializer<JobTaskGraph> {
+public class JobTaskGraphSerializer extends Serializer<TaskGraph> {
   @Override
-  public JobTaskGraph read(final Kryo kryo, final Input input, final Class<JobTaskGraph> clazz) {
-    final JobTaskGraph graph = new JobTaskGraph();
+  public TaskGraph read(final Kryo kryo, final Input input, final Class<TaskGraph> clazz) {
+    final TaskGraph graph = new TaskGraph();
     try {
       graph.deserialize(input);
       return graph;
@@ -42,7 +42,7 @@ public class JobTaskGraphSerializer extends Serializer<JobTaskGraph> {
   }
 
   @Override
-  public void write(final Kryo kryo, final Output output, final JobTaskGraph object) {
+  public void write(final Kryo kryo, final Output output, final TaskGraph object) {
     try {
       object.serialize(output);
     } catch (final IOException e) {

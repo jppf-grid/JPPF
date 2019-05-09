@@ -21,22 +21,23 @@ package org.jppf.node.protocol.graph;
 import java.util.*;
 
 import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.graph.TaskGraph.Node;
 
 /**
  * Utility and factory methods to build and manipulate graphs of tasks.
  * @author Laurent Cohen
  * @exclude
  */
-public class JobGraphHelper {
+public class TaskGraphHelper {
   /**
    * Build a task graph from the specified collection of tasks.
    * @param tasks the task to covert to nodes int he graph.
-   * @return a newly created {@link JobTaskGraph}.
+   * @return a newly created {@link TaskGraph}.
    */
-  public static JobTaskGraph graphOf(final Collection<Task<?>> tasks) {
-    final Map<Integer, JobTaskNode> nodesMap = new HashMap<>();
+  public static TaskGraph graphOf(final Collection<Task<?>> tasks) {
+    final Map<Integer, Node> nodesMap = new HashMap<>();
     for (final Task<?> task: tasks) addNode(nodesMap, task);
-    return new JobTaskGraph(nodesMap);
+    return new TaskGraph(nodesMap);
   }
 
   /**
@@ -45,17 +46,17 @@ public class JobGraphHelper {
    * @param task the task to add.
    * @return  the node corrresponding to the task.
    */
-  private static JobTaskNode addNode(final Map<Integer, JobTaskNode> nodesMap, final Task<?> task) {
+  private static Node addNode(final Map<Integer, Node> nodesMap, final Task<?> task) {
     final int pos = task.getPosition();
-    JobTaskNode node = nodesMap.get(pos);
+    Node node = nodesMap.get(pos);
     if (node == null) {
-      node = new JobTaskNode(pos, false, null);
+      node = new Node(pos, false, null);
       nodesMap.put(pos, node);
       if (task instanceof TaskNode) {
         final TaskNode<?> taskNode = (TaskNode<?>) task;
         if (taskNode.hasDependency()) {
           for (final TaskNode<?> dep: taskNode.getDependencies()) {
-            final JobTaskNode depNode = addNode(nodesMap, dep);
+            final Node depNode = addNode(nodesMap, dep);
             node.getDependencies().add(depNode);
           }
         }

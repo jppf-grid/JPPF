@@ -228,7 +228,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
 
     final MyTask[] tasks = createLayeredTasks(layers, tasksPerLayer);
     final JPPFJob job = new JPPFJob();
-    for (int i=0; i<tasksPerLayer; i++) job.addWithDpendencies(tasks[i]);
+    for (int i=0; i<tasksPerLayer; i++) job.add(tasks[i]);
     assertEquals(nbTasks, job.unexecutedTaskCount());
     assertTrue(job.hasTaskGraph());
 

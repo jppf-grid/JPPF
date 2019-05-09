@@ -130,32 +130,32 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
   }
 
   /**
-   * Add a {@link Task} to this job.
+   * Add a {@link Task} to this job. When the task is an instance of {@link TaskNode}, the entire dependency graph rooted at this task is added as well.
    * @param task the task to add to this job.
-   * @return an instance of {@code Task} that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
+   * @return an instance of {@code Task} that is either the same as the input if the input is a subclass of {@code AbstractTask},
    * or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a {@code Task} or a JPPF-annotated class.
    * @since 5.0
    */
   public Task<?> add(final Task<?> task) throws JPPFException {
-    return add(task, (Object[]) null);
+    return (task instanceof TaskNode) ? addWithDependencies((TaskNode<?>) task) : add(task, (Object[]) null);
   }
 
   /**
    * Add a {@link TaskNode} to this job. The entire dependency graph rooted at this task is added as well.
    * <br>If the task is already present in this job, nothing is added.
    * @param task the task to add to this job.
-   * @return an instance of {@code Task} that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
+   * @return an instance of {@code Task} that is either the same as the input if the input is a subclass of {@code AbstractTask},
    * or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a {@code Task} or a JPPF-annotated class.
    * @since 6.2
    */
-  public Task<?> addWithDpendencies(final TaskNode<?> task) throws JPPFException {
+  private Task<?> addWithDependencies(final TaskNode<?> task) throws JPPFException {
     if (tasks.contains(task)) return task;
     taskGraph = true;
-    final Task<?> result = add(task);
+    final Task<?> result = add(task, (Object[]) null);
     if (task.hasDependency()) {
-      for (final TaskNode<?> dep: task.getDependencies()) addWithDpendencies(dep);
+      for (final TaskNode<?> dep: task.getDependencies()) addWithDependencies(dep);
     }
     return result;
   }

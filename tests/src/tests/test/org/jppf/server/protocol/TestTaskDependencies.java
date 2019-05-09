@@ -26,6 +26,7 @@ import java.util.*;
 import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
 import org.jppf.node.protocol.graph.*;
+import org.jppf.node.protocol.graph.TaskGraph.Node;
 import org.jppf.serialization.*;
 import org.jppf.serialization.kryo.KryoSerialization;
 import org.junit.Test;
@@ -78,9 +79,9 @@ public class TestTaskDependencies extends BaseTest {
   public void testGraph() throws Exception {
     final MyTask t0 = new MyTask("T0", 0), t1 = new MyTask("T1", 1), t2 = new MyTask("T2", 2), t3 = new MyTask("T3", 3);
     t0.dependsOn(t1.dependsOn(t3), t2.dependsOn(t3));
-    final JobTaskGraph graph = JobGraphHelper.graphOf(Arrays.asList(t0, t1, t2, t3));
+    final TaskGraph graph = TaskGraphHelper.graphOf(Arrays.asList(t0, t1, t2, t3));
 
-    final List<JobTaskNode> nodes = new ArrayList<>();
+    final List<Node> nodes = new ArrayList<>();
     print(false, false, "getting all nodes");
     graph.startVisit((NodeVisitor) node -> nodes.add(node));
     print(false, false, "all nodes: %s", nodes);
@@ -106,7 +107,7 @@ public class TestTaskDependencies extends BaseTest {
     final MyTask t0 = new MyTask("T0", 0), t1 = new MyTask("T1", 1), t2 = new MyTask("T2", 2), t3 = new MyTask("T3", 3);
     t0.dependsOn(t1.dependsOn(t3), t2.dependsOn(t3));
     final JPPFJob job = new JPPFJob();
-    job.addWithDpendencies(t0);
+    job.add(t0);
     assertTrue(job.hasTaskGraph());
     assertEquals(4, job.unexecutedTaskCount());
     final List<Task<?>> tasks = job.getJobTasks();
@@ -120,7 +121,7 @@ public class TestTaskDependencies extends BaseTest {
    */
   @Test
   public void testGraphExecution() throws Exception {
-    final JobTaskGraph graph = createDiamondGraph();
+    final TaskGraph graph = createDiamondGraph();
     print(false, false, "graph = %s", graph);
     checkExecution(graph, -1, 0, false, 3);
     checkExecution(graph,  3, 1, false, 1, 2);
@@ -138,7 +139,7 @@ public class TestTaskDependencies extends BaseTest {
     final JPPFSerialization[] serializations = { new DefaultJavaSerialization(), new DefaultJPPFSerialization(), new KryoSerialization()/*, new XstreamSerialization()*/ };
     for (final JPPFSerialization ser: serializations) {
       print(false, false, ">> testing with %s <<", ser.getClass().getSimpleName());
-      JobTaskGraph graph = createDiamondGraph();
+      TaskGraph graph = createDiamondGraph();
       checkExecution(graph = copyGraph(graph, ser), -1, 0, false, 3);
       checkExecution(graph = copyGraph(graph, ser),  3, 1, false, 1, 2);
       checkExecution(graph = copyGraph(graph, ser),  2, 2, false, 1);
@@ -153,7 +154,7 @@ public class TestTaskDependencies extends BaseTest {
    */
   @Test
   public void testTopologicalSort() throws Exception {
-    final JobTaskGraph graph = createGraph();
+    final TaskGraph graph = createGraph();
     final List<Integer> to = graph.topologicalSortDFS();
     print(false, false, "b: graph = %s, topological order = %s", graph, to);
     for (final Integer n: to) {
@@ -175,7 +176,7 @@ public class TestTaskDependencies extends BaseTest {
       tasks[i] = new MyTask("T" + i, i);
       if (i > 0) tasks[i].dependsOn(tasks[i - 1]);
     }
-    final JobTaskGraph graph = JobGraphHelper.graphOf(Arrays.asList(tasks));
+    final TaskGraph graph = TaskGraphHelper.graphOf(Arrays.asList(tasks));
     print(false, false, "graph = %s", graph);
     final List<Integer> sorted = graph.topologicalSortDFS();
     print(false, false, "topoplogical sort -> %s", sorted);

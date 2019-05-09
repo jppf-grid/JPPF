@@ -24,7 +24,12 @@ import org.jppf.node.protocol.*;
 import org.jppf.utils.SystemUtils;
 
 /**
- * 
+ * Instances of this class represent tasks that are part of a dependency graph of tasks within a job.<br>
+ * Dependencies can be added using the {@link #dependsOn(Collection) dependsOn(Collection&lt;TaskNode&gt;)} and {@link TaskNode#dependsOn(TaskNode[]) dependsOn(TaskNode...)} methods.
+ * <p>Dependency cycles are checked and detected every time one or more dependencies are added to this task via the aforementioned methods.
+ * When a dependency cycle is detected, a {@link JPPFDependencyCycleException} is raised, with a description of the cycle.
+ * <p>It is therefore guaranteed that tasks with dependencies form a <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">directed acyclic graph</a> (DAG).
+ * This ensures that the tasks can be executed n a <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological order</a> where no task will be executed before its dependencies.
  * @author Laurent Cohen
  * @param <T> the type of results returned by this task.
  */

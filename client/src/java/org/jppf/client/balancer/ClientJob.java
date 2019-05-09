@@ -86,7 +86,7 @@ public class ClientJob extends AbstractClientJob {
   /**
    * The graph of tasks in the job, if any.
    */
-  private final JobTaskGraph taskGraph;
+  private final TaskGraph taskGraph;
   /**
    * Position of taskss sent tot he server.
    */
@@ -123,7 +123,7 @@ public class ClientJob extends AbstractClientJob {
     for (final Task<?> result : job.getResults().getAllResults()) {
       if (result != null) taskStateMap.put(result.getPosition(), TaskState.RESULT);
     }
-    this.taskGraph = job.hasTaskGraph() ? JobGraphHelper.graphOf(tasks) : null;
+    this.taskGraph = job.hasTaskGraph() ? TaskGraphHelper.graphOf(tasks) : null;
     if (debugEnabled && (taskGraph != null)) log.debug("taskGraph = {}", taskGraph);
   }
 
@@ -562,7 +562,7 @@ public class ClientJob extends AbstractClientJob {
   /**
    * @return the graph of tasks in the job, if any.
    */
-  public JobTaskGraph getTaskGraph() {
+  public TaskGraph getTaskGraph() {
     return taskGraph;
   }
 

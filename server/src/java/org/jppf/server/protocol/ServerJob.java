@@ -26,7 +26,7 @@ import org.jppf.io.DataLocation;
 import org.jppf.job.JobInformation;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.*;
-import org.jppf.node.protocol.graph.JobTaskGraph;
+import org.jppf.node.protocol.graph.TaskGraph;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.job.management.NodeJobInformation;
@@ -58,7 +58,7 @@ public class ServerJob extends AbstractServerJobBase {
   /**
    * The graph of tasks in the job, if any.
    */
-  private final JobTaskGraph taskGraph;
+  private final TaskGraph taskGraph;
   /**
    * Position of taskss sent tot he server.
    */
@@ -430,7 +430,7 @@ public class ServerJob extends AbstractServerJobBase {
   /**
    * @return the graph of tasks in the job, if any.
    */
-  public JobTaskGraph getTaskGraph() {
+  public TaskGraph getTaskGraph() {
     return taskGraph;
   }
 

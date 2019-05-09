@@ -19,7 +19,7 @@
 package org.jppf.node.protocol.graph;
 
 /**
- * 
+ * Enumeration of the possible outcomes (other than exceptions) of the visit of a node in a graph of tasks.
  * @author Laurent Cohen
  * @exclude
  */

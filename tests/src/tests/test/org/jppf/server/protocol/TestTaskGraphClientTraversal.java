@@ -50,7 +50,7 @@ public class TestTaskGraphClientTraversal extends Setup1D2N1C {
       pool.setMaxJobs(Integer.MAX_VALUE);
       final MyTask[] tasks = createDiamondTasks();
       final JPPFJob job = new JPPFJob();
-      job.addWithDpendencies(tasks[0]);
+      job.add(tasks[0]);
       assertTrue(job.hasTaskGraph());
       job.getClientSLA().setGraphTraversalInClient(true);
       final DispatchListener listener = new DispatchListener();
@@ -93,7 +93,7 @@ public class TestTaskGraphClientTraversal extends Setup1D2N1C {
       taskMap.get("T1").setDuration(5000L).setStartNotif("start");
       taskMap.get("T2").setDuration(5000L).setStartNotif("start");
       final JPPFJob job = new JPPFJob();
-      job.addWithDpendencies(tasks[0]);
+      job.add(tasks[0]);
       assertTrue(job.hasTaskGraph());
       job.getClientSLA().setGraphTraversalInClient(true);
       final DispatchListener listener = new DispatchListener();

@@ -28,6 +28,7 @@ import javax.management.*;
 import org.jppf.client.event.*;
 import org.jppf.job.*;
 import org.jppf.node.protocol.graph.*;
+import org.jppf.node.protocol.graph.TaskGraph.Node;
 import org.jppf.serialization.JPPFSerialization;
 import org.jppf.utils.ExceptionThrowingRunnable;
 
@@ -45,13 +46,13 @@ public class TaskDependenciesHelper {
    * @return a copy of the input graph.
    * @throws Exception if any error occurs.
    */
-  public static JobTaskGraph copyGraph(final JobTaskGraph graph, final JPPFSerialization ser) throws Exception {
+  public static TaskGraph copyGraph(final TaskGraph graph, final JPPFSerialization ser) throws Exception {
     BaseTest.print(false, false, "1: graph = %s", graph);
     try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
       ser.serialize(graph, os);
       final byte[] bytes = os.toByteArray();
       try (final ByteArrayInputStream is = new ByteArrayInputStream(bytes)) {
-        final JobTaskGraph graph2 = (JobTaskGraph) ser.deserialize(is);
+        final TaskGraph graph2 = (TaskGraph) ser.deserialize(is);
         BaseTest.print(false, false, "2: graph = %s; seriallzed size = %,d bytes, string = %s", graph2, bytes.length, new String(bytes));
         return graph2;
       }
@@ -70,9 +71,9 @@ public class TaskDependenciesHelper {
    * </pre>
    * @throws Exception if any error occurs.
    */
-  public static JobTaskGraph createDiamondGraph() throws Exception {
+  public static TaskGraph createDiamondGraph() throws Exception {
     final MyTask[] tasks = createDiamondTasks();
-    final JobTaskGraph graph = JobGraphHelper.graphOf(Arrays.asList(tasks));
+    final TaskGraph graph = TaskGraphHelper.graphOf(Arrays.asList(tasks));
     BaseTest.print(false, false, "graph topological sort = %s", graph.topologicalSortDFS());
     return graph;
   }
@@ -124,7 +125,7 @@ public class TaskDependenciesHelper {
    * @return a graph with diamonfd dependencies.
    * @throws Exception if any error occurs.
    */
-  public static JobTaskGraph createGraph() throws Exception {
+  public static TaskGraph createGraph() throws Exception {
     final MyTask[] tasks = new MyTask[6];
     for (int i=0; i<tasks.length; i++) tasks[i] = new MyTask("" + (char) ('A' + i), i);
     tasks[5].dependsOn(tasks[0], tasks[1], tasks[4]);
@@ -133,7 +134,7 @@ public class TaskDependenciesHelper {
     tasks[2].dependsOn(tasks[0]);
     tasks[1].dependsOn(tasks[0]);
     
-    final JobTaskGraph graph = JobGraphHelper.graphOf(Arrays.asList(tasks));
+    final TaskGraph graph = TaskGraphHelper.graphOf(Arrays.asList(tasks));
     //print(false, false, "graph topological sort = %s", graph.topologicalSortDFS());
     return graph;
   }
@@ -146,7 +147,7 @@ public class TaskDependenciesHelper {
    * @param expectGraphDone whether to expect the graph execution to be complete.
    * @param expectedPositions the expected positions of the task that no longer have pending dependencies.
    */
-  public static void checkExecution(final JobTaskGraph graph, final int taskPosition, final int expectedDoneCount, final boolean expectGraphDone, final int...expectedPositions) {
+  public static void checkExecution(final TaskGraph graph, final int taskPosition, final int expectedDoneCount, final boolean expectGraphDone, final int...expectedPositions) {
     final int expectedSize = ((expectedPositions == null) || (expectedPositions.length <= 0)) ? 0 : expectedPositions.length;
     if (taskPosition >= 0) graph.nodeDone(taskPosition);
     final Set<Integer> positions = graph.getAvailableNodes();
@@ -282,7 +283,7 @@ public class TaskDependenciesHelper {
   @FunctionalInterface
   public interface NodeVisitor extends TaskNodeVisitor {
     @Override
-    default TaskNodeVisitResult visitTaskNode(JobTaskNode node) {
+    default TaskNodeVisitResult visitTaskNode(Node node) {
       BaseTest.print(false, false, "visiting %s", node);
       doVisit(node);
       return TaskNodeVisitResult.CONTINUE;
@@ -292,7 +293,7 @@ public class TaskDependenciesHelper {
      * Visit the specified node.
      * @param node the node to visit.
      */
-    void doVisit(JobTaskNode node);
+    void doVisit(Node node);
   }
 
   /** */

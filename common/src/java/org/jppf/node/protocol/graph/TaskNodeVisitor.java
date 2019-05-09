@@ -19,7 +19,7 @@
 package org.jppf.node.protocol.graph;
 
 /**
- * 
+ * Visitor interface for a graph of tasks with dependencies.
  * @author Laurent Cohen
  * @exclude
  */
@@ -30,19 +30,19 @@ public interface TaskNodeVisitor {
    * @param node the node to visit.
    * @return the result of the node's visit as a {@link TaskNodeVisitResult} enum element.
    */
-  TaskNodeVisitResult visitTaskNode(JobTaskNode node);
+  TaskNodeVisitResult visitTaskNode(TaskGraph.Node node);
 
   /**
    * Called before visiting the specified node.
    * @param node the node to visit.
    */
-  default void preVisitNode(JobTaskNode node) {
+  default void preVisitNode(TaskGraph.Node node) {
   }
 
   /**
    * Called after visiting the specified node.
    * @param node the node to visit.
    */
-  default void postVisitNode(JobTaskNode node) {
+  default void postVisitNode(TaskGraph.Node node) {
   }
 }

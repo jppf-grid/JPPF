@@ -366,7 +366,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     taskMap.get("T1").setDuration(2500L).setStartNotif("start");
     taskMap.get("T2").setDuration(2500L).setStartNotif("start");
     final JPPFJob job = new JPPFJob().setName(method);
-    job.addWithDpendencies(tasks[0]);
+    job.add(tasks[0]);
     assertTrue(job.hasTaskGraph());
     final int nbTasks = job.getTaskCount();
     assertEquals(4, nbTasks);
