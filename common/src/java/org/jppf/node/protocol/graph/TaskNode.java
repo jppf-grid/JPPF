@@ -28,7 +28,7 @@ import org.jppf.node.protocol.*;
  * <p>Dependency cycles are checked and detected every time one or more dependencies are added to this task via the aforementioned methods.
  * When a dependency cycle is detected, a {@link JPPFDependencyCycleException} is raised, with a description of the cycle.
  * <p>It is therefore guaranteed that tasks with dependencies form a <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">directed acyclic graph</a> (DAG).
- * This ensures that the tasks can be executed n a <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological order</a> where no task will be executed before its dependencies.
+ * This ensures that the tasks can be executed in a <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological order</a> where no task will be executed before its dependencies.
  * @param <T> the type of results produced by the task.
  * @author Laurent Cohen
  */

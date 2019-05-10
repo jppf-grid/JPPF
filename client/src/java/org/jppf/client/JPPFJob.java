@@ -138,6 +138,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * @since 5.0
    */
   public Task<?> add(final Task<?> task) throws JPPFException {
+    if (tasks.contains(task)) return task;
     return (task instanceof TaskNode) ? addWithDependencies((TaskNode<?>) task) : add(task, (Object[]) null);
   }
 

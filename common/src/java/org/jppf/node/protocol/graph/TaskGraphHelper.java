@@ -21,7 +21,6 @@ package org.jppf.node.protocol.graph;
 import java.util.*;
 
 import org.jppf.node.protocol.Task;
-import org.jppf.node.protocol.graph.TaskGraph.Node;
 
 /**
  * Utility and factory methods to build and manipulate graphs of tasks.
@@ -35,7 +34,7 @@ public class TaskGraphHelper {
    * @return a newly created {@link TaskGraph}.
    */
   public static TaskGraph graphOf(final Collection<Task<?>> tasks) {
-    final Map<Integer, Node> nodesMap = new HashMap<>();
+    final Map<Integer, TaskGraph.Node> nodesMap = new HashMap<>();
     for (final Task<?> task: tasks) addNode(nodesMap, task);
     return new TaskGraph(nodesMap);
   }
@@ -46,17 +45,17 @@ public class TaskGraphHelper {
    * @param task the task to add.
    * @return  the node corrresponding to the task.
    */
-  private static Node addNode(final Map<Integer, Node> nodesMap, final Task<?> task) {
+  private static TaskGraph.Node addNode(final Map<Integer, TaskGraph.Node> nodesMap, final Task<?> task) {
     final int pos = task.getPosition();
-    Node node = nodesMap.get(pos);
+    TaskGraph.Node node = nodesMap.get(pos);
     if (node == null) {
-      node = new Node(pos, false, null);
+      node = new TaskGraph.Node(pos, false, null);
       nodesMap.put(pos, node);
       if (task instanceof TaskNode) {
         final TaskNode<?> taskNode = (TaskNode<?>) task;
         if (taskNode.hasDependency()) {
           for (final TaskNode<?> dep: taskNode.getDependencies()) {
-            final Node depNode = addNode(nodesMap, dep);
+            final TaskGraph.Node depNode = addNode(nodesMap, dep);
             node.getDependencies().add(depNode);
           }
         }
