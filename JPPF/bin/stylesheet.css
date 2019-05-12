@@ -539,6 +539,7 @@ div.topNav div.aboutLanguage {
 
 .deprecatedLabel {
   font-weight: bold;
+  vertical-align: top;
 }
 
 .deprecationComment {
@@ -548,6 +549,7 @@ div.topNav div.aboutLanguage {
 span.deprecatedLabel + div.block span.deprecationComment {
   margin-left: -0px;
   padding-left: 8px;
+  display: none;
 }
 
 span.deprecatedLabel, span.deprecationComment {
