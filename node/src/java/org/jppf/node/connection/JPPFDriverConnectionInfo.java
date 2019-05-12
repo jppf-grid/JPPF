@@ -49,7 +49,7 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
    * @param host the driver host name or IP address.
    * @param port the driver port to connect to.
    * @param recoveryPort the driver recovery port to connect to.
-   * @deprecated as of JPPF 6.0, the recovery mechanism uses the same port number as the main server port.
+   * @deprecated as of JPPF 6.0, the recovery mechanism uses the same port number as the main server port.<br>
    * This constructor assumes recovery is enabled if {@code recoveryPort > 0}, and disabled otherwise.
    */
   public JPPFDriverConnectionInfo(final boolean secure, final String host, final int port, final int recoveryPort) {
@@ -86,7 +86,7 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
   }
 
   /**
-   * @deprecated as of JPPF 6.0, the recovery mechanism uses the same port number as the main server port.
+   * @deprecated as of JPPF 6.0, the recovery mechanism uses the same port number as the main server port.<br>
    * This method will return {@code -1} if recovery is disabled, or the value of {@link #getPort()} if it is enabled.
    */
   @Override
