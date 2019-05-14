@@ -26,7 +26,6 @@ import javax.management.*;
 
 import org.jppf.management.*;
 import org.jppf.management.forwarding.*;
-import org.jppf.node.protocol.ScriptedTask;
 import org.jppf.node.provisioning.*;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ConcurrentUtils;
@@ -36,7 +35,7 @@ import org.junit.Test;
 import test.org.jppf.test.setup.Setup1D1N1C;
 
 /**
- * Unit tests for the {@link ScriptedTask} class.
+ * Unit tests for node provisioning.
  * @author Laurent Cohen
  */
 public class TestJPPFNodeProvisioning extends Setup1D1N1C {

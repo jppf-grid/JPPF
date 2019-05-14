@@ -78,7 +78,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
         assertEquals(JPPFNodeState.ConnectionState.CONNECTED, state.getConnectionStatus());
         assertEquals(JPPFNodeState.ExecutionState.IDLE, state.getExecutionStatus());
       }
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, nbNodes, LifeCycleTask.class, 2000L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-" + selectorClass, false, nbNodes, LifeCycleTask.class, 2000L);
       job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
       client.submitAsync(job);
       Thread.sleep(750L);
