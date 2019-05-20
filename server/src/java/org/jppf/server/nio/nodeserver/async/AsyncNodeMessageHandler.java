@@ -132,6 +132,7 @@ public class AsyncNodeMessageHandler {
       systemInfo.getJppf().setBoolean("jppf.peer.driver", isPeer);
       systemInfo.getJppf().set(JPPFProperties.NODE_IDLE, true);
       context.setNodeInfo(systemInfo, false);
+      if (log.isTraceEnabled()) log.trace("node network info:\nipv4: {}\nipv6: {}", systemInfo.getNetwork().getString("ipv4.addresses"), systemInfo.getNetwork().getString("ipv6.addresses"));
     } else if (debugEnabled) log.debug("no system info received for node {}", context);
     final int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
     if (debugEnabled) log.debug("management port = {} for node = {}", port, context);
@@ -192,27 +193,30 @@ public class AsyncNodeMessageHandler {
   private HostIP resolveHost(final AsyncNodeContext context) throws Exception {
     String host = getChannelHost(context);
     String ip = host;
-    try {
-      final InetAddress addr = InetAddress.getByName(host);
-      ip = addr.getHostAddress();
-      if (host.equals(ip)) host = addr.getHostName();
-      if (!host.equals(ip)) {
-        if (log.isTraceEnabled()) log.trace("resolved host from reverse DNS lookup: host={}, ip={}", host, ip);
-        return new HostIP(host, ip);
+    final boolean resolveFromSysInfo = driver.getConfiguration().getBoolean("jppf.resolve.node.host.from.sysinfo", false);
+    if (!resolveFromSysInfo) {
+      try {
+        final InetAddress addr = InetAddress.getByName(host);
+        ip = addr.getHostAddress();
+        if (host.equals(ip)) host = addr.getHostName();
+        if (!host.equals(ip)) {
+          if (log.isTraceEnabled()) log.trace("resolved host from reverse DNS lookup: host={}, ip={}", host, ip);
+          return new HostIP(host, ip);
+        }
+      } catch (@SuppressWarnings("unused") final UnknownHostException ignore) {
       }
-    } catch (@SuppressWarnings("unused") final UnknownHostException ignore) {
     }
     // if host couldn't be resolved via reverse DNS lookup
     final JPPFSystemInformation info = context.getSystemInformation();
     if (info != null) {
       for (final HostIP hostIP: info.parseIPV4Addresses()) {
-        if (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress())) {
+        if (resolveFromSysInfo || (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress()))) {
           if (log.isTraceEnabled()) log.trace("resolved host from system info: {}", hostIP);
           return hostIP;
         }
       }
       for (final HostIP hostIP: info.parseIPV6Addresses()) {
-        if (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress())) {
+        if (resolveFromSysInfo || (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress()))) {
           if (log.isTraceEnabled()) log.trace("resolved host from system info: {}", hostIP);
           return hostIP;
         }

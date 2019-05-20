@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  jppf-driver:
+    image: jppf-driver:6.2-alpha
+    ports:
+      - "11111:11111"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "2"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 15s
+    networks:
+      jppf_net:
+
+  jppf-node:
+    image: jppf-node:6.2-alpha
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 15s
+    networks:
+      jppf_net:
+
+networks:
+  jppf_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"

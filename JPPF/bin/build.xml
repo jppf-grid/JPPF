@@ -219,6 +219,7 @@ build.date = ${readable.now}</echo>
   <import file="build-docs.xml"/>
   <import file="build-tests.xml"/>
   <import file="build-maven.xml"/>
+  <import file="build-docker.xml"/>
   <import file="build-dotnet.xml"/>
   <import file="build-android.xml"/>
   <import file="build-utils.xml"/>

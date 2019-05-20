@@ -305,13 +305,20 @@ public final class NetworkUtils {
     final HostIP[] result = new HostIP[pairs.length];
     int count = 0;
     for (String pair: pairs) {
-      final String[] comps = RegexUtils.PIPE_PATTERN.split(pair);
-      if ("".equals(comps[0])) comps[0] = null;
-      if (comps[1] != null) {
-        final int idx = comps[1].indexOf('%');
-        if (idx >= 0) comps[1] = comps[1].substring(0, idx);
-      };
-      result[count++] = new HostIP(comps[0], comps[1]);
+      try {
+        final String[] comps = RegexUtils.PIPE_PATTERN.split(pair);
+        if ((comps  != null) && (comps.length > 0)) {
+          if ("".equals(comps[0])) comps[0] = null;
+          if ((comps.length > 1) && (comps[1] != null)) {
+            final int idx = comps[1].indexOf('%');
+            if (idx >= 0) comps[1] = comps[1].substring(0, idx);
+          };
+          result[count++] = new HostIP(comps[0], (comps.length > 1) ? comps[1] : comps[0]);
+        }
+      } catch(final RuntimeException e) {
+        log.error("error parsing '{}' in [{}]: {}", pair, addresses, ExceptionUtils.getMessage(e));
+        throw e;
+      }
     }
     return result;
   }

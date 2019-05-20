@@ -22,7 +22,7 @@
   <!--                 Package the runtime components for deployment             -->
   <!-- ========================================================================= -->
 
-  <target name="runtime" depends="rebuild, runtime.setup, runtime.driver, runtime.node, runtime.gui, application.template, runtime.jmxremote.nio"/>
+  <target name="runtime" depends="rebuild, runtime.driver, runtime.node, runtime.gui, application.template, runtime.jmxremote.nio"/>
 
   <!--
     Build a distributable zip module with predefined base libraries.
@@ -76,7 +76,7 @@
 
   <!-- =========== Application template packaging =========== -->
 
-  <target name="application.template">
+  <target name="application.template" depends="runtime.setup">
     <package-module module="application-template">
       <module-elements>
         <zipfileset dir="${build}" prefix="${application-template.prefix}/lib" includes="jppf-client-${version.number}.jar"/>
@@ -89,7 +89,7 @@
 
   <!-- =========== Driver packaging =========== -->
 
-  <target name="runtime.driver">
+  <target name="runtime.driver" depends="runtime.setup">
     <package-module module="driver">
       <module-elements>
         <zipfileset dir="${lib}/HikariCP" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
@@ -104,7 +104,7 @@
 
   <!-- =========== Node packaging =========== -->
 
-  <target name="runtime.node">
+  <target name="runtime.node" depends="runtime.setup">
     <package-module module="node">
       <module-elements>
         <zipfileset dir="${build}" prefix="${node.prefix}/lib" includes="jppf-node-${version.number}.jar"/>
@@ -117,7 +117,7 @@
 
   <!-- =========== GUI packaging =========== -->
 
-  <target name="runtime.gui">
+  <target name="runtime.gui" depends="runtime.setup">
     <package-module module="gui" zip-prefix="admin-ui">
       <module-elements>
         <zipfileset dir="${build}" prefix="${gui.prefix}/lib" includes="jppf-client-${version.number}.jar,jppf-admin-${version.number}.jar"/>
@@ -134,7 +134,7 @@
 
   <!-- =========== JPPF JMX REMOTE =========== -->
   
-  <target name="runtime.jmxremote.nio">
+  <target name="runtime.jmxremote.nio" depends="runtime.setup">
     <delete dir="${build}/config/jmxremote-nio" quiet="true"/>
     <mkdir dir="${build}/config/jmxremote-nio"/>
     <package-module module="jmxremote-nio" />

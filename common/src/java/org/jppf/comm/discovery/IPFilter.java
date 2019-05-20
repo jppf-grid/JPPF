@@ -76,10 +76,28 @@ public class IPFilter {
   }
 
   /**
+   * Initialize this filter with the specified configuration.
+   * @param config the configuration from which to get the include and exclude filters.
+   * @param prefix the confiugration properties prefix to use.
+   */
+  public IPFilter(final TypedProperties config, final String prefix) {
+    this.config = (config == null) ? new TypedProperties() : config;
+    this.broadcaster = false;
+    configure(prefix);
+  }
+
+  /**
    * Configure this IP filter from the JPPF configuration.
    */
   public void configure() {
-    final String prefix = "jppf.discovery." + (broadcaster ? "broadcast." : "");
+    configure("jppf.discovery." + (broadcaster ? "broadcast." : ""));
+  }
+
+  /**
+   * Configure this IP filter from the JPPF configuration.
+   * @param prefix the confiugration properties prefix to use.
+   */
+  public void configure(final String prefix) {
     configureIPAddressPatterns(config.getString(prefix + "include.ipv4"), true, true);
     configureIPAddressPatterns(config.getString(prefix + "include.ipv6"), false, true);
     configureIPAddressPatterns(config.getString(prefix + "exclude.ipv4"), true, false);

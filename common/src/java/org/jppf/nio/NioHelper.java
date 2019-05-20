@@ -98,10 +98,10 @@ public class NioHelper {
 
   /**
    * Get the acceptor server.
-   * @return a {@link NioServer} instance.
+   * @return a {@link AcceptorNioServer} instance.
    * @throws Exception if any error occurs.
    */
-  public static NioServer getAcceptorServer() throws Exception {
+  public static AcceptorNioServer getAcceptorServer() throws Exception {
     synchronized(identifiedServers) {
       NioServer acceptor = identifiedServers.get(JPPFIdentifiers.ACCEPTOR_CHANNEL);
       if (acceptor == null) {
@@ -111,7 +111,7 @@ public class NioHelper {
         acceptor.start();
         if (debugEnabled) log.debug("acceptor started");
       }
-      return acceptor;
+      return (AcceptorNioServer) acceptor;
     }
   }
 

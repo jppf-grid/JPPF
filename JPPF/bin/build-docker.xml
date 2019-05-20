@@ -1,0 +1,99 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2019 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="JPPF-docker" basedir=".." xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+  <!-- ========================================================================= -->
+  <!-- Build docker images for JPPF                                              -->
+  <!-- ========================================================================= -->
+  
+  <target name="build.docker.images" depends="detect.docker, build.docker.images.internal" description="build docker images"/>
+  <target name="build.docker.images.internal" depends="docker.driver.image, docker.node.image" if="docker.installed"/>
+
+  <target name="detect.docker">
+    <exec dir="${basedir}" executable="docker" failonerror="false" resultproperty="docker.exit.code">
+      <arg value="-v"/>
+    </exec>
+    <condition property="docker.installed">
+      <equals arg1="0" arg2="${docker.exit.code}"/>
+    </condition>
+    <echo message="docker.installed = ${docker.installed}"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Build the driver docker image                                             -->
+  <!-- ========================================================================= -->
+  
+  <target name="docker.driver.image" depends="detect.docker, docker.driver.image.internal" description="build the JPPF driver docker image"/>
+
+  <target name="docker.driver.image.internal" depends="build, runtime.driver" if="docker.installed">
+    <build.image comp="driver"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Build the node docker image                                               -->
+  <!-- ========================================================================= -->
+  
+  <target name="docker.node.image" depends="detect.docker, docker.node.image.internal" description="build the JPPF node docker image"/>
+
+  <target name="docker.node.image.internal" depends="build, runtime.node" if="docker.installed">
+    <build.image comp="node"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Macrodefs                                                                 -->
+  <!-- ========================================================================= -->
+
+  <!--
+    Build a docker image that runs a JPPF component.
+    Attributes:
+    - comp: the JPFP component for which to build an image, should be 'driver' or 'node'
+  -->
+  <macrodef name="build.image">
+    <attribute name="comp"/>
+    <sequential>
+      <delete dir="${build}/docker" quiet="true"/>
+      <mkdir dir="${build}/docker"/>
+      <!-- decompress JPPF-x.y.z-comp.zip and copy only the necessary files to the image context -->
+      <local name="zip.name"/>
+      <property name="zip.name" value="${app.ver}-@{comp}"/>
+      <unzip dest="${build}/docker" src="${build}/${zip.name}.zip"/>
+      <delete dir="${build}/docker/${zip.name}/bin" quiet="true"/>
+      <delete dir="${build}/docker/${zip.name}/lib-src" quiet="true"/>
+      <delete quiet="true">
+        <fileset dir="${build}/docker/${zip.name}" includes="*.*,JPPFDriver,JPPFNode,config/*.properties" excludes="LICENSE.txt"/>
+      </delete>
+      <copy todir="${build}/docker/${zip.name}">
+        <fileset dir="${bin}/docker/@{comp}" includes="start-@{comp}.sh"/>
+      </copy>
+      <copy todir="${build}/docker/${zip.name}/config">
+        <fileset dir="${bin}/docker/@{comp}" includes="*.properties"/>
+      </copy>
+      <copy todir="${build}/docker">
+        <fileset dir="${bin}/docker/@{comp}" includes="Dockerfile"/>
+      </copy>
+      <replace file="${build}/docker/Dockerfile" token="@version@" value="${version.number}"/>
+      <exec dir="${build}/docker" executable="docker" failonerror="true">
+        <arg value="build"/>
+        <arg value="--tag=jppf-@{comp}:${version.number}"/>
+        <arg value="."/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+</project> 
