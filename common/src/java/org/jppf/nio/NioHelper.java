@@ -29,7 +29,7 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
- *
+ * Utility methods to help with managing nio servers.
  * @author Laurent Cohen
  */
 public class NioHelper {

@@ -194,7 +194,9 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
       final int maxBindRetries = retryOnException ? JPPFConfiguration.getProperties().getInt("jppf.acceptor.bind.maxRetries", 3) : 1;
       final long retryDelay = JPPFConfiguration.getProperties().getLong("jppf.acceptor.bind.retryDelay", 3000L);
       final ServerSocketChannel server = ServerSocketChannel.open().setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
-      final InetSocketAddress addr = new InetSocketAddress(port);
+      final InetAddress bindAddress = NetworkUtils.getInetAddress("jppf.bind.");
+      if (debugEnabled) log.debug("bind address: {}", bindAddress);
+      final InetSocketAddress addr = (bindAddress == null) ? new InetSocketAddress(port) : new InetSocketAddress(bindAddress, port);
       if (debugEnabled) log.debug("binding server socket channel to address {}", addr);
       RetryUtils.runWithRetry(maxBindRetries, retryDelay, () ->  server.bind(addr));
       if (debugEnabled) log.debug("server socket channel bound to address {}", addr);

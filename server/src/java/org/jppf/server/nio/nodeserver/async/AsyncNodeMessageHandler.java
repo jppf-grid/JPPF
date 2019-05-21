@@ -136,8 +136,12 @@ public class AsyncNodeMessageHandler {
     } else if (debugEnabled) log.debug("no system info received for node {}", context);
     final int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
     if (debugEnabled) log.debug("management port = {} for node = {}", port, context);
-    String host = getChannelHost(context);
-    final HostIP hostIP = context.isLocal() ? new HostIP(host, host) : resolveHost(context);
+    String host = bundle.getParameter(NODE_MANAGEMENT_HOST_PARAM, null);
+    HostIP hostIP = null;
+    if (host == null) {
+      host = getChannelHost(context);
+      hostIP = context.isLocal() ? new HostIP(host, host) : resolveHost(context);
+    } else hostIP = NetworkUtils.getHostIP(host);
     final boolean sslEnabled = !context.isLocal() && context.getSSLHandler() != null;
     final boolean hasJmx = driver.getConfiguration().get(JPPFProperties.MANAGEMENT_ENABLED);
     final String masterUuid = bundle.getParameter(NODE_PROVISIONING_MASTER_UUID);

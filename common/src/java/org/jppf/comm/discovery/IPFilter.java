@@ -42,11 +42,11 @@ public class IPFilter {
   /**
    * List of accepted IP address patterns.
    */
-  private List<AbstractIPAddressPattern> includePatterns = new ArrayList<>();
+  private final List<AbstractIPAddressPattern> includePatterns = new ArrayList<>();
   /**
    * List of rejected IP address patterns.
    */
-  private List<AbstractIPAddressPattern> excludePatterns = new ArrayList<>();
+  private final List<AbstractIPAddressPattern> excludePatterns = new ArrayList<>();
   /**
    * The loaded configuration.
    */
@@ -153,5 +153,12 @@ public class IPFilter {
       if (p.matches(ipComps)) return true;
     }
     return false;
+  }
+
+  /**
+   * @return whether there is at least one pattern.
+   */
+  public boolean hasPattern() {
+    return !includePatterns.isEmpty() || !excludePatterns.isEmpty();
   }
 }

@@ -21,6 +21,7 @@ package org.jppf.utils;
 import java.net.*;
 import java.util.*;
 
+import org.jppf.comm.discovery.IPFilter;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -47,6 +48,10 @@ public final class NetworkUtils {
    * Constant for empty array of host/ip pairs.
    */
   private static final HostIP[] NO_ADDRESS = new HostIP[0];
+  /**
+   * The list on non-local IP addresses fgor the current host.
+   */
+  private static final List<InetAddress> nonLocalIPAddresses = new ArrayList<>();
 
   /**
    * Instantiation opf this class is not permitted.
@@ -147,10 +152,13 @@ public final class NetworkUtils {
    * @return a List of <code>InetAddress</code> instances, may be empty but never null.
    */
   public static List<InetAddress> getNonLocalIPAddresses() {
-    final List<InetAddress> addresses = new ArrayList<>();
-    addresses.addAll(getNonLocalIPV4Addresses());
-    addresses.addAll(getNonLocalIPV6Addresses());
-    return addresses;
+    synchronized(nonLocalIPAddresses) {
+      if (nonLocalIPAddresses.isEmpty()) {
+        nonLocalIPAddresses.addAll(getNonLocalIPV4Addresses());
+        nonLocalIPAddresses.addAll(getNonLocalIPV6Addresses());
+      }
+      return new ArrayList<>(nonLocalIPAddresses);
+    }
   }
 
   /**
@@ -321,5 +329,34 @@ public final class NetworkUtils {
       }
     }
     return result;
+  }
+
+  /**
+   * @param propertyPrefix prefix for the properties deifining include and exclude IP address patterns.
+   * @return an {@link InetAddress} to bind to, or {@code null} to bind to all interfaces.
+   */
+  public static InetAddress getInetAddress(final String propertyPrefix) {
+    return getInetAddress(JPPFConfiguration.getProperties(), propertyPrefix);
+  }
+
+  /**
+   * @param config the config to use.
+   * @param propertyPrefix prefix for the properties deifining include and exclude IP address patterns.
+   * @return an {@link InetAddress} to bind to, or {@code null} to bind to all interfaces.
+   */
+  public static InetAddress getInetAddress(final TypedProperties config, final String propertyPrefix) {
+    final IPFilter filter = new IPFilter(config, propertyPrefix);
+    if (!filter.hasPattern()) return null;
+    final List<InetAddress> addresses = NetworkUtils.getNonLocalIPAddresses();
+    if ((addresses != null) && !addresses.isEmpty()) {
+      final List<InetAddress> accepted = new ArrayList<>();
+      for (final InetAddress addr: addresses) {
+        if (filter.isAddressAccepted(addr)) accepted.add(addr);
+      }
+      if (debugEnabled) log.debug("accepted addresses for '{}' prefix: {}", propertyPrefix, accepted);
+      if (accepted.size() == addresses.size()) return null;
+      return accepted.isEmpty() ? null : accepted.get(0);
+    }
+    return null;
   }
 }

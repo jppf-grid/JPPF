@@ -163,7 +163,7 @@ public abstract class NioServer extends Thread {
   /**
    * Initialize the underlying server sockets for the specified array of ports.
    * @param portsToInit the array of ports to initiialize.
-   * @param ssl <code>true</code> if the server sockets should be initialized with SSL enabled, <code>false</code> otherwise.
+   * @param ssl {@code true} if the server sockets should be initialized with SSL enabled, {@code false} otherwise.
    * @throws Exception if any error occurs while initializing the server sockets.
    */
   private void init(final int[] portsToInit, final boolean ssl) throws Exception {
@@ -173,7 +173,7 @@ public abstract class NioServer extends Thread {
   /**
    * Initialize the underlying server sockets for the spcified array of ports.
    * @param portToInit the array of ports to initiialize.
-   * @param ssl <code>true</code> if the server sockets should be initialized with SSL enabled, <code>false</code> otherwise.
+   * @param ssl {@code true} if the server sockets should be initialized with SSL enabled, {@code false} otherwise.
    * @param env optional map of parameters to associate with the server socket channel.
    * @param retryOnException whether to retry if an exception occurs when binding the server.
    * @throws Exception if any error occurs while initializing the server sockets.
@@ -251,11 +251,11 @@ public abstract class NioServer extends Thread {
   /**
    * Register an incoming connection with this server's selector.
    * The channel is registered with an empty set of initial interest operations,
-   * which means a call to the corresponding {@link SelectionKey}'s <code>interestOps()</code> method will return 0.
+   * which means a call to the corresponding {@link SelectionKey}'s {@code interestOps()} method will return 0.
    * @param serverSocketChannel the server socket channel accepting the connection.
    * @param channel the socket channel representing the connection.
    * @param sslHandler an sslEngine eventually passed on from a different server.
-   * @param ssl specifies whether an <code>SSLHandler</code> should be initialized for the channel.
+   * @param ssl specifies whether an {@code SSLHandler} should be initialized for the channel.
    * @param peer specifiies whether the channel is for a peer driver.
    * @param params optional parameters.
    * @throws Exception if any error occurs.
@@ -266,7 +266,7 @@ public abstract class NioServer extends Thread {
   /**
    * Define a context for a newly created channel.
    * @param params optional parameters.
-   * @return an <code>NioContext</code> instance.
+   * @return an {@code NioContext} instance.
    */
   public abstract NioContext createNioContext(final Object...params);
 

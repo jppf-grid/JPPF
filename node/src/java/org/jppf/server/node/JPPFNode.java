@@ -18,6 +18,7 @@
 package org.jppf.server.node;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.*;
 
 import org.jppf.*;
@@ -243,6 +244,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       }
     } else {
       if (!throttlingHandler.check()) bundle.setParameter(BundleParameter.NODE_ACCEPTS_NEW_JOBS, false);
+      final String ip = getManagementAddress();
+      if (ip != null) bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, ip);
       throttlingHandler.start();
     }
     if (isJmxEnabled()) setupBundleParameters(bundle);
@@ -366,7 +369,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (isStopped()) throw new IllegalStateException("this node is shutting down");
     return false;
   }
-
+  
   /**
    * @return the slave node manager.
    * @exclude
@@ -420,5 +423,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   public List<String> getHandshakeUuidPath() {
     return handshakeUuidPath;
+  }
+
+
+  /**
+   * @return an {@link InetAddress} to bind to, or {@code null} to bind to all interfaces.
+   */
+  private String getManagementAddress() {
+    final InetAddress addr = NetworkUtils.getInetAddress(getConfiguration(), "jppf.management.host.");
+    return (addr != null) ? addr.getHostAddress() : null;
   }
 }
