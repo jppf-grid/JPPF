@@ -285,8 +285,8 @@ public class TestTypedProperties extends BaseTest {
     try (final Reader r = new StringReader(sb.toString())) {
       final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
-      checkProperty(props, "prop.1", "1/${env.  }");
-      checkProperty(props, "prop.2", "2-1/${env.  }-${env.}");
+      checkProperty(props, "prop.1", "1/null");
+      checkProperty(props, "prop.2", "2-1/null-null");
     }
   }
 
@@ -303,8 +303,8 @@ public class TestTypedProperties extends BaseTest {
     try (final Reader r = new StringReader(sb.toString())) {
       final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
-      checkProperty(props, "prop.1", "1/" + undef);
-      checkProperty(props, "prop.2", "2-1/" + undef);
+      checkProperty(props, "prop.1", "1/null");
+      checkProperty(props, "prop.2", "2-1/null");
     }
   }
 
@@ -339,8 +339,8 @@ public class TestTypedProperties extends BaseTest {
     try (final Reader r = new StringReader(sb.toString())) {
       final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
-      checkProperty(props, "prop.1", "1/${sys.  }");
-      checkProperty(props, "prop.2", "2-1/${sys.  }-${sys.}");
+      checkProperty(props, "prop.1", "1/null");
+      checkProperty(props, "prop.2", "2-1/null-null");
     }
   }
 
@@ -357,8 +357,8 @@ public class TestTypedProperties extends BaseTest {
     try (final Reader r = new StringReader(sb.toString())) {
       final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
-      checkProperty(props, "prop.1", "1/" + undef);
-      checkProperty(props, "prop.2", "2-1/" + undef);
+      checkProperty(props, "prop.1", "1/null");
+      checkProperty(props, "prop.2", "2-1/null");
     }
   }
 
