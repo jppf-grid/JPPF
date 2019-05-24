@@ -481,4 +481,16 @@ public final class StringUtils {
       return null;
     }
   }
+
+  /**
+   * Remove the leading and trailing quotes form the source string.
+   * @param source the string to unquote.
+   * @return the unquoted string.
+   */
+  public static String unquote(final String source) {
+    String s = source;
+    while ((s.length() > 0) && (s.endsWith("\"") || s.endsWith("'"))) s = s.substring(0, s.length() - 1);
+    while ((s.length() > 0) && (s.startsWith("\"") || s.startsWith("'"))) s = s.substring(1);
+    return s;
+  }
 }

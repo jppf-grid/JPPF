@@ -250,10 +250,10 @@ public class SubstitutionsHandler {
       if (resolvedValue != null) {
         if (traceEnabled) log.trace(String.format("  got property from %s : [envVar=%s, value=%s]", provider.mapName, var, resolvedValue));
       } else {
-        resolvedValue = value.substring(matcher.start(), matcher.end());
+        if (!provider.nullIfUnresolved) resolvedValue = value.substring(matcher.start(), matcher.end());
         if (traceEnabled) log.trace(String.format("  property not found in %s : [envVar=%s, value=%s]", provider.mapName, var, resolvedValue));
       }
-      resolvedProps.put(name, resolvedValue);
+      if (resolvedValue != null) resolvedProps.put(name, resolvedValue);
     }
     valueBuilder.append(resolvedValue);
     return resolvedRefCount;
@@ -271,6 +271,10 @@ public class SubstitutionsHandler {
      * Only used in trace logging.
      */
     private final String mapName;
+    /**
+     * Whether to use the {@code null} for unresolved proeprties.
+     */
+    private final boolean nullIfUnresolved = true;
 
     /**
      * Initialize this provider.

@@ -2,7 +2,9 @@ version: "3"
 
 services:
   jppf-driver:
-    image: jppf-driver:6.2-alpha
+    image: "jppf-driver:${JPPF_VERSION}"
+    env_file:
+    - .env
     ports:
       - "11111:11111"
     deploy:
@@ -20,7 +22,9 @@ services:
       jppf_net:
 
   jppf-node:
-    image: jppf-node:6.2-alpha
+    image: "jppf-node:${JPPF_VERSION}"
+    env_file:
+    - .env
     deploy:
       replicas: 2
       resources:
@@ -40,4 +44,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: "172.16.238.0/24"
+        - subnet: "${JPPF_SUBNET}"
