@@ -39,7 +39,7 @@ import org.junit.AfterClass;
 import test.org.jppf.test.setup.common.*;
 
 /**
- * Base test setup for a grid with multiple servers in p2p.
+ * Base test setup for grids with special configuration or topology.
  * @author Laurent Cohen
  */
 public class AbstractNonStandardSetup extends BaseTest {
@@ -77,11 +77,11 @@ public class AbstractNonStandardSetup extends BaseTest {
     final List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");
     final String dir = "classes/tests/config" + (prefix == null ? "" : "/" + prefix);
-    testConfig.driver.jppf = dir + "/driver.properties";
+    testConfig.driver.jppf = FileUtils.getFirstExistingFilePath(dir + "/driver.properties", dir + "/driver.template.properties", "classes/tests/config/driver.template.properties");
     testConfig.driver.log4j = FileUtils.getFirstExistingFilePath(dir + "/log4j-driver.properties", dir + "/log4j-driver.template.properties", "classes/tests/config/log4j-driver.template.properties");
     testConfig.driver.classpath = driverCP;
     testConfig.driver.jvmOptions.add("-Djava.util.logging.configuration.file=classes/tests/config/logging-driver.properties");
-    testConfig.node.jppf = dir + "/node.properties";
+    testConfig.node.jppf = FileUtils.getFirstExistingFilePath(dir + "/node.properties", dir + "/node.template.properties", "classes/tests/config/node.template.properties");
     testConfig.node.log4j = FileUtils.getFirstExistingFilePath(dir + "/log4j-node.properties", dir + "/log4j-node.template.properties", "classes/tests/config/log4j-node.template.properties");
     testConfig.node.classpath = commonCP;
     testConfig.node.jvmOptions.add("-Djava.util.logging.configuration.file=classes/tests/config/logging-node1.properties");

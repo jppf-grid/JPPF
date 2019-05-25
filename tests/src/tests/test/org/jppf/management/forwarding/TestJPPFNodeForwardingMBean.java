@@ -318,6 +318,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 10000)
+  @Override
   public void testCancelJob() throws Exception {
     for (final Map.Entry<NodeSelector, String[]> entry: selectorMap.entrySet()) testCancelJob(entry.getKey(), entry.getValue());
   }

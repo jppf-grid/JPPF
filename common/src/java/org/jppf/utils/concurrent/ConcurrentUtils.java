@@ -236,7 +236,7 @@ public final class ConcurrentUtils {
   }
 
   /**
-   * This abstrat class handles exceptions raised by its {@code evaluate()} method and returns {@code false} when it happens.
+   * This interface handles exceptions raised by its {@code evaluate()} method and returns {@code false} when it happens.
    */
   @FunctionalInterface
   public static interface ConditionFalseOnException extends Condition {
@@ -255,6 +255,28 @@ public final class ConcurrentUtils {
      * @throws Exception if any error occurs during the evaluation.
      */
     public abstract boolean evaluateWithException() throws Exception;
+  }
+
+  /**
+   * This interface handles {@code Throwable}s raised by its {@code evaluate()} method and returns {@code false} when it happens.
+   */
+  @FunctionalInterface
+  public static interface ConditionFalseOnThrowable extends Condition {
+    @Override
+    default boolean evaluate() {
+      try {
+        return evaluateWithThrowable();
+      } catch (@SuppressWarnings("unused") final Throwable t) {
+        return false;
+      }
+    }
+
+    /**
+     * Evaluate an arbitrary condition.
+     * @return true if the condition was met, false otherwise.
+     * @throws Throwable if any error occurs during the evaluation.
+     */
+    public abstract boolean evaluateWithThrowable() throws Throwable;
   }
 
   /**

@@ -41,7 +41,7 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * In this class, we test that the functionality of the DriverJobManagementMBean from the client point of view.
  * @author Laurent Cohen
  */
-public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
+public abstract class AbstractTestJPPFNodeForwardingMBean extends AbstractNonStandardSetup {
   /**
    * Connection to the driver's JMX server.
    */
@@ -74,7 +74,9 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
   @BeforeClass
   public static void setup() throws Exception {
     final int nbNodes = 2;
-    client = BaseSetup.setup(2);
+    final TestConfiguration config = createConfig(null);
+    config.driver.log4j = "classes/tests/config/log4j-driver.NodeForwarding.properties";
+    client = BaseSetup.setup(1, nbNodes, true, true, config);
     driverJmx = BaseSetup.getJMXConnection(client);
     assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> driverJmx.nbNodes() == nbNodes, 5000L, 250L, false));
     for (int i = 1; i <= nbNodes; i++) allNodes.add("n" + i);
