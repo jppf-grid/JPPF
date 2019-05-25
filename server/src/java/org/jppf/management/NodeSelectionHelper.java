@@ -105,7 +105,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
     for (final BaseNodeContext ctx : fullSet) {
       if (nodeAccepted(selector, ctx, includePeers, forForwarding)) result.add(ctx);
     }
-    if (traceEnabled) log.trace("got {} results", result.size());
+    //if (traceEnabled) log.trace("got {} results", result.size());
     return result;
   }
 
@@ -125,7 +125,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
     for (final BaseNodeContext context : allChannels) {
       if (nodeAccepted(selector, context, includePeers, forForwarding)) result.add(context);
     }
-    if (traceEnabled) log.trace("got {} results", result.size());
+    //if (traceEnabled) log.trace("got {} results", result.size());
     return result;
   }
   
@@ -206,11 +206,12 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
   private static boolean nodeAccepted(final NodeSelector selector, final BaseNodeContext context, final boolean includePeers, final boolean forForwarding) {
     if (!includePeers && context.isPeer()) return false;
     final boolean hasJmx = hasWorkingJmxConnection(context);
-    if (forForwarding && !hasJmx) return false;
     final boolean offline = context.isOffline();
+    if (traceEnabled) log.trace("includePeers={}, forForwarding={}, hasJmx={}, offline={} for {}", includePeers, forForwarding, hasJmx, offline, context);
+    if (forForwarding && !hasJmx) return false;
     if (!forForwarding && !hasJmx && !offline) return false;
     final JPPFManagementInfo info = getManagementInfo(context);
-    if (traceEnabled) log.trace("node '{}', info={}", context.getUuid(), info);
+    //if (traceEnabled) log.trace("node '{}', info={}", context.getUuid(), info);
     if (info == null) return false;
     return selector.accepts(info);
   }

@@ -27,6 +27,8 @@ import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.utils.TypedProperties;
+import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnThrowable;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -39,7 +41,7 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * In this class, we test that the functionality of the DriverJobManagementMBean from the client point of view.
  * @author Laurent Cohen
  */
-public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
+public abstract class AbstractTestJPPFNodeForwardingMBean extends AbstractNonStandardSetup {
   /**
    * Connection to the driver's JMX server.
    */
@@ -72,24 +74,18 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
   @BeforeClass
   public static void setup() throws Exception {
     final int nbNodes = 2;
-    client = BaseSetup.setup(2);
+    final TestConfiguration config = createConfig(null);
+    config.driver.log4j = "classes/tests/config/log4j-driver.NodeForwarding.properties";
+    client = BaseSetup.setup(1, nbNodes, true, true, config);
     for (int i = 1; i <= nbNodes; i++) allNodes.add("n" + i);
     driverJmx = BaseSetup.getJMXConnection(client);
     nodeForwarder = driverJmx.getNodeForwarder();
-    boolean ready = false;
     final NodeSelector selector = new AllNodesSelector();
     final String[] array = new String[nbNodes];
-    while (!ready) {
-      try {
-        final Map<String, Object> result = nodeForwarder.state(selector);
-        checkNodes(result, JPPFNodeState.class, allNodes.toArray(array));
-        ready = true;
-      } catch (@SuppressWarnings("unused") final Exception e) {
-        Thread.sleep(100L);
-      } catch (@SuppressWarnings("unused") final AssertionError e) {
-        Thread.sleep(100L);
-      }
-    }
+    ConcurrentUtils.awaitCondition((ConditionFalseOnThrowable) () -> {
+      checkNodes(nodeForwarder.state(selector), JPPFNodeState.class, allNodes.toArray(array));
+      return true;
+    }, 5000L, 100L, true);
   }
 
   /**
