@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 
-<project name="JPPF-tests" basedir="." default="build">
+<project name="JPPF-tests" basedir="." default="build" xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <!-- ========================================================================= -->
   <!-- Property definitions                                                      -->
@@ -171,6 +171,7 @@
   <target name="run"            depends="compile, generate.tests.list, runtests" description=""/>
   <target name="run.nogenerate" depends="compile,                      runtests" description=""/>
   <target name="run.junit"      depends="compile, run.junit.tests"               description=""/>
+  <target name="run.junit.lite" depends="compile, run.junit.tests.lite"          description=""/>
 
   <!-- Run the tests with a custom JUnit runner -->
   <target name="runtests">
@@ -191,31 +192,61 @@
 
   <target name="run.junit.tests">
     <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
-    <delete dir="${report}" quiet="true"/>
-    <mkdir dir="${report}"/>
-    <delete dir="${basedir}/logs" quiet="true"/>
-    <mkdir dir="${basedir}/logs"/>
-    <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed">
-      <classpath refid="tests.classpath"/>
-      <jvmarg value="-server"/>
-      <jvmarg value="-Xmx512m"/>
-      <jvmarg value="-Duser.dir=${basedir}"/>
-      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
-      <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
-      <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
-      <formatter type="xml"/>
-      <batchtest fork="yes" todir="${report}" skipNonTests="true">
-        <fileset dir="${tests.src}">
-          <include name="**/*.java"/>
-          <exclude name="**/JPPFSuite.java"/>
-          <exclude name="**/package-info.java"/>
-        </fileset>
-      </batchtest>
-    </junit>
-    <antcall target="zip.last.test.logs"/>
-    <antcall target="junit.report"/>
-    <antcall target="zip.results"/>
-    <fail if="tests.failed">Test failure, aborting build</fail>
+    <test>
+      <fileset-elements>
+        <include name="**/Test*.java"/>
+      </fileset-elements>
+    </test>
+  </target>
+  
+  <target name="run.junit.tests.lite">
+    <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
+    <test>
+      <fileset-elements>
+        <include name="**/Test*.java"/>
+        <exclude name="**/TestLocalJPPFClassLoader.java"/>
+        <exclude name="**/TestResourceLookupLocalNode.java"/>
+        <exclude name="**/TestJobManyConnections.java"/>
+        <exclude name="**/TestJPPFClientInit.java"/>
+        <exclude name="**/TestJobPersistence.java"/>
+        <exclude name="**/TestFileDataLocation.java"/>
+
+        <!-- job persistence -->
+        <exclude name="**/job/persistence/*Concurrent*.*"/>
+        <exclude name="**/job/persistence/*Persistence.java"/>
+        <exclude name="**/job/persistence/*PersistenceAsync.java"/>
+        <exclude name="**/job/persistence/*PersistenceCacheable.java"/>
+
+        <exclude name="**/load/balancer/persistence/*.*"/>
+        <exclude name="**/TestJPPFDriverAdminMBean2.java"/>
+        <exclude name="**/TestNodeRestart.java"/>
+        <exclude name="**/TestJPPFNodeProvisioning.java"/>
+        <exclude name="**/TestJPPFNodeForwardingMBean2.java"/>
+        <exclude name="**/TestJPPFNodeTaskMonitorMBean.java"/>
+
+        <!-- serialization -->
+        <exclude name="**/jppf/serialization/*WithLZ4.*"/>
+        <exclude name="**/jppf/serialization/*WithZLIB.*"/>
+
+        <!-- multi-server -->
+        <exclude name="**/jppf/server/peer/TestManyServers.*"/>
+        <exclude name="**/jppf/server/peer/TestMultiServer.*"/>
+        <exclude name="**/jppf/server/peer/TestMultiServerSetup.*"/>
+        <exclude name="**/jppf/server/peer/TestMultiServerWithOrphan.*"/>
+        <exclude name="**/jppf/server/peer/TestMultiServerWithSSLSetup.*"/>
+
+        <exclude name="**/TestJPPFJobSLA2.java"/>
+        <exclude name="**/TestJPPFJobSLA4.java"/>
+        <exclude name="**/TestGridPolicy.java"/>
+        <exclude name="**/Test*PreferencePolicy.java"/>
+        <exclude name="**/TestLocalNode.java"/>
+        <exclude name="**/TestJobReservation.java"/>
+        <exclude name="**/TestTaskGraph*Traversal.java"/>
+        <exclude name="**/TestSSL2.java"/>
+        <exclude name="**/TestSSL3.java"/>
+        <exclude name="**/TestJPPFStatistics.java"/>
+      </fileset-elements>
+    </test>
   </target>
   
   <!-- ========================================================================= -->
@@ -226,56 +257,65 @@
 
   <target name="test.pattern">
     <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}, pattern=${pattern}"/>
-    <delete dir="${report}" quiet="true"/>
-    <mkdir dir="${report}"/>
-    <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed" enableTestListenerEvents="true" showoutput="true" logfailedtests="true">
-      <classpath refid="tests.classpath"/>
-      <jvmarg value="-server"/>
-      <jvmarg value="-Xmx512m"/>
-      <jvmarg value="-Duser.dir=${basedir}"/>
-      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
-      <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
-      <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
-      <formatter type="xml"/>
-      <batchtest fork="yes" todir="${report}" skipNonTests="true">
-        <fileset dir="${tests.src}" includes="${pattern}" excludes="**/package-info.java"/>
-      </batchtest>
-    </junit>
-    <antcall target="zip.last.test.logs"/>
-    <antcall target="junit.report"/>
-    <antcall target="zip.results"/>
-    <fail if="tests.failed" status="1">Test failure, aborting build</fail>
+    <test>
+      <fileset-elements>
+        <include name="${pattern}"/>
+      </fileset-elements>
+    </test>
   </target>
   
   <target name="test.pattern2">
     <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}, pattern=${pattern}"/>
-    <mkdir dir="${report}"/>
-    <delete dir="${report}" quiet="true" includes="**/*.*"/>
-    <junit printsummary="yes" fork="yes" dir="${basedir}" enableTestListenerEvents="true" showoutput="true" logfailedtests="true"
-      failureproperty="tests.failed" errorproperty="tests.failed" >
-      <classpath refid="tests.classpath"/>
-      <jvmarg value="-server"/>
-      <jvmarg value="-Xmx512m"/>
-      <jvmarg value="-Duser.dir=${basedir}"/>
-      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
-      <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
-      <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
-      <formatter type="xml"/>
-      <batchtest fork="yes" todir="${report}" skipNonTests="true">
-        <fileset dir="${tests.src}" includes="${pattern}" excludes="**/package-info.java"/>
-      </batchtest>
-    </junit>
-    <antcall target="test.pattern2.failed"/>
-    <antcall target="zip.last.test.logs"/>
-    <antcall target="junit.report"/>
-    <antcall target="zip.results"/>
-    <fail if="tests.failed" status="1">Test failure, aborting build</fail>
+    <test repeatTest="true">
+      <fileset-elements>
+        <include name="${pattern}"/>
+      </fileset-elements>
+    </test>
   </target>
   
   <target name="test.pattern2.failed" if="tests.failed">
     <echo message="Creating failure file"/>
     <propertyfile file="failure.log" comment="Test failure"/>
   </target>
+  
+  <!--
+    Run the tests in a provided fileset.
+    Attributes:
+    - repeatTest: whether the test suite is repeated (to test intermittent failures)
+    Elements:
+    - filset-elements: elements of a fileset which provides the tests to run
+  -->
+  <macrodef name="test">
+    <attribute name="repeatTest" default="false"/>
+    <element name="fileset-elements" optional="true"/>
+    <sequential>
+      <mkdir dir="${report}"/>
+      <delete dir="${report}" quiet="true" includes="**/*.*"/>
+      <junit printsummary="yes" fork="yes" dir="${basedir}" enableTestListenerEvents="true" showoutput="true" logfailedtests="true"
+        failureproperty="tests.failed" errorproperty="tests.failed" filtertrace="off">
+        <classpath refid="tests.classpath"/>
+        <jvmarg value="-server"/>
+        <jvmarg value="-Xmx512m"/>
+        <jvmarg value="-Duser.dir=${basedir}"/>
+        <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
+        <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+        <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
+        <formatter type="xml"/>
+        <batchtest fork="yes" todir="${report}" skipNonTests="true">
+          <fileset dir="${tests.src}">
+            <fileset-elements/>
+            <exclude name="**/JPPFSuite.java"/>
+            <exclude name="**/package-info.java"/>
+          </fileset>    
+        </batchtest>
+      </junit>
+      <antcall target="test.pattern2.failed" if:true="@{repeatTest}"/>
+      <antcall target="zip.last.test.logs"/>
+      <antcall target="junit.report"/>
+      <antcall target="zip.results"/>
+      <fail if="tests.failed" status="1">Test failure, aborting build</fail>
+    </sequential>
+  </macrodef>
   
   <!-- ========================================================================= -->
   <!-- Zip the log files remaining after the last test has run                   -->

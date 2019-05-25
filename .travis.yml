@@ -5,12 +5,11 @@ language: java
 install: true
 
 before_script:
-#  - _JAVA_OPTIONS=
    - env -u _JAVA_OPTIONS
 
 script:
 - ant build
-- ant test
+- ant test.lite
 
 jdk:
   - openjdk8
