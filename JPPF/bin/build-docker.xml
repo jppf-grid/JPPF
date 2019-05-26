@@ -22,31 +22,51 @@
   <!-- Build docker images for JPPF                                              -->
   <!-- ========================================================================= -->
   
-  <target name="build.docker.images" depends="detect.docker, build.docker.images.internal" description="build docker images"/>
-  <target name="build.docker.images.internal" depends="docker.driver.image, docker.node.image" if="docker.installed"/>
-  <target name="push.docker.images" depends="detect.docker" if="docker.installed" description="psuh the JPPF docker images">
+  <target name="build.docker.images" depends="detect.docker" if="${docker.installed}" description="build docker images">
+    <antcall target="build.docker.images.internal"/>
+  </target>
+  <target name="build.docker.images.internal" depends="docker.driver.image, docker.node.image" if="${docker.installed}"/>
+  <target name="push.docker.images" depends="detect.docker" if="${docker.installed}" description="psuh the JPPF docker images">
     <docker.login/>
     <docker.push comp="driver"/>
     <docker.push comp="node"/>
   </target>
 
+  <!--
+   Determine whether docker is installed by attempting 'docker -v' and checking the exit code.
+  -->
   <target name="detect.docker">
-    <exec dir="${basedir}" executable="docker" failonerror="false" resultproperty="docker.exit.code">
+    <exec dir="${basedir}" executable="docker" failonerror="false" failifexecutionfails="false" resultproperty="docker.exit.code">
       <arg value="-v"/>
     </exec>
-    <condition property="docker.installed">
+    <condition property="docker.installed" else="false">
       <equals arg1="0" arg2="${docker.exit.code}"/>
     </condition>
     <echo message="docker.installed = ${docker.installed}"/>
   </target>
 
   <!-- ========================================================================= -->
+  <!-- Targets for testing docker commands                                       -->
+  <!-- ========================================================================= -->
+  
+  <target name="docker.test" depends="detect.docker" if="${docker.installed}">
+    <antcall target="docker.test.internal"/>
+  </target>
+
+  <target name="docker.test.internal" depends="build" if="${docker.installed}">
+    <echo message="!!! docker not installed !!!" unless:true="${docker.installed}"/>
+    <echo message="!!! docker is installed !!!" if:true="${docker.installed}"/>
+  </target>
+
+  <!-- ========================================================================= -->
   <!-- Build the driver docker image                                             -->
   <!-- ========================================================================= -->
   
-  <target name="docker.driver.image" depends="detect.docker, docker.driver.image.internal" description="build the JPPF driver docker image"/>
+  <target name="docker.driver.image" depends="detect.docker" if="${docker.installed}" description="build the JPPF driver docker image">
+    <antcall target="docker.driver.image.internal"/>
+  </target>
 
-  <target name="docker.driver.image.internal" depends="build, runtime.driver" if="docker.installed">
+  <target name="docker.driver.image.internal" depends="build, runtime.driver" if="${docker.installed}">
     <docker.build comp="driver"/>
     <docker.tag comp="driver"/>
   </target>
@@ -55,9 +75,11 @@
   <!-- Build the node docker image                                               -->
   <!-- ========================================================================= -->
   
-  <target name="docker.node.image" depends="detect.docker, docker.node.image.internal" description="build the JPPF node docker image"/>
+  <target name="docker.node.image" depends="detect.docker, docker.node.image.internal" description="build the JPPF node docker image">
+    <antcall target="docker.node.image.internal"/>
+  </target>
 
-  <target name="docker.node.image.internal" depends="build, runtime.node" if="docker.installed">
+  <target name="docker.node.image.internal" depends="build, runtime.node" if="${docker.installed}">
     <docker.build comp="node"/>
     <docker.tag comp="node"/>
   </target>
