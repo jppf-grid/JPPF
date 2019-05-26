@@ -24,6 +24,11 @@
   
   <target name="build.docker.images" depends="detect.docker, build.docker.images.internal" description="build docker images"/>
   <target name="build.docker.images.internal" depends="docker.driver.image, docker.node.image" if="docker.installed"/>
+  <target name="push.docker.images" depends="detect.docker" if="docker.installed" description="psuh the JPPF docker images">
+    <docker.login/>
+    <docker.push comp="driver"/>
+    <docker.push comp="node"/>
+  </target>
 
   <target name="detect.docker">
     <exec dir="${basedir}" executable="docker" failonerror="false" resultproperty="docker.exit.code">
@@ -42,7 +47,8 @@
   <target name="docker.driver.image" depends="detect.docker, docker.driver.image.internal" description="build the JPPF driver docker image"/>
 
   <target name="docker.driver.image.internal" depends="build, runtime.driver" if="docker.installed">
-    <build.image comp="driver"/>
+    <docker.build comp="driver"/>
+    <docker.tag comp="driver"/>
   </target>
 
   <!-- ========================================================================= -->
@@ -52,7 +58,8 @@
   <target name="docker.node.image" depends="detect.docker, docker.node.image.internal" description="build the JPPF node docker image"/>
 
   <target name="docker.node.image.internal" depends="build, runtime.node" if="docker.installed">
-    <build.image comp="node"/>
+    <docker.build comp="node"/>
+    <docker.tag comp="node"/>
   </target>
 
   <!-- ========================================================================= -->
@@ -64,7 +71,7 @@
     Attributes:
     - comp: the JPFP component for which to build an image, should be 'driver' or 'node'
   -->
-  <macrodef name="build.image">
+  <macrodef name="docker.build">
     <attribute name="comp"/>
     <sequential>
       <delete dir="${build}/docker" quiet="true"/>
@@ -96,4 +103,48 @@
     </sequential>
   </macrodef>
 
+  <!--
+    Tag an image.
+    Attributes:
+    - comp: the JPFP component for which to tag an image, should be 'driver' or 'node'
+  -->
+  <macrodef name="docker.tag">
+    <attribute name="comp"/>
+    <sequential>
+      <exec dir="${build}/docker" executable="docker" failonerror="true">
+        <arg value="tag"/>
+        <arg value="jppf-@{comp}:${version.number}"/>
+        <arg value="jppf/jppf-@{comp}:${version.number}"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <!--
+    Push an image to Docker hub.
+    Attributes:
+    - comp: the JPFP component for which to build an image, should be 'driver' or 'node'
+  -->
+  <macrodef name="docker.push">
+    <attribute name="comp"/>
+    <sequential>
+      <echo message="pushing 'jppf/jppf-@{comp}:${version.number}'"/>
+      <exec dir="${build}/docker" executable="docker" failonerror="true">
+        <arg value="push"/>
+        <arg value="jppf/jppf-@{comp}:${version.number}"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <!--
+    Login tot he jppf docker registry.
+  -->
+  <macrodef name="docker.login">
+    <sequential>
+      <exec dir="${build}/docker" executable="docker" failonerror="true">
+        <arg value="login"/>
+        <arg value="-u=${env.DOCKER_HUB_USER}"/>
+        <arg value="-p=${env.DOCKER_HUB_PWD}"/>
+      </exec>
+    </sequential>
+  </macrodef>
 </project> 

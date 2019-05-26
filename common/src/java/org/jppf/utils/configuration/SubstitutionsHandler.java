@@ -46,16 +46,34 @@ public class SubstitutionsHandler {
    * Provider for environment variables.
    */
   private static final PropertyProvider ENV_PROVIDER = new PropertyProvider("env.", "System.getEnv()") {
+    /**
+     * Whether to {@link StringUtils#unquote(String) unquote} environment variables.
+     */
+    private final boolean unquote = Boolean.getBoolean("jppf.unquote.env.vars");
+
     @Override public String getValue(final String key) {
       return System.getenv(key);
+    }
+
+    @Override boolean unquoteValues() {
+      return unquote;
     }
   };
   /**
    * Provider for system properties.
    */
   private static final PropertyProvider SYS_PROVIDER = new PropertyProvider("sys.", "System.getProperties()") {
+    /**
+     * Whether to {@link StringUtils#unquote(String) unquote} system properties.
+     */
+    private final boolean unquote = Boolean.getBoolean("jppf.unquote.sys.props");
+
     @Override public String getValue(final String key) {
       return System.getProperty(key);
+    }
+
+    @Override boolean unquoteValues() {
+      return unquote;
     }
   };
   /**
@@ -248,6 +266,7 @@ public class SubstitutionsHandler {
       if (var == null) var = "";
       if (!"".equals(var)) resolvedValue = provider.getValue(var);
       if (resolvedValue != null) {
+        if (provider.unquoteValues()) resolvedValue = StringUtils.unquote(resolvedValue);
         if (traceEnabled) log.trace(String.format("  got property from %s : [envVar=%s, value=%s]", provider.mapName, var, resolvedValue));
       } else {
         if (!provider.nullIfUnresolved) resolvedValue = value.substring(matcher.start(), matcher.end());
@@ -292,5 +311,12 @@ public class SubstitutionsHandler {
      * @return the vakue for the specified key or {@code null} if the value could not be found.
      */
     abstract String getValue(final String key);
+    
+    /**
+     * @return whether to {@link StringUtils#unquote(String) unquote} the provided values.
+     */
+    boolean unquoteValues() {
+      return false;
+    }
   }
 }

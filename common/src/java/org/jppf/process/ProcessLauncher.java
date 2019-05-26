@@ -150,7 +150,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
    */
   private Process buildProcess() throws Exception {
     final TypedProperties config = JPPFConfiguration.getProperties();
-    String s = config.get(JPPFProperties.JVM_OPTIONS);
+    final String s = config.get(JPPFProperties.JVM_OPTIONS);
     if (debugEnabled) log.debug("jppf.jvm.options=" + s);
     final Pair<List<String>, List<String>> parsed = parseJvmOptions(s);
     final List<String> jvmOptions = parsed.first();
@@ -160,11 +160,19 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
     command.add(computeJavaExecPath(config));
     command.add("-cp");
     command.add(buildClasspath(cpElements));
+    for (final Map.Entry<Object, Object> entry: System.getProperties().entrySet()) {
+      final Object key = entry.getKey();
+      if ((key instanceof String) && (entry.getValue() instanceof String)) {
+        if (((String) key).startsWith("jppf.")) command.add(String.format("-D%s=%s", entry.getKey(), entry.getValue()));
+      }
+    }
     for (String opt: jvmOptions) command.add(opt);
+    /*
     s = System.getProperty(JPPFConfiguration.CONFIG_PROPERTY);
     if (s != null) command.add("-D" + JPPFConfiguration.CONFIG_PROPERTY + '=' + s);
     s = System.getProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY);
     if (s != null) command.add("-D" + JPPFConfiguration.CONFIG_PLUGIN_PROPERTY + '=' + s);
+    */
     command.add("-Dlog4j.configuration=" + System.getProperty("log4j.configuration"));
     command.add(mainClass);
     command.add(Integer.toString(processPort));
