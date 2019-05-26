@@ -2,7 +2,7 @@ version: "3"
 
 services:
   jppf-driver:
-    image: "jppf-driver:${JPPF_VERSION}"
+    image: "jppf/jppf-driver:${JPPF_VERSION}"
     env_file:
     - .env
     ports:
@@ -18,15 +18,20 @@ services:
         delay: 5s
         max_attempts: 3
         window: 15s
+      placement:
+        constraints:
+          - node.labels.jppf_server_host == ${JPPF_SERVER_HOST}
     networks:
       jppf_net:
 
   jppf-node:
-    image: "jppf-node:${JPPF_VERSION}"
+    image: "jppf/jppf-node:${JPPF_VERSION}"
     env_file:
     - .env
+    environment:
+    - JPPF_SERVER_HOST
     deploy:
-      replicas: 2
+      replicas: 4
       resources:
         limits:
           cpus: "1"

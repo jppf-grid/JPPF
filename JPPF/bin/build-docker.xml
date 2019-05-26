@@ -26,15 +26,12 @@
     <antcall target="build.docker.images.internal"/>
   </target>
   <target name="build.docker.images.internal" depends="docker.driver.image, docker.node.image" if="${docker.installed}"/>
-  <target name="push.docker.images" depends="detect.docker" if="${docker.installed}" description="psuh the JPPF docker images">
-    <docker.login/>
-    <docker.push comp="driver"/>
-    <docker.push comp="node"/>
-  </target>
 
-  <!--
-   Determine whether docker is installed by attempting 'docker -v' and checking the exit code.
-  -->
+  <!-- ========================================================================= -->
+  <!-- Determine whether docker is installed by attempting 'docker -v'           -->
+  <!-- and checking the exit code.                                               -->
+  <!-- ========================================================================= -->
+
   <target name="detect.docker">
     <exec dir="${basedir}" executable="docker" failonerror="false" failifexecutionfails="false" resultproperty="docker.exit.code">
       <arg value="-v"/>
@@ -46,16 +43,13 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!-- Targets for testing docker commands                                       -->
+  <!-- Push the JPPF docker images to docker hub                                 -->
   <!-- ========================================================================= -->
   
-  <target name="docker.test" depends="detect.docker" if="${docker.installed}">
-    <antcall target="docker.test.internal"/>
-  </target>
-
-  <target name="docker.test.internal" depends="build" if="${docker.installed}">
-    <echo message="!!! docker not installed !!!" unless:true="${docker.installed}"/>
-    <echo message="!!! docker is installed !!!" if:true="${docker.installed}"/>
+  <target name="push.docker.images" depends="detect.docker" if="${docker.installed}" description="psuh the JPPF docker images">
+    <docker.login/>
+    <docker.push comp="driver"/>
+    <docker.push comp="node"/>
   </target>
 
   <!-- ========================================================================= -->
@@ -68,20 +62,18 @@
 
   <target name="docker.driver.image.internal" depends="build, runtime.driver" if="${docker.installed}">
     <docker.build comp="driver"/>
-    <docker.tag comp="driver"/>
   </target>
 
   <!-- ========================================================================= -->
   <!-- Build the node docker image                                               -->
   <!-- ========================================================================= -->
   
-  <target name="docker.node.image" depends="detect.docker, docker.node.image.internal" description="build the JPPF node docker image">
+  <target name="docker.node.image" depends="detect.docker" if="${docker.installed}" description="build the JPPF node docker image">
     <antcall target="docker.node.image.internal"/>
   </target>
 
   <target name="docker.node.image.internal" depends="build, runtime.node" if="${docker.installed}">
     <docker.build comp="node"/>
-    <docker.tag comp="node"/>
   </target>
 
   <!-- ========================================================================= -->
@@ -119,24 +111,8 @@
       <replace file="${build}/docker/Dockerfile" token="@version@" value="${version.number}"/>
       <exec dir="${build}/docker" executable="docker" failonerror="true">
         <arg value="build"/>
-        <arg value="--tag=jppf-@{comp}:${version.number}"/>
+        <arg value="--tag=jppf/jppf-@{comp}:${version.number}"/>
         <arg value="."/>
-      </exec>
-    </sequential>
-  </macrodef>
-
-  <!--
-    Tag an image.
-    Attributes:
-    - comp: the JPFP component for which to tag an image, should be 'driver' or 'node'
-  -->
-  <macrodef name="docker.tag">
-    <attribute name="comp"/>
-    <sequential>
-      <exec dir="${build}/docker" executable="docker" failonerror="true">
-        <arg value="tag"/>
-        <arg value="jppf-@{comp}:${version.number}"/>
-        <arg value="jppf/jppf-@{comp}:${version.number}"/>
       </exec>
     </sequential>
   </macrodef>
@@ -158,7 +134,7 @@
   </macrodef>
 
   <!--
-    Login tot he jppf docker registry.
+    Login to the jppf docker registry.
   -->
   <macrodef name="docker.login">
     <sequential>
@@ -169,4 +145,18 @@
       </exec>
     </sequential>
   </macrodef>
+
+  <!-- ========================================================================= -->
+  <!-- Targets for testing docker commands                                       -->
+  <!-- ========================================================================= -->
+  
+  <target name="docker.test" depends="detect.docker" if="${docker.installed}">
+    <antcall target="docker.test.internal"/>
+  </target>
+
+  <target name="docker.test.internal" depends="build" if="${docker.installed}">
+    <echo message="!!! docker not installed !!!" unless:true="${docker.installed}"/>
+    <echo message="!!! docker is installed !!!" if:true="${docker.installed}"/>
+  </target>
+
 </project> 
