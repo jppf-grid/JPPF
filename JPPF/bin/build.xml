@@ -187,7 +187,7 @@ build.date = ${readable.now}</echo>
   <!--
   <target name="build" depends="init, compile, jar, jar.src, j2ee.connector.build, tests.build"/>
   -->
-  <!-- build binary and souurce jars without cleanup -->
+  <!-- build binary and source jars without cleanup -->
   <target name="build" depends="clean.jars, init, compile, jar, jar.src" description=""/>
   <!-- build the JEE connector -->
   <target name="build.j2ee.connector" depends="clean.jars, init, compile, jar, jar.src, j2ee.connector" description=""/>

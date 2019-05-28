@@ -10,7 +10,7 @@ set +a
 
 NODE_ID=$(docker node inspect --pretty self | grep "ID:" | cut -d ':' -f 2 | sed s/[[:space:]]*//)
 
-echo "node id = '$NODE_ID', driver host = '$JPPF_SERVER_HOST'"
+echo "JPPF v$JPPF_VERSION, node id = '$NODE_ID', driver host = '$JPPF_SERVER_HOST'"
 
 docker node update --label-add jppf_server_host=$JPPF_SERVER_HOST $NODE_ID
 

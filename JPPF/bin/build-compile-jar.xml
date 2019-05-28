@@ -16,13 +16,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<project name="JPPF-compile-jar" basedir="..">
+<project name="JPPF-compile-jar" basedir=".." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <!-- ==================================================================== -->
   <!--                         Compile the application                      -->
   <!-- ==================================================================== -->
 
   <target name="compile" depends="init, i18n" unless="compile.done">
+    <echo message="(1) compile.done = ${compile.done}"/>
+    <property name="compile.done" value="true"/>
     <path id="checkstyle.path">
       <fileset dir="${lib}/Checkstyle" includes="${Checkstyle.inc}"/>
     </path>
@@ -36,10 +38,9 @@ limitations under the License.
     <compile.module path="${server}"/>
     <compile.module path="${demo}"/>
     <compile.module.simple path="${application.template}"/>
-    <property name="compile.done" value="true"/>
   </target>
 
-  <target name="compile.jmxremote" depends="init, i18n" unless="compile.done">
+  <target name="compile.jmxremote" depends="init, i18n" unless="${compile.done}">
     <path id="checkstyle.path">
       <fileset dir="${lib}/Checkstyle" includes="${Checkstyle.inc}"/>
     </path>
@@ -144,6 +145,7 @@ limitations under the License.
       </fileset>
     </delete>
     <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
+    <property name="jars.done" value="true"/>
   </target>
 
   <!--

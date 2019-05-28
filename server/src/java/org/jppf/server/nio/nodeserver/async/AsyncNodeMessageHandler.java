@@ -158,7 +158,7 @@ public class AsyncNodeMessageHandler {
       if (bundle.getParameter(NODE_DOTNET_CAPABLE, false)) type |= JPPFManagementInfo.DOTNET;
       if ((systemInfo != null) && (systemInfo.getJppf().get(JPPFProperties.NODE_ANDROID))) type |= JPPFManagementInfo.ANDROID;
       final JPPFManagementInfo info = new JPPFManagementInfo(hostIP.hostName(), hostIP.ipAddress(), port, uuid, type, sslEnabled, masterUuid);
-      if (debugEnabled) log.debug("configuring management for node {}", info);
+      if (debugEnabled) log.debug("configuring management for IP={} : {}", hostIP.ipAddress(), info);
       if (systemInfo != null) {
         info.setSystemInfo(systemInfo);
         if (debugEnabled) log.debug("node has following configuration:\n{}", systemInfo.getJppf());

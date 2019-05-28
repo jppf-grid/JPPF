@@ -22,7 +22,7 @@ services:
         constraints:
           - node.labels.jppf_server_host == ${JPPF_SERVER_HOST}
     networks:
-      jppf_net:
+      jppfnet:
 
   jppf-node:
     image: "jppf/jppf-node:${JPPF_VERSION}"
@@ -42,10 +42,11 @@ services:
         max_attempts: 3
         window: 15s
     networks:
-      jppf_net:
+      jppfnet:
 
 networks:
-  jppf_net:
+  jppfnet:
+    driver: overlay
     ipam:
       driver: default
       config:
