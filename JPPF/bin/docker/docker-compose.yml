@@ -7,6 +7,7 @@ services:
     - .env
     ports:
       - "11111:11111"
+      - "11143:11143"
     deploy:
       replicas: 1
       resources:
@@ -20,6 +21,8 @@ services:
         window: 15s
       placement:
         constraints:
+          # force the driver to be deployed on the docker swarm node that starts the service stack
+          # i.e. where the 'docker stack deploy ...' command is issued
           - node.labels.jppf_server_host == ${JPPF_SERVER_HOST}
     networks:
       jppfnet:

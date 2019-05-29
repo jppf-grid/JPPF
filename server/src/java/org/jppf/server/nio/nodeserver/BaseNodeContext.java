@@ -245,7 +245,6 @@ public abstract class BaseNodeContext extends AbstractNioContext implements  Exe
         jmx = jmxConnection;
       } else {
         final JPPFManagementInfo info = getManagementInfo();
-        if (debugEnabled) log.debug("establishing JMX connection for {}", info);
         if (!isPeer()) {
           jmxConnection = new JMXNodeConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
           jmx = jmxConnection;
@@ -253,6 +252,7 @@ public abstract class BaseNodeContext extends AbstractNioContext implements  Exe
           peerJmxConnection = new JMXDriverConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
           jmx = peerJmxConnection;
         }
+        if (debugEnabled) log.debug("establishing JMX connection for {}", jmx);
       }
       jmx.addJMXWrapperListener(new NodeJMXWrapperListener(this, listener));
       jmx.connect();

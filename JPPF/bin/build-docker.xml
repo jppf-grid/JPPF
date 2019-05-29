@@ -25,7 +25,7 @@
   <target name="build.docker.images" depends="detect.docker" if="${docker.installed}" description="build docker images">
     <antcall target="build.docker.images.internal"/>
   </target>
-  <target name="build.docker.images.internal" depends="docker.driver.image, docker.node.image" if="${docker.installed}"/>
+  <target name="build.docker.images.internal" depends="docker.driver.image.internal, docker.node.image.internal" if="${docker.installed}"/>
 
   <!-- ========================================================================= -->
   <!-- Determine whether docker is installed by attempting 'docker -v'           -->

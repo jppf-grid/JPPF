@@ -60,4 +60,11 @@ public class HostIP extends Pair<String, String> {
   public String ipAddress() {
     return second();
   }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append(hostName()).append('|').append(ipAddress())
+      .append(']').toString();
+  }
 }

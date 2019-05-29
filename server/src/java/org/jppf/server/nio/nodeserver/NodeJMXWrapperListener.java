@@ -19,7 +19,7 @@
 package org.jppf.server.nio.nodeserver;
 
 import org.jppf.management.*;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -64,7 +64,7 @@ public class NodeJMXWrapperListener implements JMXWrapperListener {
 
   @Override
   public void jmxWrapperTimeout(final JMXWrapperEvent event) {
-    if (debugEnabled) log.debug("received jmxWrapperTimeout() for {}", context);
+    if (debugEnabled) log.debug("received jmxWrapperTimeout() for {}, exception: {}", context, ExceptionUtils.getStackTrace(event.getJMXConnectionWrapper().getLastConnectionException()));
     if (context.getJmxConnection() != null) context.getJmxConnection().removeJMXWrapperListener(this);
     else if (context.getPeerJmxConnection() != null) context.getPeerJmxConnection().removeJMXWrapperListener(this);
     context.setJmxConnection(null);

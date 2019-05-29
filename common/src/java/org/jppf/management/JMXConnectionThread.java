@@ -66,6 +66,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
           if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
         } catch(final Exception e) {
           if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), e);
+          connectionWrapper.lastConnectionException = e;
           goToSleep(10L);
         }
       }

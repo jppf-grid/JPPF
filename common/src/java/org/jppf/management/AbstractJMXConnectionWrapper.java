@@ -130,6 +130,10 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * The JMX remote protocol.
    */
   private final String protocol;
+  /**
+   * The last exception received when attempting to connect, if any.
+   */
+  Throwable lastConnectionException;
 
   /**
    * Initialize a local connection (same JVM) to the MBean server.
@@ -373,5 +377,13 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    */
   public String getProtocol() {
     return protocol;
+  }
+
+  /**
+   * @return the last exception received when attempting to connect, if any.
+   * @exclude
+   */
+  public Throwable getLastConnectionException() {
+    return lastConnectionException;
   }
 }
