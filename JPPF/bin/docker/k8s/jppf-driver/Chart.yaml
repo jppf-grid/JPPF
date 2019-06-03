@@ -1,0 +1,20 @@
+apiVersion: v1
+
+name: jppf-driver
+home: https://www.jppf.org
+
+version: 6.2-alpha
+appVersion: "6.2-alpha"
+
+description: The open-source grid computing solution. JPPF enables applications with
+  large processing power requirements to be run on any number of computers, in order
+  to dramatically reduce their processing time. 
+
+sources:
+- https://github.com/jppf-grid/JPPF
+
+maintainers:
+- name: Laurent Cohen
+  email: laurent.cohen@jppf.org
+
+icon: https://www.jppf.org/images/jppf_group_large.png

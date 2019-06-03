@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+
+
+metadata:
+  name: jppf-driver-deployment
+  namespace: jppf
+
+spec:
+  selector:
+    matchLabels:
+      app: jppf-driver
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jppf-driver
+    spec:
+      containers:
+      - name: jppf-driver
+        image: jppf/jppf-driver:6.2-alpha
+        ports:
+        - containerPort: 11111
