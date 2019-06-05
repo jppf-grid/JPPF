@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: jppf-driver-service
+
+spec:
+  ports:
+  - port: 11111
+    targetPort: jppf
+    protocol: TCP
+
+  selector:
+      app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
+      app.kubernetes.io/instance: {{ .Release.Name }}-driver
+
+  type: NodePort
