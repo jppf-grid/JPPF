@@ -1,0 +1,25 @@
+# Default values for jppf-driver.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+driver:
+  imageRepository: jppf-driver
+  jvmOptions: "-Xmx256m -Xms64m"
+  replicaCount: 1
+  hostname: jppf-driver
+
+node:
+  imageRepository: jppf-node
+  jvmOptions: "-Xmx128m -Xms32m"
+  replicaCount: 2
+
+image:
+  registryName: jppf
+  tag: 6.2-alpha
+  pullPolicy: IfNotPresent
+
+jppf:
+  subnet: "172.16.238.0/24"
+  version: "6.2-alpha"
+

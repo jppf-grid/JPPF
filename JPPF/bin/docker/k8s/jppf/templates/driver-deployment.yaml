@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  #name: {{ include "jppf.fullname" . }}-driver
+  name: {{ .Chart.Name }}-driver
+  labels:
+{{ include "jppf.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.driver.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
+      app.kubernetes.io/instance: {{ .Release.Name }}-driver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
+        app.kubernetes.io/instance: {{ .Release.Name }}-driver
+    spec:
+      hostname: {{ .Values.driver.hostname }}
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.registryName }}/{{ .Values.driver.imageRepository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: JPPF_SUBNET
+              value: {{ .Values.jppf.subnet }}
+            - name: JPPF_DRIVER_JVM_OPTIONS
+              value: {{ .Values.driver.jvmOptions }}
+            - name: JPPF_VERSION
+              value: {{ .Values.jppf.version }}
+          ports:
+            - name: jppf
+              containerPort: 11111
+              hostPort: 11111
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
