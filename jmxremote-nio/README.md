@@ -7,7 +7,7 @@ JMX service URLs are in the form `service:jmx:jppf://<host>:<port>`
 
 ## How to get it
 
-**Direct download**: from the [latest release](https://github.com/jppf-grid/JPPF/releases/tag/v_6_1_alpha_2), look for JPPF-&lt;version&gt;-jmxremote-nio.zip
+**Direct download**: from the [latest release](https://github.com/jppf-grid/JPPF/releases/tag/v_6_1), look for JPPF-&lt;version&gt;-jmxremote-nio.zip
 
 **Maven Central**: [groupId: org.jppf, artifactId: jppf-jmxremote-nio](https://search.maven.org/search?q=g:org.jppf%20AND%20a:jppf-jmxremote-nio&core=gav)
 
@@ -15,7 +15,7 @@ JMX service URLs are in the form `service:jmx:jppf://<host>:<port>`
 <dependency>
   <groupId>org.jppf</groupId>
   <artifactId>jppf-jmxremote-nio</artifactId>
-  <version>6.0</version>
+  <version>6.1</version>
 </dependency>
 ~~~
 
