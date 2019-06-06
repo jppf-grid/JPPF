@@ -13,14 +13,20 @@ date --iso-8601='seconds' >> time.tmp
 rm -f logs/*.zip > nul.tmp
 
 if [ -z $1 ]; then
-  PATTERN="**/JPPFSuite.java"
+  PATTERN="**/Test*.java"
 else
   PATTERN="$1"
 fi
 
+if [ -z $2 ]; then
+  NB_REPEATS=1
+else
+  NB_REPEATS=$2
+fi
+
 echo "PATTERN = $PATTERN, repeats = $2"
 
-for i in `seq 1 $2`; do
+for i in `seq 1 $NB_REPEATS`; do
   echo "\n"
   echo "===== Test run $i ====="
   rm -f *.log > nul.tmp
