@@ -9,9 +9,14 @@ spec:
   - port: 11111
     targetPort: jppf
     protocol: TCP
+    name: jppf1
+  - port: 11443
+    targetPort: jppf-tls
+    protocol: TCP
+    name: jppf2
 
   selector:
-      app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
-      app.kubernetes.io/instance: {{ .Release.Name }}-driver
+    app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
+    app.kubernetes.io/instance: {{ .Release.Name }}-driver
 
   type: NodePort

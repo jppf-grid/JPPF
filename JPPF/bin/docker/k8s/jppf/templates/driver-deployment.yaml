@@ -1,12 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  #name: {{ include "jppf.fullname" . }}-driver
   name: {{ .Chart.Name }}-driver
   labels:
 {{ include "jppf.labels" . | indent 4 }}
 spec:
-  replicas: {{ .Values.driver.replicaCount }}
+  replicas: {{ .Values.driver.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
@@ -17,7 +16,7 @@ spec:
         app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
         app.kubernetes.io/instance: {{ .Release.Name }}-driver
     spec:
-      hostname: {{ .Values.driver.hostname }}
+      hostname: {{ .Values.jppf.serverHostName }}
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -26,17 +25,61 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registryName }}/{{ .Values.driver.imageRepository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+
           env:
             - name: JPPF_SUBNET
-              value: {{ .Values.jppf.subnet }}
+              value: "{{ .Values.jppf.subnet }}"
             - name: JPPF_DRIVER_JVM_OPTIONS
-              value: {{ .Values.driver.jvmOptions }}
+              value: "{{ .Values.driver.jvmOptions }}"
             - name: JPPF_VERSION
-              value: {{ .Values.jppf.version }}
+              value: "{{ .Values.jppf.version }}"
+            - name: JPPF_TLS_ENABLED
+              value: "{{ .Values.jppf.tlsEnabled }}"
+            - name: JPPF_SERIALIZATION
+              value: "{{ .Values.jppf.serialization }}"
+            - name: JPPF_LB_ALGORITHM
+              value: "{{ .Values.driver.lb.algorithm }}"
+            - name: JPPF_LB_SIZE
+              value: "{{ .Values.driver.lb.size }}"
+            - name: JPPF_LB_PERFORMANCE_CACHE_SIZE
+              value: "{{ .Values.driver.lb.performanceCacheSize }}"
+            - name: JPPF_LB_MIN_SAMPLES_TO_ANALYZE
+              value: "{{ .Values.driver.lb.minSamplesToAnalyse }}"
+            - name: JPPF_LB_MIN_SAMPLES_TO_CHECK_CONVERGENCE
+              value: "{{ .Values.driver.lb.minSamplesToCheckConvergence }}"
+            - name: JPPF_LB_MAX_DEVIATION
+              value: "{{ .Values.driver.lb.maxDeviation }}"
+            - name: JPPF_LB_MAX_GUESS_TO_STABLE
+              value: "{{ .Values.driver.lb.maxGuessToStable }}"
+            - name: JPPF_LB_SIZE_RATIO_DEVIATION
+              value: "{{ .Values.driver.lb.sizeRatioDeviation }}"
+            - name: JPPF_LB_DECREASE_RATIO
+              value: "{{ .Values.driver.lb.decreaseRatio }}"
+            - name: JPPF_LB_INITIAL_SIZE
+              value: "{{ .Values.driver.lb.initialSize }}"
+            - name: JPPF_LB_INITIAL_MEAN_TIME
+              value: "{{ .Values.driver.lb.initialMeanTime }}"
+            - name: JPPF_LB_PROPORTIONALITY_FACTOR
+              value: "{{ .Values.driver.lb.proportionalityFactor }}"
+            - name: JPPF_LB_MULTIPLICATOR
+              value: "{{ .Values.driver.lb.multiplicator }}"
+            - name: JPPF_LB_PERFORMANCE_VARIATION_THRESHOLD
+              value: "{{ .Values.driver.lb.performanceVariationThreshold }}"
+            - name: JPPF_LB_MIN_SAMPLES
+              value: "{{ .Values.driver.lb.minSamples }}"
+            - name: JPPF_LB_MAX_SAMPLES
+              value: "{{ .Values.driver.lb.maxSamples }}"
+            - name: JPPF_LB_MAX_RELATIVE_SIZE
+              value: "{{ .Values.driver.lb.maxRelativeSize }}"
+
           ports:
             - name: jppf
               containerPort: 11111
               hostPort: 11111
+              protocol: TCP
+            - name: jppf-tls
+              containerPort: 11443
+              hostPort: 11443
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

@@ -1,12 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  #name: {{ include "jppf.fullname" . }}-node
   name: {{ .Chart.Name }}-node
   labels:
 {{ include "jppf.labels" . | indent 4 }}
 spec:
-  replicas: {{ .Values.node.replicaCount }}
+  replicas: {{ .Values.node.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "jppf.name" . }}-node
@@ -25,16 +24,31 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registryName }}/{{ .Values.node.imageRepository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+
           env:
             - name: JPPF_SUBNET
-              value: {{ .Values.jppf.subnet }}
+              value: "{{ .Values.jppf.subnet }}"
             - name: JPPF_NODE_JVM_OPTIONS
-              value: {{ .Values.node.jvmOptions }}
+              value: "{{ .Values.node.jvmOptions }}"
             - name: JPPF_VERSION
-              value: {{ .Values.jppf.version }}
+              value: "{{ .Values.jppf.version }}"
             - name: JPPF_SERVER_HOST
-              value: {{ .Values.driver.hostname }}-service
-              #value: {{ .Values.driver.hostname }}.{{ .Release.Namespace }}.svc.cluster.local
+              value: "{{ .Values.jppf.serverHostName }}"
+            - name: JPPF_PROCESSING_THREADS
+              value: "{{ .Values.node.processingThreads }}"
+            - name: JPPF_TLS_ENABLED
+              value: "{{ .Values.jppf.tlsEnabled }}"
+            - name: JPPF_SERIALIZATION
+              value: "{{ .Values.jppf.serialization }}"
+            - name: JPPF_NODE_MAX_JOBS
+              value: "{{ .Values.node.maxConcurrentJobs }}"
+            - name: JPPF_NODE_THROTTLING_ACTIVE
+              value: "{{ .Values.node.throttling.active }}"
+            - name: JPPF_NODE_THROTTLING_THRESHOLD
+              value: "{{ .Values.node.throttling.threshold }}"
+            - name: JPPF_NODE_THROTTLING_MAX_CHECKS_BEFORE_GC
+              value: "{{ .Values.node.throttling.maxChecksBeforeGC }}"
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

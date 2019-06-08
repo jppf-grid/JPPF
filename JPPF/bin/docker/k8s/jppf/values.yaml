@@ -1,25 +1,70 @@
-# Default values for jppf-driver.
+# Default values for jppf chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-
+# driver-specific configuration values
 driver:
   imageRepository: jppf-driver
+  # options of the driver JVM
   jvmOptions: "-Xmx256m -Xms64m"
-  replicaCount: 1
-  hostname: jppf-driver
+  replicas: 1
+  # load-balancing configuration
+  lb:
+    # load-balancing algorithm to use; pre-defined possible values:
+    # manual | autotuned | proportional | rl2 | nodethreads
+    algorithm: "rl2"
+    # used with "manual" and "autotuned" algorithms
+    size: "1"
+    # used with "proportional" and "rl2" algorithms
+    performanceCacheSize: "1000"
+    # "autotuned" parameters
+    minSamplesToAnalyse: "100"
+    minSamplesToCheckConvergence: "50"
+    maxDeviation: "0.2"
+    maxGuessToStable: "50"
+    sizeRatioDeviation: "1.5"
+    decreaseRatio: "0.2"
+    # "proportional" parameters
+    initialSize: "5"
+    initialMeanTime: "1e10"
+    proportionalityFactor: "1"
+    # "nodethreads" parameters
+    multiplicator: "1"
+    # "rl2" parameters
+    performanceVariationThreshold: "0.75"
+    minSamples: "20"
+    maxSamples: "100"
+    maxRelativeSize: "0.5"
 
+# node-specific configuration values
 node:
+  replicas: 2
   imageRepository: jppf-node
+  # options of the node JVM
   jvmOptions: "-Xmx128m -Xms32m"
-  replicaCount: 2
+  # number of threads processing tasks
+  processingThreads: "1"
+  # maximum number of jobs a node can handle concurrently
+  maxConcurrentJobs: "1000"
+  # Memory-based node throttling
+  throttling:
+    # activate the throttling plugin
+    active: "true"
+    # % of maximum heap size that causes the node to refuse jobs
+    threshold: "81.11"
+    # number of times the check returns false before invoking System.gc()
+    maxChecksBeforeGC: "5"
 
 image:
-  registryName: jppf
+  registryName: jppfgrid
   tag: 6.2-alpha
   pullPolicy: IfNotPresent
 
+# values common to driver and nodes
 jppf:
   subnet: "172.16.238.0/24"
   version: "6.2-alpha"
-
+  # whether secure TLS communication is enabled
+  tlsEnabled: "false"
+  serverHostName: jppf-driver-service
+  serialization: "org.jppf.serialization.DefaultJavaSerialization"

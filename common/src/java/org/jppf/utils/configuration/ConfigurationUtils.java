@@ -116,4 +116,26 @@ public class ConfigurationUtils {
     }
     return threshold;
   }
+
+  /**
+   * Get a value from a specified environment variable, or a default value if the variable is not set.
+   * @param envVariable the envrionment variable name.
+   * @param defaultValue the default value to use.
+   * @return the value of the enviornement variable if it is not null, or the default value.
+   */
+  public static String getFromEnv(final String envVariable, final String defaultValue) {
+    final String result = StringUtils.unquote(System.getenv(envVariable));
+    return (result == null) || "null".equals(result) || "".equals(result) ? defaultValue : result;
+  }
+
+  /**
+   * Get a boolean value from a specified environment variable, or a default value if the variable is not set.
+   * @param envVariable the envrionment variable name.
+   * @param defaultValue the default value to use.
+   * @return the value of the enviornement variable if it is not null, or the default value.
+   */
+  public static boolean getBooleanFromEnv(final String envVariable, final boolean defaultValue) {
+    final String result = StringUtils.unquote(System.getenv(envVariable));
+    return (result == null) || "null".equals(result) || "".equals(result) ? defaultValue : Boolean.valueOf(result);
+  }
 }

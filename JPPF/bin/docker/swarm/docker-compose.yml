@@ -2,12 +2,12 @@ version: "3"
 
 services:
   jppf-driver:
-    image: "jppf/jppf-driver:${JPPF_VERSION}"
+    image: "jppfgrid/jppf-driver:${JPPF_VERSION}"
     env_file:
     - .env
     ports:
       - "11111:11111"
-      - "11143:11143"
+      - "11443:11443"
     deploy:
       replicas: 1
       resources:
@@ -28,17 +28,17 @@ services:
       jppfnet:
 
   jppf-node:
-    image: "jppf/jppf-node:${JPPF_VERSION}"
+    image: "jppfgrid/jppf-node:${JPPF_VERSION}"
     env_file:
     - .env
     environment:
     - JPPF_SERVER_HOST
     deploy:
-      replicas: 4
+      replicas: 2
       resources:
         limits:
           cpus: "1"
-          memory: 512M
+          memory: 256M
       restart_policy:
         condition: on-failure
         delay: 5s

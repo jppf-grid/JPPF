@@ -1,5 +1,7 @@
 #! /bin/sh
 
+DIR=`dirname $0`
+
 # deploy a jppf cluster with docker compose
 
 # export variables defined in .env
@@ -17,4 +19,4 @@ echo "JPPF v$JPPF_VERSION, node id = '$NODE_ID', driver host = '$JPPF_SERVER_HOS
 docker node update --label-add jppf_server_host=$JPPF_SERVER_HOST $NODE_ID
 
 # deploy and run the JPPF cluster
-docker stack deploy -c docker-compose.yml jppf
+docker stack deploy -c $DIR/docker-compose.yml jppf

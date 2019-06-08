@@ -18,6 +18,8 @@
 
 <project name="JPPF-docker" basedir=".." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
+  <property name="docker.registry" value="jppfgrid"/>
+
   <!-- ========================================================================= -->
   <!-- Build docker images for JPPF                                              -->
   <!-- ========================================================================= -->
@@ -104,6 +106,7 @@
       </copy>
       <copy todir="${build}/docker/${zip.name}/config">
         <fileset dir="${bin}/docker/@{comp}" includes="*.properties"/>
+        <fileset dir="${bin}/docker" includes="utils.properties"/>
       </copy>
       <copy todir="${build}/docker">
         <fileset dir="${bin}/docker/@{comp}" includes="Dockerfile"/>
@@ -111,7 +114,7 @@
       <replace file="${build}/docker/Dockerfile" token="@version@" value="${version.number}"/>
       <exec dir="${build}/docker" executable="docker" failonerror="true">
         <arg value="build"/>
-        <arg value="--tag=jppf/jppf-@{comp}:${version.number}"/>
+        <arg value="--tag=${docker.registry}/jppf-@{comp}:${version.number}"/>
         <arg value="."/>
       </exec>
     </sequential>
@@ -125,10 +128,10 @@
   <macrodef name="docker.push">
     <attribute name="comp"/>
     <sequential>
-      <echo message="pushing 'jppf/jppf-@{comp}:${version.number}'"/>
+      <echo message="pushing '${docker.registry}/jppf-@{comp}:${version.number}'"/>
       <exec dir="${build}/docker" executable="docker" failonerror="true">
         <arg value="push"/>
-        <arg value="jppf/jppf-@{comp}:${version.number}"/>
+        <arg value="${docker.registry}/jppf-@{comp}:${version.number}"/>
       </exec>
     </sequential>
   </macrodef>
