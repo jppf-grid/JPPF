@@ -119,7 +119,7 @@ public class ConfigurationUtils {
 
   /**
    * Get a value from a specified environment variable, or a default value if the variable is not set.
-   * @param envVariable the envrionment variable name.
+   * @param envVariable the environment variable name.
    * @param defaultValue the default value to use.
    * @return the value of the enviornement variable if it is not null, or the default value.
    */
@@ -129,8 +129,19 @@ public class ConfigurationUtils {
   }
 
   /**
+   * Get a value from a first environment variable, or a second environment variable if the first is not set, or a default value if the variables are not set.
+   * @param envVar1 the first environment variable name.
+   * @param envVar2 the second environment variable name.
+   * @param defaultValue the default value to use.
+   * @return the value of the enviornement variable if it is not null, or the default value.
+   */
+  public static String getFromEnv(final String envVar1, final String envVar2, final String defaultValue) {
+    return getFromEnv(envVar1, getFromEnv(envVar2, defaultValue));
+  }
+
+  /**
    * Get a boolean value from a specified environment variable, or a default value if the variable is not set.
-   * @param envVariable the envrionment variable name.
+   * @param envVariable the environment variable name.
    * @param defaultValue the default value to use.
    * @return the value of the enviornement variable if it is not null, or the default value.
    */
