@@ -68,11 +68,12 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
     try {
       final SocketChannel socketChannel = socketClient.getChannel();
       socketClient.setChannel(null);
+      if (debugEnabled) log.debug("accepting peer socket channel {}", socketChannel);
       final ChannelWrapper<?> channel = server.accept(null, socketChannel, null, secure, true);
       context = (ClientClassContext) channel.getContext();
       context.setPeer(true);
       context.setConnectionUuid(connectionUuid);
-      if (debugEnabled) log.debug("registered class server channel " + channel);
+      if (debugEnabled) log.debug("registered class server channel {}", channel);
       if (secure) {
         context.setSsl(true);
         server.configurePeerSSL(channel);
@@ -86,7 +87,9 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
       resource.setProviderUuid(uuid);
       context.setResource(resource);
       context.serializeResource();
+      if (debugEnabled) log.debug("transitionning channel to TO_SENDING_PEER_INITIATION_REQUEST with resource={}", resource);
       server.getTransitionManager().transitionChannel(channel, ClientClassTransition.TO_SENDING_PEER_INITIATION_REQUEST);
+      if (debugEnabled) log.debug("channel transition done");
       socketClient = null;
     } catch (final Exception e) {
       log.error(e.getMessage());

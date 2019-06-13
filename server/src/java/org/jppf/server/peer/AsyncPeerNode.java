@@ -67,6 +67,7 @@ class AsyncPeerNode extends AbstractPeerConnectionHandler {
   void postInit() throws Exception {
     try {
       final SocketChannel socketChannel = socketClient.getChannel();
+      if (debugEnabled) log.debug("accepting peer socket channel {}", socketChannel);
       socketClient.setChannel(null);
       socketChannel.configureBlocking(false);
       server.accept(null, socketChannel, null, secure, true);

@@ -51,7 +51,7 @@ abstract class AbstractPeerConnectionHandler implements AutoCloseable {
   /**
    * Wrapper around the underlying socket connection.
    */
-  SocketChannelClient socketClient = null;
+  SocketChannelClient socketClient;
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
@@ -102,19 +102,21 @@ abstract class AbstractPeerConnectionHandler implements AutoCloseable {
   public synchronized void init() throws Exception {
     if (socketClient == null) socketClient = initSocketChannel();
     final String cname = String.format("%s@%s:%d", name, socketClient.getHost(), socketClient.getPort());
-    if (printConnectionMessage) {
+    if (printConnectionMessage || debugEnabled) {
       final String msg = "Attempting connection to remote peer " + cname;
-      log.info(msg);
-      System.out.println(msg);
+      if (debugEnabled) log.debug(msg);
+      else log.info(msg);
+      if (printConnectionMessage) System.out.println(msg);
     }
     if (!socketInitializer.initialize(socketClient)) throw new ConnectException("could not connect to peer " + cname);
     if (!InterceptorHandler.invokeOnConnect(socketClient)) throw new JPPFException("peer connection denied by interceptor");
     if (debugEnabled) log.debug("Connected to peer {}, sending channel identifier", cname);
     socketClient.writeInt(channelIdentifier);
-    if (printConnectionMessage) {
+    if (printConnectionMessage || debugEnabled) {
       final String msg = "Reconnected to remote peer " + cname;
-      log.info(msg);
-      System.out.println(msg);
+      if (debugEnabled) log.debug(msg);
+      else log.info(msg);
+      if (printConnectionMessage) System.out.println(msg);
     }
     postInit();
   }

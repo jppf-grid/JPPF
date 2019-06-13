@@ -119,9 +119,11 @@ public class JPPFPeerInitializer implements Runnable {
     try {
       if (connecting.compareAndSet(false, true)) {
         if (provider == null) provider = new PeerResourceProvider(peerName, connectionInfo, driver.getClientClassServer(), secure, connectionUuid);
+        if (debugEnabled) log.debug("initializing peer class loader channel");
         provider.init();
         if (node == null) node = new AsyncPeerNode(peerName, connectionInfo, driver.getAsyncClientNioServer(), secure, connectionUuid);
         node.onCloseAction = () -> start();
+        if (debugEnabled) log.debug("initializing peer job channel");
         node.init();
       }
     } catch(final Exception e) {
