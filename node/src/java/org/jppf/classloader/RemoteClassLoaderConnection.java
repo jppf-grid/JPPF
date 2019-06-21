@@ -83,7 +83,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
           System.out.println("Attempting connection to the class server at " + channel.getHost() + ':' + channel.getPort());
           if (!socketInitializer.initialize(channel)) {
             channel = null;
-            throw new JPPFNodeReconnectionNotification("the JPPF class loader could not reconnect to the server", null, ConnectionReason.CLASSLOADER_INIT_ERROR);
+            throw new JPPFNodeReconnectionNotification("the JPPF class loader could not reconnect to the server", socketInitializer.getLastException(), ConnectionReason.CLASSLOADER_INIT_ERROR);
           }
           if (!InterceptorHandler.invokeOnConnect(channel)) throw new JPPFNodeReconnectionNotification("connection denied by interceptor", null, ConnectionReason.CLASSLOADER_INIT_ERROR);
           performHandshake();
@@ -124,7 +124,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
       final ResourceRequestRunner rr = new RemoteResourceRequest(getSerializer(), channel);
       performCommonHandshake(rr);
     } catch (final IOException e) {
-      throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
+      throw new JPPFNodeReconnectionNotification("Error during driver handshake", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
     } catch (final Exception e) {
       throw new RuntimeException(e);
     }

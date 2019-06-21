@@ -34,6 +34,8 @@ spec:
               value: "{{ .Values.jppf.version }}"
             - name: JPPF_SERVER_HOST
               value: "{{ .Values.jppf.serverHostName }}"
+              #value: "{{ .Values.jppf.serverHostName }}.{{ .Release.Namespace }}.svc.cluster.local"
+              #value: "{{ .Values.jppf.serverHostName }}.jppf.svc.cluster.local"
             - name: JPPF_PROCESSING_THREADS
               value: "{{ .Values.node.processingThreads }}"
             - name: JPPF_TLS_ENABLED

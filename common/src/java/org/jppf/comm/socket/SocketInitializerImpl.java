@@ -85,6 +85,7 @@ class SocketInitializerImpl extends ThreadSynchronization implements SocketIniti
     boolean successful = false;
     if (isClosed()) return false;
     name = getClass().getSimpleName() + '[' + socketWrapper.getHost() + ':' + socketWrapper.getPort() + ']';
+    if (debugEnabled) log.debug("initializing connection {}", name);
     if (socketWrapper.isOpened()) {
       try {
         if (debugEnabled) log.debug("{} about to close socket wrapper", name);

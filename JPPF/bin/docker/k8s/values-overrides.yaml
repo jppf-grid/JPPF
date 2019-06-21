@@ -1,0 +1,27 @@
+# This is an example yaml file which overrrides values in the JPPF chart
+
+# driver-specific configuration values
+driver:
+  # options of the driver JVM
+  jvmOptions: "-Xmx256m -Xms64m"
+  servicePort: 31111
+  servicePortTLS: 31443
+
+# node-specific configuration values
+node:
+  # number of nodes in the JPPF cluster
+  replicas: 4
+  # options of the node JVM
+  jvmOptions: "-Xmx128m -Xms32m"
+  # number of threads processing tasks
+  processingThreads: "1"
+  # maximum number of jobs a node can handle concurrently
+  maxConcurrentJobs: "10"
+
+# values common to driver and nodes
+jppf:
+  # 10.244.0.0/16 for flannel CNI plugin
+  subnet: "10.244.0.0/16"
+  version: "6.2-alpha"
+  # whether secure TLS communication is enabled
+  tlsEnabled: "false"

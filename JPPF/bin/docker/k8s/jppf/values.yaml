@@ -5,9 +5,12 @@
 # driver-specific configuration values
 driver:
   imageRepository: jppf-driver
+  name: jppf-driver
   # options of the driver JVM
   jvmOptions: "-Xmx256m -Xms64m"
   replicas: 1
+  servicePort: 31111
+  servicePortTLS: 31443
   # load-balancing configuration
   lb:
     # load-balancing algorithm to use; pre-defined possible values:
@@ -51,14 +54,15 @@ node:
     # activate the throttling plugin
     active: "true"
     # % of maximum heap size that causes the node to refuse jobs
-    threshold: "81.11"
+    threshold: "90.0"
     # number of times the check returns false before invoking System.gc()
     maxChecksBeforeGC: "5"
 
 image:
   registryName: jppfgrid
   tag: 6.2-alpha
-  pullPolicy: IfNotPresent
+  #pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # values common to driver and nodes
 jppf:

@@ -15,8 +15,9 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
         app.kubernetes.io/instance: {{ .Release.Name }}-driver
+        driver.name: {{ .Values.driver.name }}
     spec:
-      hostname: {{ .Values.jppf.serverHostName }}
+      #hostname: {{ .Values.jppf.serverHostName }}
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
