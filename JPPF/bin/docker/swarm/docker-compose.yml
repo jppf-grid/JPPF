@@ -1,12 +1,16 @@
 version: "3"
 
 services:
+
+  # the JPPF driver
   jppf-driver:
     image: "jppfgrid/jppf-driver:${JPPF_VERSION}"
     env_file:
     - .env
     ports:
+      # plain port
       - "11111:11111"
+      # TLS port
       - "11443:11443"
     deploy:
       replicas: 1
@@ -19,14 +23,10 @@ services:
         delay: 5s
         max_attempts: 3
         window: 15s
-      placement:
-        constraints:
-          # force the driver to be deployed on the docker swarm node that starts the service stack
-          # i.e. where the 'docker stack deploy ...' command is issued
-          - node.labels.jppf_server_host == ${JPPF_SERVER_HOST}
     networks:
       jppfnet:
 
+  # the JPPF nodes
   jppf-node:
     image: "jppfgrid/jppf-node:${JPPF_VERSION}"
     env_file:
@@ -34,11 +34,36 @@ services:
     environment:
     - JPPF_SERVER_HOST
     deploy:
-      replicas: 2
+      replicas: ${JPPF_NB_NODES}
       resources:
         limits:
           cpus: "1"
           memory: 256M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 15s
+    networks:
+      jppfnet:
+
+  # the JPPF web administration console
+  jppf-admin-web:
+    image: "jppfgrid/jppf-admin-web:${JPPF_VERSION}"
+    env_file:
+    - .env
+    environment:
+    - JPPF_SERVER_HOST
+    volumes:
+    - ${JPPF_TOMCAT_USERS_FILE}:/usr/local/tomcat/conf/tomcat-users.xml
+    ports:
+      - "8080:8080"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
       restart_policy:
         condition: on-failure
         delay: 5s

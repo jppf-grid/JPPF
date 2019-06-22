@@ -27,7 +27,7 @@
   <target name="build.docker.images" depends="detect.docker" if="${docker.installed}" description="build docker images">
     <antcall target="build.docker.images.internal"/>
   </target>
-  <target name="build.docker.images.internal" depends="docker.driver.image.internal, docker.node.image.internal" if="${docker.installed}"/>
+  <target name="build.docker.images.internal" depends="docker.driver.image.internal, docker.node.image.internal, docker.admin-web.image" if="${docker.installed}"/>
 
   <!-- ========================================================================= -->
   <!-- Determine whether docker is installed by attempting 'docker -v'           -->
@@ -52,6 +52,7 @@
     <docker.login/>
     <docker.push comp="driver"/>
     <docker.push comp="node"/>
+    <docker.push comp="admin-web"/>
   </target>
 
   <!-- ========================================================================= -->
@@ -76,6 +77,33 @@
 
   <target name="docker.node.image.internal" depends="build, runtime.node" if="${docker.installed}">
     <docker.build comp="node"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Build the web admin console docker image                                  -->
+  <!-- ========================================================================= -->
+  
+  <target name="docker.admin-web.image" depends="admin.web">
+    <delete dir="${build}/docker" quiet="true"/>
+    <mkdir dir="${build}/docker"/>
+    <mkdir dir="${build}/docker/ROOT"/>
+    <unzip dest="${build}/docker/ROOT" src="${admin-web}/build/jppf-admin-web-${version.number}.war"/>
+    <delete quiet="true">
+      <fileset dir="${build}/docker/ROOT/WEB-INF/classes" includes="jppf.properties,log4j.properties"/>
+    </delete>
+    <copy todir="${build}/docker/ROOT/WEB-INF/classes">
+      <fileset dir="${bin}/docker/admin-web" includes="*.properties"/>
+      <fileset dir="${bin}/docker" includes="utils.properties"/>
+    </copy>
+    <copy todir="${build}/docker">
+      <fileset dir="${bin}/docker/admin-web" includes="Dockerfile"/>
+    </copy>
+    <replace file="${build}/docker/Dockerfile" token="@version@" value="${version.number}"/>
+    <exec dir="${build}/docker" executable="docker" failonerror="true">
+      <arg value="build"/>
+      <arg value="--tag=${docker.registry}/jppf-admin-web:${version.number}"/>
+      <arg value="."/>
+    </exec>
   </target>
 
   <!-- ========================================================================= -->
