@@ -8,13 +8,10 @@ spec:
   replicas: {{ .Values.driver.replicas }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
-      app.kubernetes.io/instance: {{ .Release.Name }}-driver
+      driver.name: {{ .Values.driver.name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
-        app.kubernetes.io/instance: {{ .Release.Name }}-driver
         driver.name: {{ .Values.driver.name }}
     spec:
       #hostname: {{ .Values.jppf.serverHostName }}
@@ -84,10 +81,6 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}

@@ -18,8 +18,6 @@ spec:
     name: jppf2
 
   selector:
-    #app.kubernetes.io/name: {{ include "jppf.name" . }}-driver
-    #app.kubernetes.io/instance: {{ .Release.Name }}-driver
     driver.name: {{ .Values.driver.name }}
 
   type: NodePort
