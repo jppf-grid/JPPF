@@ -79,8 +79,9 @@ spec:
               containerPort: 11443
               hostPort: 11443
               protocol: TCP
+
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.driver.resources | nindent 12 }}
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}

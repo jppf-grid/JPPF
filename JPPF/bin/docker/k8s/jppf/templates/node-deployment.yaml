@@ -34,8 +34,6 @@ spec:
               value: "{{ .Values.jppf.version }}"
             - name: JPPF_SERVER_HOST
               value: "{{ .Values.jppf.serverHostName }}"
-              #value: "{{ .Values.jppf.serverHostName }}.{{ .Release.Namespace }}.svc.cluster.local"
-              #value: "{{ .Values.jppf.serverHostName }}.jppf.svc.cluster.local"
             - name: JPPF_PROCESSING_THREADS
               value: "{{ .Values.node.processingThreads }}"
             - name: JPPF_TLS_ENABLED
@@ -52,7 +50,7 @@ spec:
               value: "{{ .Values.node.throttling.maxChecksBeforeGC }}"
 
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.node.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

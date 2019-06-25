@@ -39,7 +39,7 @@ spec:
             - name: tomcat-users
               mountPath: /tomcat-conf
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.admin.resources | nindent 12 }}
 
       volumes:
         - name: tomcat-users
