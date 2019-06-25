@@ -96,7 +96,7 @@
       <fileset dir="${bin}/docker" includes="utils.properties"/>
     </copy>
     <copy todir="${build}/docker">
-      <fileset dir="${bin}/docker/admin-web" includes="Dockerfile"/>
+      <fileset dir="${bin}/docker/admin-web" includes="Dockerfile,server.xml,tomcat-users.xml,start-tomcat.sh"/>
     </copy>
     <replace file="${build}/docker/Dockerfile" token="@version@" value="${version.number}"/>
     <exec dir="${build}/docker" executable="docker" failonerror="true">

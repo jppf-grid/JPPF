@@ -55,7 +55,7 @@ services:
     environment:
     - JPPF_SERVER_HOST
     volumes:
-    - ${JPPF_TOMCAT_USERS_FILE}:/usr/local/tomcat/conf/tomcat-users.xml
+    - ${JPPF_TOMCAT_USERS_FILE}:/tomcat-conf/tomcat-users.xml
     ports:
       - "8080:8080"
     deploy:

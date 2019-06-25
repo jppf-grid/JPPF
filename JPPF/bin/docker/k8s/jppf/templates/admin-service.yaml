@@ -1,0 +1,21 @@
+{{- if .Values.admin.enabled -}}
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: jppf-admin-web-service
+
+spec:
+  ports:
+  - port: 8080
+    nodePort: {{ .Values.admin.servicePort }}
+    targetPort: http
+    protocol: TCP
+    name: http1
+
+  selector:
+    admin.name: {{ .Values.admin.name }}
+
+  type: NodePort
+{{- end }}
+  

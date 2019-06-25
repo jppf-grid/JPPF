@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<tomcat-users>
+  <role rolename="jppf-admin"/>
+  <role rolename="jppf-manager"/>
+  <role rolename="jppf-monitor"/>
+  <user username="jppf" password="jppf" roles="jppf-manager,jppf-admin"/>
+  <user username="jppf2" password="jppf2" roles="jppf-manager,jppf-admin"/>
+  <user username="admin" password="admin" roles="jppf-admin"/>
+  <user username="manager" password="manager" roles="jppf-manager"/>
+  <user username="monitor" password="monitor" roles="jppf-monitor"/>
+</tomcat-users>

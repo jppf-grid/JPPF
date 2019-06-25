@@ -9,7 +9,9 @@ driver:
   # options of the driver JVM
   jvmOptions: "-Xmx256m -Xms64m"
   replicas: 1
+  # plain port on which the driver can be reached on any k8s node
   servicePort: 31111
+  # TLS port on which the driver can be reached on any k8s node
   servicePortTLS: 31443
   # load-balancing configuration
   lb:
@@ -43,6 +45,7 @@ driver:
 node:
   replicas: 2
   imageRepository: jppf-node
+  name: jppf-node
   # options of the node JVM
   jvmOptions: "-Xmx128m -Xms32m"
   # number of threads processing tasks
@@ -57,6 +60,19 @@ node:
     threshold: "90.0"
     # number of times the check returns false before invoking System.gc()
     maxChecksBeforeGC: "5"
+
+# admin console specific configuration values
+admin:
+  replicas: 1
+  imageRepository: jppf-admin-web
+  name: jppf-admin-web
+  # whether to deploy the console or not
+  enabled: true
+  # port on which the admin console can be reached on any k8s node
+  servicePort: 31180
+  # base64-encoded content of a tomcat-users.xml file
+  # for instance, the output of "base64 -w 0 ./tomcat-user.xml"
+  tomcatUsers:
 
 image:
   registryName: jppfgrid

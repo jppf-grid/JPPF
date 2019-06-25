@@ -1,0 +1,60 @@
+{{- if .Values.admin.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-admin-web
+  labels:
+{{ include "jppf.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.admin.replicas }}
+  selector:
+    matchLabels:
+      admin.name: {{ .Values.admin.name }}
+  template:
+    metadata:
+      labels:
+        admin.name: {{ .Values.admin.name }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.registryName }}/{{ .Values.admin.imageRepository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: JPPF_VERSION
+              value: "{{ .Values.jppf.version }}"
+            - name: JPPF_SERVER_HOST
+              value: "{{ .Values.jppf.serverHostName }}"
+            - name: JPPF_TLS_ENABLED
+              value: "{{ .Values.jppf.tlsEnabled }}"
+          ports:
+            - name: http
+              containerPort: 8080
+              hostPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: tomcat-users
+              mountPath: /tomcat-conf
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+      volumes:
+        - name: tomcat-users
+          secret:
+            secretName: tomcat-users
+            items:
+            - key: tomcatUsers
+              path: tomcat-users.xml
+
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end }}
