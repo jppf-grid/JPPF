@@ -55,4 +55,4 @@ jppf:
   subnet: "10.244.0.0/16"
   version: "6.2-alpha"
   # whether secure TLS communication is enabled
-  tlsEnabled: "false"
+  tlsEnabled: false

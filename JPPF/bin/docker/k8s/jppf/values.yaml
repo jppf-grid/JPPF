@@ -9,9 +9,13 @@ driver:
   # options of the driver JVM
   jvmOptions: "-Xmx256m -Xms64m"
   replicas: 1
+  # type of service to use: NodePort or ClusterIP
+  serviceType: NodePort
   # plain port on which the driver can be reached on any k8s node
+  # only used with serviceType = NodePort
   servicePort: 31111
   # TLS port on which the driver can be reached on any k8s node
+  # only used with serviceType = NodePort
   servicePortTLS: 31443
   # load-balancing configuration
   lb:
