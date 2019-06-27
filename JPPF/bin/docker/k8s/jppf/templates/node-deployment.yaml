@@ -8,13 +8,15 @@ spec:
   replicas: {{ .Values.node.replicas }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "jppf.name" . }}-node
-      app.kubernetes.io/instance: {{ .Release.Name }}-node
+      app: jppf
+      comp: node
+      release: "{{ .Release.Name }}"
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "jppf.name" . }}-node
-        app.kubernetes.io/instance: {{ .Release.Name }}-node
+        app: jppf
+        comp: node
+        release: "{{ .Release.Name }}"
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

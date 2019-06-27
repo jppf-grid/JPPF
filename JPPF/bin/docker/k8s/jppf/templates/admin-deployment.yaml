@@ -9,11 +9,15 @@ spec:
   replicas: {{ .Values.admin.replicas }}
   selector:
     matchLabels:
-      admin.name: {{ .Values.admin.name }}
+      app: jppf
+      comp: admin
+      release: "{{ .Release.Name }}"
   template:
     metadata:
       labels:
-        admin.name: {{ .Values.admin.name }}
+        app: jppf
+        comp: admin
+        release: "{{ .Release.Name }}"
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

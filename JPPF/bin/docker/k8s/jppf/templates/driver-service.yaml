@@ -6,18 +6,32 @@ metadata:
 
 spec:
   ports:
-  - port: 11111
-    nodePort: {{ .Values.driver.servicePort }}
-    targetPort: jppf
-    protocol: TCP
-    name: jppf1
   - port: 11443
+    {{- if .Values.driver.servicePortTLS }}
+      {{- if eq .Values.driver.serviceType "NodePort" }}
     nodePort: {{ .Values.driver.servicePortTLS }}
+      {{- end }}
+    {{- end }}
     targetPort: jppf-tls
     protocol: TCP
     name: jppf2
+  - port: 11111
+    {{- if .Values.admin.servicePort }}
+      {{- if eq .Values.driver.serviceType "NodePort" }}
+    nodePort: {{ .Values.driver.servicePort }}
+      {{- end }}
+    {{- end }}
+    targetPort: jppf
+    protocol: TCP
+    name: jppf1
 
   selector:
-    driver.name: {{ .Values.driver.name }}
+    app: jppf
+    comp: driver
+    release: "{{ .Release.Name }}"
 
+  {{ if eq .Values.driver.serviceType "NodePort" }}
   type: NodePort
+  {{ else }}
+  type: ClusterIP
+  {{ end }}

@@ -1,0 +1,34 @@
+Thank you for installing JPPF.
+
+* To obtain the JPPF driver host and port:
+ 
+{{- if contains "NodePort" .Values.driver.serviceType }}
+
+export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}") \
+{{- if .Values.jppf.tlsEnabled }}
+&& export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services jppf-driver-service) \
+{{- else  }}
+&& export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[1].nodePort}" services jppf-driver-service) \
+{{- end }}
+&& echo $NODE_IP:$NODE_PORT
+{{- else  }}
+
+export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app=jppf,comp=driver,release={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}") \
+{{- if .Values.jppf.tlsEnabled }}
+&& echo "localhost:11443" \
+&& kubectl port-forward $POD_NAME 11443:11443
+{{- else  }}
+&& echo "localhost:11111" \
+&& kubectl port-forward $POD_NAME 11111:11111
+{{- end }}
+{{- end }}
+ 
+{{- if .Values.admin.enabled }}
+ 
+* To obtain the web admin console URL:
+ 
+export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}") \
+&& export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services jppf-admin-web-service) \
+&& echo http://$NODE_IP:$NODE_PORT
+ 
+{{- end }}

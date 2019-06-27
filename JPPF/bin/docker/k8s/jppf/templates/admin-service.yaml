@@ -14,7 +14,9 @@ spec:
     name: http1
 
   selector:
-    admin.name: {{ .Values.admin.name }}
+    app: jppf
+    comp: admin
+    release: "{{ .Release.Name }}"
 
   type: NodePort
 {{- end }}

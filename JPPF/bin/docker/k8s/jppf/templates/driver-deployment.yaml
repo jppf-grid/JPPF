@@ -8,11 +8,15 @@ spec:
   replicas: {{ .Values.driver.replicas }}
   selector:
     matchLabels:
-      driver.name: {{ .Values.driver.name }}
+      app: jppf
+      comp: driver
+      release: "{{ .Release.Name }}"
   template:
     metadata:
       labels:
-        driver.name: {{ .Values.driver.name }}
+        app: jppf
+        comp: driver
+        release: "{{ .Release.Name }}"
     spec:
       #hostname: {{ .Values.jppf.serverHostName }}
     {{- with .Values.imagePullSecrets }}
