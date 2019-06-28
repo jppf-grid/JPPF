@@ -23,6 +23,7 @@ This is the home for the JPPF source code. Other services can be found at the fo
 * **[application-template](application-template)**: source code for the JPPF client application template
 * **[client](client)**: source code for the JPPF client APIs
 * **[common](common)**: utilities and classes common to the other modules
+* **[containers](containers)**: configuration files and scripts to build JPPF Docker images and deploy them in cluster environments
 * **[demo](demo)**: some demos and tests of JPPF features, which may be useful as code samples
 * **[dotnet-bridge](dotnet-bridge)**: source code and resources for the .Net bridge
 * **[jca-client](jca-client)**: source code for the J2EE connector

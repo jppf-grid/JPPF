@@ -19,6 +19,7 @@
 <project name="JPPF-docker" basedir=".." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <property name="docker.registry" value="jppfgrid"/>
+  <property name="docker.images.dir" value="${containers}/images"/>
 
   <!-- ========================================================================= -->
   <!-- Build docker images for JPPF                                              -->
@@ -92,11 +93,11 @@
       <fileset dir="${build}/docker/ROOT/WEB-INF/classes" includes="jppf.properties,log4j.properties"/>
     </delete>
     <copy todir="${build}/docker/ROOT/WEB-INF/classes">
-      <fileset dir="${bin}/docker/admin-web" includes="*.properties"/>
-      <fileset dir="${bin}/docker" includes="utils.properties"/>
+      <fileset dir="${docker.images.dir}/admin-web" includes="*.properties"/>
+      <fileset dir="${docker.images.dir}" includes="utils.properties"/>
     </copy>
     <copy todir="${build}/docker">
-      <fileset dir="${bin}/docker/admin-web" includes="Dockerfile,server.xml,tomcat-users.xml,start-tomcat.sh"/>
+      <fileset dir="${docker.images.dir}/admin-web" includes="Dockerfile,server.xml,tomcat-users.xml,start-tomcat.sh"/>
     </copy>
     <replace file="${build}/docker/Dockerfile" token="@version@" value="${version.number}"/>
     <exec dir="${build}/docker" executable="docker" failonerror="true">
@@ -130,14 +131,14 @@
         <fileset dir="${build}/docker/${zip.name}" includes="*.*,JPPFDriver,JPPFNode,config/*.properties" excludes="LICENSE.txt"/>
       </delete>
       <copy todir="${build}/docker/${zip.name}">
-        <fileset dir="${bin}/docker/@{comp}" includes="start-@{comp}.sh"/>
+        <fileset dir="${docker.images.dir}/@{comp}" includes="start-@{comp}.sh"/>
       </copy>
       <copy todir="${build}/docker/${zip.name}/config">
-        <fileset dir="${bin}/docker/@{comp}" includes="*.properties"/>
-        <fileset dir="${bin}/docker" includes="utils.properties"/>
+        <fileset dir="${docker.images.dir}/@{comp}" includes="*.properties"/>
+        <fileset dir="${docker.images.dir}" includes="utils.properties"/>
       </copy>
       <copy todir="${build}/docker">
-        <fileset dir="${bin}/docker/@{comp}" includes="Dockerfile"/>
+        <fileset dir="${docker.images.dir}/@{comp}" includes="Dockerfile"/>
       </copy>
       <replace file="${build}/docker/Dockerfile" token="@version@" value="${version.number}"/>
       <exec dir="${build}/docker" executable="docker" failonerror="true">

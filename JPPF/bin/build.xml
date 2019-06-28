@@ -39,6 +39,7 @@
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
   <property name="tests"                 value="${basedir}/../tests"/>
   <property name="stress-tests"          value="${basedir}/../stress-tests"/>
+  <property name="containers"            value="${basedir}/../containers"/>
 
   <property environment="env"/>
   <property name="build.properties.file" value="${basedir}/bin/build.properties"/>
