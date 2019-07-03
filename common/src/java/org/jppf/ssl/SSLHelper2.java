@@ -106,7 +106,7 @@ public final class SSLHelper2 {
   private SSLContext getSSLContext(final String...trustStorePropertyPrefixes) throws SSLConfigurationException {
     try {
       final char[] keyPwd = getPassword("jppf.ssl.keystore.password");
-      if (debugEnabled) log.debug("keystore password = '{}'", maskPassword(new String(keyPwd)));
+      if (debugEnabled) log.debug("keystore password = '{}'", maskPassword((keyPwd == null) ? null : new String(keyPwd)));
       final KeyStore keyStore = getStore("jppf.ssl.keystore", keyPwd);
       KeyManagerFactory kmf = null;
       if (keyStore != null) {
@@ -148,6 +148,7 @@ public final class SSLHelper2 {
   private TrustManagerFactory getTrustManagerFactory(final String trustStorePropertyPrefix) throws SSLConfigurationException {
     try {
       final char[] trustPwd = getPassword(trustStorePropertyPrefix + ".truststore.password");
+      if (debugEnabled) log.debug("truststore password = '{}'", maskPassword((trustPwd == null) ? null : new String(trustPwd)));
       final KeyStore trustStore = getStore(trustStorePropertyPrefix + ".truststore", trustPwd);
       TrustManagerFactory tmf = null;
       if (trustStore != null) {
