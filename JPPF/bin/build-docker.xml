@@ -98,6 +98,7 @@
     </copy>
     <copy todir="${build}/docker">
       <fileset dir="${docker.images.dir}/admin-web" includes="Dockerfile,server.xml,tomcat-users.xml,start-tomcat.sh"/>
+      <fileset dir="${docker.images.dir}/admin-web" includes="tls/*.*"/>
     </copy>
     <replace file="${build}/docker/Dockerfile" token="@version@" value="${version.number}"/>
     <exec dir="${build}/docker" executable="docker" failonerror="true">
@@ -139,6 +140,7 @@
       </copy>
       <copy todir="${build}/docker">
         <fileset dir="${docker.images.dir}/@{comp}" includes="Dockerfile"/>
+        <fileset dir="${docker.images.dir}/@{comp}" includes="tls/*.*"/>
       </copy>
       <replace file="${build}/docker/Dockerfile" token="@version@" value="${version.number}"/>
       <exec dir="${build}/docker" executable="docker" failonerror="true">

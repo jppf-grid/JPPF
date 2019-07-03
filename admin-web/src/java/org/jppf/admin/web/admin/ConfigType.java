@@ -19,6 +19,7 @@
 package org.jppf.admin.web.admin;
 
 import org.jppf.utils.CryptoUtils;
+import org.jppf.utils.configuration.ConfigurationUtils;
 
 /**
  * The types of configurations handled in the admin panels.
@@ -31,7 +32,7 @@ public enum ConfigType {
   /**
    * The SSL/TLS configuration.
    */
-  SSL("jppf_ssl_config", "admin.ssl", "ssl.properties");
+  SSL("jppf_ssl_config", "admin.ssl", ConfigurationUtils.getFromEnv("JPPF_ADMIN_SSL_CONFIG_PATH", "ssl.properties"));
 
   /**
    * A hash of the name given to the config.

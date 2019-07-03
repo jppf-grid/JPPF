@@ -494,4 +494,13 @@ public final class StringUtils {
     while ((s.length() > 0) && (s.startsWith("\"") || s.startsWith("'"))) s = s.substring(1);
     return s;
   }
+
+  /**
+   * Mask the specified password.
+   * @param password the password to mask.
+   * @return either the string "null" if password is null, or a sequence of asterisks.
+   */
+  public static String maskPassword(final String password) {
+    return (password == null) ? "null" : "********";
+  }
 }

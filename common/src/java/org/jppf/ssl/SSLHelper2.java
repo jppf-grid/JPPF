@@ -19,6 +19,7 @@
 package org.jppf.ssl;
 
 import static org.jppf.jmx.JPPFJMXProperties.*;
+import static org.jppf.utils.StringUtils.maskPassword;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -105,6 +106,7 @@ public final class SSLHelper2 {
   private SSLContext getSSLContext(final String...trustStorePropertyPrefixes) throws SSLConfigurationException {
     try {
       final char[] keyPwd = getPassword("jppf.ssl.keystore.password");
+      if (debugEnabled) log.debug("keystore password = '{}'", maskPassword(new String(keyPwd)));
       final KeyStore keyStore = getStore("jppf.ssl.keystore", keyPwd);
       KeyManagerFactory kmf = null;
       if (keyStore != null) {
@@ -312,8 +314,10 @@ public final class SSLHelper2 {
    */
   private char[] getPassword(final String baseProperty) throws Exception {
     String s = sslConfig.getString(baseProperty, null);
+    if (debugEnabled) log.debug("found {} = {}", baseProperty, maskPassword(s));
     if (s != null) return s.toCharArray();
     s = sslConfig.getString(baseProperty + ".source", null);
+    if (debugEnabled) log.debug("found {}.source = {}", baseProperty, maskPassword(s));
     return (char[]) callSource(s);
   }
 

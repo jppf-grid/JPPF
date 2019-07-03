@@ -112,13 +112,15 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
       @Override
       public synchronized ConfigurationHandler load() {
         final ConfigurationHandler handler = super.load();
-        getProperties().set(JPPFProperties.SSL_CONFIGURATION_SOURCE, SSLConfigSource.class.getName()).remove(JPPFProperties.SSL_CONFIGURATION_FILE);
+        if (handler.getProperties().getBoolean("jppf.ssl.loadFromWebApp", true))
+          getProperties().set(JPPFProperties.SSL_CONFIGURATION_SOURCE, SSLConfigSource.class.getName()).remove(JPPFProperties.SSL_CONFIGURATION_FILE);
         return handler;
       }
 
       @Override
       public synchronized ConfigurationHandler save() {
-        getProperties().set(JPPFProperties.SSL_CONFIGURATION_SOURCE, SSLConfigSource.class.getName()).remove(JPPFProperties.SSL_CONFIGURATION_FILE);
+        if (getProperties().getBoolean("jppf.ssl.loadFromWebApp", true))
+          getProperties().set(JPPFProperties.SSL_CONFIGURATION_SOURCE, SSLConfigSource.class.getName()).remove(JPPFProperties.SSL_CONFIGURATION_FILE);
         return super.save();
       }
     });
