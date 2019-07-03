@@ -337,11 +337,11 @@ public class JPPFProperties {
   /** Plain text key store password. */
   public static final JPPFProperty<String> SSL_KEYSTORE_PASSWORD = new StringProperty("jppf.ssl.keystore.password", null);
   /** Key store password as an arbitrary source. */
-  public static final JPPFProperty<String> SSL_KEYSTORE_PASSWORD_SOURCE = new StringProperty("jppf.ssl.keyststore.password.source", null);
+  public static final JPPFProperty<String> SSL_KEYSTORE_PASSWORD_SOURCE = new StringProperty("jppf.ssl.keystore.password.source", null);
   /** Key store format, e.g. 'JKS'. */
-  public static final JPPFProperty<String> SSL_KEYSTORE_TYPE = new StringProperty("jppf.ssl.keyststore.type", KeyStore.getDefaultType());
+  public static final JPPFProperty<String> SSL_KEYSTORE_TYPE = new StringProperty("jppf.ssl.keystore.type", KeyStore.getDefaultType());
   /** Key store location as an arbitrary source. */
-  public static final JPPFProperty<String> SSL_KEYSTORE_SOURCE = new StringProperty("jppf.ssl.keytstore.source", null);
+  public static final JPPFProperty<String> SSL_KEYSTORE_SOURCE = new StringProperty("jppf.ssl.keystore.source", null);
   /** A list of space-separated enabled protocols. */
   public static final JPPFProperty<String[]> SSL_PROTOCOLS = new StringArrayProperty("jppf.ssl.protocols", " ", null);
   /** Path to the trust store in the file system or classpath. */
