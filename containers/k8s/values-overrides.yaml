@@ -55,5 +55,7 @@ jppf:
   # 10.244.0.0/16 for flannel CNI plugin
   subnet: "10.244.0.0/16"
   version: "6.2-alpha"
+
+tls:
   # whether secure TLS communication is enabled
-  tlsEnabled: false
+  enabled: true

@@ -36,7 +36,7 @@ spec:
             - name: JPPF_VERSION
               value: "{{ .Values.jppf.version }}"
             - name: JPPF_TLS_ENABLED
-              value: "{{ .Values.jppf.tlsEnabled }}"
+              value: "{{ .Values.tls.enabled }}"
             - name: JPPF_SERIALIZATION
               value: "{{ .Values.jppf.serialization }}"
             - name: JPPF_LB_ALGORITHM
@@ -86,6 +86,33 @@ spec:
 
           resources:
             {{- toYaml .Values.driver.resources | nindent 12 }}
+
+          {{- if .Values.tls.enabled }}
+          volumeMounts:
+            - name: driver-tls-config
+              mountPath: /jppf-config
+          {{- end }}
+
+      volumes:
+        {{- if .Values.tls.enabled }}
+        - name: driver-tls-config
+          secret:
+            secretName: driver-tls-config
+            items:
+            - key: driverKeyStore
+              path: driver_keystore.ks
+            - key: driverKeyStorePassword
+              path: driver_keystore.txt
+            - key: clientTrustStore
+              path: client_truststore.ks
+            - key: clientTrustStorePassword
+              path: client_truststore.txt
+            - key: nodeTrustStore
+              path: node_truststore.ks
+            - key: nodeTrustStorePassword
+              path: node_truststore.txt
+        {{- end }}
+
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}

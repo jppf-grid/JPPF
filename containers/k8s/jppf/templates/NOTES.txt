@@ -5,7 +5,7 @@ Thank you for installing JPPF.
 {{- if contains "NodePort" .Values.driver.serviceType }}
 
 export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}") \
-{{- if .Values.jppf.tlsEnabled }}
+{{- if .Values.tls.enabled }}
 && export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services jppf-driver-service) \
 {{- else  }}
 && export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[1].nodePort}" services jppf-driver-service) \
@@ -14,7 +14,7 @@ export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonp
 {{- else  }}
 
 export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app=jppf,comp=driver,release={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}") \
-{{- if .Values.jppf.tlsEnabled }}
+{{- if .Values.tls.enabled }}
 && echo "localhost:11443" \
 && kubectl port-forward $POD_NAME 11443:11443
 {{- else  }}

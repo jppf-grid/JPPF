@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # display the environment so it can be retrieved with 'docker logs ...'
-env
+env | sort
 
 # start the driver
 java -cp config:lib/* -Xmx16m -Djppf.unquote.env.vars=true -Djppf.config=jppf-driver.properties -Dlog4j.configuration=log4j-driver.properties org.jppf.server.DriverLauncher

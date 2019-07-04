@@ -39,7 +39,7 @@ spec:
             - name: JPPF_PROCESSING_THREADS
               value: "{{ .Values.node.processingThreads }}"
             - name: JPPF_TLS_ENABLED
-              value: "{{ .Values.jppf.tlsEnabled }}"
+              value: "{{ .Values.tls.enabled }}"
             - name: JPPF_SERIALIZATION
               value: "{{ .Values.jppf.serialization }}"
             - name: JPPF_NODE_MAX_JOBS
@@ -53,6 +53,29 @@ spec:
 
           resources:
             {{- toYaml .Values.node.resources | nindent 12 }}
+
+          {{- if .Values.tls.enabled }}
+          volumeMounts:
+            - name: node-tls-config
+              mountPath: /jppf-config
+          {{- end }}
+
+      volumes:
+        {{- if .Values.tls.enabled }}
+        - name: node-tls-config
+          secret:
+            secretName: node-tls-config
+            items:
+            - key: nodeKeyStore
+              path: node_keystore.ks
+            - key: nodeKeyStorePassword
+              path: node_keystore.txt
+            - key: driverTrustStore
+              path: driver_truststore.ks
+            - key: driverTrustStorePassword
+              path: driver_truststore.txt
+        {{- end }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
