@@ -12,6 +12,13 @@ services:
       - "11111:11111"
       # TLS port
       - "11443:11443"
+    volumes:
+    - ./tls/driver_keystore.ks:/jppf-config/driver_keystore.ks
+    - ./tls/driver_keystore.txt:/jppf-config/driver_keystore.txt
+    - ./tls/client_truststore.ks:/jppf-config/client_truststore.ks
+    - ./tls/client_truststore.txt:/jppf-config/client_truststore.txt
+    - ./tls/node_truststore.ks:/jppf-config/node_truststore.ks
+    - ./tls/node_truststore.txt:/jppf-config/node_truststore.txt
     deploy:
       replicas: 1
       resources:
@@ -33,6 +40,11 @@ services:
     - .env
     environment:
     - JPPF_SERVER_HOST
+    volumes:
+    - ./tls/node_keystore.ks:/jppf-config/node_keystore.ks
+    - ./tls/node_keystore.txt:/jppf-config/node_keystore.txt
+    - ./tls/driver_truststore.ks:/jppf-config/driver_truststore.ks
+    - ./tls/driver_truststore.txt:/jppf-config/driver_truststore.txt
     deploy:
       replicas: ${JPPF_NB_NODES}
       resources:
@@ -56,6 +68,10 @@ services:
     - JPPF_SERVER_HOST
     volumes:
     - ${JPPF_TOMCAT_USERS_FILE}:/tomcat-conf/tomcat-users.xml
+    - ./tls/client_keystore.ks:/jppf-config/client_keystore.ks
+    - ./tls/client_keystore.txt:/jppf-config/client_keystore.txt
+    - ./tls/driver_truststore.ks:/jppf-config/driver_truststore.ks
+    - ./tls/driver_truststore.txt:/jppf-config/driver_truststore.txt
     ports:
       - "8080:8080"
     deploy:
