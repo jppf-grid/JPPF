@@ -1,0 +1,13 @@
+{{- if .Values.driver.configOverrides }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: driver-configuration
+  labels:
+    app: jppf
+    comp: driver
+    release: "{{ .Release.Name }}"
+data:
+  configOverrides: |-
+{{ .Values.driver.configOverrides | indent 4 }}
+{{- end -}}

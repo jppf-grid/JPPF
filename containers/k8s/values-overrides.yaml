@@ -14,6 +14,8 @@ driver:
     limits:
       memory: "512Mi"
       cpu: "1000m"
+  configOverrides: |-
+    custom.driver.prop = driver value
 
 # node-specific configuration values
 node:
@@ -33,6 +35,8 @@ node:
     limits:
       memory: "256Mi"
       cpu: "500m"
+  configOverrides: |-
+    custom.node.prop = node value
 
 # admin console specific configuration values
 admin:
@@ -49,6 +53,8 @@ admin:
     limits:
       memory: "512Mi"
       cpu: "500m"
+  configOverrides: |-
+    custom.admin.prop = admin value
 
 # values common to driver and nodes
 jppf:

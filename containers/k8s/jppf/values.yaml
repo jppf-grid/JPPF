@@ -18,32 +18,6 @@ driver:
   # only used with serviceType = NodePort
   servicePortTLS: 31443
   # load-balancing configuration
-  lb:
-    # load-balancing algorithm to use; pre-defined possible values:
-    # manual | autotuned | proportional | rl2 | nodethreads
-    algorithm: "rl2"
-    # used with "manual" and "autotuned" algorithms
-    size: "1"
-    # used with "proportional" and "rl2" algorithms
-    performanceCacheSize: "1000"
-    # "autotuned" parameters
-    minSamplesToAnalyse: "100"
-    minSamplesToCheckConvergence: "50"
-    maxDeviation: "0.2"
-    maxGuessToStable: "50"
-    sizeRatioDeviation: "1.5"
-    decreaseRatio: "0.2"
-    # "proportional" parameters
-    initialSize: "5"
-    initialMeanTime: "1e10"
-    proportionalityFactor: "1"
-    # "nodethreads" parameters
-    multiplicator: "1"
-    # "rl2" parameters
-    performanceVariationThreshold: "0.75"
-    minSamples: "20"
-    maxSamples: "100"
-    maxRelativeSize: "0.5"
 
 # node-specific configuration values
 node:

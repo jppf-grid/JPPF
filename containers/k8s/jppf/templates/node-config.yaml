@@ -1,0 +1,13 @@
+{{- if .Values.node.configOverrides }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node-configuration
+  labels:
+    app: jppf
+    comp: node
+    release: "{{ .Release.Name }}"
+data:
+  configOverrides: |-
+{{ .Values.node.configOverrides | indent 4 }}
+{{- end -}}

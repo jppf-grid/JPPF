@@ -54,10 +54,14 @@ spec:
           resources:
             {{- toYaml .Values.node.resources | nindent 12 }}
 
-          {{- if .Values.tls.enabled }}
           volumeMounts:
+          {{- if .Values.tls.enabled }}
             - name: node-tls-config
               mountPath: /jppf-config
+          {{- end }}
+          {{- if .Values.node.configOverrides }}
+            - name: node-configuration
+              mountPath: /jppf-config-overrides
           {{- end }}
 
       volumes:
@@ -74,6 +78,14 @@ spec:
               path: driver_truststore.ks
             - key: driverTrustStorePassword
               path: driver_truststore.txt
+        {{- end }}
+        {{- if .Values.node.configOverrides }}
+        - name: node-configuration
+          configMap:
+            name: node-configuration
+            items:
+            - key: configOverrides
+              path: config-overrides.properties
         {{- end }}
 
       {{- with .Values.nodeSelector }}

@@ -46,6 +46,10 @@ spec:
             - name: admin-tls-config
               mountPath: /jppf-config
             {{- end }}
+            {{- if .Values.admin.configOverrides }}
+            - name: admin-configuration
+              mountPath: /jppf-config-overrides
+            {{- end }}
           resources:
             {{- toYaml .Values.admin.resources | nindent 12 }}
 
@@ -69,6 +73,14 @@ spec:
               path: driver_truststore.ks
             - key: driverTrustStorePassword
               path: driver_truststore.txt
+        {{- end }}
+        {{- if .Values.admin.configOverrides }}
+        - name: admin-configuration
+          configMap:
+            name: admin-configuration
+            items:
+            - key: configOverrides
+              path: config-overrides.properties
         {{- end }}
 
     {{- with .Values.affinity }}

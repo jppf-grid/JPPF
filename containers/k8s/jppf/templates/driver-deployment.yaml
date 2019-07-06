@@ -39,40 +39,6 @@ spec:
               value: "{{ .Values.tls.enabled }}"
             - name: JPPF_SERIALIZATION
               value: "{{ .Values.jppf.serialization }}"
-            - name: JPPF_LB_ALGORITHM
-              value: "{{ .Values.driver.lb.algorithm }}"
-            - name: JPPF_LB_SIZE
-              value: "{{ .Values.driver.lb.size }}"
-            - name: JPPF_LB_PERFORMANCE_CACHE_SIZE
-              value: "{{ .Values.driver.lb.performanceCacheSize }}"
-            - name: JPPF_LB_MIN_SAMPLES_TO_ANALYZE
-              value: "{{ .Values.driver.lb.minSamplesToAnalyse }}"
-            - name: JPPF_LB_MIN_SAMPLES_TO_CHECK_CONVERGENCE
-              value: "{{ .Values.driver.lb.minSamplesToCheckConvergence }}"
-            - name: JPPF_LB_MAX_DEVIATION
-              value: "{{ .Values.driver.lb.maxDeviation }}"
-            - name: JPPF_LB_MAX_GUESS_TO_STABLE
-              value: "{{ .Values.driver.lb.maxGuessToStable }}"
-            - name: JPPF_LB_SIZE_RATIO_DEVIATION
-              value: "{{ .Values.driver.lb.sizeRatioDeviation }}"
-            - name: JPPF_LB_DECREASE_RATIO
-              value: "{{ .Values.driver.lb.decreaseRatio }}"
-            - name: JPPF_LB_INITIAL_SIZE
-              value: "{{ .Values.driver.lb.initialSize }}"
-            - name: JPPF_LB_INITIAL_MEAN_TIME
-              value: "{{ .Values.driver.lb.initialMeanTime }}"
-            - name: JPPF_LB_PROPORTIONALITY_FACTOR
-              value: "{{ .Values.driver.lb.proportionalityFactor }}"
-            - name: JPPF_LB_MULTIPLICATOR
-              value: "{{ .Values.driver.lb.multiplicator }}"
-            - name: JPPF_LB_PERFORMANCE_VARIATION_THRESHOLD
-              value: "{{ .Values.driver.lb.performanceVariationThreshold }}"
-            - name: JPPF_LB_MIN_SAMPLES
-              value: "{{ .Values.driver.lb.minSamples }}"
-            - name: JPPF_LB_MAX_SAMPLES
-              value: "{{ .Values.driver.lb.maxSamples }}"
-            - name: JPPF_LB_MAX_RELATIVE_SIZE
-              value: "{{ .Values.driver.lb.maxRelativeSize }}"
 
           ports:
             - name: jppf
@@ -87,10 +53,14 @@ spec:
           resources:
             {{- toYaml .Values.driver.resources | nindent 12 }}
 
-          {{- if .Values.tls.enabled }}
           volumeMounts:
+          {{- if .Values.tls.enabled }}
             - name: driver-tls-config
               mountPath: /jppf-config
+          {{- end }}
+          {{- if .Values.driver.configOverrides }}
+            - name: driver-configuration
+              mountPath: /jppf-config-overrides
           {{- end }}
 
       volumes:
@@ -111,6 +81,14 @@ spec:
               path: node_truststore.ks
             - key: nodeTrustStorePassword
               path: node_truststore.txt
+        {{- end }}
+        {{- if .Values.driver.configOverrides }}
+        - name: driver-configuration
+          configMap:
+            name: driver-configuration
+            items:
+            - key: configOverrides
+              path: config-overrides.properties
         {{- end }}
 
     {{- with .Values.affinity }}
