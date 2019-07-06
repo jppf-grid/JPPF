@@ -1,0 +1,13 @@
+{{- if .Values.admin.configOverrides }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: admin-configuration
+  labels:
+    app: jppf
+    comp: admin
+    release: "{{ .Release.Name }}"
+data:
+  configOverrides: |-
+{{ .Values.admin.configOverrides | indent 4 }}
+{{- end -}}

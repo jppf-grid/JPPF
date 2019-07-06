@@ -33,7 +33,7 @@ spec:
             - name: JPPF_SERVER_HOST
               value: "{{ .Values.jppf.serverHostName }}"
             - name: JPPF_TLS_ENABLED
-              value: "{{ .Values.jppf.tlsEnabled }}"
+              value: "{{ .Values.tls.enabled }}"
           ports:
             - name: http
               containerPort: 8080
@@ -42,6 +42,14 @@ spec:
           volumeMounts:
             - name: tomcat-users
               mountPath: /tomcat-conf
+            {{- if .Values.tls.enabled }}
+            - name: admin-tls-config
+              mountPath: /jppf-config
+            {{- end }}
+            {{- if .Values.admin.configOverrides }}
+            - name: admin-configuration
+              mountPath: /jppf-config-overrides
+            {{- end }}
           resources:
             {{- toYaml .Values.admin.resources | nindent 12 }}
 
@@ -52,6 +60,28 @@ spec:
             items:
             - key: tomcatUsers
               path: tomcat-users.xml
+        {{- if .Values.tls.enabled }}
+        - name: admin-tls-config
+          secret:
+            secretName: admin-tls-config
+            items:
+            - key: adminKeyStore
+              path: client_keystore.ks
+            - key: adminKeyStorePassword
+              path: client_keystore.txt
+            - key: driverTrustStore
+              path: driver_truststore.ks
+            - key: driverTrustStorePassword
+              path: driver_truststore.txt
+        {{- end }}
+        {{- if .Values.admin.configOverrides }}
+        - name: admin-configuration
+          configMap:
+            name: admin-configuration
+            items:
+            - key: configOverrides
+              path: config-overrides.properties
+        {{- end }}
 
     {{- with .Values.affinity }}
       affinity:
