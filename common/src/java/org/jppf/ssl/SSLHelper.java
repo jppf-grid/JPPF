@@ -20,8 +20,9 @@ package org.jppf.ssl;
 
 import static org.jppf.jmx.JPPFJMXProperties.*;
 
-import java.io.InputStream;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.net.ssl.*;
@@ -30,7 +31,6 @@ import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.jmx.JMXEnvHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.*;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -127,12 +127,10 @@ public final class SSLHelper {
         is = FileUtils.getFileInputStream(source);
       }
       if (is == null) throw new SSLConfigurationException("could not load the SSL configuration '" + source + "'");
-      try {
-        sslConfig.load(is);
+      try (final InputStreamReader reader = new InputStreamReader(is, StandardCharsets.ISO_8859_1)) {
+        sslConfig.loadAndResolve(reader);
         helper = new SSLHelper2(sslConfig);
         if (debugEnabled) log.debug("successfully loaded the SSL configuration from '{}'", source);
-      } finally {
-        StreamUtils.closeSilent(is);
       }
     }
   }
