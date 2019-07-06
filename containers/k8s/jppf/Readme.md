@@ -32,7 +32,7 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ## Configuration
 
-The following table lists the configurable parameters of the Hazelcast chart and their default values.
+The following table lists the configurable values of th"e JPPF chart.
 
 | Name                            | Description                                                       | Default                                 |
 |---------------------------------|-------------------------------------------------------------------|---------------------                    |
@@ -53,7 +53,7 @@ The following table lists the configurable parameters of the Hazelcast chart and
 | `admin.replicas`                | Number of admin consoles to deploy in the K8s cluster             | 1                                       |
 | `admin.imageRepository`         | Docker image repository name                                      | jppf-admin-web                          |
 | `admin.servicePort`             | HTTP port exposed on all K8S nodes                                | 31180                                   |
-| `admin.tomcatUsers`             | base64-encoded tomcat-users.xml file content                      |                                         |
+| `admin.tomcatUsers`             | base64-encoded tomcat-users.xml file content                      | see [Tomcat users](#tomcat-users)       |
 | ***Docker images common***      |                                                                   |                                         |
 | `image.registryName`            | Docker image repository name                                      | jppfgrid                                |
 | `image.tag`                     | Tag for all images in the cluster                                 | 6.2-alpha                               |
