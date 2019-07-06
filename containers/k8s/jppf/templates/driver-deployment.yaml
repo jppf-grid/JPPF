@@ -30,7 +30,7 @@ spec:
 
           env:
             - name: JPPF_SUBNET
-              value: "{{ .Values.jppf.subnet }}"
+              value: "172.16.238.0/24"
             - name: JPPF_DRIVER_JVM_OPTIONS
               value: "{{ .Values.driver.jvmOptions }}"
             - name: JPPF_VERSION

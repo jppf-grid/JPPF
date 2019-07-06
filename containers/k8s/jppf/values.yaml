@@ -4,11 +4,10 @@
 
 # driver-specific configuration values
 driver:
+  replicas: 1
   imageRepository: jppf-driver
-  name: jppf-driver
   # options of the driver JVM
   jvmOptions: "-Xmx256m -Xms64m"
-  replicas: 1
   # type of service to use: NodePort or ClusterIP
   serviceType: NodePort
   # plain port on which the driver can be reached on any k8s node
@@ -17,13 +16,11 @@ driver:
   # TLS port on which the driver can be reached on any k8s node
   # only used with serviceType = NodePort
   servicePortTLS: 31443
-  # load-balancing configuration
 
 # node-specific configuration values
 node:
   replicas: 2
   imageRepository: jppf-node
-  name: jppf-node
   # options of the node JVM
   jvmOptions: "-Xmx128m -Xms32m"
   # number of threads processing tasks
@@ -41,11 +38,10 @@ node:
 
 # admin console specific configuration values
 admin:
-  replicas: 1
-  imageRepository: jppf-admin-web
-  name: jppf-admin-web
   # whether to deploy the console or not
   enabled: true
+  replicas: 1
+  imageRepository: jppf-admin-web
   # port on which the admin console can be reached on any k8s node
   servicePort: 31180
   # base64-encoded content of a tomcat-users.xml file
@@ -55,12 +51,10 @@ admin:
 image:
   registryName: jppfgrid
   tag: 6.2-alpha
-  #pullPolicy: IfNotPresent
   pullPolicy: Always
 
 # values common to driver and nodes
 jppf:
-  subnet: "172.16.238.0/24"
   version: "6.2-alpha"
   serverHostName: jppf-driver-service
   serialization: "org.jppf.serialization.DefaultJavaSerialization"
@@ -69,6 +63,8 @@ jppf:
 tls:
   # whether secure TLS communication is enabled
   enabled: "false"
+  # Type of key stores and trust stores (JKS, PKCS12)
+  storeType: "JKS"
   # secrets for the driver TLS credentials
   driver:
     # base64-encoded keystore for the driver, contains the driver private/public key pair
