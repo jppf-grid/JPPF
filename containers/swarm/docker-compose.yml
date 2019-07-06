@@ -19,6 +19,7 @@ services:
     - ./tls/client_truststore.txt:/jppf-config/client_truststore.txt
     - ./tls/node_truststore.ks:/jppf-config/node_truststore.ks
     - ./tls/node_truststore.txt:/jppf-config/node_truststore.txt
+    - ./config-overrides/driver-overrides.properties:/jppf-config-overrides/config-overrides.properties
     deploy:
       replicas: 1
       resources:
@@ -45,6 +46,7 @@ services:
     - ./tls/node_keystore.txt:/jppf-config/node_keystore.txt
     - ./tls/driver_truststore.ks:/jppf-config/driver_truststore.ks
     - ./tls/driver_truststore.txt:/jppf-config/driver_truststore.txt
+    - ./config-overrides/node-overrides.properties:/jppf-config-overrides/config-overrides.properties
     deploy:
       replicas: ${JPPF_NB_NODES}
       resources:
@@ -72,6 +74,7 @@ services:
     - ./tls/client_keystore.txt:/jppf-config/client_keystore.txt
     - ./tls/driver_truststore.ks:/jppf-config/driver_truststore.ks
     - ./tls/driver_truststore.txt:/jppf-config/driver_truststore.txt
+    - ./config-overrides/admin-overrides.properties:/jppf-config-overrides/config-overrides.properties
     ports:
       - "8080:8080"
     deploy:
