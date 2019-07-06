@@ -37,6 +37,8 @@ spec:
               value: "{{ .Values.jppf.version }}"
             - name: JPPF_TLS_ENABLED
               value: "{{ .Values.tls.enabled }}"
+            - name: JPPF_TLS_STORE_TYPE
+              value: "{{ .Values.tls.storeType }}"
             - name: JPPF_SERIALIZATION
               value: "{{ .Values.jppf.serialization }}"
 

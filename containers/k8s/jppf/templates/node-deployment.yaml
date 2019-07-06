@@ -40,6 +40,8 @@ spec:
               value: "{{ .Values.node.processingThreads }}"
             - name: JPPF_TLS_ENABLED
               value: "{{ .Values.tls.enabled }}"
+            - name: JPPF_TLS_STORE_TYPE
+              value: "{{ .Values.tls.storeType }}"
             - name: JPPF_SERIALIZATION
               value: "{{ .Values.jppf.serialization }}"
             - name: JPPF_NODE_MAX_JOBS
