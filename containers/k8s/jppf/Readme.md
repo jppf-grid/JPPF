@@ -32,10 +32,10 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ## Configuration
 
-The following table lists the configurable values of th"e JPPF chart.
+The following table lists the configurable values of the JPPF chart.
 
 | Name                            | Description                                                       | Default                                 |
-|---------------------------------|-------------------------------------------------------------------|---------------------                    |
+|---------------------------------|-------------------------------------------------------------------|-----------------------------------------|
 | ***JPPF driver configuration*** |                                                                   |                                         |
 | `driver.replicas`               | Number of driver instances. Only 1 is supported yet               | 1                                       |
 | `driver.imageRepository`        | Docker image repository name                                      | jppf-driver                             |
@@ -81,7 +81,7 @@ The following table lists the configurable values of th"e JPPF chart.
 
 ### TLS credentials:
 
-For key- and trust- stores, the value is the store's content encoded in base64 format, such as obained from the output of this command:
+For key- and trust- stores, the value is the store's content encoded in base64 format, such as obtained from the output of this command:
 
 ```bash
 $ base64 -w 0 tls/my_keystore.jks
@@ -93,6 +93,10 @@ For passwords, the value is the base64 encoding of the password string:
 $ base64 <<< "password"
 cGFzc3dvcmQK
 ```
+
+Default key stores, trust stores and store passwords are provided, for the sole purpose of demonstrating a working example.
+These default artefacts are not safe, because the passwords are trivial and the certificates in the trust stores are self-signed and not signed by a trusted certificate authority.
+They should not be used in a production environment. Rather, you should provide your own.
 
 ### Specifying or overriding configuration values:
 
