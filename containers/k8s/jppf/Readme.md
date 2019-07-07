@@ -20,6 +20,28 @@ $ helm install --name jppf --namespace jppf jppf
 
 This command deploys a JPPF grid which includes a JPPF driver, 2 nodes and a web administration console, all with default options.
 
+### Installing from the JPPF charts repository
+
+JPPF host its own Helm charts repository at https://www.jppf.org//helm-charts
+
+To add this repository under the name "jppf-repo":
+
+```bash
+$ helm repo add https://www.jppf.org//helm-charts jppf-repo
+```
+
+To list all the charts in the JPPF repository:
+
+```bash
+$ helm search jppf-repo/
+```
+
+To install from the repository:
+
+```bash
+$ helm install --name jppf --namespace jppf jppf-repo/jppf
+```
+
 ## Uninstalling the Chart
 
 To uninstall/delete the "jppf" deployment:

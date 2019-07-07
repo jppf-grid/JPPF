@@ -14,7 +14,7 @@ sources:
 - https://github.com/jppf-grid/JPPF
 
 maintainers:
-- name: Laurent Cohen
+- name: lolocohen
   email: laurent.cohen@jppf.org
 
 icon: https://www.jppf.org/images/jppf_group_large.png
