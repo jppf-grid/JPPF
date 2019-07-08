@@ -47,7 +47,7 @@ $ helm install --name jppf --namespace jppf jppf-repo/jppf
 ## JPPF service stack
 
 JPPF can also be deployed in a [Docker swarm](https://docs.docker.com/engine/swarm/) cluster with Docker stack.
-The deployment relies on a [`docker-compose.yaml`](swarm/docker-compose.yaml) file which defines the JPPF services to deploy,
+The deployment relies on a [`docker-compose.yaml`](swarm/docker-compose.yml) file which defines the JPPF services to deploy,
 and a [`.env`](swarm/.env) file which defines the environment variables the services depend on. 
 
 To deploy JPPF in a swarm cluster with a stack name "jppf":
