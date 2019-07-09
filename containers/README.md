@@ -14,7 +14,7 @@ This module holds:
 
 The latest JPPF docker images are available on [Docker Hub](https://hub.docker.com/?) in the [JPPF docker registry](https://cloud.docker.com/u/jppfgrid/repository/list)
 
-We cuurently have images and correpsonding Dockerfiles for:
+We currently have images and corresponding `Dockerfile`s for:
 
 - JPPF [drivers](./images/driver/Dockerfile) 
 - JPPF [nodes](images/node/Dockerfile)
@@ -22,9 +22,9 @@ We cuurently have images and correpsonding Dockerfiles for:
 
 ## JPPF Helm chart
 
-JPPF docker images can be deployed in a Kubernetes cluster using the [JPPF helm chart](k8s/jppf)
+JPPF docker images can be deployed in a Kubernetes cluster using the [JPPF helm chart](k8s/jppf).
 
-JPPF host its own Helm charts repository at `https://www.jppf.org//helm-charts`
+JPPF hosts its own Helm charts repository at `https://www.jppf.org//helm-charts`.
 
 To add this repository under the name "jppf-repo":
 
@@ -47,7 +47,7 @@ $ helm install --name jppf --namespace jppf jppf-repo/jppf
 ## JPPF service stack
 
 JPPF can also be deployed in a [Docker swarm](https://docs.docker.com/engine/swarm/) cluster with Docker stack.
-The deployment relies on a [`docker-compose.yaml`](swarm/docker-compose.yml) file which defines the JPPF services to deploy,
+The deployment relies on a [`docker-compose.yml`](swarm/docker-compose.yml) file which defines the JPPF services to deploy,
 and a [`.env`](swarm/.env) file which defines the environment variables the services depend on. 
 
 To deploy JPPF in a swarm cluster with a stack name "jppf":

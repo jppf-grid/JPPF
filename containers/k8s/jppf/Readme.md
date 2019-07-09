@@ -103,7 +103,21 @@ The following table lists the configurable values of the JPPF chart.
 
 ### TLS credentials:
 
-For key- and trust- stores, the value is the store's content encoded in base64 format, such as obtained from the output of this command:
+When TLS is enabled (i.e. when `tls.enabled` is set to `"true"`), secure communication is configured with mutual authentication between JPPF driver and nodes,
+as well as between JPPF driver and clients, with the driver using separate trust stores for the clients and the nodes respectively.
+
+The layout of the vairous stores per JPPF component is as follows:
+
+| Store type         | driver | node | client |
+|--------------------|:------:|:----:|:------:|
+| driver key store   | **X**  |      |        |
+| driver trust store |        |**X** | **X**  |
+| node key store     |        |**X** |        |
+| node trust store   | **X**  |      |        |
+| client key store   |        |      | **X**  |
+| client trust store | **X**  |      |        |
+
+For key- and trust- stores, the corresponding value is the store's content encoded in base64 format, such as obtained from the output of this command:
 
 ```bash
 $ base64 -w 0 tls/my_keystore.jks
