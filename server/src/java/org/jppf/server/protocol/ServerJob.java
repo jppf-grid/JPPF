@@ -337,8 +337,9 @@ public class ServerJob extends AbstractServerJobBase {
 
   /**
    * Perform the necessary actions for when this job has been cancelled.
+   * @return a mapping of client bundles to the tasks that belong to them and were cacelled.
    */
-  private void handleCancelledTasks() {
+  private CollectionMap<ServerTaskBundleClient, ServerTask> handleCancelledTasks() {
     if (debugEnabled) log.debug("cancelling tasks for {}", this);
     final CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
     for (final ServerTask task: tasks.values()) {
@@ -347,7 +348,7 @@ public class ServerJob extends AbstractServerJobBase {
         clientMap.putValue(task.getBundle(), task);
       }
     }
-    clientMap.forEach((clientBundle, tasks) -> clientBundle.resultReceived(tasks));
+    return clientMap;
   }
 
   /**
@@ -359,13 +360,13 @@ public class ServerJob extends AbstractServerJobBase {
   public boolean cancel(final JPPFDriver driver, final boolean mayInterruptIfRunning) {
     if (debugEnabled) log.debug("request to cancel {}", this);
     boolean result = false;
+    CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = null;
     lock.lock();
     try {
       if (setCancelled(mayInterruptIfRunning)) {
         handleCancelledStatus();
-        if (!getSLA().isBroadcastJob()) handleCancelledTasks();
+        if (!getSLA().isBroadcastJob()) clientMap = handleCancelledTasks();
         setSubmissionStatus(SubmissionStatus.COMPLETE);
-        //taskCompleted(null, null);
         final NodeReservationHandler handler = driver.getAsyncNodeNioServer().getNodeReservationHandler();
         handler.onJobCancelled(this);
         result = true;
@@ -373,6 +374,7 @@ public class ServerJob extends AbstractServerJobBase {
     } finally {
       lock.unlock();
     }
+    if (clientMap != null) clientMap.forEach((clientBundle, tasks) -> clientBundle.resultReceived(tasks));
     if (result) setSubmissionStatus(SubmissionStatus.ENDED);
     return result;
   }
