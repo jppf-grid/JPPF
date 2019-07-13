@@ -71,7 +71,7 @@ The following table lists the configurable values of the JPPF chart.
 | `node.jvmOptions`               | Options given to the node's JVM                                   | "-Xmx128m -Xms32m"                      |
 | `node.processingThreads`        | Number of processing threads in a node                            | "1"                                     |
 | ***JPPF web admin console***    |                                                                   |                                         |
-| `admin.enabled`                 | whether the amdin console should be deployed                      | true                                    |
+| `admin.enabled`                 | whether the admin console should be deployed                      | true                                    |
 | `admin.replicas`                | Number of admin consoles to deploy in the K8s cluster             | 1                                       |
 | `admin.imageRepository`         | Docker image repository name                                      | jppf-admin-web                          |
 | `admin.servicePort`             | HTTP port exposed on all K8S nodes                                | 31180                                   |
@@ -106,7 +106,7 @@ The following table lists the configurable values of the JPPF chart.
 When TLS is enabled (i.e. when `tls.enabled` is set to `"true"`), secure communication is configured with mutual authentication between JPPF driver and nodes,
 as well as between JPPF driver and clients, with the driver using separate trust stores for the clients and the nodes respectively.
 
-The layout of the vairous stores per JPPF component is as follows:
+The layout of the various stores per JPPF component is as follows:
 
 | Store type         | driver | node | client |
 |--------------------|:------:|:----:|:------:|

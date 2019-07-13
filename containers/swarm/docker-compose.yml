@@ -24,7 +24,6 @@ services:
     #- ./tls/client_truststore.txt:/jppf-config/client_truststore.txt
     #- ./tls/node_truststore.ks:/jppf-config/node_truststore.ks
     #- ./tls/node_truststore.txt:/jppf-config/node_truststore.txt
-
     # Uncomment this line to mount additional JPPF configuration properties, changing the source path as needed
     #- ./config-overrides/driver-overrides.properties:/jppf-config-overrides/config-overrides.properties
 
