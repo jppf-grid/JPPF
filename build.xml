@@ -88,4 +88,9 @@
     <delete dir="samples-pack/shared/lib" quiet="true"/>
   </target>
 
+  <target name="docker" description="build JPPF docker images">
+    <echo message="Building the JPPF docker images"/>
+    <ant dir="JPPF/bin" target="build.docker.images" useNativeBasedir="true"/>
+  </target>
+
 </project> 
