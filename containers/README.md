@@ -29,7 +29,7 @@ JPPF hosts its own Helm charts repository at `https://www.jppf.org//helm-charts`
 To add this repository under the name "jppf-repo":
 
 ```bash
-$ helm repo add https://www.jppf.org//helm-charts jppf-repo
+$ helm repo add jppf-repo https://www.jppf.org//helm-charts
 ```
 
 To list all the charts in the JPPF repository:
