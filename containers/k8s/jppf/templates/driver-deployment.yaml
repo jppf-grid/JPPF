@@ -65,6 +65,21 @@ spec:
               mountPath: /jppf-config-overrides
           {{- end }}
 
+          {{- if .Values.driver.livenessProbe.enabled }}
+          livenessProbe:
+            tcpSocket:
+              {{- if .Values.tls.enabled }}
+              port: jppf-tls
+              {{- else }}
+              port: jppf
+              {{- end }}
+            {{- with .Values.driver.livenessProbe }}
+            initialDelaySeconds: {{ default 15 .initialDelaySeconds }}
+            periodSeconds: {{ default 30 .periodSeconds }}
+            timeoutSeconds: {{ default 5 .timeoutSeconds }}
+            {{- end }}
+          {{- end }}
+
       volumes:
         {{- if .Values.tls.enabled }}
         - name: driver-tls-config

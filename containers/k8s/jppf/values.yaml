@@ -16,6 +16,13 @@ driver:
   # TLS port on which the driver can be reached on any k8s node
   # only used with serviceType = NodePort
   servicePortTLS: 31443
+  # liveness probe settings
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 30
+    timeoutSeconds: 5
+
 
 # node-specific configuration values
 node:
@@ -47,13 +54,19 @@ admin:
   # base64-encoded content of a tomcat-users.xml file
   # for instance, the output of "base64 -w 0 ./tomcat-user.xml"
   tomcatUsers:
+  # liveness probe settings
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 60
+    periodSeconds: 15
+    timeoutSeconds: 10
 
 image:
   registryName: jppfgrid
   tag: 6.2-alpha
   pullPolicy: Always
 
-# values common to driver and nodes
+# values common to driver, nodes and admin console
 jppf:
   version: "6.2-alpha"
   serverHostName: jppf-driver-service

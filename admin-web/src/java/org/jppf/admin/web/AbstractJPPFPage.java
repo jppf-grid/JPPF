@@ -60,6 +60,7 @@ public class AbstractJPPFPage extends WebPage {
    *
    */
   public AbstractJPPFPage() {
+    setVersioned(false);
     add(new TooltipBehavior(TOOLTIP_OPTIONS));
   }
 

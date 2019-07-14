@@ -9,17 +9,17 @@ driver:
   # CPU and memory allocation to the driver
   resources:
     requests:
-      memory: "256Mi"
+      memory: "512Mi"
       cpu: "500m"
     limits:
-      memory: "512Mi"
+      memory: "1024Mi"
       cpu: "1000m"
   configOverrides: |-
     custom.driver.prop = driver value
 
 # node-specific configuration values
 node:
-  # number of nodes in the JPPF cluster
+  # number of nodes in the JPPF grid
   replicas: 2
   # options of the node JVM
   jvmOptions: "-Xmx128m -Xms32m"
@@ -30,10 +30,10 @@ node:
   # CPU and memory allocation to each node
   resources:
     requests:
-      memory: "128Mi"
+      memory: "256Mi"
       cpu: "250m"
     limits:
-      memory: "256Mi"
+      memory: "512Mi"
       cpu: "500m"
   configOverrides: |-
     custom.node.prop = node value
@@ -64,4 +64,4 @@ jppf:
 
 tls:
   # whether secure TLS communication is enabled
-  enabled: true
+  enabled: false
