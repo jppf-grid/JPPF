@@ -11,6 +11,6 @@
 			<attribute name="javadoc_location" value="file:/C:/ftp/dev/Apache/apache-log4j-1.2.15/site/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/JPPF/lib/LZ4/lz4-1.3.0.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/LZ4/lz4-java-1.6.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
