@@ -80,7 +80,7 @@
     <get.maven.lib g="net.sf.jung"          a="jung-visualization" v="${jung.version}"      dest="${lib}/Jung"/>
     <get.maven.lib g="junit"                a="junit"              v="4.10"                 dest="${lib}/JUnit"/>
     <get.maven.lib g="log4j"                a="log4j"              v="${log4j.version}"     dest="${lib}/log4j"/>
-    <get.maven.lib g="net.jpountz.lz4"      a="lz4"                v="1.3.0"                dest="${lib}/LZ4"/>
+    <get.maven.lib g="org.lz4"              a="lz4-java"           v="1.6.0"                dest="${lib}/LZ4"/>
     <get.maven.lib g="org.apache.maven"     a="maven-ant-tasks"    v="2.1.3"                dest="${lib}/maven"/>
     <get.maven.lib g="com.miglayout"        a="miglayout-core"     v="${miglayout.version}" dest="${lib}/MigLayout"/>
     <get.maven.lib g="com.miglayout"        a="miglayout-swing"    v="${miglayout.version}" dest="${lib}/MigLayout"/>
