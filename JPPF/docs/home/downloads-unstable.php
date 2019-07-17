@@ -127,6 +127,7 @@
   </div>
   <br>
   <div class="column_left" style="text-align: justify; padding: 0px">
+    <!--
     <div class="blockWithHighlightedTitle">
       <a name="<?php echo $ver1 ?>"></a>
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
@@ -141,7 +142,7 @@
         <li>Make sure to get started with our <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/></li>
       </ul>
     </div>
-    <!--
+    -->
     <div class="blockWithHighlightedTitle">
       <a name="<?php echo $ver1 ?>"></a>
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
@@ -154,6 +155,11 @@
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-application-template.zip'; ?>">Application template</a></li>
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-ui.zip'; ?>">Desktop administration and monitoring console</a></li>
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-web.zip'; ?>">Web administration and monitoring console</a></li>
+      </ul>
+      <h3>Docker and Kubernetes artefacts</h3>
+      <ul class="list_nomargin">
+        <li><a href="https://hub.docker.com/u/jppfgrid">public Docker images registry</a></li>
+        <li><a href="<?php echo 'https://www.jppf.org/helm-charts/jppf-' . $ver1 . '.tgz'; ?>">packaged helm chart</a></li>
       </ul>
       <h3>Source code and documentation</h3>
       <ul class="list_nomargin">
@@ -172,17 +178,6 @@
         <li>Make sure to get started with our <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/></li>
       </ul>
     </div>
-    -->
-    <div style="height: 8px"></div>
-    <div class="blockWithHighlightedTitle">
-      <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
-  <h3 style="${style}">&nbsp;<img src="images/icons/folder-download.png" class="titleWithIcon"/>JPPF 6.2 roadmap</h3>
-</div>
-      <ul class="samplesList">
-        <li>The current state of the 6.2 milestone can be found <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/8/search/1"><b>here</b></a>.<br/></li>
-        <li><a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/18/search/1">Open issues</a> and <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/7/search/1">closed issues</a></li>
-      </ul>
-    </div>
     <div style="height: 6px"></div>
     <br>
   </div>
@@ -195,13 +190,13 @@
       <p>You are welcome to try it and provide feedback in our <a href="/forums">user forums</a>, as well as register bugs or enhancement requests in our <a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1">issue tracker</a>,
       so we have a chance to improve it before the final release.
     </div>
-    <div style="height: 8px"></div>
+    <div style="height: 28px"></div>
     <div class="blockWithHighlightedTitle">
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h3 style="${style}">&nbsp;<img src="images/icons/documentation.png" class="titleWithIcon"/>Documentation preview</h3>
 </div>
       <p>Doc preview for the major new features:
-      <table style="width: 100%"><tr>
+      <p><table style="width: 100%"><tr>
         <td valign="top">
           <ul class="samplesList" style="margin-bottom: 0px">
             <li><a href="/doc/6.2">JPPF 6.2 User Guide</a></li>
@@ -214,6 +209,16 @@
           </ul>
         </td>
       </tr></table>
+    </div>
+    <div style="height: 28px"></div>
+    <div class="blockWithHighlightedTitle">
+      <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h3 style="${style}">&nbsp;<img src="images/icons/folder-download.png" class="titleWithIcon"/>JPPF 6.2 roadmap</h3>
+</div>
+      <ul class="samplesList">
+        <li>The current state of the 6.2 milestone can be found <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/8/search/1"><b>here</b></a>.<br/></li>
+        <li><a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/18/search/1">Open issues</a> and <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/7/search/1">closed issues</a></li>
+      </ul>
     </div>
   </div>
 </div>
