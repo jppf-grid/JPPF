@@ -99,6 +99,10 @@ public final class SerializationReflectionHelper {
    */
   private static final Set<Class<?>> TRANSIENT_EXCEPTION_CLASSES = initTransientExceptionClasses();
   /**
+   * Handler for java.time.* classes.
+   */
+  static final SerializationHandler javaTimeHandler = new JavaTimeSerializationHandler();
+  /**
    * Map of classes to their assigned {@link SerializationHandler}, if any.
    */
   private static final Map<Class<?>, SerializationHandler> handlerMap = new HashMap<>();
@@ -492,6 +496,10 @@ public final class SerializationReflectionHelper {
    * @return a {@link SerializationHandler} instance, or null if none is defined for the class.
    */
   static SerializationHandler getSerializationHandler(final Class<?> clazz) {
-    return handlerMap.get(clazz);
+    SerializationHandler handler = handlerMap.get(clazz);
+    if (handler == null) {
+      if (clazz.getName().startsWith("java.time.")) handler = javaTimeHandler;
+    }
+    return handler;
   }
 }

@@ -121,7 +121,6 @@ class Serializer {
           writeString((String) obj);
         } else writeObject(obj, handle);
       } else {
-        //writeHeaderAndHandle(isString ? STRING_HEADER : OBJECT_HEADER, handle);
         writeHeaderAndHandle(OBJECT_HEADER, handle);
       }
     }
@@ -143,7 +142,11 @@ class Serializer {
     //if (traceEnabled) try { log.trace("writing object " + obj + ", handle=" + handle + ", class=" + obj.getClass() + ", cd=" + cd); } catch(Exception e) {}
     if (cd.array) writeArray(obj, cd);
     else if (cd.enumType) writeString(((Enum<?>) obj).name());
-    else writeFields(obj, cd);
+    else {
+      final SerializationHandler serializationHandler = SerializationReflectionHelper.getSerializationHandler(cd.clazz);
+      if (serializationHandler != null) serializationHandler.writeObject(obj, this, cd);
+      else writeFields(obj, cd);
+    }
   }
 
   /**
@@ -175,9 +178,7 @@ class Serializer {
       tmpDesc = tmpDesc.superClass;
     }
     for (final ClassDescriptor desc: stack) {
-      final SerializationHandler handler = SerializationReflectionHelper.getSerializationHandler(desc.clazz);
-      if (handler != null) handler.writeDeclaredFields(this, desc, obj);
-      else if (desc.hasReadWriteObject) {
+      if (desc.hasReadWriteObject) {
         final Method m = desc.writeObjectMethod;
         //if (traceEnabled) try { log.trace("invoking writeObject() for class=" + desc + " on object " + obj.hashCode()); } catch(Exception e) { log.trace(e.getMessage(), e); }
         try {

@@ -30,14 +30,14 @@ public class VectorHandler extends AbstractSerializationHandler {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(Serializer.class);
+  private static final Logger log = LoggerFactory.getLogger(Serializer.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
 
   @Override
-  public void writeDeclaredFields(final Serializer serializer, final ClassDescriptor cd, final Object obj) throws Exception {
+  public void writeObject(final Object obj, final Serializer serializer, final ClassDescriptor cd) throws Exception {
     if (traceEnabled) log.trace("writing declared fields for cd={}", cd);
     final Vector<?>  vector = (Vector<?>) obj;
     ClassDescriptor tmpDesc = null;
@@ -55,10 +55,10 @@ public class VectorHandler extends AbstractSerializationHandler {
   }
 
   @Override
-  public void readDeclaredFields(final Deserializer deserializer, final ClassDescriptor cd, final Object obj) throws Exception {
+  public Object readDObject(final Deserializer deserializer, final ClassDescriptor cd) throws Exception {
     if (traceEnabled) log.trace("reading declared fields for cd={}", cd);
     @SuppressWarnings("unchecked")
-    final Vector<? super Object> vector = (Vector<? super Object>) obj;
+    final Vector<? super Object> vector = new Vector<>();
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = deserializer.currentClassDescriptor;
@@ -72,5 +72,6 @@ public class VectorHandler extends AbstractSerializationHandler {
     } finally {
       deserializer.currentClassDescriptor = tmpDesc;
     }
+    return null;
   }
 }
