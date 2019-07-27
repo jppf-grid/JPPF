@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ConcurrentHashMapHandler extends AbstractSerializationHandler {
   @Override
-  public void writeDeclaredFields(final Serializer serializer, final ClassDescriptor cd, final Object obj) throws Exception {
+  public void writeObject(final Object obj, final Serializer serializer, final ClassDescriptor cd) throws Exception {
     final Map<?, ?> map = (Map<?, ?>) obj;
     ClassDescriptor tmpDesc = null;
     try {
@@ -45,14 +45,12 @@ public class ConcurrentHashMapHandler extends AbstractSerializationHandler {
   }
 
   @Override
-  public void readDeclaredFields(final Deserializer deserializer, final ClassDescriptor cd, final Object obj) throws Exception {
-    @SuppressWarnings("unchecked")
-    final Map<? super Object, ? super Object> map = (Map<? super Object, ? super Object>) obj;
+  public Object readDObject(final Deserializer deserializer, final ClassDescriptor cd) throws Exception {
+    final ConcurrentHashMap<? super Object, ? super Object> map = new ConcurrentHashMap<>();
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = deserializer.currentClassDescriptor;
       deserializer.currentClassDescriptor = cd;
-      if (map instanceof ConcurrentHashMap) copyFields(new ConcurrentHashMap<>(), obj, cd);
       final int size = deserializer.readInt();
       for (int i=0; i<size; i++) {
         final Object key = deserializer.readObject();
@@ -62,5 +60,6 @@ public class ConcurrentHashMapHandler extends AbstractSerializationHandler {
     } finally {
       deserializer.currentClassDescriptor = tmpDesc;
     }
+    return map;
   }
 }

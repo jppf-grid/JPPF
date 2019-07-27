@@ -24,20 +24,30 @@ package org.jppf.serialization;
  */
 public interface SerializationHandler {
   /**
-   * Write the declared fields of the specified class.
-   * @param cd the class descriptor.
-   * @param serializer the serializer to use.
+   * Serialize an object of the type processed by this serialization handler.
    * @param obj the object for which to write the fields.
+   * @param serializer the serializer to use.
+   * @param cd the class descriptor.
    * @throws Exception if any error occurs.
    */
-  void writeDeclaredFields(final Serializer serializer, final ClassDescriptor cd, final Object obj) throws Exception;
+  void writeObject(final Object obj, final Serializer serializer, final ClassDescriptor cd) throws Exception;
 
   /**
-   * Read the declared fields of the specified class.
-   * @param cd the class descriptor.
+   * Deserialize an object of the type processed by this serialization handler.
    * @param deserializer the deserializer to use.
-   * @param obj the object for which to read the fields.
+   * @param cd the class descriptor.
+   * @return the deserialized object.
    * @throws Exception if any error occurs.
    */
-  void readDeclaredFields(final Deserializer deserializer, final ClassDescriptor cd, final Object obj) throws Exception;
+  Object readDObject(final Deserializer deserializer, final ClassDescriptor cd) throws Exception;
+
+  /**
+   * Create a new instance of the class described by the specified descriptor.
+   * @param cd the class descriptor to use.
+   * @return a new instance of the class.
+   * @throws Exception if any error occurs.
+   */
+  default Object newInstance(final ClassDescriptor cd) throws Exception {
+    return SerializationReflectionHelper.create(cd.clazz);
+  }
 }

@@ -21,6 +21,8 @@ package test.org.jppf.serialization;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
 import javax.management.*;
@@ -364,6 +366,31 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
     assertEquals(1L, notif2.getSequenceNumber());
     assertEquals("message", notif2.getMessage());
     assertEquals("data", notif2.getUserData());
+  }
+
+  /**
+   * Test the serialization and deseralization of a float array.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = TEST_TIMEOUT)
+  public void testJavaTime() throws Exception {
+    final ZoneId zoneId = ZoneId.systemDefault();
+    testObject(ZonedDateTime.now());
+    testObject(LocalDateTime.now());
+    testObject(zoneId);
+    testObject(ZoneOffset.of("+02:00"));
+    testObject(Duration.of(1_234_567L, ChronoUnit.MILLIS));
+    testObject(LocalDate.now(zoneId));
+    testObject(LocalTime.now(zoneId));
+    testObject(Instant.from(ZonedDateTime.now()));
+    testObject(Clock.system(zoneId));
+    testObject(MonthDay.now());
+    testObject(OffsetDateTime.now());
+    testObject(OffsetTime.now());
+    testObject(Period.of(2, 7, 13));
+    testObject(Year.now());
+    testObject(YearMonth.now());
+    //testObject(new DateTimeException("test"));
   }
 
   /**

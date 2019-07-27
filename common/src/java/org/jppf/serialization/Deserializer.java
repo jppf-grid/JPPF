@@ -133,12 +133,13 @@ class Deserializer {
       final Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) cd.clazz, name);
       caches.handleToObjectMap.put(handle, val);
     } else {
-      final Object obj = newInstance(cd);
-      currentObject = obj;
       currentClassDescriptor = cd;
+      final SerializationHandler handler = SerializationReflectionHelper.getSerializationHandler(cd.clazz);
+      final Object obj = (handler != null) ? handler.readDObject(this, cd) : newInstance(cd);
+      currentObject = obj;
       if (traceEnabled) try { log.trace("reading handle={}, object={}", handle, StringUtils.toIdentityString(obj)); } catch(@SuppressWarnings("unused") final Exception e) {}
       caches.handleToObjectMap.put(handle, obj);
-      readFields(cd, obj);
+      if (handler == null) readFields(cd, obj);
     }
   }
 
@@ -168,9 +169,9 @@ class Deserializer {
       tmpDesc = tmpDesc.superClass;
     }
     for (ClassDescriptor desc: stack) {
-      final SerializationHandler handler = SerializationReflectionHelper.getSerializationHandler(desc.clazz);
+      /*final SerializationHandler handler = SerializationReflectionHelper.getSerializationHandler(desc.clazz);
       if (handler != null) handler.readDeclaredFields(this, desc, obj);
-      else if (desc.hasReadWriteObject) {
+      else*/ if (desc.hasReadWriteObject) {
         final Method m = desc.readObjectMethod;
         if (traceEnabled) try { log.trace("invoking readObject() for object = {}, class = {}", StringUtils.toIdentityString(obj), desc); } catch(@SuppressWarnings("unused") final Exception e) {}
         try {
