@@ -103,12 +103,12 @@ public class JPPFScheduleHandler {
         log.debug(name + " : scheduling action[key=" + key + ", " + schedule + ", action=" + action + ", start=" + sdf.format(new Date(start)));
       }
     }
-    final Date date = schedule.toDate(start);
-    final ScheduledFuture<?> future = executor.schedule(action, date.getTime() - start, TimeUnit.MILLISECONDS);
+    final long epoch = schedule.toLong(start);
+    final ScheduledFuture<?> future = executor.schedule(new ScheduledAction(key, action), epoch - start, TimeUnit.MILLISECONDS);
     futureMap.put(key, future);
     if (debugEnabled) {
       synchronized(sdf) {
-        log.debug(name + " : date=" + sdf.format(date) + ", key=" + key + ", future=" + future);
+        log.debug(name + " : date=" + sdf.format(new Date(schedule.toLong(start))) + ", key=" + key + ", future=" + future);
       }
     }
   }
@@ -154,10 +154,9 @@ public class JPPFScheduleHandler {
    * @param shutdown flag indicating whether this schedule handler should be shutdown.
    */
   public void clear(final boolean shutdown) {
-    for (final Map.Entry<Object, ScheduledFuture<?>> entry: futureMap.entrySet()) {
-      final ScheduledFuture<?> f = entry.getValue();
-      if (f != null) f.cancel(true);
-    }
+    futureMap.forEach((key, future) -> {
+      if (future != null) future.cancel(true);
+    });
     futureMap.clear();
     if (shutdown) executor.shutdownNow();
   }
@@ -168,5 +167,35 @@ public class JPPFScheduleHandler {
   private void createExecutor() {
     executor = Executors.newScheduledThreadPool(1, new JPPFThreadFactory(this.name));
     if (debugEnabled) log.debug("created executor with name=" + name);
+  }
+
+  /**
+   * 
+   */
+  private final class ScheduledAction implements Runnable {
+    /**
+     * The key associated with the action.
+     */
+    private final Object key;
+    /**
+     * The action to run upon expiration.
+     */
+    private final Runnable action;
+
+    /**
+     * Initialize this scheduled action.
+     * @param key the key associated with the action.
+     * @param action the action to run upon expiration.
+     */
+    private ScheduledAction(final Object key, final Runnable action) {
+      this.key = key;
+      this.action = action;
+    }
+
+    @Override
+    public void run() {
+      futureMap.remove(key);
+      action.run();
+    }
   }
 }
