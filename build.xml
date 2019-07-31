@@ -93,4 +93,9 @@
     <ant dir="JPPF/bin" target="build.docker.images" useNativeBasedir="true"/>
   </target>
 
+  <target name="security" description="perform securityy scans on JPPF artefacts">
+    <echo message="Performing dependency check"/>
+    <ant dir="JPPF/bin" target="dependency.check" useNativeBasedir="true"/>
+  </target>
+
 </project> 
