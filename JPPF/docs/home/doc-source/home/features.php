@@ -1,6 +1,6 @@
 <?php
   $currentPage="Features";
-  $jppf_version = "6.1";
+  $jppf_version = "6.2";
 ?>
 $template{name="about-page-header" title="Features"}$
   <h1 align="center">JPPF Features</h1>
@@ -43,6 +43,13 @@ $template{name="about-page-header" title="Features"}$
     <p>The built-in networked and <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=Class_loading_in_JPPF">distributed class loader</a> transparently ensures that the nodes can download the Java code for your application from where it is running.
     New or changed code is automatically reloaded into the nodes without any deployment hassle.
     Not only is tweaking and tinkering with the code no longer a source of time-consuming problems, it is actively facilitated and encouraged.
+    <br></div>
+
+    <br><div class="blockWithHighlightedTitle">
+    $template{name="title-with-icon" img="images/icons/anchor.png" title="Container-teady" heading="h3"}$
+    <p>Fully integrated with container-based technologies, JPPF provides <a href="https://hub.docker.com/u/jppfgrid">Docker images</a> that can be deployed in Kubernetes clusters using a <a href="https://github.com/jppf-grid/JPPF/tree/master/containers/k8s/jppf">Helm chart</a>,
+    as well as in a Docker swarm cluster, using a <a href="https://github.com/jppf-grid/JPPF/tree/master/containers#jppf-service-stack">docker compose service stack</a>.
+    Deployment of a JPPF compute grid in a cloud infrastructure has never been easer.
     <br></div>
 
   </div>

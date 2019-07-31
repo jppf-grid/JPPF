@@ -8,7 +8,7 @@
     <title>JPPF <?php echo $currentPage ?>
 </title>
     <meta name="description" content="The open source grid computing solution">
-    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net">
+    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net, docker, kubernetes, helm">
     <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
     <link rel="shortcut icon" href="/images/jppf-icon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="/jppf.css" title="Style">
@@ -158,11 +158,12 @@
     <ul class="samplesList">
       <li>a JPPF grid can be up and running in minutes</li>
       <li>dynamically scalable on-demand</li>
-      <li>ready for the Cloud, a natural medium for JPPF</li>
+      <li>easy programming model</li>
       <li>fully secure SSL / TLS communications</li>
       <li>full volunteer computing support</li>
       <li>integration with leading <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=J2EE_Connector">J2EE servers</a>, <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=Android_Node">Android</a>, <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=.Net_Bridge">.Net</a></li>
-      <li>easy programming model</li>
+      <li>ready for the Cloud, a natural medium for JPPF</li>
+      <li>deployment in <a href="https://github.com/jppf-grid/JPPF/blob/master/containers/k8s/jppf">Kubernetes</a>, with <a href="https://cloud.docker.com/u/jppfgrid/repository/list">public Docker images</a></li>
       <li>fine-grained monitoring and administration</li>
       <li>fault-tolerance and self-repair capabilities</li>
       <li>exceptional level of service and reliability</li>

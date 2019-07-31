@@ -1,13 +1,13 @@
 <?php
   $currentPage="Features";
-  $jppf_version = "6.1";
+  $jppf_version = "6.2";
 ?>
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
 	  <head>
     <title>JPPF Features
 </title>
     <meta name="description" content="The open source grid computing solution">
-    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net">
+    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net, docker, kubernetes, helm">
     <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
     <link rel="shortcut icon" href="/images/jppf-icon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="/jppf.css" title="Style">
@@ -145,6 +145,12 @@
     <p>The built-in networked and <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=Class_loading_in_JPPF">distributed class loader</a> transparently ensures that the nodes can download the Java code for your application from where it is running.
     New or changed code is automatically reloaded into the nodes without any deployment hassle.
     Not only is tweaking and tinkering with the code no longer a source of time-consuming problems, it is actively facilitated and encouraged.
+    <br></div>
+    <br><div class="blockWithHighlightedTitle">
+    <h3 style="${style}"><img src="images/icons/anchor.png" class="titleWithIcon"/>Container-teady</h3>
+    <p>Fully integrated with container-based technologies, JPPF provides <a href="https://hub.docker.com/u/jppfgrid">Docker images</a> that can be deployed in Kubernetes clusters using a <a href="https://github.com/jppf-grid/JPPF/tree/master/containers/k8s/jppf">Helm chart</a>,
+    as well as in a Docker swarm cluster, using a <a href="https://github.com/jppf-grid/JPPF/tree/master/containers#jppf-service-stack">docker compose service stack</a>.
+    Deployment of a JPPF compute grid in a cloud infrastructure has never been easer.
     <br></div>
   </div>
   <div class="column_right" style="text-align: justify">
