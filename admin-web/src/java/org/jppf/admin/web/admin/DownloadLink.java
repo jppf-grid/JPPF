@@ -53,7 +53,7 @@ public class DownloadLink extends AbstractAdminLink {
   }
 
   @Override
-  public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+  public void onSubmit(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on {}.download", type.getPrefix());
     configDownload.initiate(target);
   }

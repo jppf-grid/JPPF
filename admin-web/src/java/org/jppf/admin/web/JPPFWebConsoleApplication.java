@@ -251,6 +251,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
     @Override public Serializable prepareForSerialization(final String sessionId, final Serializable page) { return null; }
     @Override public Object restoreAfterSerialization(final Serializable serializable) { return null; }
     @Override public IManageablePage convertToPage(final Object page) { return null; }
+    @Override public boolean canBeAsynchronous() { return false; }
   }
 
   /**

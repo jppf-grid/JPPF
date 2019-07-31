@@ -22,7 +22,7 @@ import java.util.Locale;
 
 import org.apache.wicket.Session;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.ajax.markup.html.form.*;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
@@ -54,24 +54,20 @@ public class HeaderPanel extends Panel {
     final Form<String> form = new Form<>("login.signout.form");
     final AjaxButton link = new AjaxButton("login.signout.link", Model.of("Sign out")) {
       @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+      protected void onSubmit(final AjaxRequestTarget target) {
         AuthenticatedWebSession.get().signOut();
         AuthenticatedWebSession.get().invalidate();
-        target.add(form);
+        target.add(getForm());
         setResponsePage(getApplication().getHomePage());
       }
     };
 
     form.add(link);
-    showIPCheckBox = new CheckBox("jppf.header.show.ip", Model.of(JPPFWebSession.get().isShowIP())) {
+    showIPCheckBox = new AjaxCheckBox("jppf.header.show.ip", Model.of(JPPFWebSession.get().isShowIP())) {
       @Override
-      protected void onSelectionChanged(final Boolean newSelection) {
+      protected void onUpdate(final AjaxRequestTarget target) {
+        final Boolean newSelection = this.getModelObject();
         JPPFWebSession.get().setShowIP((newSelection != null) && newSelection);
-      }
-
-      @Override
-      protected boolean wantOnSelectionChangedNotifications() {
-        return true;
       }
     };
     form.add(showIPCheckBox);

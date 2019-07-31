@@ -47,7 +47,7 @@ public class SaveLink extends AbstractAdminLink {
   }
 
   @Override
-  public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+  public void onSubmit(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on {}.save", type.getPrefix());
     final TextArea<String> area = ((AdminPage) target.getPage()).getConfigPanel(type).getConfig();
     final String configString = area.getModelObject();

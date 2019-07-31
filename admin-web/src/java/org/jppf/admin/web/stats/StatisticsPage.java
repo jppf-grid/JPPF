@@ -35,6 +35,8 @@ import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.monitoring.data.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
+import com.googlecode.wicket.jquery.ui.form.dropdown.AjaxDropDownChoice;
+
 /**
  * This is the admin page. It can only be instantiated for users with a {@code jppf-admin} role.
  * @author Laurent Cohen
@@ -63,16 +65,12 @@ public class StatisticsPage extends TemplatePage implements RefreshTimerHolder {
     final Form<String> form = new Form<>("stats.toolbar");
     add(form);
     final List<TopologyDriver> drivers = JPPFWebConsoleApplication.get().getTopologyManager().getDrivers();
-    final DropDownChoice<TopologyDriver> combo = new DropDownChoice<TopologyDriver>("stats.driver_selector.field", drivers, new TopologyDriverRenderer()) {
+    final DropDownChoice<TopologyDriver> combo = new AjaxDropDownChoice<TopologyDriver>("stats.driver_selector.field", drivers, new TopologyDriverRenderer()) {
       @Override
-      protected void onSelectionChanged(final TopologyDriver newSelection) {
+      public void onSelectionChanged(final AjaxRequestTarget target) {
+        final TopologyDriver newSelection = this.getModelObject();
         JPPFWebSession.get().setCurrentDriver(newSelection);
         setResponsePage(StatisticsPage.class);
-      }
-
-      @Override
-      protected boolean wantOnSelectionChangedNotifications() {
-        return true;
       }
     };
     final TopologyDriver driver = JPPFWebSession.get().getCurrentDriver();

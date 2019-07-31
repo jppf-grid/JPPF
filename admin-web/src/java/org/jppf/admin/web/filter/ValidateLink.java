@@ -50,7 +50,7 @@ public class ValidateLink extends AjaxButtonWithIcon {
   }
 
   @Override
-  public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+  public void onSubmit(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on node.filter.validate");
     final NodeFilterPage page = (NodeFilterPage) target.getPage();
     final TextArea<String> area = page.getPolicyField();

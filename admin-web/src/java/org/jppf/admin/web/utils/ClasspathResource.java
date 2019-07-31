@@ -44,7 +44,7 @@ public class ClasspathResource extends ResourceStreamResource {
   }
 
   @Override
-  protected IResourceStream getResourceStream() {
+  protected IResourceStream getResourceStream(final Attributes attributes) {
     return new ClasspathResourceStream(path);
   }
 

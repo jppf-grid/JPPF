@@ -19,7 +19,6 @@
 package org.jppf.admin.web.admin;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.html.form.Form;
 import org.jppf.admin.web.JPPFWebConsoleApplication;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -47,7 +46,7 @@ public class ResetClientLink extends AbstractAdminLink {
   }
 
   @Override
-  public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+  public void onSubmit(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on {}.reset_client", type.getPrefix());
     final JPPFWebConsoleApplication app = JPPFWebConsoleApplication.get();
     final TypedProperties config = app.getConfig(ConfigType.CLIENT).getProperties();

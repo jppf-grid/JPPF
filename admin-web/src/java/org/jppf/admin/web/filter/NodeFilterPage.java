@@ -19,6 +19,8 @@
 package org.jppf.admin.web.filter;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.core.request.handler.IPartialPageRequestHandler;
 import org.apache.wicket.markup.html.form.*;
@@ -92,15 +94,11 @@ public class NodeFilterPage extends TemplatePage {
     });
     final UserSettings settings = JPPFWebSession.get().getUserSettings();
     final boolean active = settings.getProperties().getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
-    form.add(new CheckBox("node.filter.active", Model.of(active)) {
+    form.add(new AjaxCheckBox("node.filter.active", Model.of(active)) {
       @Override
-      protected void onSelectionChanged(final Boolean newSelection) {
+      protected void onUpdate(final AjaxRequestTarget target) {
+        final Boolean newSelection = this.getModelObject();
         onActiveStateChanged((newSelection != null) && newSelection);
-      }
-
-      @Override
-      protected boolean wantOnSelectionChangedNotifications() {
-        return true;
       }
     });
     form.add(new ValidateLink());

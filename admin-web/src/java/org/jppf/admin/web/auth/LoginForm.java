@@ -80,7 +80,7 @@ public class LoginForm extends Form<String> {
     });
     final AjaxButton button = new AjaxButton(PREFIX + ".ok") {
       @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+      protected void onSubmit(final AjaxRequestTarget target) {
         if (debugEnabled) log.debug("clicked on login.ok");
         doOK(target);
       }

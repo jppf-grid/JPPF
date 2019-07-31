@@ -48,10 +48,10 @@ public class RevertLink extends AjaxButtonWithIcon {
   }
 
   @Override
-  public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+  public void onSubmit(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on node.filter.revert");
     final TextArea<String> area = ((NodeFilterPage) target.getPage()).getPolicyField();
     area.setModel(Model.of(JPPFWebSession.get().getNodeFilter().getXmlPolicy()));
-    target.add(form);
+    target.add(getForm());
   }
 }

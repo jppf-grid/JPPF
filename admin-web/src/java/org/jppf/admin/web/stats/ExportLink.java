@@ -19,7 +19,6 @@
 package org.jppf.admin.web.stats;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.util.resource.*;
 import org.jppf.admin.web.*;
 import org.jppf.admin.web.utils.*;
@@ -69,7 +68,7 @@ public class ExportLink extends AjaxButtonWithIcon {
   }
 
   @Override
-  public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+  public void onSubmit(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on {}", getId());
     configDownload.initiate(target);
   }

@@ -93,7 +93,7 @@ public abstract class AbstractModalForm extends Form<String> {
     if (addDefaultButtons) {
       final AjaxButton okButton = new AjaxButton(prefix + ".ok") {
         @Override
-        protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+        protected void onSubmit(final AjaxRequestTarget target) {
           if (debugEnabled) log.debug("clicked on {}.ok", AbstractModalForm.this.prefix);
           if (okAction != null) okAction.run();
           saveSettings();
@@ -104,7 +104,7 @@ public abstract class AbstractModalForm extends Form<String> {
       setDefaultButton(okButton);
       add(new AjaxButton(prefix + ".cancel") {
         @Override
-        protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+        protected void onSubmit(final AjaxRequestTarget target) {
           if (debugEnabled) log.debug("clicked on {}.cancel", AbstractModalForm.this.prefix);
           modal.close(target);
         }

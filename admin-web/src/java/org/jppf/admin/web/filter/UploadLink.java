@@ -50,7 +50,7 @@ public class UploadLink extends AjaxButtonWithIcon {
   }
 
   @Override
-  public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+  public void onSubmit(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on node.filter.upload");
     final NodeFilterPage page = (NodeFilterPage) target.getPage();
     final FileUploadField fileUploadField = page.getFileUploadField();
@@ -63,7 +63,7 @@ public class UploadLink extends AjaxButtonWithIcon {
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-    target.add(form);
+    target.add(getForm());
   }
 
   @Override
