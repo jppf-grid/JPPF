@@ -68,7 +68,7 @@ image:
 
 # values common to driver, nodes and admin console
 jppf:
-  version: "6.2-alpha"
+  version: "6.2-alpha-2"
   serverHostName: jppf-driver-service
   serialization: "org.jppf.serialization.DefaultJavaSerialization"
 
