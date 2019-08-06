@@ -73,7 +73,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
     <b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/find/saved_search/1/search/1" target=_top>bugs database</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/wishlist" target=_top>feature requests database</a></b><br>
-    <b>Explore the <a href="https://github.com/lolocohen/JPPF">source code</a> on <a href="https://github.com/lolocohen/JPPF">Github</a></b><br><br>
+    <b>Explore the <a href="https://github.com/jppf-grid/JPPF">source code</a> on <a href="https://github.com/jppf-grid/JPPF">Github</a></b><br><br>
     </div><br>
 
   </div>

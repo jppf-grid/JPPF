@@ -163,7 +163,7 @@
       </ul>
       <h3>Source code and documentation</h3>
       <ul class="list_nomargin">
-        <li><a href="<?php echo 'https://github.com/lolocohen/JPPF/archive/' . $tag1 . '.zip'; ?>">Full source code distribution</a></li>
+        <li><a href="<?php echo 'https://github.com/jppf-grid/JPPF/archive/' . $tag1 . '.zip'; ?>">Full source code distribution</a></li>
         <li>User Guide: <a href="/doc/6.1">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip'; ?>">download the PDF</a></li>
         <li>API documentation: <a href="/javadoc/6.1">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip'; ?>">download</a></li>
       </ul>

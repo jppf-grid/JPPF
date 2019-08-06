@@ -31,10 +31,14 @@ $template{name="about-page-header" title="Features"}$
     <br></div>
 
     <br><div class="blockWithHighlightedTitle">
-    <a name="feat04"></a>
-    $template{name="title-with-icon" img="images/icons/job-node2.png" title="Matching the Workload with the Grid" heading="h3"}$
-    <p>The <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=Job_Service_Level_Agreement">right tools</a> at the right time for the job. Ensure that jobs are executed where they are supposed to, without interfering with each other and in the best conditions.
-    Fine-grained node filtering, job prioritization and scheduling, grid partitioning and many other features provide a dynamic way of matching heterogenous workloads to the grid's capacity.
+    <a name="feat09"></a>
+    $template{name="title-with-icon" img="images/icons/integration.png" title=Android, "Android, .Net, J2EE integration" heading="h3"}$
+    <p>
+    Specialized client and node implementations bring JPPF grids to the <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=Android_Node">Android</a>,
+    <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=.Net_Bridge">.Net</a> and <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=J2EE_Connector">J2EE</a> worlds.
+    Open up your grid implementation to the world of Android mobile devices.
+    Write your jobs in any .Net language and execute them on .Net-enabled JPPF nodes.
+    Use JPPF services from JEE enterprise applications or wrap them as Web or REST services. Make interoperability an operational reality.
     <br></div>
 
     <br><div class="blockWithHighlightedTitle">
@@ -46,7 +50,7 @@ $template{name="about-page-header" title="Features"}$
     <br></div>
 
     <br><div class="blockWithHighlightedTitle">
-    $template{name="title-with-icon" img="images/icons/anchor.png" title="Container-teady" heading="h3"}$
+    $template{name="title-with-icon" img="images/icons/anchor.png" title="Container-ready" heading="h3"}$
     <p>Fully integrated with container-based technologies, JPPF provides <a href="https://hub.docker.com/u/jppfgrid">Docker images</a> that can be deployed in Kubernetes clusters using a <a href="https://github.com/jppf-grid/JPPF/tree/master/containers/k8s/jppf">Helm chart</a>,
     as well as in a Docker swarm cluster, using a <a href="https://github.com/jppf-grid/JPPF/tree/master/containers#jppf-service-stack">docker compose service stack</a>.
     Deployment of a JPPF compute grid in a cloud infrastructure has never been easer.
@@ -81,14 +85,10 @@ $template{name="about-page-header" title="Features"}$
     <br></div>
 
     <br><div class="blockWithHighlightedTitle">
-    <a name="feat09"></a>
-    $template{name="title-with-icon" img="images/icons/integration.png" title=Android, "Android, .Net, J2EE integration" heading="h3"}$
-    <p>
-    Specialized client and node implementations bring JPPF grids to the <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=Android_Node">Android</a>,
-    <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=.Net_Bridge">.Net</a> and <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=J2EE_Connector">J2EE</a> worlds.
-    Open up your grid implementation to the world of Android mobile devices.
-    Write your jobs in any .Net language and execute them on .Net-enabled JPPF nodes.
-    Use JPPF services from JEE enterprise applications or wrap them as Web or REST services. Make interoperability an operational reality.
+    <a name="feat04"></a>
+    $template{name="title-with-icon" img="images/icons/job-node2.png" title="Matching the Workload with the Grid" heading="h3"}$
+    <p>The <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=Job_Service_Level_Agreement">right tools</a> at the right time for the job. Ensure that jobs are executed where they are supposed to, without interfering with each other and in the best conditions.
+    Fine-grained node filtering, job prioritization and scheduling, grid partitioning and many other features provide a dynamic way of matching heterogenous workloads to the grid's capacity.
     <br></div>
 
     <br><div class="blockWithHighlightedTitle">
@@ -96,7 +96,14 @@ $template{name="about-page-header" title="Features"}$
     $template{name="title-with-icon" img="images/icons/personal.png" title="Customization" heading="h3"}$
     <p>Whenever your specialized needs go beyond what is available out-of-the-box, JPPF provides many <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=Extending_and_Customizing_JPPF">extension points, addons and plugins</a> which allow you to tailor and customize the behavior of any of its components.
     Make JPPF your grid computing solution, without ever being stuck because of missing features.
-    <br></div><br>
+    <br></div>
+
+    <br><div class="blockWithHighlightedTitle">
+    $template{name="title-with-icon" img="images/icons/system-run.png" title="Continuous quality" heading="h3"}$
+    <p>The quality of the JPPF code and deliverables is continuously ensured, thanks to a large set of unit and integration tests, using a home-grown test frameworks that mounts real-life JPPF grids.
+    From simple to complex grid topologies, there is nothing that cannot be automatically tested. This guarantees that any issue is identified and fixed as early as possible.
+    Furthermore, security scans ensure that potential security issues are quickly identified and remediated.
+    <br></div>
 
   </div>
 
