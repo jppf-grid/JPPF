@@ -59,7 +59,7 @@
         <exclude name="maven/*.jar"/>
       </fileset>
     </dependency-check>
-    <echo message="dependency-check reports avaulable at ${build}/dependency-check-ant/reports"/>
+    <echo message="dependency-check reports available at ${build}/dependency-check-ant/reports"/>
   </target>
 
 </project> 
