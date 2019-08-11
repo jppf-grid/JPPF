@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import javax.management.Notification;
+import javax.management.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.load.balancer.LoadBalancingInformation;
@@ -32,6 +32,8 @@ import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.test.addons.mbeans.*;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
@@ -156,6 +158,111 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
         if (count == nbNodes) break;
       }
       Thread.sleep(100L);
+    }
+  }
+
+  /**
+   * Test that a job dispatch expires after a given duration.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=8000)
+  public void testSimpleJob() throws Exception {
+    String listenerId = null;
+    checkNodes();
+    final int nbTasks = 20;
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    try {
+      final MyTaskListener listener = new MyTaskListener();
+      listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 0L, true, "notif");
+      final List<Task<?>> results = client.submit(job);
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      print(false, false, "received so far %d notifications", listener.getTotalNotificationCount());
+      assertTrue(ConcurrentUtils.awaitCondition(() -> listener.getTotalNotificationCount() == 2 * nbTasks, 5000L, 250L, false));
+      assertEquals(nbTasks, listener.taskExecutionUserNotificationCount);
+      assertEquals(nbTasks, listener.startNotifMap.size());
+      assertEquals(nbTasks, listener.taskExecutionJppfNotificationCount);
+      assertEquals(nbTasks, listener.endNotifMap.size());
+      for (int i=0; i<nbTasks; i++) {
+        assertTrue(results.get(i) instanceof LifeCycleTask);
+        final LifeCycleTask task = (LifeCycleTask) results.get(i);
+        assertEquals(job.getJobTasks().get(i).getId(), task.getId());
+        assertNotNull(task.getResult());
+        assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+        final Collection<TaskExecutionNotification> startNotifs = listener.startNotifMap.getValues(task.getId());
+        assertNotNull(startNotifs);
+        assertEquals(1, startNotifs.size());
+        final Collection<TaskExecutionNotification> endNotifs = listener.endNotifMap.getValues(task.getId());
+        assertNotNull(endNotifs);
+        assertEquals(1, endNotifs.size());
+      }
+    } finally {
+      if (listenerId != null) jmx.unregisterForwardingNotificationListener(listenerId);
+    }
+  }
+
+  /**
+   * A JMX {@link NotificationListener} which simply accumulates the notifications it receives.
+   * @author Laurent Cohen
+   */
+  static class MyTaskListener implements NotificationListener {
+    /**
+     * Collects the start notifications for all the tasks.
+     */
+    public final CollectionMap<String, TaskExecutionNotification> startNotifMap = new ArrayListHashMap<>();
+    /**
+     * Collects the start notifications for all the tasks.
+     */
+    public final CollectionMap<String, TaskExecutionNotification> endNotifMap = new ArrayListHashMap<>();
+    /**
+     * An eventual exception that occurred in the {@link #handleNotification(Notification, Object)} method.
+     */
+    public Exception exception;
+    /**
+     * The total count of notifications.
+     */
+    private int totalNotificationCount;
+    /**
+     * The count of user notifications sent via {@code Task.fireNotification()}.
+     */
+    public int taskExecutionUserNotificationCount;
+    /**
+     * The count of JPPF notifications sent via {@code Task.fireNotification()}.
+     */
+    public int taskExecutionJppfNotificationCount;
+
+    @Override
+    public synchronized void handleNotification(final Notification notification, final Object handback) {
+      try {
+        totalNotificationCount++;
+        if (notification instanceof JPPFNodeForwardingNotification) {
+          final JPPFNodeForwardingNotification forwardingNotif = (JPPFNodeForwardingNotification) notification;
+          final String node = forwardingNotif.getNodeUuid();
+          final Notification realNotif = forwardingNotif.getNotification();
+          if (realNotif instanceof TaskExecutionNotification) {
+            print(false, false, "received notification from node %s: %s", node, realNotif);
+            final TaskExecutionNotification notif = (TaskExecutionNotification) realNotif;
+            if (notif.isUserNotification()) {
+              startNotifMap.putValue(notif.getTaskInformation().getId(), notif);
+              taskExecutionUserNotificationCount++;
+            } else {
+              taskExecutionJppfNotificationCount++;
+              endNotifMap.putValue(notif.getTaskInformation().getId(), notif);
+            }
+          }
+        }
+      } catch (final Exception e) {
+        print(false, false, "exception in listener: %s", e);
+        if (exception == null) exception = e;
+      }
+    }
+
+    /**
+     * @return the total count of notifications.
+     */
+    public synchronized int getTotalNotificationCount() {
+      return totalNotificationCount;
     }
   }
 }

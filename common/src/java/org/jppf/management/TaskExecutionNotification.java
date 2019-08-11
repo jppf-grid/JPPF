@@ -85,6 +85,7 @@ public class TaskExecutionNotification extends OffloadableNotification {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("source=").append(getSource())
       .append(", type=").append(getType())
+      .append(", userNotification=").append(userNotification)
       .append(", taskInfo=").append(taskInformation)
       .append(", sequence=").append(getSequenceNumber())
       .append(']').toString();
