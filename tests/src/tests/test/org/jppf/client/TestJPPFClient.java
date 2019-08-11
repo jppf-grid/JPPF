@@ -182,7 +182,7 @@ public class TestJPPFClient extends Setup1D1N {
   @Test(timeout=10000)
   public void testLocalExecutionNbThreads() throws Exception {
     final int nbThreads = 2;
-    JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_THREADS, nbThreads);
+    JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_THREADS, nbThreads).set(REMOTE_EXECUTION_ENABLED, false);
     try (JPPFClient client = new JPPFClient()) {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
       // submit a job to ensure all local execution threads are created
@@ -201,7 +201,6 @@ public class TestJPPFClient extends Setup1D1N {
           print(false, false, errorMsg);
           fail(errorMsg);
         }
-        assertNull(t);
         assertEquals(msg, task.getResult());
       }
       final ThreadMXBean mxbean = ManagementFactory.getThreadMXBean();
