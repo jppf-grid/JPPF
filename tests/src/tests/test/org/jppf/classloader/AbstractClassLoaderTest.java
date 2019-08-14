@@ -181,6 +181,7 @@ public abstract class AbstractClassLoaderTest extends AbstractNonStandardSetup {
       else job.add(new MyTask2(i));
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
       final Task<?> task = client.submit(job).get(0);
+      print(false, false, "got results for job %d", i);
       final Throwable t = task.getThrowable();
       assertNull(String.format("got exception in task %d: %s", i, ExceptionUtils.getStackTrace(t)), t);
       if (i == 1) {

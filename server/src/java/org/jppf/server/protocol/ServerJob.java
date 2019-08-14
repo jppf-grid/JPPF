@@ -163,6 +163,7 @@ public class ServerJob extends AbstractServerJobBase {
           if (task.getState() == TaskState.RESUBMIT) {
             if (traceEnabled) log.trace("task to resubmit: {}", task);
             task.setState(TaskState.PENDING);
+            task.setReturnedFromNode(false);
             nbResubmits++;
             if (pos > maxPos) maxPos = pos;
             if (pos < minPos) minPos = pos;
@@ -204,6 +205,7 @@ public class ServerJob extends AbstractServerJobBase {
         if (task.getState() == TaskState.RESUBMIT) {
           if (traceEnabled) log.trace("task to resubmit: {}", task);
           task.setState(TaskState.PENDING);
+          task.setReturnedFromNode(false);
           nbResubmits++;
           if (pos > maxPos) maxPos = pos;
           if (pos < minPos) minPos = pos;
@@ -343,7 +345,7 @@ public class ServerJob extends AbstractServerJobBase {
     if (debugEnabled) log.debug("cancelling tasks for {}", this);
     final CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
     for (final ServerTask task: tasks.values()) {
-      if (!task.isDone()) {
+      if (!task.isDone() && !task.isReturnedFromNode()) {
         task.cancel();
         clientMap.putValue(task.getBundle(), task);
       }
