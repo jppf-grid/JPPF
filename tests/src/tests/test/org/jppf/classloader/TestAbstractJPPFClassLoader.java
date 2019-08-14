@@ -151,6 +151,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
       else job.add(new MyTask2(i));
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
       final Task<?> task = client.submit(job).get(0);
+      print(false, false, "got results for job %d", i);
       final Throwable t = task.getThrowable();
       assertNull(t);
       if (i == 1) {

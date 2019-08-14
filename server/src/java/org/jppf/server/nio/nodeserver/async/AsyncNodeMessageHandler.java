@@ -266,19 +266,32 @@ public class AsyncNodeMessageHandler {
   private void process(final NodeBundleResults received, final AsyncNodeContext context) throws Exception {
     final TaskBundle bundle = received.first();
     final ServerTaskBundleNode nodeBundle = context.removeJobEntry(bundle.getUuid(), bundle.getBundleId());
-    context.getServer().getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(nodeBundle), false);
-    boolean requeue = false;
+    final ServerJob job = nodeBundle.getServerJob();
+    boolean mustProcess = true;
+    job.getLock().lock();
     try {
-      final TaskBundle newBundle = received.bundle();
-      if (debugEnabled) log.debug("read bundle " + newBundle + " from node " + context);
-      requeue = processResults(context, received, nodeBundle);
-    } catch (final Throwable t) {
-      log.error(t.getMessage(), t);
-      nodeBundle.setJobReturnReason(JobReturnReason.DRIVER_PROCESSING_ERROR);
-      nodeBundle.resultsReceived(t);
+      if (job.isCancelled()) mustProcess = false;
+      else {
+        for (final ServerTask task: nodeBundle.getTaskList()) task.setReturnedFromNode(true);
+      }
+    } finally {
+      job.getLock().unlock();
     }
-    if (requeue) nodeBundle.resubmit();
-    //context.setMessage(null);
+    context.getServer().getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(nodeBundle), false);
+
+    if (mustProcess) {
+      boolean requeue = false;
+      try {
+        final TaskBundle newBundle = received.bundle();
+        if (debugEnabled) log.debug("read bundle " + newBundle + " from node " + context);
+        requeue = processResults(context, received, nodeBundle);
+      } catch (final Throwable t) {
+        log.error(t.getMessage(), t);
+        nodeBundle.setJobReturnReason(JobReturnReason.DRIVER_PROCESSING_ERROR);
+        nodeBundle.resultsReceived(t);
+      }
+      if (requeue) nodeBundle.resubmit();
+    }
     if (!context.isOffline()) updateMaxJobs(context, bundle);
     if (context.getCurrentNbJobs() < context.getMaxJobs()) {
       if (debugEnabled) log.debug("updating execution status to ACTIVE for {}", context);

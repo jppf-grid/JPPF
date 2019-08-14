@@ -78,6 +78,10 @@ public class ServerTask implements Serializable {
    * Number of times a task resubmitted itself.
    */
   private int resubmitCount;
+  /**
+   * Whether this task has returned from the node.
+   */
+  private boolean returnedFromNode;
 
   /**
    *
@@ -293,6 +297,21 @@ public class ServerTask implements Serializable {
     } catch(final Exception e) {
       throw (e instanceof IOException) ? (IOException) e : new IOException(e);
     }
+  }
+
+  /**
+   * @return whether this task has returned from the node
+   */
+  public boolean isReturnedFromNode() {
+    return returnedFromNode;
+  }
+
+  /**
+   * Set whether this task has returned from the node
+   * @param returnedFromNode {@code true} if this task has returned from a node, {@code false} otherwise.
+   */
+  public void setReturnedFromNode(final boolean returnedFromNode) {
+    this.returnedFromNode = returnedFromNode;
   }
 
   /**
