@@ -492,4 +492,11 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       currentLoadBalancingInformation = bundlerFactory.setAndGetCurrentInfo(lbi);
     }
   }
+
+  /**
+   * @return the job queue.
+   */
+  public JPPFPriorityQueue getQueue() {
+    return queue;
+  }
 }
