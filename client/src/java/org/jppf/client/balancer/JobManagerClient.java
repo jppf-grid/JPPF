@@ -509,4 +509,11 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   public TaskQueueChecker getTaskQueueChecker() {
     return taskQueueChecker;
   }
+
+  /**
+   * @return the job queue.
+   */
+  public JPPFPriorityQueue getQueue() {
+    return queue;
+  }
 }

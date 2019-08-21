@@ -20,9 +20,11 @@ package org.jppf.client;
 import java.util.*;
 
 import org.jppf.client.balancer.JobManagerClient;
+import org.jppf.client.balancer.queue.JPPFPriorityQueue;
 import org.jppf.client.debug.Debug;
 import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.discovery.ClientDriverDiscovery;
+import org.jppf.job.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.node.policy.ExecutionPolicy;
@@ -447,5 +449,53 @@ public class JPPFClient extends AbstractGenericClient {
     } finally {
       defaultPolicyLock.unlock();
     }
+  }
+
+  /**
+   * Get the list of currently queued jobs.
+   * @return a list of {@link JPPFJob} instances, possibly empty.
+   */
+  public List<JPPFJob> getQueuedJobs() {
+    return getQueuedJobs(null);
+  }
+ 
+  /**
+   * Get a list of currently queued jobs, filtered by a {@link JobSelector}.
+   * @param selector a job filter to apply. May be {@code null}, in which case all queued jobs are returned.
+   * @return a list of {@link JPPFJob} instances that satisfy the provided job selector, possibly empty.
+   */
+  public List<JPPFJob> getQueuedJobs(final JobSelector selector) {
+    final JPPFPriorityQueue queue = ((JobManagerClient) getJobManager()).getQueue();
+    final List<JPPFJob> allJobs = queue.getJPPFJobs();
+    if ((selector == null) || (selector instanceof AllJobsSelector)) return allJobs;
+    final List<JPPFJob> result = new ArrayList<>(allJobs.size() < 10 ? 10 : allJobs.size());
+    for (final JPPFJob job: allJobs) {
+      if (selector.accepts(job)) result.add(job);
+    }
+    return result;
+  }
+ 
+  /**
+   * Get the current number of queued jobs.
+   * @return the current queued jobs count as an {@code int}.
+   */
+  public int getQueuedJobsCount() {
+    return getQueuedJobsCount(null);
+  }
+ 
+  /**
+   * Get the current number of jobs that satisfy a job selector.
+   * @param selector a job filter to apply. May be {@code null}, in which case the count of all queued jobs is returned.
+   * @return the number of queued jobs that satisfy the filter.
+   */
+  public int getQueuedJobsCount(final JobSelector selector) {
+    final JPPFPriorityQueue queue = ((JobManagerClient) getJobManager()).getQueue();
+    if ((selector == null) || (selector instanceof AllJobsSelector)) return queue.getQueueSize();
+    final List<JPPFJob> allJobs = queue.getJPPFJobs();
+    int result = 0;
+    for (final JPPFJob job: allJobs) {
+      if (selector.accepts(job)) result++;
+    }
+    return result;
   }
 }
