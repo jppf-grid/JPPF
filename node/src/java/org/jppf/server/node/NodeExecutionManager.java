@@ -65,7 +65,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    * @param nbThreadsProperty the name of the property which configures the number of threads.
    */
   public NodeExecutionManager(final NodeInternal node, final JPPFProperty<Integer> nbThreadsProperty) {
-    super(nbThreadsProperty);
+    super(JPPFConfiguration.getProperties(), nbThreadsProperty);
     if (node == null) throw new IllegalArgumentException("node is null");
     this.node = node;
   }

@@ -20,6 +20,7 @@ package org.jppf.client.balancer;
 
 import java.util.*;
 
+import org.jppf.client.JPPFClient;
 import org.jppf.execute.AbstractExecutionManager;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
@@ -45,10 +46,11 @@ public class ClientExecutionManager extends AbstractExecutionManager {
 
   /**
    * Initialize this execution manager.
+   * @param client the JPPF client from whose configuration the number of execution threads is obtained.
    * @param nbThreadsProperty the name of the property which configures the number of threads.
    */
-  public ClientExecutionManager(final JPPFProperty<Integer> nbThreadsProperty) {
-    super(nbThreadsProperty);
+  public ClientExecutionManager(final JPPFClient client, final JPPFProperty<Integer> nbThreadsProperty) {
+    super(client.getConfig(), nbThreadsProperty);
   }
 
   /**
