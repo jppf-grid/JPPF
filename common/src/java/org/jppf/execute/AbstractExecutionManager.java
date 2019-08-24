@@ -101,13 +101,14 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
 
   /**
    * Initialize this execution manager with the specified node.
+   * @param config the configuration from which to obtain the number of execution threads.
    * @param nbThreadsProperty the name of the property which configures the number of threads.
    */
-  public AbstractExecutionManager(final JPPFProperty<Integer> nbThreadsProperty) {
+  public AbstractExecutionManager(final TypedProperties config, final JPPFProperty<Integer> nbThreadsProperty) {
     taskNotificationDispatcher = new TaskExecutionDispatcher(getClass().getClassLoader());
-    int poolSize = JPPFConfiguration.get(nbThreadsProperty);
+    int poolSize = config.get(nbThreadsProperty);
     if (poolSize <= 0) poolSize = Runtime.getRuntime().availableProcessors();
-    JPPFConfiguration.set(nbThreadsProperty, poolSize);
+    config.set(nbThreadsProperty, poolSize);
     log.info("running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     threadManager = createThreadManager(poolSize);
   }
