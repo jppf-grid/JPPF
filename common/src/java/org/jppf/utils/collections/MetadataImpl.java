@@ -60,6 +60,11 @@ public class MetadataImpl implements Metadata {
   }
 
   @Override
+  public boolean hasParameter(final Object key) {
+    return parameters.containsKey(key);
+  }
+
+  @Override
   public Map<Object, Object> getAll() {
     return parameters;
   }

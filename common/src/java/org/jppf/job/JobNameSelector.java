@@ -23,11 +23,11 @@ import java.util.*;
 import org.jppf.node.protocol.JPPFDistributedJob;
 
 /**
- * A job selector which accepts all jobs whose uuids are in the set specified in one of its constructors.
+ * A job selector which accepts all jobs whose names are in the set specified in one of its constructors.
  * @author Laurent Cohen
- * @since 5.1
+ * @since 6.2
  */
-public class JobUuidSelector implements JobSelector {
+public class JobNameSelector implements JobSelector {
   /**
    * Explicit serialVersionUID.
    */
@@ -35,34 +35,34 @@ public class JobUuidSelector implements JobSelector {
   /**
    * The set of accepted job uuids.
    */
-  private final Set<String> uuids;
+  private final Set<String> names;
 
   /**
    * Initiialize this selector with the specified collection of accepted job uuids.
-   * @param uuids a collection of string uuids.
+   * @param names a collection of job names.
    */
-  public JobUuidSelector(final Collection<String> uuids) {
-    this.uuids = (uuids == null) ? Collections.<String>emptySet() : new HashSet<>(uuids);
+  public JobNameSelector(final Collection<String> names) {
+    this.names = (names == null) ? Collections.<String>emptySet() : new HashSet<>(names);
   }
 
   /**
    * Initiialize this selector with the specified array of accepted job uuids.
-   * @param uuids an array of string uuids.
+   * @param names an array of job names.
    */
-  public JobUuidSelector(final String...uuids) {
-    this.uuids = new HashSet<>(Arrays.asList(uuids));
+  public JobNameSelector(final String...names) {
+    this.names = new HashSet<>(Arrays.asList(names));
   }
 
   @Override
   public boolean accepts(final JPPFDistributedJob job) {
-    return uuids.contains(job.getUuid());
+    return names.contains(job.getName());
   }
 
   /**
    * Get the set of job uuids accepted by this selector.
    * @return a set of uuids, possibly empty.
    */
-  public Set<String> getUuids() {
-    return uuids;
+  public Set<String> getNames() {
+    return names;
   }
 }

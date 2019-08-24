@@ -61,6 +61,13 @@ public interface Metadata extends Serializable {
   <T> T removeParameter(Object key);
 
   /**
+   * Determine whether this metadata container has a parameter with the specified key.
+   * @param key the key to lookup in this metadata container.
+   * @return {@code true} if this metadata has an entry with the specified key, {@code false} otherwise.
+   */
+  public boolean hasParameter(Object key);
+
+  /**
    * Get a copy of the metadata map.
    * @return a map of the metadata contained in this object.
    */
