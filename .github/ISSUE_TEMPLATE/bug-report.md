@@ -7,20 +7,22 @@ assignees: ''
 
 ---
 
-## Oberved behavior
+### Observed behavior
 
 Please describe what the problem is. What did you find out?
 
-## Expected behavior
+### Expected behavior
 
 What were you expecting instead?
 
-## In which release does it happen?
+### Environment information
 
-For instance: `JPPF 6.0.1 and 6.0.2`
+- **JPPF version(s):**  
+- **JDK version:** 
+- **OS and version:** 
 
-## How to reproduce
+### How to reproduce
 
-Please describe the steps and conditions to reprodcue the problem
+Please describe the steps and conditions to reproduce the problem
 
-**Please attach any log file, code sample or screenshot that demonstrates or reproduces the issue**
+**attach/include any log file, code sample or screenshot that demonstrates or reproduces the issue**
