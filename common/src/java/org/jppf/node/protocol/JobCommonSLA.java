@@ -135,6 +135,9 @@ public class JobCommonSLA<T extends JobCommonSLA<T>> implements Serializable {
     sla.setExecutionPolicy(executionPolicy);
     sla.setJobExpirationSchedule(jobExpirationSchedule);
     sla.setJobSchedule(jobSchedule);
+    sla.setMaxDispatchSize(maxDispatchSize);
+    sla.setAllowMultipleDispatchesToSameChannel(allowMultipleDispatchesToSameChannel);
+    sla.setPreferencePolicy(preferencePolicy);
     return sla;
   }
 

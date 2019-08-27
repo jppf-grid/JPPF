@@ -72,7 +72,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   private void cancelJob(final ServerJob job) throws Exception {
     if (job != null) {
-      if (debugEnabled) log.debug("Request to cancel job '{}'", job.getJob().getName());
+      if (debugEnabled) log.debug("Request to cancel job '{}'", job.getName());
       job.cancel(driver, false);
       final JPPFStatistics stats = driver.getStatistics();
       stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -job.getTaskCount());
@@ -95,7 +95,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       if (debugEnabled) log.debug("job is null");
       return;
     }
-    if (debugEnabled) log.debug("Request to suspend job '" + job.getJob().getName() + '\'');
+    if (debugEnabled) log.debug("Request to suspend job '" + job.getName() + '\'');
     job.setSuspended(true, requeue);
   }
 
@@ -114,7 +114,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       if (debugEnabled) log.debug("job is null");
       return;
     }
-    if (debugEnabled) log.debug("Request to resume job '" + job.getJob().getName() + '\'');
+    if (debugEnabled) log.debug("Request to resume job '" + job.getName() + '\'');
     job.setSuspended(false, false);
     driver.getAsyncNodeNioServer().getJobScheduler().wakeUp();
   }
@@ -135,7 +135,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       if (debugEnabled) log.debug("job is null");
       return;
     }
-    if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + job.getJob().getName() + '\'');
+    if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + job.getName() + '\'');
     job.setMaxNodes(maxNodes);
   }
 
@@ -315,7 +315,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     final List<ServerJob> allJobs = queue.getAllJobs();
     final List<ServerJob> list = new ArrayList<>(allJobs.size());
     for (final ServerJob job: allJobs) {
-      if (selector.accepts(job.getJob()) && !JPPFJobManager.isBroadcastDispatch(job)) list.add(job);
+      if (selector.accepts(job) && !JPPFJobManager.isBroadcastDispatch(job)) list.add(job);
     }
     return list;
   }

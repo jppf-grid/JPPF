@@ -298,9 +298,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     try {
       final ServerJob job = jobMap.get(jobUuid);
       if (job == null) return;
-      final int oldPriority = job.getJob().getSLA().getPriority();
+      final int oldPriority = job.getSLA().getPriority();
       if (oldPriority != newPriority) {
-        job.getJob().getSLA().setPriority(newPriority);
+        job.getSLA().setPriority(newPriority);
         priorityMap.removeValue(oldPriority, job);
         priorityMap.putValue(newPriority, job);
         job.fireJobUpdated(true);
@@ -452,8 +452,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  protected int getSize(final ServerJob bundleWrapper) {
-    return bundleWrapper.getJob().getDriverQueueTaskCount();
+  protected int getSize(final ServerJob job) {
+    return job.getJob().getDriverQueueTaskCount();
   }
 
   /**
@@ -506,7 +506,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       for (final ServerJob job: jobMap.values()) {
-        if (selector.accepts(job.getJob())) list.add(job);
+        if (selector.accepts(job)) list.add(job);
       }
     } finally {
       lock.unlock();

@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.LoggingUtils;
@@ -62,6 +62,10 @@ public class ServerJobBroadcast extends ServerJob {
    * Number of remaining tasks that have not completed.
    */
   protected int pendingTasksCount;
+  /**
+   * 
+   */
+  private JobSLA sla; 
 
   /**
    * Initialized broadcast job with task bundle and data provider.
@@ -94,6 +98,7 @@ public class ServerJobBroadcast extends ServerJob {
     } else {
       this.broadcastMap = Collections.emptyMap();
     }
+    this.sla = job.getSLA();
   }
 
   @Override
@@ -274,5 +279,15 @@ public class ServerJobBroadcast extends ServerJob {
     } finally {
       lock.unlock();
     }
+  }
+
+  @Override
+  public JobSLA getSLA() {
+    return sla;
+  }
+
+  @Override
+  public void setSLA(final JobSLA sla) {
+    this.sla = sla;
   }
 }

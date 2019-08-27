@@ -36,7 +36,6 @@ import org.jppf.server.nio.client.AsyncClientNioServer;
 import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
 import org.jppf.server.nio.nodeserver.async.*;
 import org.jppf.server.node.local.*;
-import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
@@ -133,8 +132,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
    * @return a {@link JPPFDistributedJob} instance, or {@code null} if there is no job with the specified uuid.
    */
   public JPPFDistributedJob getJob(final String uuid) {
-    final ServerJob serverJob = this.getQueue().getJob(uuid);
-    return (serverJob == null) ? null : serverJob.getJob();
+    return this.getQueue().getJob(uuid);
   }
 
   /**

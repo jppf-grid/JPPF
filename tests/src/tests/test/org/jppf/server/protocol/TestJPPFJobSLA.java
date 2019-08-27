@@ -298,17 +298,22 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
       final String suffix = "broadcast-node-";
       final JPPFJob job2 = BaseTestHelper.createJob(methodName + "-broadcast", true, 1, FileTask.class, suffix, true);
       job2.getSLA().setPriority(-1000);
+      BaseTestHelper.printToAll(client, true, true, true, false, ">>> submitting job1");
       client.submitAsync(job1);
       Thread.sleep(500L);
+      BaseTestHelper.printToAll(client, true, true, true, false, ">>> submitting job2");
       client.submitAsync(job2);
       job1.awaitResults();
+      BaseTestHelper.printToAll(client, true, true, true, false, ">>> got job1 results");
       job2.awaitResults();
+      BaseTestHelper.printToAll(client, true, true, true, false, ">>> got job2 results");
       for (int i=1; i<=2; i++) {
         final File file = new File(suffix + "n" + i + ".tmp");
+        final boolean exists = file.exists();
         try {
-          assertTrue("file '" + file + "' does not exist", file.exists());
+          assertTrue("file '" + file + "' does not exist", exists);
         } finally {
-          if (file.exists()) file.delete();
+          if (exists) file.delete();
         }
       }
     } finally {
@@ -330,10 +335,11 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     client.submit(job);
     for (int i=1; i<=2; i++) {
       final File file = new File("node-n" + i + ".tmp");
+      final boolean exists = file.exists();
       try {
-        assertFalse("file '" + file + "' exists but shouldn't", file.exists());
+        assertFalse("file '" + file + "' exists but shouldn't", exists);
       } finally {
-        if (file.exists()) file.delete();
+        if (exists) file.delete();
       }
     }
   }

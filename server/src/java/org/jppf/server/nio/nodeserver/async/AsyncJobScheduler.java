@@ -208,7 +208,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
   private BaseNodeContext findIdleChannelIndex(final ServerJob job) {
-    final JobSLA sla = job.getJob().getSLA();
+    final JobSLA sla = job.getSLA();
     final JPPFNodeConfigSpec spec =  sla.getDesiredNodeConfiguration();
     final TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
     List<BaseNodeContext> acceptableChannels = new ArrayList<>(idleChannels.size());
@@ -359,7 +359,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    */
   private static boolean checkJobState(final ServerJob job) {
     if (job.isCancelled()) return false;
-    final JobSLA sla = job.getJob().getSLA();
+    final JobSLA sla = job.getSLA();
     if (debugEnabled) log.debug("job '{}', suspended={}, pending={}, expired={}", new Object[] {job.getName(), sla.isSuspended(), job.isPending(), job.isJobExpired()});
     if (sla.isSuspended() || job.isPending() || job.isJobExpired()) return false;
     if (debugEnabled) log.debug("current nodes = " + job.getNbChannels() + ", maxNodes = " + sla.getMaxNodes());
@@ -392,7 +392,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
     if (currentInfo == null) return true;
     final String currentMasterUuid = getMasterUuid(currentInfo);
     if (currentMasterUuid == null) return true;
-    final int maxNodeGroups = job.getJob().getSLA().getMaxNodeProvisioningGroupss();
+    final int maxNodeGroups = job.getSLA().getMaxNodeProvisioningGroupss();
     if ((maxNodeGroups == Integer.MAX_VALUE) || (maxNodeGroups <= 0)) return true;
     final Set<ServerTaskBundleNode> nodes = job.getDispatchSet();
     final Set<String> masterUuids = new HashSet<>();

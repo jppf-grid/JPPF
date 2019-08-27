@@ -19,7 +19,7 @@ package org.jppf.server.protocol;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.*;
@@ -34,7 +34,7 @@ import org.slf4j.*;
  * Abstract class that support job state management.
  * @author Martin JANDA
  */
-public abstract class AbstractServerJob {
+public abstract class AbstractServerJob implements JPPFDistributedJob {
   /**
    * Logger for this class.
    */
@@ -79,14 +79,6 @@ public abstract class AbstractServerJob {
    * The user-defined display name for this job.
    */
   protected String name;
-  /**
-   * The service level agreement between the job and the server.
-   */
-  protected JobSLA sla;
-  /**
-   * The job metadata.
-   */
-  protected JobMetadata metadata;
   /**
    * Job expired indicator, determines whether the job is should be cancelled.
    */
@@ -133,8 +125,6 @@ public abstract class AbstractServerJob {
     this.job = job;
     this.uuid = this.job.getUuid();
     this.name = this.job.getName();
-    this.sla = this.job.getSLA();
-    this.metadata = this.job.getMetadata();
   }
 
   /**
@@ -150,6 +140,7 @@ public abstract class AbstractServerJob {
    * @return the uuid as a string.
    * @exclude
    */
+  @Override
   public String getUuid() {
     return uuid;
   }
@@ -166,6 +157,7 @@ public abstract class AbstractServerJob {
    * Get the user-defined display name for this job. This is the name displayed in the administration console.
    * @return the name as a string.
    */
+  @Override
   public String getName() {
     return name;
   }
@@ -182,16 +174,18 @@ public abstract class AbstractServerJob {
    * Get the service level agreement between the job and the server.
    * @return an instance of {@link org.jppf.node.protocol.JobSLA}.
    */
+  @Override
   public JobSLA getSLA() {
-    return sla;
+    return job.getSLA();
   }
 
   /**
    * Get the job metadata.
    * @return an instance of {@link JobMetadata}.
    */
+  @Override
   public JobMetadata getMetadata() {
-    return metadata;
+    return job.getMetadata();
   }
 
   /**
@@ -199,7 +193,7 @@ public abstract class AbstractServerJob {
    * @param metadata an instance of {@link JobMetadata}.
    */
   public void setMetadata(final JobMetadata metadata) {
-    this.metadata = metadata;
+    job.setMetadata(metadata);
   }
 
   /**
@@ -207,7 +201,7 @@ public abstract class AbstractServerJob {
    * @param sla an instance of <code>JobSLA</code>.
    */
   public void setSLA(final JobSLA sla) {
-    this.sla = sla;
+    job.setSLA(sla);
   }
 
   /**
@@ -249,7 +243,7 @@ public abstract class AbstractServerJob {
    * @return <code>true</code> if job is suspended, <code>false</code> otherwise.
    */
   public boolean isSuspended() {
-    return getJob().getSLA().isSuspended();
+    return getSLA().isSuspended();
   }
   
   /**
@@ -258,9 +252,8 @@ public abstract class AbstractServerJob {
    * @param requeue <code>true</code> to indicate that job should be requeued, <code>false</code> otherwise.
    */
   public void setSuspended(final boolean suspended, final boolean requeue) {
-    final JobSLA sla = getJob().getSLA();
-    if (sla.isSuspended() == suspended) return;
-    sla.setSuspended(suspended);
+    if (getSLA().isSuspended() == suspended) return;
+    getSLA().setSuspended(suspended);
     fireJobUpdated(true);
   }
 
@@ -270,8 +263,8 @@ public abstract class AbstractServerJob {
    */
   public void setMaxNodes(final int maxNodes) {
     if (maxNodes <= 0) return;
-    if (getJob().getSLA().getMaxNodes() == maxNodes) return;
-    getJob().getSLA().setMaxNodes(maxNodes);
+    if (getSLA().getMaxNodes() == maxNodes) return;
+    getSLA().setMaxNodes(maxNodes);
     fireJobUpdated(true);
   }
 
@@ -391,6 +384,7 @@ public abstract class AbstractServerJob {
     * Get the current number of tasks in the job.
     * @return the number of tasks as an int.
     */
+  @Override
   public abstract int getTaskCount();
 
   /**
@@ -502,7 +496,7 @@ public abstract class AbstractServerJob {
    * @return whether this job is persisted in the driver.
    */
   public boolean isPersistent() {
-    return sla.getPersistenceSpec().isPersistent();
+    return getSLA().getPersistenceSpec().isPersistent();
   }
 
   /**

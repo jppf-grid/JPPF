@@ -202,7 +202,7 @@ public class BroadcastManager {
           newBundle.setName(broadcastJob.getName() + " [node: " + info.toDisplayString() + ']');
           newBundle.setUuid(JPPFUuid.normalUUID());
           jobList.add(newBundle);
-          if (debugEnabled) log.debug("node uuid={} accepted for broadcast {}", uuid, broadcastJob);
+          if (debugEnabled) log.debug("node uuid={} accepted for broadcast: {}, execution policy =\n{}", uuid, newBundle, newBundle.getSLA().getExecutionPolicy());
         }
       }
     }

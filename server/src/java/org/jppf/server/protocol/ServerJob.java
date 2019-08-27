@@ -415,13 +415,11 @@ public class ServerJob extends AbstractServerJobBase {
     lock.lock();
     try {
       if (sla != null) {
-        this.sla = sla;
         job.setSLA(sla);
         driver.getQueue().updateSchedules(this);
         updated = true;
       }
       if (metadata != null) {
-        this.metadata = metadata;
         job.setMetadata(metadata);
         updated = true;
       }
