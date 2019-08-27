@@ -46,7 +46,7 @@ public class DependencyProcessor implements NotificationListener, JPPFDriverStar
    */
   DriverJobManagementMBean jobManager;
   /**
-   * A refeence to the JPPF driver.
+   * A reference to the JPPF driver.
    */
   private JPPFDriver driver;
 

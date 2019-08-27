@@ -55,7 +55,7 @@ public final class DependencyGraph {
   /**
    * Get the node for the specified id.
    * @param id the id of the node to retrieve.
-   * @return a {@link DependencyNode} instance, or {@code null} if no node as the specified id.
+   * @return a {@link DependencyNode} instance, or {@code null} if no node has the specified id.
    */
   public synchronized DependencyNode getNode(final String id) {
     return nodes.get(id);
