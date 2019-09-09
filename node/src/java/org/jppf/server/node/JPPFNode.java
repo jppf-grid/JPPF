@@ -405,6 +405,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (getJobWriter() != null) getJobWriter().close();
     throttlingHandler.stop();
     super.stopNode();
+    slaveManager.stopAllSlaves();
   }
 
   /**

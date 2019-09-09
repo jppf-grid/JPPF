@@ -171,7 +171,6 @@ public class NodeRunner {
     try {
       if (debugEnabled) log.debug("node startup main loop");
       ConnectionContext context = new ConnectionContext("Initial connection", null, ConnectionReason.INITIAL_CONNECTION_REQUEST);
-      //boolean reconnect = true;
       while (true) {
         node = null;
         try {
@@ -191,8 +190,10 @@ public class NodeRunner {
           context = new ConnectionContext(e.getMessage(), e.getCause(), e.getReason());
           if (classLoader != null) classLoader.close();
           classLoader = null;
-          if (node != null) node.stopNode();
-          //reconnect = true;
+          if (node != null) {
+            node.stopNode();
+            if (node.isSlaveNode()) System.exit(0);
+          }
         } finally {
           if ((node != null) && (node.getShuttingDown().get() || embeddedShutdown.get())) {
             if (debugEnabled) log.debug("exiting: node={}, shuttingDown={}, embeddedShutdown", node, (node == null) ? "n/a" :node.getShuttingDown().get(), embeddedShutdown.get());
