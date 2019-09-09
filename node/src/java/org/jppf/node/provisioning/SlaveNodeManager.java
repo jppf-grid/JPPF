@@ -142,6 +142,13 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
   }
 
   /**
+   * Stop all the slave nodes still running.
+   */
+  public void stopAllSlaves() {
+    shrinkOrGrowSlaves(0, true, null);
+  }
+
+  /**
    * Start or stop the required number of slaves to reach the specified number,
    * using the specified config overrides. If {@code configOverrides} is null, then previous overrides are applied.
    * @param requestedSlaves the number of slaves to reach.
