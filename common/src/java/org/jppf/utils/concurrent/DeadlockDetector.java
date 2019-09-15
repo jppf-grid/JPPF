@@ -91,16 +91,14 @@ public class DeadlockDetector {
             if (deadlockDetected) cancel();
             else if (diag.hasDeadlock()) {
               deadlockDetected = true;
-              final String title =  "client".equals(type) ? "thread dump for local JVM" : "thread dump for " + type + " " + suffix;
-              final String text = TextThreadDumpWriter.printToString(diag.threadDump(), title);
-              log.error("deadlock detected !!!\n{}", text);
-              System.err.println("deadlock detected !!!\n" + text);
+              printThreadDump(type, suffix);
               cancel();
             }
           } catch (final Exception e) {
             log.error(e.getMessage(), e);
             cancel();
             reset();
+            setup(type, interval);
           }
         }
       };
@@ -138,6 +136,19 @@ public class DeadlockDetector {
       }
     }
     return null;
+  }
+
+  /**
+   * Print the thread dump with deadlock report to the log and to stderr.
+   * @param type the type of JPPF component, either "driver" or "node".
+   * @param suffix suffix added to the thread dump title.
+   * @throws Exception if any error occurs.
+   */
+  private static void printThreadDump(final String type, final String suffix) throws Exception {
+    final String title =  "thread dump for " + ("client".equals(type) ? "local JVM" : type + " " + suffix);
+    final String text = TextThreadDumpWriter.printToString(diag.threadDump(), title);
+    log.error("deadlock detected !!!\n{}", text);
+    System.err.println("deadlock detected !!!\n" + text);
   }
 
   /**

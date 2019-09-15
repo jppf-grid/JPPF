@@ -34,11 +34,11 @@ public final class NetworkUtils {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(NetworkUtils.class);
+  private static Logger log = LoggerFactory.getLogger(NetworkUtils.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Contains a set of all possible loopback addresses.
    * These are all the IPs in the 127.0.0.0-8 range.
@@ -47,11 +47,14 @@ public final class NetworkUtils {
   /**
    * Constant for empty array of host/ip pairs.
    */
-  private static final HostIP[] NO_ADDRESS = new HostIP[0];
+  private static final HostIP[] NO_ADDRESS = { };
   /**
-   * The list on non-local IP addresses fgor the current host.
+   * Performance optimization by caching the discovered IP addresses.
    */
-  private static final List<InetAddress> nonLocalIPAddresses = new ArrayList<>();
+  private static List<InetAddress> ipv4Addresses, ipv6Addresses, nonLocalIpv4Addresses, nonLocalIpv6Addresses;
+  static {
+    init();
+  }
 
   /**
    * Instantiation opf this class is not permitted.
@@ -70,63 +73,44 @@ public final class NetworkUtils {
 
   /**
    * Get a list of all known IP v4 addresses for the current host.
-   * @return a List of <code>InetAddress</code> instances, may be empty but never null.
+   * @return a List of {@link InetAddress} instances, may be empty but never null.
    */
   public static List<InetAddress> getIPV4Addresses() {
-    return getIPAddresses(new InetAddressFilter() {
-      @Override
-      public boolean accepts(final InetAddress addr) {
-        return addr instanceof Inet4Address;
-      }
-    });
+    if (ipv4Addresses != null) return ipv4Addresses; 
+    return getIPAddresses(addr -> addr instanceof Inet4Address);
   }
 
   /**
    * Get a list of all known non-local IP v4 addresses for the current host.
-   * @return a List of <code>InetAddress</code> instances, may be empty but never null.
+   * @return a List of {@link InetAddress} instances, may be empty but never null.
    */
   public static List<InetAddress> getNonLocalIPV4Addresses() {
-    return getIPAddresses(new InetAddressFilter() {
-      @Override
-      public boolean accepts(final InetAddress addr) {
-        return (addr instanceof Inet4Address)
-            && !(LOOPBACK_ADDRESSES.contains(addr.getHostAddress()) || "localhost".equals(addr.getHostName()));
-      }
-    });
+    if (nonLocalIpv4Addresses != null) return nonLocalIpv4Addresses; 
+    return getIPAddresses(addr -> (addr instanceof Inet4Address) && !(LOOPBACK_ADDRESSES.contains(addr.getHostAddress()) || "localhost".equals(addr.getHostName())));
   }
 
   /**
    * Get a list of all known IP v6 addresses for the current host.
    * @return a List of <code>Inet6Address</code> instances, may be empty but never null.
    */
-  public static List<InetAddress> getIPV6Addresses()
-  {
-    return getIPAddresses(new InetAddressFilter() {
-      @Override
-      public boolean accepts(final InetAddress addr) {
-        return addr instanceof Inet6Address;
-      }
-    });
+  public static List<InetAddress> getIPV6Addresses() {
+    if (ipv6Addresses != null) return ipv6Addresses; 
+    return getIPAddresses(addr -> addr instanceof Inet6Address);
   }
 
   /**
    * Get a list of all known non-local IP v4 addresses for the current host.
-   * @return a List of <code>InetAddress</code> instances, may be empty but never null.
+   * @return a List of {@link InetAddress} instances, may be empty but never null.
    */
   public static List<InetAddress> getNonLocalIPV6Addresses() {
-    return getIPAddresses(new InetAddressFilter() {
-      @Override
-      public boolean accepts(final InetAddress addr) {
-        return (addr instanceof Inet6Address) &&
-            !(addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress() || "localhost".equals(addr.getHostName()));
-      }
-    });
+    if (nonLocalIpv6Addresses != null) return nonLocalIpv6Addresses; 
+    return getIPAddresses(addr -> (addr instanceof Inet6Address) && !(addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress() || "localhost".equals(addr.getHostName())));
   }
 
   /**
    * Get a list of all known IP addresses for the current host, according to the specified filter.
    * @param filter filters out unwanted addresses.
-   * @return a List of <code>InetAddress</code> instances, may be empty but never null.
+   * @return a List of {@link InetAddress} instances, may be empty but never null.
    */
   private static List<InetAddress> getIPAddresses(final InetAddressFilter filter) {
     final List<InetAddress> list = new ArrayList<>();
@@ -149,16 +133,13 @@ public final class NetworkUtils {
 
   /**
    * Get a list of all known non-local IP v4  and v6 addresses for the current host.
-   * @return a List of <code>InetAddress</code> instances, may be empty but never null.
+   * @return a List of {@link InetAddress} instances, may be empty but never null.
    */
   public static List<InetAddress> getNonLocalIPAddresses() {
-    synchronized(nonLocalIPAddresses) {
-      if (nonLocalIPAddresses.isEmpty()) {
-        nonLocalIPAddresses.addAll(getNonLocalIPV4Addresses());
-        nonLocalIPAddresses.addAll(getNonLocalIPV6Addresses());
-      }
-      return new ArrayList<>(nonLocalIPAddresses);
-    }
+    final List<InetAddress> addresses = new ArrayList<>();
+    addresses.addAll(getNonLocalIPV4Addresses());
+    addresses.addAll(getNonLocalIPV6Addresses());
+    return addresses;
   }
 
   /**
@@ -313,22 +294,32 @@ public final class NetworkUtils {
     final HostIP[] result = new HostIP[pairs.length];
     int count = 0;
     for (String pair: pairs) {
-      try {
-        final String[] comps = RegexUtils.PIPE_PATTERN.split(pair);
-        if ((comps  != null) && (comps.length > 0)) {
-          if ("".equals(comps[0])) comps[0] = null;
-          if ((comps.length > 1) && (comps[1] != null)) {
-            final int idx = comps[1].indexOf('%');
-            if (idx >= 0) comps[1] = comps[1].substring(0, idx);
-          };
-          result[count++] = new HostIP(comps[0], (comps.length > 1) ? comps[1] : comps[0]);
-        }
-      } catch(final RuntimeException e) {
-        log.error("error parsing '{}' in [{}]: {}", pair, addresses, ExceptionUtils.getMessage(e));
-        throw e;
-      }
+      final String[] comps = RegexUtils.PIPE_PATTERN.split(pair);
+      if ("".equals(comps[0])) comps[0] = null;
+      if (comps[1] != null) {
+        final int idx = comps[1].indexOf('%');
+        if (idx >= 0) comps[1] = comps[1].substring(0, idx);
+      };
+      result[count++] = new HostIP(comps[0], comps[1]);
     }
     return result;
+  }
+
+  /**
+   * Performance optimization by caching the discovered IP addresses.
+   */
+  private static void init() {
+    ipv4Addresses = getIPAddresses(addr -> addr instanceof Inet4Address);
+    nonLocalIpv4Addresses = new ArrayList<>(ipv4Addresses.size());
+    for (final InetAddress addr: ipv4Addresses) {
+      if ((addr instanceof Inet4Address) && !(LOOPBACK_ADDRESSES.contains(addr.getHostAddress()) || "localhost".equals(addr.getHostName()))) nonLocalIpv4Addresses.add(addr);
+    }
+    ipv6Addresses = getIPAddresses(addr -> addr instanceof Inet6Address);
+    nonLocalIpv6Addresses = new ArrayList<>(ipv6Addresses.size());
+    for (final InetAddress addr: ipv6Addresses) {
+      if ((addr instanceof Inet6Address) && !(addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress() || "localhost".equals(addr.getHostName())))
+        nonLocalIpv6Addresses.add(addr);
+    }
   }
 
   /**

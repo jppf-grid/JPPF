@@ -21,6 +21,8 @@ package org.jppf.management.diagnostics.provider;
 import java.text.*;
 import java.util.Locale;
 
+import org.jppf.utils.Range;
+
 /**
  * Interface for converting monitored data values to displayable strings.
  * @author Laurent Cohen
@@ -113,13 +115,17 @@ public interface MonitoringValueConverter {
      * Suffix after the number, e.g. " %".
      */
     private final String suffix;
+    /**
+     * AN optional range of valid values.
+     */
+    private final Range<Double> range;
 
     /**
      * Create a converter producing values with a specified number of fraction digits.
      * @param nbDecimals number of digits after the decimal point.
      */
     public DoubleConverterWithFractionDigits(final int nbDecimals) {
-      this(nbDecimals, null);
+      this(nbDecimals, null, null);
     }
 
     /**
@@ -128,15 +134,27 @@ public interface MonitoringValueConverter {
      * @param suffix suffix appended to the formatted number, e.g. " %". May be {@code null}.
      */
     public DoubleConverterWithFractionDigits(final int nbDecimals, final String suffix) {
+      this(nbDecimals, suffix, null);
+    }
+    
+    /**
+     * Create a converter producing values with a specified number of fraction digits and a specified suffix.
+     * @param nbDecimals number of digits after the decimal point.
+     * @param suffix suffix appended to the formatted number, e.g. " %". May be {@code null}.
+     * @param range aN optional range of valid values.
+     */
+    public DoubleConverterWithFractionDigits(final int nbDecimals, final String suffix, final Range<Double> range) {
       nf = DecimalFormat.getIntegerInstance(Locale.getDefault());
       nf.setGroupingUsed(true);
       nf.setMinimumFractionDigits(nbDecimals);
       nf.setMaximumFractionDigits(nbDecimals);
       this.suffix = suffix;
+      this.range = range;
     }
     
     @Override
     public String convert(final Double value) {
+      if ((range != null) && !range.isValueInRange(value)) return "n/a";
       final String s = nf.format(value);
       return (suffix == null) ? s : s + suffix;
     }
