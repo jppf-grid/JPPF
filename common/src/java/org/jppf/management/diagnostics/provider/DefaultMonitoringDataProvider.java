@@ -22,10 +22,8 @@ import static org.jppf.management.diagnostics.provider.MonitoringConstants.*;
 
 import java.lang.management.*;
 
-import javax.management.*;
-
 import org.jppf.management.diagnostics.*;
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -49,29 +47,9 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
    * Reference to the platform's {@link ThreadMXBean} instance.
    */
   private static final ThreadMXBean threadsMXBean = ManagementFactory.getThreadMXBean();
-  /**
-   * Whether the full operating system MXBean features are available or not.
-   */
-  private static boolean osMXBeanAvailable = true;
-  /**
-   * The object name of the operating system MXBean.
-   */
-  private static ObjectName osMXBeanName = null;
-  /**
-   * The platform MBean server.
-   */
-  private static final MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
   static {
     if (threadsMXBean.isThreadCpuTimeSupported()) {
       if (!threadsMXBean.isThreadCpuTimeEnabled()) threadsMXBean.setThreadCpuTimeEnabled(true);
-      try {
-        Class.forName("com.sun.management.OperatingSystemMXBean");
-        osMXBeanName = new ObjectName("java.lang", "type", "OperatingSystem");
-        if (debugEnabled) log.debug("CPU load collection from OperatingSystemMXBean is enabled");
-      } catch (@SuppressWarnings("unused") final Exception e) {
-        osMXBeanAvailable = false;
-        log.info("OperatingSystemMXBean not avaialble, an approximation of the process CPU load will be computed");
-      }
     } else if (debugEnabled) log.debug("CPU time collection is not supported - CPU load will be unavailable");
     if (threadsMXBean.isThreadContentionMonitoringSupported()) threadsMXBean.setThreadContentionMonitoringEnabled(true);
   }
@@ -80,6 +58,10 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
    * This allows using this built-in provider on the console side without needing OShi classes in the classpath.
    */
   private Oshi oshi;
+  /**
+   * Collects regular snapshots of the total CPU time for the current process.
+   */
+  private CPUTimeCollector cpuTimeCollector;
 
   @Override
   public void defineProperties() {
@@ -106,6 +88,8 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
   @Override
   public void init() {
     oshi = new Oshi().init();
+    if (debugEnabled) log.debug("Starting CPU time collector thread");
+    cpuTimeCollector = CPUTimeCollector.getInstance();
   }
 
   @Override
@@ -121,8 +105,9 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     final long[] ids = threadsMXBean.findDeadlockedThreads();
     props.setBoolean(DEADLOCKED, (ids != null) && (ids.length > 0));
     props.setInt(LIVE_THREADS_COUNT, threadsMXBean.getThreadCount());
-    props.setDouble(PROCESS_CPU_LOAD, 100d * osMXBeanDoubleValue("ProcessCpuLoad"));
-    props.setDouble(SYSTEM_CPU_LOAD, 100d * osMXBeanDoubleValue("SystemCpuLoad"));
+    double d = cpuTimeCollector.getLoad();
+    if ((d < 0d) || (d > 1d)) d = -1d;
+    props.setDouble(PROCESS_CPU_LOAD, 100d * d);
     return props;
   }
 
@@ -137,21 +122,5 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
    */
   private static MemoryInformation memoryInformation() {
     return new MemoryInformation();
-  }
-
-  /**
-   * Get the value of a double attribute from the OS mxbean.
-   * @param attribute the name of the attribute to get the value from.
-   * @return the attribute value as a double.
-   */
-  private static double osMXBeanDoubleValue(final String attribute) {
-    if (osMXBeanAvailable) {
-      try {
-        return ((Number) mbeanServer.getAttribute(osMXBeanName, attribute)).doubleValue();
-      } catch (final Exception e) {
-        if (debugEnabled) log.debug("error getting attribute '{}': {}", attribute, ExceptionUtils.getMessage(e));
-      }
-    }
-    return -1d;
   }
 }

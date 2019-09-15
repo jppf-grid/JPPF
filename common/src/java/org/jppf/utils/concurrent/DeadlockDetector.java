@@ -28,7 +28,7 @@ import org.slf4j.*;
 
 /**
  * This class performs periodic deadlock checks and prints detailed deadlock information,
- * along with a thread dump, to the log, the first time a deadlock is detetced.
+ * along with a thread dump, to the log, the first time a deadlock is detected.
  * @author Laurent Cohen
  */
 public class DeadlockDetector {
@@ -69,7 +69,7 @@ public class DeadlockDetector {
   public synchronized static void setup(final String type, final long interval) {
     if (alreadyRun) return;
     alreadyRun = true;
-    System.out.println("setting up " + type + " deadlock detector");
+    log.info("setting up {} deadlock detector", type);
     try {
       final String suffix;
       if ("client".equals(type)) {
@@ -91,16 +91,14 @@ public class DeadlockDetector {
             if (deadlockDetected) cancel();
             else if (diag.hasDeadlock()) {
               deadlockDetected = true;
-              final String title =  "client".equals(type) ? "thread dump for local JVM" : "thread dump for " + type + " " + suffix;
-              final String text = TextThreadDumpWriter.printToString(diag.threadDump(), title);
-              log.error("deadlock detected !!!\n{}", text);
-              System.err.println("deadlock detected !!!\n" + text);
+              printThreadDump(type, suffix);
               cancel();
             }
           } catch (final Exception e) {
             log.error(e.getMessage(), e);
             cancel();
             reset();
+            setup(type, interval);
           }
         }
       };
@@ -121,6 +119,19 @@ public class DeadlockDetector {
     }
     diag = null;
     alreadyRun = false;
+  }
+
+  /**
+   * Print the thread dump with deadlock report to the log and to stderr.
+   * @param type the type of JPPF component, either "driver" or "node".
+   * @param suffix suffix added to the thread dump title.
+   * @throws Exception if any error occurs.
+   */
+  private static void printThreadDump(final String type, final String suffix) throws Exception {
+    final String title =  "thread dump for " + ("client".equals(type) ? "local JVM" : type + " " + suffix);
+    final String text = TextThreadDumpWriter.printToString(diag.threadDump(), title);
+    log.error("deadlock detected !!!\n{}", text);
+    System.err.println("deadlock detected !!!\n" + text);
   }
 
   /**

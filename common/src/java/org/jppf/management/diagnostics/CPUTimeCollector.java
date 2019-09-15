@@ -21,8 +21,8 @@ package org.jppf.management.diagnostics;
 import java.lang.management.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -36,7 +36,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class CPUTimeCollector extends ThreadSynchronization implements Runnable {
+public final class CPUTimeCollector extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -60,30 +60,44 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable 
    */
   ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
   /**
-   * Reference to the platform's operating system MXBean.
+   * Number of available processors.
    */
-  OperatingSystemMXBean systemMXBean = ManagementFactory.getOperatingSystemMXBean();
+  private final int nbProcessors = Runtime.getRuntime().availableProcessors();
+  /**
+   * The singleton instance of this class.
+   */
+  private static final CPUTimeCollector instance = new CPUTimeCollector();
+  static {
+    ThreadUtils.startDaemonThread(instance, "CPUTimeCollector");
+  }
+
+  /**
+   * Instantiation nopt permitted.
+   */
+  private CPUTimeCollector() {
+  }
 
   @Override
   public void run() {
     try {
+      long sleepTime = 0L;
+      Thread.sleep(INTERVAL);
       while (!isStopped()) {
+        sleepTime = System.currentTimeMillis() - sleepTime;
         final long oldValue = totalCpuTime.get();
-        final long start = System.nanoTime();
         final long[] ids = threadMXBean.getAllThreadIds();
         long time = 0L;
         for (final long id: ids) {
           final long l = threadMXBean.getThreadCpuTime(id);
           if (l >= 0L) time += l;
         }
-        final long cpuTime = time / 1000000L;
+        final long cpuTime = time / 1_000_000L;
         totalCpuTime.set(cpuTime);
 
-        final double d = (double) (cpuTime - oldValue) / (double) (INTERVAL * systemMXBean.getAvailableProcessors());
+        final double d = (double) (cpuTime - oldValue) / (double) (sleepTime * nbProcessors);
         load.set(Double.doubleToLongBits(d));
-        final long sleepTime = INTERVAL - ((System.nanoTime() - start) / 1_000_000L);
-        //log.info("computed difference ms = " + (cpuTime - oldValue) + ", sleep time = " + sleepTime);
-        goToSleep(sleepTime <= 0L ? INTERVAL : sleepTime);
+        sleepTime = System.currentTimeMillis();
+        goToSleep(INTERVAL);
       }
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
@@ -97,6 +111,14 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable 
   public double getLoad() {
     double d = Double.longBitsToDouble(load.get());
     if (d > 1d) d = 1d;
+    else if (d < 0d) d = 0d;
     return d;
+  }
+
+  /**
+   * @return the singleton instance of this class.
+   */
+  public static CPUTimeCollector getInstance() {
+    return instance;
   }
 }

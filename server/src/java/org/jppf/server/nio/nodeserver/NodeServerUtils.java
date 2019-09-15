@@ -41,6 +41,7 @@ class NodeServerUtils {
    * @throws Exception if any error occurs.
    */
   static Pair<String, String> getNodeIdentifier(final JPPFBundlerFactory factory, final ChannelWrapper<?> channel, final JPPFSystemInformation info) throws Exception {
+    if (factory.getPersistence() == null) return null;
     final StringBuilder sb = new StringBuilder();
     final String ip = NetworkUtils.getNonLocalHostAddress();
     sb.append('[').append(ip == null ? "localhost" : ip);
