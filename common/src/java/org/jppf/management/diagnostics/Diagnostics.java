@@ -21,9 +21,8 @@ package org.jppf.management.diagnostics;
 import java.io.*;
 import java.lang.management.*;
 
-import javax.management.*;
-
 import org.jppf.JPPFException;
+import org.jppf.management.diagnostics.provider.MonitoringConstants;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
@@ -47,36 +46,12 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
    */
   private static final ThreadMXBean threadsMXBean = ManagementFactory.getThreadMXBean();
   /**
-   * Collects regular snapshots of the total CPU time.
-   */
-  private CPUTimeCollector cpuTimeCollector = null;
-  /**
    * Triggers a heap dump based on the JVM implementation.
    */
-  private HeapDumpCollector heapDumpCollector = null;
-  /**
-   * Whether the full operating system MXBean features are available or not.
-   */
-  private static boolean osMXBeanAvailable = true;
-  /**
-   * The object name of the operating system MXBean.
-   */
-  private static ObjectName osMXBeanName = null;
-  /**
-   * The platform MBean server.
-   */
-  private static final MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
+  private HeapDumpCollector heapDumpCollector;
   static {
     if (threadsMXBean.isThreadCpuTimeSupported()) {
       if (!threadsMXBean.isThreadCpuTimeEnabled()) threadsMXBean.setThreadCpuTimeEnabled(true);
-      try {
-        Class.forName("com.sun.management.OperatingSystemMXBean");
-        osMXBeanName = new ObjectName("java.lang", "type", "OperatingSystem");
-        if (debugEnabled) log.debug("CPU load collection from OperatingSystemMXBean is enabled");
-      } catch (@SuppressWarnings("unused") final Exception e) {
-        osMXBeanAvailable = false;
-        log.info("OperatingSystemMXBean not avaialble, an approximation of the process CPU load will be computed");
-      }
     } else if (debugEnabled) log.debug("CPU time collection is not supported - CPU load will be unavailable");
     if (threadsMXBean.isThreadContentionMonitoringSupported()) threadsMXBean.setThreadContentionMonitoringEnabled(true);
   }
@@ -100,11 +75,6 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
    */
   private void init() {
     if (debugEnabled) log.debug("initializing " + getClass().getSimpleName());
-    if (!osMXBeanAvailable) {
-      if (debugEnabled) log.debug("Starting CPU time collector thread");
-      cpuTimeCollector = new CPUTimeCollector();
-      ThreadUtils.startDaemonThread(cpuTimeCollector, "CPUTimeCollector");
-    }
     heapDumpCollector = HeapDumpCollector.Factory.newInstance();
     if (heapDumpCollector == null) log.info("a heap dump collector could not be created for this JVM - no heap dumps will be available");
     MonitoringDataProviderHandler.getProviders();
@@ -175,28 +145,15 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
 
   @Override
   public Double cpuLoad() {
-    if (osMXBeanAvailable) return 100d * osMXBeanDoubleValue("ProcessCpuLoad");
-    return cpuTimeCollector == null ? -1d : cpuTimeCollector.getLoad();
+    try {
+      return healthSnapshot().getDouble(MonitoringConstants.PROCESS_CPU_LOAD);
+    } catch(final Exception e) {
+      log.error("error getting cpu load", e);
+    }
+    return -1d;
   }
 
   @Override
   public void close() throws IOException {
-    if (cpuTimeCollector != null) cpuTimeCollector.setStopped(true);
-  }
-
-  /**
-   * Get the value of a double attribute from the OS mxbean.
-   * @param attribute the name of the attribute to get the value from.
-   * @return the attribute value as a double.
-   */
-  private static double osMXBeanDoubleValue(final String attribute) {
-    if (osMXBeanAvailable) {
-      try {
-        return (Double) mbeanServer.getAttribute(osMXBeanName, attribute);
-      } catch (final Exception e) {
-        if (debugEnabled) log.debug("error getting attribute '{}': {}", attribute, ExceptionUtils.getMessage(e));
-      }
-    }
-    return -1d;
   }
 }

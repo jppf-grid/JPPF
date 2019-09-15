@@ -25,6 +25,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManager;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
@@ -81,6 +82,11 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
       uuid = systemInfo.getUuid().getProperty("jppf.uuid");
       if ((uuid != null) && uuid.isEmpty()) uuid = null;
     }
+    final JPPFBundlerFactory factory = channel.getPool().getClient().getBundlerFactory();
+    if (factory.getPersistence() == null) {
+      channelID = new Pair<>("no_persistence", "no_persistence");
+      return;
+    }
     try {
       final TaskServerConnectionHandler handler = channel.getTaskServerConnection();
       final SocketWrapper socketClient = handler.getSocketClient();
@@ -93,7 +99,7 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
         sb.append(sa.getAddress().getHostAddress()).append(':').append(socketClient.getPort());
         sb.append(channel.isSSLEnabled());
         final String s = sb.toString();
-        channelID = new Pair<>(s, CryptoUtils.computeHash(s, channel.getPool().getClient().getBundlerFactory().getHashAlgorithm()));
+        channelID = new Pair<>(s, CryptoUtils.computeHash(s, factory.getHashAlgorithm()));
         if (debugEnabled) log.debug("computed channelID for {} : {}", this, channelID);
       }
     } catch (final Exception e) {

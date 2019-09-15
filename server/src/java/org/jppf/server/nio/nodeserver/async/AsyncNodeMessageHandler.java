@@ -431,6 +431,7 @@ public class AsyncNodeMessageHandler {
    * @throws Exception if any error occurs.
    */
   private static Pair<String, String> getNodeIdentifier(final JPPFBundlerFactory factory, final BaseNodeContext channel, final JPPFSystemInformation info) throws Exception {
+    if (factory.getPersistence() == null) return null;
     final StringBuilder sb = new StringBuilder();
     final String ip = NetworkUtils.getNonLocalHostAddress();
     sb.append('[').append(ip == null ? "localhost" : ip);

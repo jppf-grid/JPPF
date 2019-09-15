@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.utils.TypedProperties;
 
-import oshi.SystemInfo;
+import oshi.*;
 import oshi.hardware.*;
 import oshi.software.os.*;
 
@@ -62,6 +62,14 @@ public class Oshi {
    * Determines whether CPU termperature is available.
    */
   private final AtomicBoolean temperatureAvailable = new AtomicBoolean(true);
+  /**
+   * 
+   */
+  private PlatformEnum currentPlatform;
+  /**
+   * 
+   */
+  private CentralProcessor processor;
 
   /**
    * Initialize the Oshi API.
@@ -69,11 +77,13 @@ public class Oshi {
    */
   Oshi init() {
     final SystemInfo si = getSystemInfo();
+    this.currentPlatform = si.getCurrentPlatformEnum();
     hal = si.getHardware();
     os = si.getOperatingSystem();
     sensors = hal.getSensors();
     memory = hal.getMemory();
     process = os.getProcess(os.getProcessId());
+    processor = hal.getProcessor();
     return this;
   }
 
@@ -102,6 +112,7 @@ public class Oshi {
     props.setDouble(SWAP_USAGE_RATIO, 100d * used / total);
     props.setDouble(PROCESS_RESIDENT_SET_SIZE, (double) process.getResidentSetSize() / MB);
     props.setDouble(PROCESS_VIRTUAL_SIZE, (double) process.getVirtualSize() / MB);
+    props.setDouble(SYSTEM_CPU_LOAD, 100d * processor.getSystemCpuLoadBetweenTicks());
     return props;
   }
 
@@ -111,5 +122,13 @@ public class Oshi {
   public static synchronized SystemInfo getSystemInfo() {
     if (si == null) si = new SystemInfo();
     return si;
+  }
+
+  /**
+   * Get the name of the current OS family (one of "WINDOWS", "LINUX", "MACOSX", "SOLARIS", "FREEBSD", "UNKNOWN").
+   * @return  the name of the current platform (OS family).
+   */
+  public String getCurrentPlatformName() {
+    return currentPlatform == null ? null : currentPlatform.name();
   }
 }
