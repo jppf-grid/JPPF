@@ -18,17 +18,13 @@
 
 package test.driver.restart;
 
-import java.io.IOException;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Map;
 
-import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.management.diagnostics.*;
-import org.jppf.management.diagnostics.provider.MonitoringConstants;
+import org.jppf.management.JPPFNodeState.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.utils.ExceptionUtils;
-import org.jppf.utils.Operator;
+import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.slf4j.*;
 
 /**
  * 
@@ -36,149 +32,85 @@ import org.jppf.utils.Operator;
  */
 public class TestDriverRestart {
   /**
-   * The JPPF client.
+   * Logger for this class.
    */
-  private static JPPFClient client = null;
+  private static final Logger log = LoggerFactory.getLogger(TestDriverRestart.class);
   /** */
-  private static AtomicBoolean initializing = new AtomicBoolean(false);
-  /** */
-  private static JPPFNodeForwardingMBean nodeForwarder = null;
-  /** */
-  private static DiagnosticsMBean diagnostics = null;
+  private static final int NB_NODES = 4;
 
   /**
    * Entry point.
    * @param args not used.
    */
   public static void main(final String...args) {
-    try {
-      client = new JPPFClient();
-
-      JMXDriverConnectionWrapper jmx = null;
-      while ((jmx = getJmxWrapper()) == null) Thread.sleep(10L);
-      initializeProxies();
-      while (diagnostics == null) Thread.sleep(10L);
-      performGC();
-
-      jmx.restartShutdown(1L, 1L); // restart the driver
-      System.out.println("first try after restart");
-      performGC(); // fails with IOException : this is expected since driver was restarted
-
-      // wait until connection is initialized and retry
-      while ((getJmxWrapper() == null) || (diagnostics == null)) Thread.sleep(10L);
-      System.out.println("second try after restart");
-      performGC();
-    } catch(final Exception e) {
-      e.printStackTrace();
-    } finally {
-      if (client != null) client.close();
+    final long  waitTime = 10_000L;
+    final int nbIterations = 100;
+    for (int i=1; i<=nbIterations; i++) {
+      print("***** iteration %,6d *****", i);
+      try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11111)) {
+        if (!jmx.connectAndWait(waitTime)) {
+          print("failed to connect to driver");
+          System.exit(1);
+        }
+        ConcurrentUtils.awaitCondition(new NodesCondition(jmx), waitTime, 250L, true);
+        jmx.restartShutdown(1L, 1L);
+        //Thread.sleep(400L);
+      } catch(final Exception  e) {
+        e.printStackTrace(System.out);
+        System.exit(1);
+      }
     }
+    System.out.println("done");
   }
 
   /**
-   * Get a connection to the remote driver's MBean server..
-   * @return a {@link JMXDriverConnectionWrapper} instance.
+   * @param format .
+   * @param params 0
    */
-  public static JMXDriverConnectionWrapper getJmxWrapper() {
-    try {
-      return client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
-    } catch(final Exception e) {
-      e.printStackTrace();
-      return null;
-    }
-    /*
-    JMXDriverConnectionWrapper jmxConnection = null;
-    final List<JPPFClientConnection> connections = client.getAllConnections();
-    for (final JPPFClientConnection c : connections) {
-      if (c.getStatus() == JPPFClientConnectionStatus.ACTIVE) {
-        jmxConnection = c.getJmxConnection();
-        if (jmxConnection != null && jmxConnection.isConnected()) {
-          break;
-        } else {
-          jmxConnection = null;
-        }
-      }
-    }
-    return jmxConnection;
-    */
+  private static void print(final String format, final Object...params) {
+    print(true, true, format, params);
   }
 
+  /**
+   * @param toStdout .
+   * @param toLog .
+   * @param format .
+   * @param params .
+   */
+  private static void print(final boolean toStdout, final boolean toLog, final String format, final Object...params) {
+    final String message = (params != null) && (params.length > 0) ? String.format(format, params) : format;
+    if (toLog) log.info(message);
+    if (toStdout) System.out.println(message);
+  }
+
+
   /** */
-  @SuppressWarnings("unused")
-  private static class KillDriverTask extends TimerTask {
+  private static final class NodesCondition implements ConcurrentUtils.ConditionFalseOnException {
+    /** */
+    private final JMXDriverConnectionWrapper jmx;
+
+    /**
+     * @param jmx .
+     */
+    private NodesCondition(final JMXDriverConnectionWrapper jmx) {
+      this.jmx = jmx;
+    }
+
     @Override
-    public void run() {
-      try {
-        final JPPFDriverAdminMBean jmx = getJmxWrapper();
-        jmx.restartShutdown(10L, 10L);
-      } catch (final Exception e) {
+    public boolean evaluateWithException() throws Exception {
+      if (jmx.nbNodes() != NB_NODES) return false; 
+      if (jmx.nbIdleNodes() != NB_NODES) return false; 
+      final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+      final Map<String, Object> results = forwarder.forwardInvoke(NodeSelector.ALL_NODES, JPPFNodeAdminMBean.MBEAN_NAME, "state");
+      //print(false, true, "results = %s", results);
+      if (results.size() != NB_NODES) return false;
+      for (final Map.Entry<String, Object> entry: results.entrySet()) {
+        if (!(entry.getValue() instanceof JPPFNodeState)) return false;
+        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
+        if (state.getConnectionStatus() != ConnectionState.CONNECTED) return false;
+        if (state.getExecutionStatus() != ExecutionState.IDLE) return false;
       }
-    }
-  }
-
-  /** */
-  private static void initializeProxies() {
-    if (initializing.compareAndSet(false, true)) {
-      nodeForwarder = null;
-      diagnostics = null;
-      new Thread(new ProxySettingTask()).start();
-    }
-  }
-
-  /** */
-  private static class ProxySettingTask implements Runnable {
-    @SuppressWarnings("unused")
-    @Override
-    public void run() {
-      try {
-        boolean hasNullProxy = true;
-        while (hasNullProxy) {
-          final JMXDriverConnectionWrapper jmxWrapper = getJmxWrapper();
-          if (jmxWrapper != null) {
-            try {
-              if (nodeForwarder == null) nodeForwarder = jmxWrapper.getNodeForwarder();
-            } catch (final Exception ignore) {
-            }
-            try {
-              if (diagnostics == null) {
-                diagnostics = jmxWrapper.getDiagnosticsProxy();
-              }
-            } catch (final Exception ignore) {
-            }
-          }
-          hasNullProxy = (nodeForwarder == null) || (diagnostics == null);
-          try {
-            if (hasNullProxy) {
-              Thread.sleep(500L);
-            }
-          } catch (final InterruptedException ignore) {
-          }
-        }
-      } finally {
-        initializing.set(false);
-      }
-    }
-  }
-
-  /** */
-  private static void performGC() {
-    System.out.println("Performing garbage collection.");
-    // Do the gc() in the drivers
-    try {
-      if (diagnostics == null) {
-        return;
-      }
-
-      final HealthSnapshot healthSnapshot = diagnostics.healthSnapshot();
-      System.out.println("health snapshot = " + healthSnapshot);
-      if (healthSnapshot.getDouble(MonitoringConstants.HEAP_USAGE_RATIO) >= 0.6 || healthSnapshot.getDouble(MonitoringConstants.NON_HEAP_USAGE_RATIO) >= 0.6) {
-        diagnostics.gc();
-      }
-    } catch (final IOException ex) {
-      System.out.println("Unable to collect garbage in the drivers." + ExceptionUtils.getStackTrace(ex));
-      initializeProxies();
-    } catch (final Exception ex) {
-      System.out.println("Unable to collect garbage in the drivers." + ExceptionUtils.getStackTrace(ex));
+      return true;
     }
   }
 }
