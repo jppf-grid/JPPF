@@ -274,7 +274,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
     public void run() {
       try {
         socketClient = new BootstrapSocketClient(processServer.accept());
-        if (log.isDebugEnabled()) log.debug("initialized {}", socketClient);
+        if (log.isDebugEnabled()) log.debug("initialized slave connection {}", socketClient);
         final int n = socketClient.readInt();
         if (n == -1) throw new EOFException();
         if (log.isDebugEnabled()) log.debug("received {}", n);
