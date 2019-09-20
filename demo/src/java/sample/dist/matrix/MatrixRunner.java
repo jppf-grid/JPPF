@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
+import org.jppf.client.event.ConnectionPoolListenerAdapter;
 import org.jppf.location.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
@@ -87,8 +88,15 @@ public class MatrixRunner {
    */
   public void perform(final int size, final int iterations, final int nbRows, final String clientUuid, final int nbChannels) throws Exception {
     try {
-      JPPFConfiguration.set(JPPFProperties.POOL_SIZE, nbChannels);
-      final String s = JPPFConfiguration.getProperties().getString("matrix.classpath");
+      final TypedProperties config = JPPFConfiguration.getProperties();
+      /*
+      final TypedProperties config = new TypedProperties();
+      config.load(new BufferedInputStream(new FileInputStream("config/jppf-client.properties")));
+      config.setBoolean("jppf.remote.execution.enabled", false);
+      config.setBoolean("jppf.local.execution.enabled", true);
+      */
+      System.out.printf("configured local thread pool size: %d\n", config.getInt("jppf.local.execution.threads"));
+      final String s = config.getString("matrix.classpath");
       if (s != null) {
         classpath = new ClassPathImpl();
         final String[] paths = s.split("\\|");
@@ -99,12 +107,13 @@ public class MatrixRunner {
           classpath.add(jar);
         }
       }
-      if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
-      else jppfClient = new JPPFClient();
-      final JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
-      pool.setSize(nbChannels);
-      pool.awaitWorkingConnections(Operator.AT_LEAST, nbChannels);
-      // initialize the 2 matrices to multiply
+      if (clientUuid != null) jppfClient = new JPPFClient(clientUuid, config);
+      else jppfClient = new JPPFClient(config, new ConnectionPoolListenerAdapter());
+      if (config.get(JPPFProperties.REMOTE_EXECUTION_ENABLED)) {
+        final JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
+        pool.setSize(nbChannels);
+        pool.awaitWorkingConnections(Operator.AT_LEAST, nbChannels);
+      }
       final Matrix a = new Matrix(size).assignRandomValues();
       final Matrix b = new Matrix(size).assignRandomValues();
       if (size <= 500) performSequentialMultiplication(a, b);
@@ -112,7 +121,6 @@ public class MatrixRunner {
       long min = Long.MAX_VALUE;
       long max = 0L;
 
-      // perform "iteration" times
       for (int iter=0; iter<iterations; iter++) {
         final long elapsed = performParallelMultiplication(a, b, nbRows, null, nbChannels);
         if (elapsed < min) min = elapsed;
