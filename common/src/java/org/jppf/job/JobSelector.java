@@ -46,7 +46,7 @@ public interface JobSelector extends Serializable {
    * @since 6.2
    */
   default JobSelector negate() {
-    return job -> !this.accepts(job);
+    return new LogicalJobSelector.Not(this);
   }
 
   /**
@@ -63,26 +63,24 @@ public interface JobSelector extends Serializable {
 
   /**
    * Obtain a job selector that realizes a logical "and" operation on this selector and an other.
-   * @param other the other selector to combine with.
+   * @param others the other selectors to combine with.
    * @return a {@code JobSelector} which combines this selector and the other with an "and" operator.
    * @throws NullPointerException if {@code other} is null.
    * @since 6.2
    */
-  default JobSelector and(final JobSelector other) throws NullPointerException {
-    if (other == null) throw new NullPointerException("operand cannot be null");
-    return job -> this.accepts(job) && other.accepts(job);
+  default JobSelector and(final JobSelector...others) throws NullPointerException {
+    return new LogicalJobSelector.And(this, others);
   }
 
   /**
    * Obtain a job selector that realizes a logical "or" operation on this selector and an other.
-   * @param other the other selector to combine with.
+   * @param others the other selectors to combine with.
    * @return a {@code JobSelector} which combines this selector and the other with an "or" operator.
    * @throws NullPointerException if {@code other} is null.
    * @since 6.2
    */
-  default JobSelector or(final JobSelector other) throws NullPointerException {
-    if (other == null) throw new NullPointerException("operand cannot be null");
-    return job -> this.accepts(job) || other.accepts(job);
+  default JobSelector or(final JobSelector others) throws NullPointerException {
+    return new LogicalJobSelector.Or(this, others);
   }
 
   /**
@@ -93,7 +91,6 @@ public interface JobSelector extends Serializable {
    * @since 6.2
    */
   default JobSelector xor(final JobSelector other) throws NullPointerException {
-    if (other == null) throw new NullPointerException("operand cannot be null");
-    return job -> this.accepts(job) != other.accepts(job);
+    return new LogicalJobSelector.Xor(this, other);
   }
 }

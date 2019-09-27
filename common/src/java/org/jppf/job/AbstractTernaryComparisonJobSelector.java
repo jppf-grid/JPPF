@@ -39,4 +39,25 @@ abstract class AbstractTernaryComparisonJobSelector<E> extends AbstractBinaryCom
     super(key, operand);
     this.operand2 = operand2;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((operand2 == null) ? 0 : operand2.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (!super.equals(obj)) return false;
+    if (this == obj) return true;
+    if (!super.equals(obj)) return false;
+    if (getClass() != obj.getClass()) return false;
+    final AbstractTernaryComparisonJobSelector<?> other = (AbstractTernaryComparisonJobSelector<?>) obj;
+    if (operand2 == null) {
+      if (other.operand2 != null) return false;
+    } else if (!operand2.equals(other.operand2)) return false;
+    return true;
+  }
 }
