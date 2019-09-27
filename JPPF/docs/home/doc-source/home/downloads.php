@@ -13,7 +13,9 @@ $template{name="about-page-header" title="Downloads"}$
         $template{name="download-link" label="Maven Central" link="https://search.maven.org/#search|ga|1|g:org.jppf"}$
         $template{name="download-link" label="Releases on Github" link="https://github.com/jppf-grid/JPPF/tags"}$
         $template{name="download-link" label="Older releases on SF.net" link="https://sourceforge.net/projects/jppf-project/files/jppf-project"}$
+        <!--
         $template{name="download-link" label="JPPF 6.2 alpha preview" link="downloads-unstable.php"}$
+        -->
       </ul>
     </div>
   </div>
@@ -22,18 +24,14 @@ $template{name="about-page-header" title="Downloads"}$
   <div class="column_left" style="text-align: justify; padding: 0px; font-size: 11pt">
     <div class="blockWithHighlightedTitle">
       <?php
-        $tag1 = "v_6_1_1";
-        $ver1 = "6.1.1";
+        $tag1 = "v_6_1_2";
+        $ver1 = "6.1.2";
         $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
       $template{name="highlighted-title-with-icon" img="images/icons/download.png" title="JPPF <?php echo $ver1 ?>" heading="h1" style="margin: 10px 0px"}$
 
       $template{name="highlighted-title-with-icon" img="images/icons/warning.png" title="Please note:<div style='padding-left: 10px; font-size: 14pt; margin-top: 10px'>JPPF <?php echo $ver1 ?> now requires Java 8 or later to run</div>" heading="h2"}$
-
-      <!--
-      <h4 style="font-style: italic; font-weight: 900">JPPF <?php echo $ver1 ?> now requires Java 8 or later to run</h4>
-      -->
 
       <h3>Web Installer</h3>
       <a href="<?php echo '/download/' . $ver1 . '/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
@@ -71,13 +69,23 @@ $template{name="about-page-header" title="Downloads"}$
       </ul>
     </div>
     <br>
+
+    <div class="blockWithHighlightedTitle">
+      $template{name="highlighted-title-with-icon" img="images/icons/download.png" title="JPPF 6.2 alpha preview" heading="h2" style="margin: 10px 0px; font-weight: bold"}$
+      <div style="height: 5px"></div>
+      <ul class="list_nomargin">
+        <li><a href="release_notes.php?version=6.2-alpha">Release notes</a></li>
+        <li><a href="downloads-unstable.php">Download</a></li>
+      </ul>
+    </div>
+    <div style="height: 5px"></div>
   </div>
 
   <div class="column_right" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $tag1 = "v_6_0_3";
-        $ver1 = "6.0.3";
+        $tag1 = "v_6_0_4";
+        $ver1 = "6.0.4";
         $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
