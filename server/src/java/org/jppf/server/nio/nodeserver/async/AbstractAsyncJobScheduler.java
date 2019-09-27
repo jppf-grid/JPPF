@@ -29,7 +29,7 @@ import org.jppf.node.policy.*;
 import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.ServerJob;
-import org.jppf.server.queue.JPPFPriorityQueue;
+import org.jppf.server.queue.*;
 import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -105,6 +105,10 @@ abstract class AbstractAsyncJobScheduler extends ThreadSynchronization implement
    * Selects the node according to a node selector.
    */
   final NodeSelectionHelper selectionHelper;
+  /**
+   * 
+   */
+  final JobDependenciesHandler dependencyHandler; 
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -116,6 +120,7 @@ abstract class AbstractAsyncJobScheduler extends ThreadSynchronization implement
   AbstractAsyncJobScheduler(final AsyncNodeNioServer server, final JPPFPriorityQueue queue, final JPPFStatistics stats, final JPPFBundlerFactory bundlerFactory) {
     this.server = server;
     this.queue = queue;
+    this.dependencyHandler = queue.getDependenciesHandler();
     this.disptachtoPeersWithoutNode = server.getDriver().getConfiguration().get(JPPFProperties.PEER_ALLOW_ORPHANS);
     this.jppfContext = new JPPFContextDriver(queue);
     this.stats = stats;

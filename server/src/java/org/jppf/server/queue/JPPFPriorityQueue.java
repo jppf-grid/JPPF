@@ -81,6 +81,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * 
    */
   private final Map<String, Condition> jobRemovalConditions = new HashMap<>();
+  /**
+   * The job dependency graph handler.
+   */
+  private final JobDependenciesHandler dependenciesHandler;
 
   /**
    * Initialize this queue.
@@ -91,7 +95,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     this.driver = driver;
     this.jobManager = jobManager;
     broadcastManager = new BroadcastManager(this);
-    this.persistenceHandler = new PersistenceHandler(this);
+    persistenceHandler = new PersistenceHandler(this);
+    dependenciesHandler = new JobDependenciesHandler(this);
   }
 
   @Override
@@ -101,6 +106,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     final JobSLA sla = clientBundle.getSLA();
     final String jobUuid = clientBundle.getUuid();
     ServerJob serverJob = null;
+    boolean cancel = false;
     lock.lock();
     try {
       if (sla.isBroadcastJob()) {
@@ -132,15 +138,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         }
         if (added) {
           if (!newJob) priorityMap.removeValue(sla.getPriority(), serverJob);
+          else cancel = (serverJob.getSLA().getDependencySpec().getId() != null) && dependenciesHandler.jobQueued(serverJob);
         } else return serverJob;
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
           priorityMap.putValue(sla.getPriority(), serverJob);
           incrementSizeCount(getSize(serverJob));
         }
         updateLatestMaxSize();
-        if (!newJob) {
-          driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, clientBundle.getTaskCount());
-        }
+        if (!newJob) driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, clientBundle.getTaskCount());
         final TaskBundle header = clientBundle.getJob();
         if (!header.getParameter(BundleParameter.FROM_PERSISTENCE, false) && !header.getParameter(BundleParameter.ALREADY_PERSISTED, false)) {
           header.setParameter(BundleParameter.ALREADY_PERSISTED, true);
@@ -154,6 +159,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     }
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_TOTAL, clientBundle.getTaskCount());
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, clientBundle.getTaskCount());
+    if (cancel) serverJob.cancel(driver, true);
     return serverJob;
   }
 
@@ -234,11 +240,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (effectiveNbTasks >= taskCount) {
         if (taskCount <= 0) throw new IllegalStateException("no task to dispatch for job " + serverJob);
         serverJob.setOnRequeue(new RequeueBundleAction(this, serverJob));
-        result = serverJob.copy(taskCount);
+        result = serverJob.createNodeDispatch(taskCount);
         removeBundle(serverJob, false);
       } else {
         if (debugEnabled) log.debug("removing {} tasks from bundle", effectiveNbTasks);
-        result = serverJob.copy(effectiveNbTasks);
+        result = serverJob.createNodeDispatch(effectiveNbTasks);
         incrementSizeCount(size);
         // to ensure that other jobs with same priority are also processed without waiting
         priorityMap.moveToEndOfList(serverJob.getSLA().getPriority(), serverJob);
@@ -273,6 +279,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         final String uuid = serverJob.getUuid();
         if (jobMap.remove(uuid) != null) {
           scheduleManager.clearSchedules(serverJob.getUuid());
+          dependenciesHandler.jobEnded(serverJob);
           jobManager.jobEnded(serverJob);
         } else if (debugEnabled) log.debug("could not remove {}", serverJob);
         final Condition cond = jobRemovalConditions.remove(uuid);
@@ -327,7 +334,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   /**
-   * Close this queue and all resources it uses.
+   * Close this queue and all the resources it uses.
    */
   public void close() {
     lock.lock();
@@ -488,14 +495,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   /**
-   * Get the objects wich manages operations on broadcast jobs.
-   * @return a {@link BroadcastManager} instance.
-   */
-  public BroadcastManager getBroadcastManager() {
-    return broadcastManager;
-  }
-
-  /**
    * Select the jobs specified by a given job selector.
    * @param selector determines for which jobs to return.
    * @return a list of {@link ServerJob} obejcts, possibly empty.
@@ -526,9 +525,24 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   /**
+   * Get the objects wich manages operations on broadcast jobs.
+   * @return a {@link BroadcastManager} instance.
+   */
+  public BroadcastManager getBroadcastManager() {
+    return broadcastManager;
+  }
+
+  /**
    * @return the persistence handler.
    */
   public PersistenceHandler getPersistenceHandler() {
     return persistenceHandler;
+  }
+
+  /**
+   * @return the job dependency graph handler.
+   */
+  public JobDependenciesHandler getDependenciesHandler() {
+    return dependenciesHandler;
   }
 }

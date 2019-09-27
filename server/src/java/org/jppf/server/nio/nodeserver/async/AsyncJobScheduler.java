@@ -30,7 +30,7 @@ import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.*;
-import org.jppf.server.queue.JPPFPriorityQueue;
+import org.jppf.server.queue.*;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -95,20 +95,16 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
           final Iterator<ServerJob> jobIterator = allJobs.iterator();
           while ((channel == null) && jobIterator.hasNext() && !idleChannels.isEmpty()) {
             final ServerJob job = jobIterator.next();
-            final JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
-            if (spec != null) {
-              if ((reservationHandler.getNbReservedNodes(job.getUuid()) >= job.getSLA().getMaxNodes()) &&
-                !reservationHandler.hasReadyNode(job.getUuid())) continue;
-            }
-            if ((job.getTaskGraph() != null) && !job.hasAvailableGraphNode()) continue;
-            if (!checkGridPolicy(job)) continue;
-            channel = checkJobState(job) ? findIdleChannelIndex(job) : null;
+            if (debugEnabled) log.debug("checking {}", job);
+            if (!performJobChecks(job)) continue;
+            channel = findIdleChannelIndex(job);
             if (channel == null) continue;
             synchronized(channel.getMonitor()) {
-              if (spec != null) {
+              if (job.getSLA().getDesiredNodeConfiguration() != null) {
                 final String readyJobUUID = reservationHandler.getReadyJobUUID(channel);
                 final String pendingJobUUID = reservationHandler.getPendingJobUUID(channel);
                 if ((pendingJobUUID == null) && (readyJobUUID == null)) {
+                  if (debugEnabled) log.debug("reserving {} with {}", job, channel);
                   reservationHandler.doReservation(job, channel);
                   channel = null;
                   continue;
@@ -116,6 +112,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
               }
               if (channel.getCurrentNbJobs() >= channel.getMaxJobs()) removeIdleChannel(channel);
               if (!channel.isEnabled()) {
+                if (debugEnabled) log.debug("channel is disabled [}", channel);
                 channel = null;
                 continue;
               }
@@ -208,6 +205,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
   private BaseNodeContext findIdleChannelIndex(final ServerJob job) {
+    if (debugEnabled) log.debug("checking {}", job);
     final JobSLA sla = job.getSLA();
     final JPPFNodeConfigSpec spec =  sla.getDesiredNodeConfiguration();
     final TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
@@ -228,7 +226,10 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
           toRemove.add(channel);
           continue;
         }
-        if (!channel.isActive() || !channel.isAcceptingNewJobs()) continue;
+        if (!channel.isActive() || !channel.isAcceptingNewJobs()) {
+          if (debugEnabled) log.debug("node not accepting jobs: {}", channel);
+          continue;
+        }
         if (channel.isPeer() && (server.nodeConnectionHandler.getConnectedRealNodes() >= peerLoadBalanceThreshold)) {
           if (debugEnabled) log.debug("this driver has {} nodes and the threshold is {}", server.nodeConnectionHandler.getConnectedNodes(), peerLoadBalanceThreshold);
           continue;
@@ -277,6 +278,32 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
     if (debugEnabled) log.debug("found {} acceptable channels", size);
     final BaseNodeContext channel = (size > 0) ? acceptableChannels.get(size > 1 ? random.nextInt(size) : 0) : null;
     return channel;
+  }
+
+  /**
+   * 
+   * @param job the job to check.
+   * @return {@code true} if the job can be scheduiled, {@code false} otherwise.
+   */
+  private boolean performJobChecks(final ServerJob job) {
+    final JobDependencySpec dependencySpec = job.getSLA().getDependencySpec();
+    if ((dependencySpec.getId() != null) && !job.isJobGraphAlreadyHandled() && dependencySpec.hasDependency() && dependencyHandler.hasPendingDependencyOrCancelled(job.getUuid())) {
+      if (debugEnabled) log.debug("job dependency check false for {}", job);
+      return false;
+    }
+    final JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
+    if (spec != null) {
+      if ((reservationHandler.getNbReservedNodes(job.getUuid()) >= job.getSLA().getMaxNodes()) && !reservationHandler.hasReadyNode(job.getUuid())) {
+        if (debugEnabled) log.debug("node config check false for {}", job);
+        return false;
+      }
+    }
+    if ((job.getTaskGraph() != null) && !job.hasAvailableGraphNode()) {
+      if (debugEnabled) log.debug("tasks graph check false for {}", job);
+      return false;
+    }
+    if (!checkGridPolicy(job)) return false;
+    return checkJobState(job);
   }
 
   /**
@@ -358,7 +385,10 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    * @return true if the job can be dispatched to at least one more node, false otherwise.
    */
   private static boolean checkJobState(final ServerJob job) {
-    if (job.isCancelled()) return false;
+    if (job.isCancelled()) {
+      if (debugEnabled) log.debug("job is cancelled: {}", job);
+      return false;
+    }
     final JobSLA sla = job.getSLA();
     if (debugEnabled) log.debug("job '{}', suspended={}, pending={}, expired={}", new Object[] {job.getName(), sla.isSuspended(), job.isPending(), job.isJobExpired()});
     if (sla.isSuspended() || job.isPending() || job.isJobExpired()) return false;
@@ -445,11 +475,13 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    */
   private boolean checkGridPolicy(final ServerJob job) {
     final ExecutionPolicy policy = job.getSLA().getGridExecutionPolicy();
+    boolean result = true;
     if (policy != null) {
       preparePolicy(policy, job, stats, job.getNbChannels());
-      return policy.evaluate(this.driverInfo);
+      result = policy.evaluate(this.driverInfo);
+      if (!result && debugEnabled) log.debug("grid policy check false for {}", job);
     }
-    return true;
+    return result;
   }
 
   /**

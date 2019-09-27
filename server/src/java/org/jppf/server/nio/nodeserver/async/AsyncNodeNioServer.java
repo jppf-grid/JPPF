@@ -487,7 +487,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
    * @return a {@link ServerJob} instance, with no task in it.
    */
   public ServerTaskBundleNode getHandshakeBundle() {
-    return initialServerJob.copy(0);
+    return initialServerJob.createNodeDispatch(0);
   }
 
   /**

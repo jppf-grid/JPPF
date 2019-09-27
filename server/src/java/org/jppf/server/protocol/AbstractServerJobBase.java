@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -276,16 +276,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
       if (hasCompleted()) {
         throw new JPPFJobEndedException("Job " + submissionStatus);
       } else {
-        if (log.isTraceEnabled()) {
-          final StringBuilder sb = new StringBuilder();
-          int count = 0;
-          for (final ServerTask task: bundle.getTaskList()) {
-            if (count > 0) sb.append(", ");
-            sb.append(task.getPosition());
-            count++;
-          }
-          log.trace("tasks positions in client bundle: {}", sb);
-        }
+        if (log.isTraceEnabled()) logTasksPositions(bundle);
         clientBundles.add(bundle);
         for (final ServerTask task: bundle.getTaskList()) {
           final int pos = task.getPosition();
@@ -299,6 +290,21 @@ public class AbstractServerJobBase extends AbstractServerJob {
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * Log the positions of the tasks in a client bundle.
+   * @param bundle the bundle whose tasks to log.
+   */
+  private static void logTasksPositions(final ServerTaskBundleClient bundle) {
+    final StringBuilder sb = new StringBuilder();
+    int count = 0;
+    for (final ServerTask task: bundle.getTaskList()) {
+      if (count > 0) sb.append(", ");
+      sb.append(task.getPosition());
+      count++;
+    }
+    log.trace("tasks positions in client bundle: {}", sb);
   }
 
   /**
@@ -346,5 +352,12 @@ public class AbstractServerJobBase extends AbstractServerJob {
    */
   public int getNbBundles() {
     return clientBundles.size();
+  }
+
+  /**
+   * @return {@code true} if the job graph is already handled in another driver that dispatched the job, {@code false} otherwise.
+   */
+  public boolean isJobGraphAlreadyHandled() {
+    return job.getParameter(BundleParameter.JOB_GRAPH_ALREADY_HANDLED, false);
   }
 }

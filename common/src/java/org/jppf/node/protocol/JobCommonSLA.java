@@ -186,6 +186,7 @@ public class JobCommonSLA<T extends JobCommonSLA<T>> implements Serializable {
   /**
    * Get the preference policy.for this job SLA.
    * @return a {@link Preference} policy instance, or {@code null} if it was not {@link #setPreferencePolicy(Preference) set}.
+   * @since 6.1
    */
   public Preference getPreferencePolicy() {
     return preferencePolicy;

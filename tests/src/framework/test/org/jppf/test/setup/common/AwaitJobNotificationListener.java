@@ -111,8 +111,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
   public boolean await() throws Exception {
     synchronized (this) {
       if (listenerRemoved) return true;
-      while (true) {
-        if (!jmx.isConnected() || eventReceived) break;
+      while (jmx.isConnected() && !eventReceived) {
         wait(100L);
       }
       if (debugEnabled) log.debug("finished waiting for expected event {}", expectedEvent);

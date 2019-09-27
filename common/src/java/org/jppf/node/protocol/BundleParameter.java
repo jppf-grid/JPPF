@@ -167,5 +167,9 @@ public enum BundleParameter {
   /**
    * Entry holding the dependency graph of the tasks in a job, if any.
    */
-  JOB_TASK_GRAPH
+  JOB_TASK_GRAPH,
+  /**
+   * Whether a job graph is already being handled by a driver.
+   */
+  JOB_GRAPH_ALREADY_HANDLED
 }

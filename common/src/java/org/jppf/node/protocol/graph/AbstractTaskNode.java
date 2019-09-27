@@ -32,6 +32,7 @@ import org.jppf.utils.SystemUtils;
  * This ensures that the tasks can be executed in a <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological order</a> where no task will be executed before its dependencies.
  * @author Laurent Cohen
  * @param <T> the type of results returned by this task.
+ * @since 6.2
  */
 public class AbstractTaskNode<T> extends AbstractTask<T> implements TaskNode<T> {
   /**

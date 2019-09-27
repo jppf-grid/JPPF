@@ -98,6 +98,10 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
    * In a multi server topology, an upper bound for how many drivers a job can be transfered to before being executed on a node.
    */
   private int maxDriverDepth = Integer.MAX_VALUE;
+  /**
+   * The specification of dependencies for the job.
+   */
+  private JobDependencySpec dependencySpec = new JobDependencySpec();
 
   /**
    * Default constructor.
@@ -463,5 +467,13 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   public JobSLA setMaxDriverDepth(final int maxDriverDepth) {
     if (maxDriverDepth > 0) this.maxDriverDepth = maxDriverDepth;
     return this;
+  }
+
+  /**
+   * Get the specification of dependencies for the job.
+   * @return a {@link JobDependencySpec} instance.
+   */
+  public JobDependencySpec getDependencySpec() {
+    return dependencySpec;
   }
 }

@@ -30,14 +30,13 @@ import org.jppf.node.protocol.graph.TaskGraph;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.job.management.NodeJobInformation;
-import org.jppf.server.nio.nodeserver.NodeReservationHandler;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
- *
+ * Server-side representation of a job.
  * @author Laurent Cohen
  * @author Martin JANDA
  * @exclude
@@ -68,7 +67,7 @@ public class ServerJob extends AbstractServerJobBase {
    * Initialized client job with task bundle and list of tasks to execute.
    * @param lock used to synchronized access to job.
    * @param notificationEmitter an {@code ChangeListener} instance that fires job notifications.
-   * @param job   underlying task bundle.
+   * @param job underlying task bundle.
    * @param dataProvider the data location of the data provider.
    */
   public ServerJob(final Lock lock, final ServerJobChangeListener notificationEmitter, final TaskBundle job, final DataLocation dataProvider) {
@@ -81,7 +80,7 @@ public class ServerJob extends AbstractServerJobBase {
    * @param nbTasks the number of tasks to include in the copy.
    * @return a new {@code ServerJob} instance.
    */
-  public ServerTaskBundleNode copy(final int nbTasks) {
+  public ServerTaskBundleNode createNodeDispatch(final int nbTasks) {
     lock.lock();
     try {
       Collection<ServerTask> list = null;
@@ -128,6 +127,7 @@ public class ServerJob extends AbstractServerJobBase {
           newTaskBundle = job.copy();
           job.setCurrentTaskCount(0);
         }
+        if (!job.isHandshake() && getSLA().getDependencySpec().getId() != null) newTaskBundle.setParameter(BundleParameter.JOB_GRAPH_ALREADY_HANDLED, true);
         return new ServerTaskBundleNode(this, newTaskBundle, list);
       } finally {
         for (final ServerTask task: list) tasks.remove(task.getPosition());
@@ -366,11 +366,11 @@ public class ServerJob extends AbstractServerJobBase {
     lock.lock();
     try {
       if (setCancelled(mayInterruptIfRunning)) {
+        driver.getQueue().getDependenciesHandler().jobCancelled(this);
         handleCancelledStatus();
         if (!getSLA().isBroadcastJob()) clientMap = handleCancelledTasks();
         setSubmissionStatus(SubmissionStatus.COMPLETE);
-        final NodeReservationHandler handler = driver.getAsyncNodeNioServer().getNodeReservationHandler();
-        handler.onJobCancelled(this);
+        driver.getAsyncNodeNioServer().getNodeReservationHandler().onJobCancelled(this);
         result = true;
       }
     } finally {

@@ -380,10 +380,6 @@ public abstract class AbstractServerJob implements JPPFDistributedJob {
     this.queueEntryTime = queueEntryTime;
   }
 
-    /**
-    * Get the current number of tasks in the job.
-    * @return the number of tasks as an int.
-    */
   @Override
   public abstract int getTaskCount();
 

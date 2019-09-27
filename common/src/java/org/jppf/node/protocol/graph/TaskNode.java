@@ -31,6 +31,7 @@ import org.jppf.node.protocol.*;
  * This ensures that the tasks can be executed in a <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological order</a> where no task will be executed before its dependencies.
  * @param <T> the type of results produced by the task.
  * @author Laurent Cohen
+ * @since 6.2
  */
 public interface TaskNode<T> extends Task<T> {
   /**

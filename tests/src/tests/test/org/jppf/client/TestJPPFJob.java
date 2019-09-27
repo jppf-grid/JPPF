@@ -86,17 +86,22 @@ public class TestJPPFJob extends Setup1D1N {
    */
   @Test(timeout=10000)
   public void testCancel() throws Exception {
-    try (JPPFClient client = BaseSetup.createClient(null, true)) {
+    try (final JPPFClient client = BaseSetup.createClient(null, true)) {
       BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       final int nbTasks = 10;
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 5000L);
+      assertNull(job.getSLA().getDependencySpec().getId());
       final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
+      print(false, false, "submitting %s", job);
       client.submitAsync(job);
+      print(false, false, "awaiting JOB_DISPATCHED event");
       listener.await();
+      print(false, false, "cancelling job");
       final boolean cancelled = job.cancel(true);
       assertTrue(cancelled);
       final List<Task<?>> results = job.get();
+      print(false, false, "got job results");
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       int count = 0;

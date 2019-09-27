@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for graphs of tasks within jobs.
+ * Support for graphs of tasks within jobs and graphs of jobs.
  * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.node.protocol.graph;
