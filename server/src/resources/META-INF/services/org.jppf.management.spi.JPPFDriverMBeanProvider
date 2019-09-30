@@ -6,3 +6,4 @@ org.jppf.management.spi.PeerDriverMBeanProvider                     # notificati
 org.jppf.management.spi.JPPFNodeConnectionNotifierMBeanProvider     # notifications of nodes connecting or disconnecting
 org.jppf.job.persistence.PersistedJobsManagerMBeanProvider          # management of jobs persisted in the driver
 org.jppf.management.spi.LoadBalancerPersistenceManagerMBeanProvider # management of the persisted load-balancer states
+org.jppf.server.job.management.JobDependencyManagerMBeanProvider    # management and monitoring of job dependencies

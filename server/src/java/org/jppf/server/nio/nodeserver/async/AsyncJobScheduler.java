@@ -287,7 +287,8 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    */
   private boolean performJobChecks(final ServerJob job) {
     final JobDependencySpec dependencySpec = job.getSLA().getDependencySpec();
-    if ((dependencySpec.getId() != null) && !job.isJobGraphAlreadyHandled() && dependencySpec.hasDependency() && dependencyHandler.hasPendingDependencyOrCancelled(job.getUuid())) {
+    //if (debugEnabled) log.debug("job graph node: {}", dependencyHandler.getGraph().getNode(dependencySpec.getId()));
+    if ((dependencySpec.getId() != null) && !job.isJobGraphAlreadyHandled() && dependencySpec.hasDependency() && dependencyHandler.hasPendingDependencyOrCancelled(dependencySpec.getId())) {
       if (debugEnabled) log.debug("job dependency check false for {}", job);
       return false;
     }

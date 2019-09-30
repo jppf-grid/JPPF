@@ -18,8 +18,8 @@
 
 package org.jppf.node.protocol.graph;
 
+import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 import org.jppf.node.protocol.JobDependencySpec;
 import org.slf4j.*;
@@ -29,7 +29,11 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JobDependencyGraph {
+public class JobDependencyGraph implements Serializable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Logger for this class.
    */
@@ -67,7 +71,7 @@ public class JobDependencyGraph {
    * @return a Set of nodes ids, possibly empty.
    */
   public synchronized Set<String> getNodeIds() {
-    return nodes.keySet();
+    return new HashSet<>(nodes.keySet());
   }
 
   /**
@@ -86,8 +90,9 @@ public class JobDependencyGraph {
    */
   public synchronized List<JobDependencyNode> jobEnded(final String jobUuid) {
     final JobDependencyNode node = getNodeByJobUuid(jobUuid);
-    final List<JobDependencyNode> toResume = (node != null) ? node.onCompleted(true) : null;
-    return toResume;
+    if (debugEnabled) log.debug("processing job ended for {}", node);
+    if (node != null) return node.onCompleted(true);
+    return null;
   }
 
   /**
@@ -95,9 +100,10 @@ public class JobDependencyGraph {
    * @param spec the dependencies specification for the job.
    * @param jobUuid the uuid of the associated jppf job.
    * @return the added {@link JobDependencyNode}.
-   * @throws JPPFDependencyCycleException if a cycle is detected.
+   * @throws JPPFJobDependencyCycleException if a cycle is detected.
    */
-  public synchronized JobDependencyNode addNode(final JobDependencySpec spec, final String jobUuid) throws JPPFDependencyCycleException {
+  public synchronized JobDependencyNode addNode(final JobDependencySpec spec, final String jobUuid) throws JPPFJobDependencyCycleException {
+    if (debugEnabled) log.debug("adding node with spec={}, uuid={}", spec, jobUuid);
     final JobDependencyNode node = addNode(spec.getId(), jobUuid, spec.getDependencies());
     node.setRemoveUponCompletion(spec.isRemoveUponCompletion());
     if (debugEnabled) log.debug("job graph: added {}", node);
@@ -110,25 +116,18 @@ public class JobDependencyGraph {
    * @param jobUuid the uuid of the associated jppf job.
    * @param dependencies the dependencies.
    * @return the added {@link JobDependencyNode}.
-   * @throws JPPFDependencyCycleException if a cycle is detected.
+   * @throws JPPFJobDependencyCycleException if a cycle is detected.
    */
-  private JobDependencyNode addNode(final String id, final String jobUuid, final List<String> dependencies) throws JPPFDependencyCycleException {
+  private JobDependencyNode addNode(final String id, final String jobUuid, final List<String> dependencies) throws JPPFJobDependencyCycleException {
+    if (debugEnabled) log.debug("adding node with id={}, uuid={}, dependencies={}", id, jobUuid, dependencies);
     JobDependencyNode node = getNode(id);
-    if (node != null) {
-      if (node.getJobUuid() != null) {
-        if ((jobUuid != null) && !jobUuid.equals(node.getJobUuid())) {
-          nodes.remove(id);
-          nodesByUuid.remove(node.getJobUuid());
-          node = null;
-        }
-      } else {
-        node.setJobUuid(jobUuid);
-      }
+    if (node == null) {
+      node = new JobDependencyNode(id, jobUuid);
+      nodes.put(id, node);
     }
-    if (node == null) node = new JobDependencyNode(id, jobUuid);
-    nodes.put(id, node);
+    if (debugEnabled) log.debug("node is {}", node);
     if (jobUuid != null) {
-      node.setJobUuid(jobUuid);
+      if (node.getJobUuid() == null) node.setJobUuid(jobUuid);
       nodesByUuid.put(jobUuid, node);
     }
     if ((dependencies != null) && !dependencies.isEmpty()) {
@@ -145,6 +144,7 @@ public class JobDependencyGraph {
    * @param id the id of the node to remove.
    */
   public synchronized void removeNode(final String id) {
+    if (debugEnabled) log.debug("removing node with id = {}", id);
     final JobDependencyNode node = getNode(id);
     if (node != null) removeNode(node);
   }
@@ -154,11 +154,12 @@ public class JobDependencyGraph {
    * @param node the node to remove.
    */
   public synchronized void removeNode(final JobDependencyNode node) {
+    if (debugEnabled) log.debug("removing node {}", node);
     final List<JobDependencyNode> dependencies = new ArrayList<>(node.getDependencies());
     for (final JobDependencyNode dependency: dependencies) {
       if (nodes.containsKey(dependency.getId())) removeNode(dependency);
     }
-    for (JobDependencyNode dependent: node.getDependendedOn()) dependent.removeDependency(node);
+    for (final JobDependencyNode dependent: node.getDependendedOn()) dependent.removeDependency(node);
     nodes.remove(node.getId());
     if (node.getJobUuid() != null) nodesByUuid.remove(node.getJobUuid());
     if (debugEnabled) log.debug("job graph: removed '{}'", node.getId());
@@ -172,24 +173,5 @@ public class JobDependencyGraph {
   public synchronized Collection<JobDependencyNode> getDependedOn(final String id) {
     final JobDependencyNode node = getNode(id);
     return (node == null) ? null : new ArrayList<>(node.getDependendedOn());
-  }
-
-  /**
-   * Execute qn arbitrary action while synchronizig on this object.
-   * @param action the {@link Runnqble} qction to execute.
-   */
-  public synchronized void executeSynchronized(final Runnable action) {
-    if (action != null) action.run();
-  }
-
-  /**
-   * Execute qn arbitrary action while synchronizig on this object.
-   * @param <E> the type of result returned by the action.
-   * @param action the {@link Runnqble} qction to execute.
-   * @return the result of the action, or {@code null} if the action is {@code null}.
-   * @throws Exception if the action raises an exception.
-   */
-  public synchronized <E> E executeSynchronized(final Callable<E> action) throws Exception {
-    return (action != null) ? action.call() : null;
   }
 }

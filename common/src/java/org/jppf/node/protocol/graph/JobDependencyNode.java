@@ -18,6 +18,7 @@
 
 package org.jppf.node.protocol.graph;
 
+import java.io.Serializable;
 import java.util.*;
 
 import org.slf4j.*;
@@ -28,7 +29,11 @@ import org.slf4j.*;
  * @exclude
  * @since 6.2
  */
-public class JobDependencyNode {
+public class JobDependencyNode implements Serializable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Logger for this class.
    */
@@ -36,7 +41,7 @@ public class JobDependencyNode {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  //private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The id asociated with this node. This is the application-defined id for the corresponding job.
    */
@@ -46,7 +51,7 @@ public class JobDependencyNode {
    */
   private String jobUuid;
   /**
-   * A mappings of this node's dependencies ids to the corresponding {@link JobDependencyNode} objects.
+   * A mapping of this node's dependencies ids to the corresponding {@link JobDependencyNode} objects.
    * This is in effect a representation of the whole graph.
    */
   private final Map<String, JobDependencyNode> dependencies =  new HashMap<>();
@@ -61,7 +66,7 @@ public class JobDependencyNode {
   /**
    * Whether the job represented by this node has completed.
    */
-  private boolean completed = false;
+  private boolean completed;
   /**
    * Whether this node should be removed from the graph upon the corresponding job completion.
    */
@@ -92,9 +97,9 @@ public class JobDependencyNode {
   /**
    * Add the specified dependency to this node.
    * @param node the node to add as a dependency.
-   * @throws JPPFDependencyCycleException if a cycle is detected.
+   * @throws JPPFJobDependencyCycleException if a cycle is detected.
    */
-  void addDependency(final JobDependencyNode node) throws JPPFDependencyCycleException {
+  void addDependency(final JobDependencyNode node) throws JPPFJobDependencyCycleException {
     final String depId = node.getId();
     final LinkedList<String> cycle = new LinkedList<>();
     if (hasCycle(node, new HashSet<String>(), cycle)) {
@@ -103,13 +108,12 @@ public class JobDependencyNode {
       sb.append(getId());
       final String message = sb.toString();
       log.error("cycle detected while adding dependency '{}' to '{}' : {}", depId, getId(), message);
-      throw new JPPFDependencyCycleException(message);
+      throw new JPPFJobDependencyCycleException(message, cycle);
     }
     dependencies.put(depId, node);
     node.addDependedOn(this);
     if (!node.isCompleted()) {
       addPendingDependency(node.getId());
-      onCompleted(false);
     }
   }
 
@@ -162,15 +166,15 @@ public class JobDependencyNode {
    * @return {@code true} if there is a dependency, {@code false} otherwise.
    */
   private boolean hasCycle(final JobDependencyNode node, final Set<String> visited, final LinkedList<String> path) {
-    path.push(node.getId());
+    path.addLast(node.getId());
     if (!visited.contains(node.getId())) {
       if (node.getDependency(this.id) != null) return true;
       visited.add(node.getId());
-      for (JobDependencyNode dependency: node.getDependencies()) {
+      for (final JobDependencyNode dependency: node.getDependencies()) {
         if (hasCycle(dependency, visited, path)) return true;
       }
     }
-    path.pop();
+    path.removeLast();
     return false;
   }
 
@@ -223,7 +227,7 @@ public class JobDependencyNode {
   List<JobDependencyNode> onCompleted(final boolean completed) {
     final List<JobDependencyNode> result = new ArrayList<>();
     this.completed = completed;
-    for (JobDependencyNode node: dependedOn.values()) {
+    for (final JobDependencyNode node: dependedOn.values()) {
       if (node != null) {
         if (!completed) {
           node.addPendingDependency(getId());
@@ -234,6 +238,7 @@ public class JobDependencyNode {
         }
       }
     }
+    if (debugEnabled) log.debug("processed completion({}) on {}", completed, this);
     return result;
   }
 
@@ -262,6 +267,14 @@ public class JobDependencyNode {
   }
 
   /**
+   * Specify whether this node should be removed from the graph upon the corresponding job completion.
+   * @param removeUponCompletion {@code true} to specify that this node should be removed from the graph, {@code false} otherwise.
+   */
+  public void setRemoveUponCompletion(final boolean removeUponCompletion) {
+    this.removeUponCompletion = removeUponCompletion;
+  }
+
+  /**
    * @return whether the job represented by this dependency node should be cancelled when it arrives in the server queue.
    */
   public boolean isCancelled() {
@@ -275,23 +288,17 @@ public class JobDependencyNode {
     this.cancelled = cancelled;
   }
 
-  /**
-   * Specify whether this node should be removed from the graph upon the corresponding job completion.
-   * @param removeUponCompletion {@code true} to specify that this node should be removed from the graph, {@code false} otherwise.
-   */
-  void setRemoveUponCompletion(final boolean removeUponCompletion) {
-    this.removeUponCompletion = removeUponCompletion;
-  }
-
   @Override
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("id=").append(id)
       .append(", removeUponCompletion=").append(removeUponCompletion)
+      .append(", completed=").append(completed)
+      .append(", cancelled=").append(cancelled)
+      .append(", jobUuid=").append(jobUuid)
       .append(", dependencies=").append(dependencies.keySet())
       .append(", pending=").append(pendingDependencies)
       .append(", dependedOn=").append(dependedOn.keySet())
-      .append(']')
-      .toString();
+      .append(']').toString();
   }
 }

@@ -495,4 +495,13 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   public DiagnosticsMBean getDiagnosticsProxy() throws Exception {
     return getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
   }
+
+  /**
+   * Get a proxy to the dependency manager MBean in the driver.
+   * @return an instance of an implementation of {@link JobDependencyManagerMBean}.
+   * @throws Exception if any error occurs.
+   */
+  public JobDependencyManagerMBean getJobDependencyManager() throws Exception {
+    return getProxy(JobDependencyManagerMBean.MBEAN_NAME, JobDependencyManagerMBean.class);
+  }
 }

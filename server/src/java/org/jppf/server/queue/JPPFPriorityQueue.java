@@ -151,7 +151,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
           header.setParameter(BundleParameter.ALREADY_PERSISTED, true);
           persistenceHandler.storeJob(serverJob, clientBundle, !newJob);
         }
-        fireBundleAdded(new QueueEvent<>(this, serverJob, false));
+        if (!cancel) fireBundleAdded(new QueueEvent<>(this, serverJob, false));
       }
       if (debugEnabled) log.debug("Maps size information: {}", formatSizeMapInfo("priorityMap", priorityMap));
     } finally {

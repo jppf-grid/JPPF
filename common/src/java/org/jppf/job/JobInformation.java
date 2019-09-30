@@ -33,31 +33,31 @@ public class JobInformation implements Serializable {
   /**
    * The unique identifier for the job.
    */
-  private String jobUuid = null;
+  private String jobUuid;
   /**
    * The user-defined name for the job.
    */
-  private String jobName = null;
+  private String jobName;
   /**
    * The current number of tasks in the job.
    */
-  private int taskCount = 0;
+  private int taskCount;
   /**
    * The initial number of tasks in the job.
    */
-  private int initialTaskCount = 0;
+  private int initialTaskCount;
   /**
    * The priority of this job.
    */
-  private int priority = 0;
+  private int priority;
   /**
    * Determines whether the job is in suspended state.
    */
-  private boolean suspended = false;
+  private boolean suspended;
   /**
    * Determines whether the job is waiting to reach its scheduled execution date.
    */
-  private boolean pending = false;
+  private boolean pending;
   /**
    * The maximum number of nodes this job can run on.
    */
@@ -232,7 +232,6 @@ public class JobInformation implements Serializable {
   /**
    * Get the unique identifier for the job.
    * @return the uuid as a string.
-   * @exclude
    */
   public String getJobUuid() {
     return jobUuid;

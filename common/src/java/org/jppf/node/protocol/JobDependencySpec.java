@@ -154,4 +154,14 @@ public class JobDependencySpec implements Serializable {
     this.cascadeCancellation = cascadeCancellation;
     return this;
   }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("id=").append(id)
+      .append(", removeUponCompletion=").append(removeUponCompletion)
+      .append(", cascadeCancellation=").append(cascadeCancellation)
+      .append(", dependencies=").append(dependencies)
+      .append("]").toString();
+  }
 }

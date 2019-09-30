@@ -26,7 +26,7 @@ import org.jppf.server.protocol.ServerJob;
 import org.slf4j.*;
 
 /**
- * 
+ * This class handles the interactions between the server queue and jobs and the job dependency graph.
  * @author Laurent Cohen
  * @exclude
  */
@@ -67,9 +67,16 @@ public class JobDependenciesHandler {
       try {
         final JobDependencyNode node = graph.addNode(spec, job.getUuid());
         if (debugEnabled) log.debug("'{}' was queued and added to the dependency graph as {}", job.getName(), node);
-        return false;
-      } catch (final JPPFDependencyCycleException e) {
-        log.error("detected dependency cycle when queuing {}", job, e);
+        return node.isCancelled();
+      } catch (final JPPFJobDependencyCycleException e) {
+        final JobDependencyNode node = graph.getNode(spec.getId());
+        log.error("detected dependency cycle when queuing {}, node = {}", job, node, e);
+        if (node != null) node.setRemoveUponCompletion(true);
+        final List<String> toCancel = e.getIdPath();
+        if ((toCancel != null) && !toCancel.isEmpty()) {
+          if (debugEnabled) log.debug("cycle id path: {}", toCancel);
+          cancelNodes(toCancel);
+        }
       }
     }
     return true;
@@ -86,17 +93,19 @@ public class JobDependenciesHandler {
     if (debugEnabled && (toResume != null)) {
       for (final JobDependencyNode jobNode: toResume) log.debug("resuming '{}'", jobNode.getId());
     }
-    final JobDependencyNode node = graph.getNodeByJobUuid(job.getUuid());
+    JobDependencyNode node = graph.getNodeByJobUuid(job.getUuid());
+    if (node == null) node = graph.getNode(job.getSLA().getDependencySpec().getId());
+    if (debugEnabled) log.debug("node ended: {}", node);
     if ((node != null) && node.isRemoveUponCompletion()) graph.removeNode(node);
   }
 
   /**
    * Determine whether the specified job has any pending dependency.
-   * @param jobUuid the uuid of the job to check.
+   * @param id the dependency id of the job to check.
    * @return {@code true} if the job has at least one pendeing dependency, {@code false} otherwise.
    */
-  public boolean hasPendingDependencyOrCancelled(final String jobUuid) {
-    final JobDependencyNode node = graph.getNodeByJobUuid(jobUuid);
+  public boolean hasPendingDependencyOrCancelled(final String id) {
+    final JobDependencyNode node = graph.getNode(id);
     return (node != null) && (node.hasPendingDependency() || node.isCancelled());
   }
 
@@ -110,8 +119,8 @@ public class JobDependenciesHandler {
       if (debugEnabled) log.debug("handling cancellation of {}", job);
       final JobDependencyNode node = graph.getNode(spec.getId());
       if (node != null) {
-        final List<String> toCancel = new ArrayList<>();
-        graph.executeSynchronized(() -> processCancellation(node, toCancel));
+        final List<String> toCancel = processCancellation(node);
+        if (debugEnabled) log.debug("cancelling dependent jobs {}", toCancel);
         for (final String uuid: toCancel) {
           final ServerJob dependentJob = queue.getJob(uuid);
           if (dependentJob != null) dependentJob.cancel(queue.driver, true);
@@ -121,17 +130,54 @@ public class JobDependenciesHandler {
   }
 
   /**
-   * 
+   * Process the cancellation cascade for the specified graph node.
    * @param node the node reprsenting a job being cancelled.
-   * @param toCancel a list of job uuids to cancel.
+   * @return a list of job uuids to cancel.
    */
-  private static void processCancellation(final JobDependencyNode node,  final List<String> toCancel) {
-    final Collection<JobDependencyNode> dependedOn = node.getDependendedOn();
-    if (dependedOn != null) {
-      for (final JobDependencyNode dependent: dependedOn) {
-        if (dependent.getJobUuid() != null) toCancel.add(dependent.getJobUuid());
-        dependent.setCancelled(true);
+  private List<String> processCancellation(final JobDependencyNode node) {
+    final List<String> toCancel = new ArrayList<>();
+    synchronized(graph) {
+      final Collection<JobDependencyNode> dependedOn = node.getDependendedOn();
+      if (dependedOn != null) {
+        for (final JobDependencyNode dependent: dependedOn) {
+          if (debugEnabled) log.debug("cancelling {}", dependent);
+          if (!dependent.isCompleted() && !dependent.isCancelled() && (dependent.getJobUuid() != null)) toCancel.add(dependent.getJobUuid());
+          dependent.setCancelled(true);
+        }
       }
+    }
+    return toCancel;
+  }
+
+  /**
+   * @return the dependency graph.
+   */
+  public JobDependencyGraph getGraph() {
+    return graph;
+  }
+
+  /**
+   * Cancel the nodes with the sepcified ids.
+   * @param nodeIds the ids of nodes whose corresponding jobs to cancel.
+   */
+  private void cancelNodes(final List<String> nodeIds) {
+    if (debugEnabled) log.debug("cancelling nodes {}", nodeIds);
+    final List<String> toCancel = new ArrayList<>();
+    synchronized(graph) {
+      for (final String id: nodeIds) {
+        final JobDependencyNode node = graph.getNode(id);
+        if (node != null) {
+          if (debugEnabled) log.debug("cancelling {}", node);
+          if (!node.isCompleted() && !node.isCancelled() && (node.getJobUuid() != null)) toCancel.add(node.getJobUuid());
+          node.setCancelled(true);
+          node.setRemoveUponCompletion(true);
+        }
+      }
+    }
+    if (debugEnabled) log.debug("cancelling jobs {}", toCancel);
+    for (final String uuid: toCancel) {
+      final ServerJob job = queue.getJob(uuid);
+      if (job != null) job.cancel(queue.driver, true);
     }
   }
 }
