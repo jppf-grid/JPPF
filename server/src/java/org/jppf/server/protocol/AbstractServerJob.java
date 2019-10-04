@@ -23,6 +23,7 @@ import java.util.concurrent.locks.*;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.*;
+import org.jppf.nio.NioHelper;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.submission.SubmissionStatus;
@@ -330,7 +331,9 @@ public abstract class AbstractServerJob {
     synchronized (onDoneList) {
       runnables = onDoneList.toArray(new Runnable[onDoneList.size()]);
     }
-    for (Runnable runnable : runnables) runnable.run();
+    NioHelper.getGlobalexecutor().execute(() -> { 
+      for (final Runnable runnable : runnables) runnable.run();
+    });
   }
 
   /**
