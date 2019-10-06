@@ -54,7 +54,6 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
   /**
    * Mapping of channels to their uuid.
    */
-  //protected final Map<String, ChannelWrapper<?>> nodeConnections = new HashMap<>();
   protected final Map<String, ChannelWrapper<?>> nodeConnections = new ConcurrentHashMap<>();
 
   /**
@@ -146,10 +145,9 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
       log.warn("attempt to close null channel - skipping this step");
       return;
     }
-    final NodeClassNioServer server = getDriver().getNodeClassServer();
     final NodeClassContext context = (NodeClassContext) channel.getContext();
     final String uuid = context.getUuid();
-    if (uuid != null) server.removeNodeConnection(uuid);
+    if (uuid != null) removeNodeConnection(uuid);
     try {
       channel.close();
     } catch(final Exception e) {

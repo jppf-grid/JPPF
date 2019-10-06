@@ -441,10 +441,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     lock.lock();
     try {
       wakeUpSelectorIfNeeded();
-      final Set<SelectionKey> keySet = selector.keys();
-      for (SelectionKey key: keySet) {
+      final Set<SelectionKey> keySet = new HashSet<>(selector.keys());
+      for (final SelectionKey key: keySet) {
         final NioContext<?> ctx = (NioContext<?>) key.attachment();
-        channels.add(ctx.getChannel());
+        if (ctx != null) channels.add(ctx.getChannel());
       }
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
