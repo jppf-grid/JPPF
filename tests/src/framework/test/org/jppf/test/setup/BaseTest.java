@@ -240,7 +240,7 @@ public class BaseTest {
         }
       }
       final File slavesDir = new File(dir, "slave_nodes");
-      if (slavesDir.exists() && !FileUtils.deletePath(slavesDir)) print(true, true, "Could not delete '%s'", slavesDir);
+      if (slavesDir.exists() && !deletePath(slavesDir)) print(true, true, "Could not delete '%s'", slavesDir);
       org.apache.log4j.PropertyConfigurator.configure("classes/tests/config/log4j-client.properties");
       // redirect System.out and System.err to files
       stdOut = System.out;
@@ -333,5 +333,29 @@ public class BaseTest {
      * @throws Exception if any error occurs.
      */
     void run() throws Exception;
+  }
+
+  /**
+   * Delete the specified path, recursively if this is a directory.
+   * @param path the path to delete.
+   * @return true if the folder and all contained files and subfolders were deleted, false otherwise.
+   */
+  private static boolean deletePath(final File path) {
+    if ((path == null) || !path.exists()) return false;
+    boolean success = true;
+    try {
+      if (path.isDirectory()) {
+        final File[] files = path.listFiles();
+        if (files != null) {
+          for (final File child: files) {
+            if (!deletePath(child)) success = false;
+          }
+        }
+      }
+      if (!path.delete()) success = false;
+    } catch (@SuppressWarnings("unused") final Exception e) {
+      success = false;
+    }
+    return success;
   }
 }
