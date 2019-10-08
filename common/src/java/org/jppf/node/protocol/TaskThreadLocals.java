@@ -27,7 +27,7 @@ public final class TaskThreadLocals {
   /**
    * Uuid of the original task bundle that triggered a resource loading request.
    */
-  private static final ThreadLocal<String> requestUuid = new ThreadLocal<>();
+  private static final InheritableThreadLocal<String> requestUuid = new InheritableThreadLocal<>();
 
   /**
    * Instantiation not permitted.

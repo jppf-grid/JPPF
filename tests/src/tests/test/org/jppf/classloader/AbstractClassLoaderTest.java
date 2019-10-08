@@ -160,6 +160,28 @@ public abstract class AbstractClassLoaderTest extends AbstractNonStandardSetup {
   }
 
   /**
+   * Test that class loading works from a thread created by a JPPF task.
+   * <br/>See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-606">JPPF-606 ClassNotFoundException when submitting a Callable to an ExecutorService from a JPPF task</a>
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout = TEST_TIMEOUT)
+  public void testClassLoadingFromSeparateThread() throws Exception {
+    final String name = ReflectionUtils.getCurrentMethodName();
+    final List<Task<?>> results = client.submit(BaseTestHelper.createJob(name + "1", false, 1, MyTestTask.class));
+    assertNotNull(results);
+    assertEquals(1, results.size());
+    final Task<?> task = results.get(0);
+    assertNotNull(task);
+    final Throwable throwable = task.getThrowable();
+    if (throwable != null) {
+      print(false, false, "task raised exception:\n%s", ExceptionUtils.getStackTrace(throwable));
+      fail("task raised exception: " + ExceptionUtils.getMessage(throwable));
+    }
+    assertNotNull(task.getResult());
+    assertEquals("hello from task", task.getResult());
+  }
+
+  /**
    * @param callable .
    * @throws Exception if any error occurs
    */
