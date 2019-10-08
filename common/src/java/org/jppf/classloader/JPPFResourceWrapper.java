@@ -96,19 +96,19 @@ public class JPPFResourceWrapper implements Serializable {
   /**
    * Determines whether the class should be loaded through the network classloader.
    */
-  private boolean dynamic = false;
+  private boolean dynamic;
   /**
    * The state associated with this resource wrapper.
    */
-  private State state = null;
+  private State state;
   /**
    * The uuid sent by a node when it first contacts a resource provider.
    */
-  private String providerUuid = null;
+  private String providerUuid;
   /**
    * Uuid of the original task bundle that triggered this resource request.
    */
-  private String requestUuid = null;
+  private String requestUuid;
   /**
    * Contains data about the kind of lookup that is to be done.
    */
@@ -116,7 +116,7 @@ public class JPPFResourceWrapper implements Serializable {
   /**
    * Performance optimization.
    */
-  protected transient JPPFResourceWrapper[] resources = null;
+  protected transient JPPFResourceWrapper[] resources;
 
   /**
    * Add a uuid to the uuid path of this resource wrapper.
@@ -323,15 +323,15 @@ public class JPPFResourceWrapper implements Serializable {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName()).append('[');
-    sb.append("dynamic=").append(dynamic);
-    sb.append(", name=").append(getName());
-    sb.append(", state=").append(state);
-    sb.append(", uuidPath=").append(uuidPath);
-    sb.append(", callableID=").append(getCallableID());
-    sb.append(']');
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("dynamic=").append(dynamic)
+      .append(", name=").append(getName())
+      .append(", state=").append(state)
+      .append(", uuidPath=").append(uuidPath)
+      .append(", callableID=").append(getCallableID())
+      .append(", requestUuid=").append(requestUuid)
+      .append(", providerUuid=").append(providerUuid)
+      .append(']').toString();
   }
 
   /**
