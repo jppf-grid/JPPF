@@ -210,11 +210,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool implements 
     final ComparisonOperator op = operator == null ? Operator.EQUAL : operator;
     if (debugEnabled) log.debug("awaiting {} connections with operator={} and status in {}", nbConnections, op, Arrays.asList(statuses));
     final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
-    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
-      @Override public boolean evaluate() {
-        return op.evaluate(ref.set(getConnections(statuses)).size(), nbConnections);
-      }
-    }, timeout);
+    ConcurrentUtils.awaitCondition(() -> op.evaluate(ref.set(getConnections(statuses)).size(), nbConnections), timeout, 10L, false);
     if (debugEnabled) log.debug("got expected connections: " + ref.get());
     return ref.get();
   }

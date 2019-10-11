@@ -296,7 +296,7 @@ public class JPPFClient extends AbstractGenericClient {
    */
   public List<JPPFConnectionPool> awaitConnectionPools(final long timeout, final JPPFClientConnectionStatus...statuses) {
     final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
-    ConcurrentUtils.awaitCondition(() -> !ref.setSynchronized(findConnectionPools(statuses), pools).isEmpty(), timeout);
+    ConcurrentUtils.awaitCondition(() -> !ref.setSynchronized(findConnectionPools(statuses), pools).isEmpty(), timeout, 10L, false);
     return ref.get();
   }
 
@@ -343,7 +343,7 @@ public class JPPFClient extends AbstractGenericClient {
         if (connectionOperator.evaluate(list.size(), expectedConnections)) result.add(pool);
       }
       return poolOperator.evaluate(result.size(), expectedPools);
-    }, timeout);
+    }, timeout, 10L, false);
     return result;
   }
 
@@ -363,7 +363,7 @@ public class JPPFClient extends AbstractGenericClient {
         if ((filter == null) || filter.accepts(pool)) result.add(pool);
       }
       return !result.isEmpty();
-    }, timeout);
+    }, timeout, 10L, false);
     return result;
   }
 
