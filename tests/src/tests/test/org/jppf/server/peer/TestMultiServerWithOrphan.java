@@ -28,7 +28,7 @@ import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ConcurrentUtils;
-import org.jppf.utils.concurrent.ConcurrentUtils.Condition;
+import org.jppf.utils.concurrent.ConcurrentUtils.*;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -60,16 +60,7 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
     for (final JPPFConnectionPool pool: pools) {
       final int expectedNodes = "driver1".equals(pool.getName()) ? 1 : 0;
       final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
-      ConcurrentUtils.awaitCondition(new Condition() {
-        @Override
-        public boolean evaluate() {
-          try {
-            return jmx.nbIdleNodes() == expectedNodes;
-          } catch (@SuppressWarnings("unused") final Exception e) {
-            return false;
-          }
-        }
-      }, 5000L, true);
+      ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbIdleNodes() == expectedNodes, 5000L, 250L, true);
     }
     final int nbTasks = 20;
     final String name = ReflectionUtils.getCurrentClassAndMethod();

@@ -177,13 +177,8 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    */
   List<JMXDriverConnectionWrapper> awaitJMXConnections(final ComparisonOperator operator, final int nbConnections, final long timeout, final boolean connected) {
     final ComparisonOperator op = operator == null ? Operator.EQUAL : operator;
-    //setSize(nbConnections);
     final MutableReference<List<JMXDriverConnectionWrapper>> ref = new MutableReference<>();
-    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
-      @Override public boolean evaluate() {
-        return op.evaluate(ref.set(getConnections(connected)).size(), nbConnections);
-      }
-    }, timeout);
+    ConcurrentUtils.awaitCondition(() -> op.evaluate(ref.set(getConnections(connected)).size(), nbConnections), timeout);
     return ref.get();
   }
 }

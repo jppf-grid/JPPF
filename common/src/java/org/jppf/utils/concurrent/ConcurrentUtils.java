@@ -116,29 +116,6 @@ public final class ConcurrentUtils {
   }
 
   /**
-   * Wait until the specified condition is fulfilled.
-   * @param condition the condition to check.
-   * @return true whenever the condition is {@code null} or gets fulfilled, {@code false} otherwise.
-   */
-  public static boolean awaitCondition(final Condition condition) {
-    return awaitCondition(condition, 0L, 10L, false);
-  }
-
-  /**
-   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
-   * This method waits for 1 millisecond each time the condition check fails and until the condition is fulfilled or the timeout expires.
-   * @param condition the condition to check.
-   * @param millis the milliseconds part of the timeout. A value of zero means an infinite timeout.
-   * @param throwExceptionOnTImeout whether to raise an exception if the timeout expires.
-   * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
-   * @throws IllegalArgumentException if the millis are negative.
-   * @throws JPPFTimeoutException if the timeout expires and {@code throwExceptionOnTImeout} is {@code true}.
-   */
-  public static boolean awaitCondition(final Condition condition, final long millis, final boolean throwExceptionOnTImeout) throws IllegalArgumentException, JPPFTimeoutException {
-    return awaitCondition(condition, millis, 10L, throwExceptionOnTImeout);
-  }
-
-  /**
    * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
    * This method waits for 1 millisecond each time the condition check fails and until the condition is fulfilled or the timeout expires.
    * @param condition the condition to check.
@@ -173,9 +150,7 @@ public final class ConcurrentUtils {
     final CountDownLatch countDown = new CountDownLatch(1);
     final ThreadSynchronization monitor = new ThreadSynchronization() { };
     final AtomicBoolean fulfilled = new AtomicBoolean(false);
-    final Runnable r = new Runnable() {
-      @Override
-      public void run() {
+    final Runnable r = () -> {
         boolean ok = false;
         synchronized(monitor) {
           try {
@@ -185,9 +160,7 @@ public final class ConcurrentUtils {
         }
         fulfilled.set(ok);
         countDown.countDown();
-      }
     };
-    ;
     final Thread thread = ThreadUtils.startThread(r, "awaitInterruptibleCondition(" + condition + ")");
     try {
       countDown.await(timeout, TimeUnit.MILLISECONDS);
@@ -254,7 +227,7 @@ public final class ConcurrentUtils {
      * @return true if the condition was met, false otherwise.
      * @throws Exception if any error occurs during the evaluation.
      */
-    public abstract boolean evaluateWithException() throws Exception;
+    boolean evaluateWithException() throws Exception;
   }
 
   /**
