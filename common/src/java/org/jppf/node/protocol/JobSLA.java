@@ -444,6 +444,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
     sla.setResultsStrategy(resultsStrategy);
     sla.setSuspended(suspended);
     sla.setMaxDriverDepth(maxDriverDepth);
+    sla.dependencySpec = dependencySpec;
     return sla;
   }
 
@@ -472,6 +473,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Get the specification of dependencies for the job.
    * @return a {@link JobDependencySpec} instance.
+   * @since 6.2
    */
   public JobDependencySpec getDependencySpec() {
     return dependencySpec;

@@ -283,8 +283,8 @@ public class TestJobDependencies extends BaseTest {
         final JobDependencyNode node = graph.getNode(id);
         assertNotNull(node);
         assertEquals(job.getUuid(), node.getJobUuid());
-        if (i == 0) assertTrue(node.isRemoveUponCompletion());
-        else assertFalse(node.isRemoveUponCompletion());
+        if (i == 0) assertTrue(node.isGraphRoot());
+        else assertFalse(node.isGraphRoot());
         assertFalse(node.isCompleted());
         assertFalse(node.isCancelled());
 
@@ -361,14 +361,11 @@ public class TestJobDependencies extends BaseTest {
         jobs.add(job);
         final JobDependencySpec spec = job.getSLA().getDependencySpec();
         spec.setId(job.getName()).setCascadeCancellation(true);
-        if (i == 0) spec.setRemoveUponCompletion(true);
+        if (i == 0) spec.setGraphRoot(true);
         job.getMetadata().setParameter("layer", i).setParameter("index", j);
       }
       if (i > 0) {
-        for (final JPPFJob previousLayerJob: layers.get(i - 1)) {
-          final JobDependencySpec spec = previousLayerJob.getSLA().getDependencySpec();
-          for (final JPPFJob job: jobs) spec.addDependencies(job.getSLA().getDependencySpec().getId());
-        }
+        for (final JPPFJob previousLayerJob: layers.get(i - 1)) previousLayerJob.addDependencies(jobs);
       }
       allJobs.addAll(jobs);
     }
@@ -396,12 +393,11 @@ public class TestJobDependencies extends BaseTest {
   static List<JPPFJob> createDiamondGraph(final String namePrefix, final int tasksPerJob, final long taskDuration) throws Exception {
     final List<JPPFJob> jobs = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
-      final JPPFJob job = BaseTestHelper.createJob(String.format("%s-%03d", namePrefix, i), false, tasksPerJob, LifeCycleTask.class, taskDuration);
-      setDependencyId(job);
+      final JPPFJob job = BaseTestHelper.createJob(String.format("%s-%03d", namePrefix, i), false, tasksPerJob, LifeCycleTask.class, taskDuration).setNameAsDependencyId();
       jobs.add(job);
     }
     final JobDependencySpec spec = jobs.get(0).getSLA().getDependencySpec();
-    spec.setRemoveUponCompletion(true);
+    spec.setGraphRoot(true);
     for (int i=1; i<=2; i++) {
       final String name = jobs.get(i).getName();
       spec.addDependencies(name);

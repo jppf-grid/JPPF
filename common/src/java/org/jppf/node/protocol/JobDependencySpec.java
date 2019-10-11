@@ -42,7 +42,7 @@ public class JobDependencySpec implements Serializable {
   /**
    * Whether the job and its dependencies should be removed from the graph upon completetion.
    */
-  private boolean removeUponCompletion;
+  private boolean graphRoot;
   /**
    * Whether cancelling the job triggers the cancellation of all the jobs that depend on it. 
    */
@@ -109,22 +109,22 @@ public class JobDependencySpec implements Serializable {
   }
 
   /**
-   * Determine whether the job and its dependencies should be removed from the graph upon completetion.
-   * This method returns {@code false} by default, unless {@link #setRemoveUponCompletion(boolean) setRemoveUponCompletion(true)} was called before.
-   * @return {@code true} if the job should be removed from the graph after completion, {@code false} otherwise.
+   * Determine whether the job is a root in the dependency graph it and its dependencies should be removed from the graph upon completetion.
+   * This method returns {@code false} by default, unless {@link #setGraphRoot(boolean) setRemoveUponCompletion(true)} was called before.
+   * @return {@code true} if the job is a root in the dependency graph and should be removed from the graph after completion, {@code false} otherwise.
    */
-  public boolean isRemoveUponCompletion() {
-    return removeUponCompletion;
+  public boolean isGraphRoot() {
+    return graphRoot;
   }
 
   /**
-   * Specify whether the job and its dependencies should be removed from the graph upon completetion.
+   * Specify whether the job is a root in the dependency graph it and its dependencies should be removed from the graph upon completetion.
    * For all practical purposes, this method should only be called for roots in a job dependency graph, that is, for jobs upon which no other job depends.
-   * @param removeUponCompletion {@code true} if the job should be removed from the graph after completion, {@code false} otherwise.
+   * @param graphRoot {@code true} if the job is a root in the dependency graph and should be removed from the graph after completion, {@code false} otherwise.
    * @return this {@code JobDependencySpec}, for method call chaining.
    */
-  public JobDependencySpec setRemoveUponCompletion(final boolean removeUponCompletion) {
-    this.removeUponCompletion = removeUponCompletion;
+  public JobDependencySpec setGraphRoot(final boolean graphRoot) {
+    this.graphRoot = graphRoot;
     return this;
   }
 
@@ -159,7 +159,7 @@ public class JobDependencySpec implements Serializable {
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("id=").append(id)
-      .append(", removeUponCompletion=").append(removeUponCompletion)
+      .append(", removeUponCompletion=").append(graphRoot)
       .append(", cascadeCancellation=").append(cascadeCancellation)
       .append(", dependencies=").append(dependencies)
       .append("]").toString();

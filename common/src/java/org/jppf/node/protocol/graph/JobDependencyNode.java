@@ -69,7 +69,7 @@ public class JobDependencyNode implements Serializable {
   /**
    * Whether this node should be removed from the graph upon the corresponding job completion.
    */
-  private boolean removeUponCompletion;
+  private boolean graphRoot;
   /**
    * Whether the job represented by this dependency node should be cancelled when it arrives in the server queue.
    */
@@ -261,17 +261,17 @@ public class JobDependencyNode implements Serializable {
    * Determine whether this node should be removed from the graph upon the corresponding job completion.
    * @return {@code true} if this node should be removed from the graph, {@code false} otherwise.
    */
-  public boolean isRemoveUponCompletion() {
-    return removeUponCompletion;
+  public boolean isGraphRoot() {
+    return graphRoot;
   }
 
   /**
    * Specify whether this node should be removed from the graph upon the corresponding job completion.
-   * @param removeUponCompletion {@code true} to specify that this node should be removed from the graph, {@code false} otherwise.
+   * @param graphRoot {@code true} to specify that this node should be removed from the graph, {@code false} otherwise.
    * @exclude
    */
-  public void setRemoveUponCompletion(final boolean removeUponCompletion) {
-    this.removeUponCompletion = removeUponCompletion;
+  public void setGraphRoot(final boolean graphRoot) {
+    this.graphRoot = graphRoot;
   }
 
   /**
@@ -294,7 +294,7 @@ public class JobDependencyNode implements Serializable {
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("id=").append(id)
-      .append(", removeUponCompletion=").append(removeUponCompletion)
+      .append(", removeUponCompletion=").append(graphRoot)
       .append(", completed=").append(completed)
       .append(", cancelled=").append(cancelled)
       .append(", jobUuid=").append(jobUuid)

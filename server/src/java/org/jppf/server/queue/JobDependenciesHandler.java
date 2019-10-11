@@ -71,7 +71,7 @@ public class JobDependenciesHandler {
       } catch (final JPPFJobDependencyCycleException e) {
         final JobDependencyNode node = graph.getNode(spec.getId());
         log.error("detected dependency cycle when queuing {}, node = {}", job, node, e);
-        if (node != null) node.setRemoveUponCompletion(true);
+        if (node != null) node.setGraphRoot(true);
         final List<String> toCancel = e.getIdPath();
         if ((toCancel != null) && !toCancel.isEmpty()) {
           if (debugEnabled) log.debug("cycle id path: {}", toCancel);
@@ -96,7 +96,7 @@ public class JobDependenciesHandler {
     JobDependencyNode node = graph.getNodeByJobUuid(job.getUuid());
     if (node == null) node = graph.getNode(job.getSLA().getDependencySpec().getId());
     if (debugEnabled) log.debug("node ended: {}", node);
-    if ((node != null) && node.isRemoveUponCompletion()) graph.removeNode(node);
+    if ((node != null) && node.isGraphRoot()) graph.removeNode(node);
   }
 
   /**
@@ -170,7 +170,7 @@ public class JobDependenciesHandler {
           if (debugEnabled) log.debug("cancelling {}", node);
           if (!node.isCompleted() && !node.isCancelled() && (node.getJobUuid() != null)) toCancel.add(node.getJobUuid());
           node.setCancelled(true);
-          node.setRemoveUponCompletion(true);
+          node.setGraphRoot(true);
         }
       }
     }

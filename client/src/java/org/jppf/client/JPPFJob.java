@@ -20,6 +20,7 @@ package org.jppf.client;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 import org.jppf.JPPFException;
 import org.jppf.client.balancer.ClientTaskBundle;
@@ -28,7 +29,7 @@ import org.jppf.client.event.JobEvent.Type;
 import org.jppf.client.persistence.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.ExecutorChannel;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.node.protocol.graph.TaskNode;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -391,17 +392,11 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
     final long start = System.nanoTime();
     long elapsed;
     final int nbTasks = tasks.size();
-    try {
-      synchronized(results) {
-        while (((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout) && ((results.size() < nbTasks) || !getStatus().isDone())) {
-          results.wait(timeout - elapsed);
-        }
-        if (!getStatus().isDone() && raiseTimeoutException) throw new TimeoutException("timeout expired");
+    synchronized(results) {
+      while (((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout) && ((results.size() < nbTasks) || !getStatus().isDone())) {
+        results.wait(timeout - elapsed);
       }
-    } catch (final TimeoutException|InterruptedException e) {
-      throw e;
-    } catch (final Exception e) {
-      log.error(e.getMessage(), e);
+      if (!getStatus().isDone() && raiseTimeoutException) throw new TimeoutException("timeout expired");
     }
   }
 
@@ -447,5 +442,85 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    */
   public boolean hasTaskGraph() {
     return taskGraph;
+  }
+
+  /**
+   * Set this job's dependency id from the specified id supplier.
+   * This is a shortcut for {@code getSLA().getDependencySpec().setId(idSupplier.get())}.
+   * @param idSupplier a {@link JobDependencyIdSupplier dependency id supplier} which computes a dependency id from this job's state.
+   * @return this job, for method call chaining.
+   * @since 6.2
+   */
+  public JPPFJob setDependencyId(final Supplier<String> idSupplier) {
+    getSLA().getDependencySpec().setId(idSupplier.get());
+    return this;
+  }
+
+  /**
+   * Set this job's dependency id from a dependency id supplier.
+   * This is a shortcut for {@code getSLA().getDependencySpec().setId(idSupplier.getId(this))}.
+   * @param idSupplier a {@link JobDependencyIdSupplier dependency id supplier} which computes a dependency id from this job's state.
+   * @return this job, for method call chaining.
+   * @since 6.2
+   */
+  public JPPFJob setDependencyId(final JobDependencyIdSupplier idSupplier) {
+    getSLA().getDependencySpec().setId(idSupplier.getId(this));
+    return this;
+  }
+
+  /**
+   * Set this job's dependency id.
+   * This is a shortcut for {@code getSLA().getDependencySpec().setId(id)}.
+   * @param id the id of this job in the job dependency graph.
+   * @return this job, for method call chaining.
+   * @since 6.2
+   */
+  public JPPFJob setDependencyId(final String id) {
+    getSLA().getDependencySpec().setId(id);
+    return this;
+  }
+
+  /**
+   * Convenience method to set this job's uuid as dependency id.
+   * This is a shortcut for {@code setDependencyId(getUuid())}.
+   * @return this job, for method call chaining.
+   * @since 6.2
+   */
+  public JPPFJob setUuidAsDependencyId() {
+    return setDependencyId(getUuid());
+  }
+
+  /**
+   * Convenience method to set this job's name as dpeendency id.
+   * This is a shortcut for {@code setDependencyId(getName())}.
+   * @return this job, for method call chaining.
+   * @since 6.2
+   */
+  public JPPFJob setNameAsDependencyId() {
+    return setDependencyId(getName());
+  }
+
+  /**
+   * Add the specified jobs as dependencies to this job.
+   * @param dependencies the job to add as dependencies to this job.
+   * @return this job, for method call chaining.
+   * @since 6.2
+   */
+  public JPPFJob addDependencies(final JPPFJob...dependencies) {
+    final JobDependencySpec spec = getSLA().getDependencySpec();
+    for (final JPPFJob dependency: dependencies) spec.addDependencies(dependency.getSLA().getDependencySpec().getId());
+    return this;
+  }
+
+  /**
+   * Add the specified jobs as dependencies to this job.
+   * @param dependencies the job to add as dependencies to this job.
+   * @return this job, for method call chaining.
+   * @since 6.2
+   */
+  public JPPFJob addDependencies(final Collection<JPPFJob> dependencies) {
+    final JobDependencySpec spec = getSLA().getDependencySpec();
+    for (final JPPFJob dependency: dependencies) spec.addDependencies(dependency.getSLA().getDependencySpec().getId());
+    return this;
   }
 }

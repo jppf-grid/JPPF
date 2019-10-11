@@ -70,7 +70,7 @@ public class MutableJobDependencyGraph extends JobDependencyGraphImpl {
   public synchronized JobDependencyNode addNode(final JobDependencySpec spec, final String jobUuid) throws JPPFJobDependencyCycleException {
     if (debugEnabled) log.debug("adding node with spec={}, uuid={}", spec, jobUuid);
     final JobDependencyNode node = addNode(spec.getId(), jobUuid, spec.getDependencies());
-    node.setRemoveUponCompletion(spec.isRemoveUponCompletion());
+    node.setGraphRoot(spec.isGraphRoot());
     if (debugEnabled) log.debug("job graph: added {}", node);
     return node;
   }
