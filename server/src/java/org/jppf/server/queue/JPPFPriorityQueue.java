@@ -291,8 +291,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
           if (debugEnabled) log.debug("adding completion bundle for job={} : {}", serverJob.getName(), clientBundle);
           addBundle(clientBundle);
         }
-        fireBundleRemoved(new QueueEvent<>(this, serverJob, false));
       }
+      fireBundleRemoved(new QueueEvent<>(this, serverJob, false));
     } finally {
       lock.unlock();
     }

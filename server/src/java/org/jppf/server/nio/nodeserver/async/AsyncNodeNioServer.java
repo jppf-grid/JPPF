@@ -146,7 +146,13 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
     this.queue.addQueueListener(new QueueListenerAdapter<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override
       public void bundleAdded(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
-        if (debugEnabled) log.debug("received queue event {}", event);
+        if (debugEnabled) log.debug("received bundle added queue event {}", event);
+        jobScheduler.wakeUp();
+      }
+
+      @Override
+      public void bundleRemoved(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
+        if (debugEnabled) log.debug("received bundle removed queue event {}", event);
         jobScheduler.wakeUp();
       }
     });
