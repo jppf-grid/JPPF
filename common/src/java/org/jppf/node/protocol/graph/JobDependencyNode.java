@@ -26,7 +26,6 @@ import org.slf4j.*;
 /**
  * Instances of this class represent a node in the job dependencies graph.
  * They also maintain state information about the job and its dependencies.
- * @exclude
  * @since 6.2
  */
 public class JobDependencyNode implements Serializable {
@@ -151,7 +150,7 @@ public class JobDependencyNode implements Serializable {
   }
 
   /**
-   * Determine whether this node has any pending dependency.
+   * Determine whether this node has any pending (not completed) dependency.
    * @return {@code true} if there is any pending dependency, {@code false} otherwise.
    */
   public boolean hasPendingDependency() {
@@ -188,7 +187,7 @@ public class JobDependencyNode implements Serializable {
   }
 
   /**
-   * Get the depencies for this node.
+   * Get the dependencies for this node.
    * @return a collection of {@link JobDependencyNode}s, possibly empty.
    */
   public Collection<JobDependencyNode> getDependencies() {
@@ -207,7 +206,7 @@ public class JobDependencyNode implements Serializable {
    * Get the nodes that depend on this node.
    * @return a collection of {@link JobDependencyNode}s, possibly empty.
    */
-  public Collection<JobDependencyNode> getDependendedOn() {
+  public Collection<JobDependencyNode> getDependedOn() {
     return dependedOn.values();
   }
 
@@ -269,13 +268,15 @@ public class JobDependencyNode implements Serializable {
   /**
    * Specify whether this node should be removed from the graph upon the corresponding job completion.
    * @param removeUponCompletion {@code true} to specify that this node should be removed from the graph, {@code false} otherwise.
+   * @exclude
    */
   public void setRemoveUponCompletion(final boolean removeUponCompletion) {
     this.removeUponCompletion = removeUponCompletion;
   }
 
   /**
-   * @return whether the job represented by this dependency node should be cancelled when it arrives in the server queue.
+   * Determine whether the job represented by this dependency node has been cancelled or should be cancelled when it arrives in the server queue.
+   * @return {@code true} if the job has been marked as cancelled, {@code false} otherwise.
    */
   public boolean isCancelled() {
     return cancelled;
@@ -283,6 +284,7 @@ public class JobDependencyNode implements Serializable {
 
   /**
    * @param cancelled {@code true} to cancel the job upon queueing, {@code false} otherwise.
+   * @exclude
    */
   public void setCancelled(final boolean cancelled) {
     this.cancelled = cancelled;

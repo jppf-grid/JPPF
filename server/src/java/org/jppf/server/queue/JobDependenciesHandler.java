@@ -42,7 +42,7 @@ public class JobDependenciesHandler {
   /**
    * The dependency graph.
    */
-  private final JobDependencyGraph graph = new JobDependencyGraph();
+  private final MutableJobDependencyGraph graph = new MutableJobDependencyGraph();
   /**
    * The job queue.
    */
@@ -137,7 +137,7 @@ public class JobDependenciesHandler {
   private List<String> processCancellation(final JobDependencyNode node) {
     final List<String> toCancel = new ArrayList<>();
     synchronized(graph) {
-      final Collection<JobDependencyNode> dependedOn = node.getDependendedOn();
+      final Collection<JobDependencyNode> dependedOn = node.getDependedOn();
       if (dependedOn != null) {
         for (final JobDependencyNode dependent: dependedOn) {
           if (debugEnabled) log.debug("cancelling {}", dependent);
@@ -152,7 +152,7 @@ public class JobDependenciesHandler {
   /**
    * @return the dependency graph.
    */
-  public JobDependencyGraph getGraph() {
+  public MutableJobDependencyGraph getGraph() {
     return graph;
   }
 

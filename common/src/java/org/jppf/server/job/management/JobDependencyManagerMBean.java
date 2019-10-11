@@ -18,7 +18,9 @@
 
 package org.jppf.server.job.management;
 
-import java.util.Set;
+import java.util.*;
+
+import org.jppf.node.protocol.graph.*;
 
 /**
  * A simple management interface for the server-side job dependency graph.
@@ -37,8 +39,39 @@ public interface JobDependencyManagerMBean {
   void removeNodes(final String...ids);
 
   /**
+   * Get the size - the number of nodes or vertices - of the job dependency grpah.
+   * @return the graph size, always >= 0.
+   */
+  int getGraphSize();
+
+  /**
    * Get the ids of all the nodes currently in the graph
    * @return a set of node ids.
    */
   Set<String> getNodeIds();
+
+  /**
+   * Get all the nodes in the job dependency graph.
+   * @return a collection of {@link JobDependencyNode} objects.
+   */
+  Collection<JobDependencyNode> getAllNodes();
+
+  /**
+   * Get the nodes in the job dependency graph, whose corresponding job has arrved int he job queue.
+   * @return a collection of {@link JobDependencyNode} objects.
+   */
+  Collection<JobDependencyNode> getQueuedNodes();
+
+  /**
+   * Get the node with the specified dependency id.
+   * @param id the id of the job node to find.
+   * @return a {@link JobDependencyNode}, or {@code null} if there is no node with this id in the job dependency graph.
+   */
+  JobDependencyNode getNode(final String id);
+
+  /**
+   * Get the grap of job dependencies.
+   * @return an instance of {@link JobDependencyGraph}.
+   */
+  JobDependencyGraph getGraph();
 }

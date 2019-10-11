@@ -22,11 +22,16 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import javax.management.*;
+
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.job.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.*;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.job.management.JobDependencyManagerMBean;
+import org.jppf.server.job.management.*;
 import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
@@ -41,6 +46,9 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public class TestJobDependencies extends BaseTest {
+  /** */
+  private static JobDependencyManagerMBean dependencyManager;
+
   /** */
   @Rule
   public TestWatcher setup1D1NInstanceWatcher = new TestWatcher() {
@@ -59,6 +67,7 @@ public class TestJobDependencies extends BaseTest {
     final TestConfiguration cfg = BaseSetup.DEFAULT_CONFIG.copy();
     cfg.driver.log4j = "classes/tests/config/log4j-driver.TestJobDependencies.properties";
     client = BaseSetup.setup(1, 2, true, cfg);
+    dependencyManager = BaseSetup.getJMXConnection().getJobDependencyManager();
   }
 
   /**
@@ -132,7 +141,7 @@ public class TestJobDependencies extends BaseTest {
         assertEquals(jobsPerLayer, layerList.size());
         count++;
       }
-      checkGraphEmpty();
+      checkGraphSize(0);
     } finally {
       if (pool != null) pool.setMaxJobs(oldMaxJobs);
     }
@@ -165,7 +174,7 @@ public class TestJobDependencies extends BaseTest {
       assertEquals(layers * jobsPerLayer, endedJobs.size());
       assertEquals(layers, jobListener.layersOrder.size());
       assertEquals(layers, jobListener.layerMap.size());
-      checkGraphEmpty();
+      checkGraphSize(0);
     } finally {
       if (pool != null) pool.setMaxJobs(oldMaxJobs);
     }
@@ -196,7 +205,7 @@ public class TestJobDependencies extends BaseTest {
       assertEquals(layers * jobsPerLayer, endedJobs.size());
       assertEquals(layers, jobListener.layersOrder.size());
       assertEquals(layers, jobListener.layerMap.size());
-      checkGraphEmpty();
+      checkGraphSize(0);
     } finally {
       if (pool != null) pool.setMaxJobs(oldMaxJobs);
     }
@@ -207,11 +216,11 @@ public class TestJobDependencies extends BaseTest {
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 10_000L)
-  public void testSubmissionFrom2Clients() throws Exception {
+  public void testSubmissionFromTwoClients() throws Exception {
     int oldMaxJobs = 1;
     JPPFConnectionPool pool = null;
     final int layers = 4, nbTasks = 10;
-    try (final JPPFClient client2 = new JPPFClient()) {
+    try (final JPPFClient client2 = new JPPFClient(client.getConfig())) {
       pool = client.awaitWorkingConnectionPool();
       oldMaxJobs = pool.getMaxJobs();
       pool.setMaxJobs(Integer.MAX_VALUE);
@@ -232,9 +241,86 @@ public class TestJobDependencies extends BaseTest {
         assertEquals(job1.getName(), job2.getName());
         assertEquals(job1.getUuid(), job2.getUuid());
       }
-      checkGraphEmpty();
+      checkGraphSize(0);
     } finally {
       if (pool != null) pool.setMaxJobs(oldMaxJobs);
+    }
+  }
+
+  /**
+   * Test that the job dependency MBean reports an accurate state of the job graph.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10_000L)
+  public void testJobDependencyManager() throws Exception {
+    int oldMaxJobs = 1;
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
+    final DriverJobManagementMBean jobManager = jmx.getJobManager();
+    final int layers = 4, nbTasks = 10;
+    try (final JobQUeuedListener queuedListener = new JobQUeuedListener(jobManager)) {
+      oldMaxJobs = pool.getMaxJobs();
+      pool.setMaxJobs(Integer.MAX_VALUE);
+      final List<JPPFJob> jobs = createLayeredJobs(layers, 1, "job", nbTasks, 1L);
+      jobs.get(layers - 1).getSLA().setSuspended(true);
+      for (int i=0; i<layers; i++) {
+        final JPPFJob job = jobs.get(i);
+        print(false, false, ">>> submitting %s <<<", job.getName());
+        client.submitAsync(job);
+        queuedListener.awaitJobQueued(job.getUuid());
+        final int expectedSize = (i < layers - 1) ? i + 2 : i + 1;
+        print(false, false, "checking expected graph size = %d", expectedSize);
+        final int graphSize = dependencyManager.getGraphSize();
+        assertEquals(expectedSize, graphSize);
+        print(false, false, "graph size is now %d, checking graph", graphSize);
+        final JobDependencyGraph graph = dependencyManager.getGraph();
+        assertNotNull(graph);
+        final Collection<JobDependencyNode> nodes = graph.getAllNodes();
+        assertNotNull(nodes);
+        assertEquals(expectedSize, nodes.size());
+        final String id = layeredJobId("job", i, 0);
+        print(false, false, "checking node %s", id);
+        final JobDependencyNode node = graph.getNode(id);
+        assertNotNull(node);
+        assertEquals(job.getUuid(), node.getJobUuid());
+        if (i == 0) assertTrue(node.isRemoveUponCompletion());
+        else assertFalse(node.isRemoveUponCompletion());
+        assertFalse(node.isCompleted());
+        assertFalse(node.isCancelled());
+
+        print(false, false, "checking dependencies for node %s", node);
+        final Collection<JobDependencyNode> dependencies = node.getDependencies();
+        assertNotNull(dependencies);
+        if (i < layers - 1) {
+          assertEquals(1, dependencies.size());
+          final JobDependencyNode dep = dependencies.iterator().next();
+          assertNotNull(dep);
+          assertEquals(layeredJobId("job", i + 1, 0), dep.getId());
+        }
+        else assertTrue(dependencies.isEmpty());
+
+        print(false, false, "checking depended on for node %s", node);
+        final Collection<JobDependencyNode> dependedOn = node.getDependedOn();
+        assertNotNull(dependedOn);
+        if (i == 0) assertTrue(dependedOn.isEmpty());
+        else {
+          assertEquals(1, dependedOn.size());
+          final JobDependencyNode dep = dependedOn.iterator().next();
+          assertNotNull(dep);
+          assertEquals(layeredJobId("job", i - 1, 0), dep.getId());
+        }
+      }
+      print(false, false, "resuming leaf job");
+      final String uuid = jobs.get(layers - 1).getUuid();
+      jobManager.resumeJob(uuid);
+      for (final JPPFJob job: jobs) {
+        print(false, false, "checking results for %s", job.getName());
+        checkJobResults(job, false);
+      }
+      print(false, false, "checking that graph is emptys");
+      checkGraphSize(0);
+    } finally {
+      pool.setMaxJobs(oldMaxJobs);
     }
   }
 
@@ -271,7 +357,7 @@ public class TestJobDependencies extends BaseTest {
       final List<JPPFJob> jobs = new ArrayList<>(jobsPerLayer);
       layers.add(jobs);
       for (int j = 0; j < jobsPerLayer; j++) {
-        final JPPFJob job = BaseTestHelper.createJob(String.format("%s-%03d-%03d", namePrefix, i, j), false, tasksPerJob, LifeCycleTask.class, taskDuration);
+        final JPPFJob job = BaseTestHelper.createJob(layeredJobId(namePrefix, i, j), false, tasksPerJob, LifeCycleTask.class, taskDuration);
         jobs.add(job);
         final JobDependencySpec spec = job.getSLA().getDependencySpec();
         spec.setId(job.getName()).setCascadeCancellation(true);
@@ -287,6 +373,16 @@ public class TestJobDependencies extends BaseTest {
       allJobs.addAll(jobs);
     }
     return allJobs;
+  }
+
+  /**
+   * @param namePrefix .
+   * @param layer .
+   * @param index .
+   * @return a dependency id.
+   */
+  private static String layeredJobId(final String namePrefix, final int layer, final int index) {
+    return String.format("%s-%03d-%03d", namePrefix, layer, index);
   }
 
   /**
@@ -355,11 +451,50 @@ public class TestJobDependencies extends BaseTest {
 
   /**
    * Check that the graph becomes emty after a maximum set time.
+   * @param expectedSize the expected number of nodes in the dependency graph.
    * @throws Exception if any error occurs.
    */
-  private static void checkGraphEmpty() throws Exception {
-    final JobDependencyManagerMBean dependencyManager = BaseSetup.getJMXConnection().getJobDependencyManager();
-    assertTrue("remaining ids: " + dependencyManager.getNodeIds(),
-      ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> dependencyManager.getNodeIds().isEmpty(), 250L, 5000L, false));
+  private static void checkGraphSize(final int expectedSize) throws Exception {
+    final boolean result = ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> dependencyManager.getGraphSize() == expectedSize, 5000L, 125L, true);
+    assertTrue("remaining ids: " + dependencyManager.getNodeIds() + " (expected " + expectedSize + ")", result);
+  }
+
+  /** */
+  private static final class JobQUeuedListener implements NotificationListener, AutoCloseable {
+    /** */
+    private final Set<String> queuedUuids = new HashSet<>();
+    /** */
+    private final DriverJobManagementMBean jobManager;
+
+    /**
+     * @param jobManager .
+     */
+    private JobQUeuedListener(final DriverJobManagementMBean jobManager) {
+      this.jobManager = jobManager;
+      jobManager.addNotificationListener(this, null, null);
+    }
+
+    @Override
+    public synchronized void handleNotification(final Notification notification, final Object handback) {
+      final JobNotification jobNotif = (JobNotification) notification;
+      if (jobNotif.getEventType() == JobEventType.JOB_QUEUED) {
+        queuedUuids.add(jobNotif.getJobInformation().getJobUuid());
+        notifyAll();
+      }
+    }
+
+    /**
+     * Wait for a notification of type JOB_QUEUED for the job with the specified uuid.
+     * @param uuid  uuid of the job to wait for.
+     * @throws InterruptedException if the thread is interrupted while waiting.
+     */
+    private synchronized void awaitJobQueued(final String uuid) throws InterruptedException {
+      while (!queuedUuids.contains(uuid)) wait(50L);
+    }
+
+    @Override
+    public void close() throws Exception {
+      jobManager.removeNotificationListener(this);
+    }
   }
 }

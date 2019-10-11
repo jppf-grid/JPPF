@@ -18,14 +18,15 @@
 
 package org.jppf.server.job.management;
 
-import java.util.Set;
+import java.util.*;
 
-import org.jppf.node.protocol.graph.JobDependencyGraph;
+import org.jppf.node.protocol.graph.*;
 import org.jppf.server.JPPFDriver;
 
 /**
  * Concrete implementation of the job dependency graph management interface.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JobDependencyManager implements JobDependencyManagerMBean {
   /**
@@ -35,7 +36,7 @@ public class JobDependencyManager implements JobDependencyManagerMBean {
   /**
    * 
    */
-  private final JobDependencyGraph graph;
+  private final MutableJobDependencyGraph graph;
 
   /**
    * 
@@ -48,13 +49,38 @@ public class JobDependencyManager implements JobDependencyManagerMBean {
 
   @Override
   public void removeNodes(final String... ids) {
-    for (String id: ids) {
+    for (final String id: ids) {
       if (id != null) graph.removeNode(id);
     }
   }
 
   @Override
+  public int getGraphSize() {
+    return graph.getSize();
+  }
+
+  @Override
   public Set<String> getNodeIds() {
     return graph.getNodeIds();
+  }
+
+  @Override
+  public Collection<JobDependencyNode> getAllNodes() {
+    return graph.getAllNodes();
+  }
+
+  @Override
+  public Collection<JobDependencyNode> getQueuedNodes() {
+    return null;
+  }
+
+  @Override
+  public JobDependencyNode getNode(final String id) {
+    return graph.getNode(id);
+  }
+
+  @Override
+  public JobDependencyGraph getGraph() {
+    return new JobDependencyGraphImpl(graph.getAllNodes());
   }
 }

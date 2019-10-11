@@ -25,6 +25,7 @@ import org.jppf.server.JPPFDriver;
  * Implemention of the Service Provider Interface (SPI) for a pluggable server MBean
  * which managages the job dependency graph. 
  * @author Laurent Cohen
+ * @exclude
  */
 public class JobDependencyManagerMBeanProvider implements JPPFDriverMBeanProvider {
   @Override
