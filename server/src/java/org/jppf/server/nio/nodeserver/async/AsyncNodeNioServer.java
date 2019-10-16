@@ -149,6 +149,12 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
         if (debugEnabled) log.debug("received queue event {}", event);
         jobScheduler.wakeUp();
       }
+
+      @Override
+      public void bundleRemoved(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
+        if (debugEnabled) log.debug("received bundle removed queue event {}", event);
+        jobScheduler.wakeUp();
+      }
     });
     initialServerJob = createInitialServerJob(driver);
     nodeReservationHandler = new NodeReservationHandler(driver);
