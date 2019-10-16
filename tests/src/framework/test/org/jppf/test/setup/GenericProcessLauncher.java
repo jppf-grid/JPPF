@@ -357,15 +357,27 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
     wrapper.addListener(new ProcessWrapperEventListener() {
       @Override
       public void outputStreamAltered(final ProcessWrapperEvent event) {
-        System.out.print(formatPrologue() + event.getContent());
+        printStreamEvent(System.out, event);
       }
       @Override
       public void errorStreamAltered(final ProcessWrapperEvent event) {
-        System.err.print(formatPrologue() + event.getContent());
+        printStreamEvent(System.err, event);
       }
     });
     wrapper.setProcess(process = builder.start());
     if (debugEnabled) log.debug(name + "starting process " + process);
+  }
+
+  /**
+   * 
+   * @param stream the stream to print to.
+   * @param event the event that holds the content to print.
+   */
+  private void printStreamEvent(final PrintStream stream, final ProcessWrapperEvent event) {
+    synchronized(stream) {
+      if (stream instanceof TestPrintStream) ((TestPrintStream) stream).printNoHeader(TestPrintStream.getHeader(name) + event.getContent());
+      else stream.print(event.getContent());
+    }
   }
 
   /**
