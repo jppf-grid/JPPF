@@ -58,13 +58,10 @@ public class BaseTest {
   /** */
   protected static JPPFClient client;
   /** */
-  private static final FileFilter logFileFilter = new FileFilter() {
-    @Override
-    public boolean accept(final File path) {
-      if (path.isDirectory()) return false;
-      final String s = path.getName();
-      return (s != null) && s.endsWith(".log");
-    }
+  private static final FileFilter logFileFilter = path -> {
+    if (path.isDirectory()) return false;
+    final String s = path.getName();
+    return (s != null) && s.endsWith(".log");
   };
   /** */
   @ClassRule
@@ -135,7 +132,7 @@ public class BaseTest {
    */
   public static void print(final boolean systemOutOnly, final boolean decorate, final String format, final Object...params) {
     final String message = String.format(Locale.US, format, params);
-    System.out.printf(Locale.US, "[  client] [%s] %s%n", getFormattedTimestamp(), message);
+    System.out.println(message);
     if (!systemOutOnly) {
       String s = "";
       if (decorate) {
@@ -246,8 +243,8 @@ public class BaseTest {
       stdOut = System.out;
       stdErr = System.err;
       try {
-        System.setOut(new PrintStream("std_out.log"));
-        System.setErr(new PrintStream("std_err.log"));
+        System.setOut(new TestPrintStream("std_out.log"));
+        System.setErr(new TestPrintStream("std_err.log"));
       } catch (final Exception e) {
         print("Error redirecting std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
       }
@@ -275,12 +272,7 @@ public class BaseTest {
       final File dir = new File(System.getProperty("user.dir"));
       final File slavesDir = new File(dir, "slave_nodes");
       if (slavesDir.exists() && slavesDir.isDirectory()) {
-        final File[] subdirs = slavesDir.listFiles(new FileFilter() {
-          @Override
-          public boolean accept(final File file) {
-            return file.isDirectory();
-          }
-        });
+        final File[] subdirs = slavesDir.listFiles(file -> file.isDirectory());
         if (subdirs != null) {
           for (final File subdir: subdirs) {
             final File[] logFiles = subdir.listFiles(logFileFilter);

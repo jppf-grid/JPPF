@@ -30,8 +30,6 @@ import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
-import test.org.jppf.test.setup.BaseTest;
-
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.
  * @author Laurent Cohen
@@ -254,7 +252,7 @@ public class BaseTestHelper {
     if ((pools == null) || pools.isEmpty()) return;
     final String[] messages = createMessages(decorate, format, params);
     if (toStdout) {
-      for (final String s: messages) System.out.printf("[  client] [%s] %s%n", BaseTest.getFormattedTimestamp(), s);
+      for (final String s: messages) System.out.println(s);
     }
     if (toClient) {
       for (final String s: messages) log.info(s);
@@ -286,7 +284,7 @@ public class BaseTestHelper {
     if (!toServers && !toNodes && !toClient) return;
     final String[] messages = createMessages(decorate, format, params);
     if (toStdout) {
-      for (final String s: messages) System.out.printf("[  client] [%s] %s%n", BaseTest.getFormattedTimestamp(), s);
+      for (final String s: messages) System.out.println(s);
     }
     if (toClient) {
       for (final String s: messages) log.info(s);
@@ -325,7 +323,7 @@ public class BaseTestHelper {
       try {
         driver.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, LOG_METHOD_SIGNATURE);
       } catch (final Exception e) {
-        System.err.printf("[%s][%s] error invoking remote logging on %s:%n%s%n", BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), driver, ExceptionUtils.getStackTrace(e));
+        System.err.printf("[%s] error invoking remote logging on %s:%n%s%n", ReflectionUtils.getCurrentClassAndMethod(), driver, ExceptionUtils.getStackTrace(e));
       }
     }
     if (toNodes) {
@@ -333,8 +331,7 @@ public class BaseTestHelper {
         final JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
         if (forwarder != null) forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "log", new Object[] { messages }, LOG_METHOD_SIGNATURE);
       } catch (final Exception e) {
-        System.err.printf("[%s][%s] error invoking remote logging on the nodes of %s:%n%s%n",
-          BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), driver, ExceptionUtils.getStackTrace(e));
+        System.err.printf("[%s] error invoking remote logging on the nodes of %s:%n%s%n", ReflectionUtils.getCurrentClassAndMethod(), driver, ExceptionUtils.getStackTrace(e));
       }
     }
   }
