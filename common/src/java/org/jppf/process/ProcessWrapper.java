@@ -173,7 +173,6 @@ public final class ProcessWrapper {
             sb = new StringBuilder(bufferSize);
           }
         }
-        Thread.sleep(1);
       } catch(@SuppressWarnings("unused") final IOException ignore) {
       } catch(final Throwable t) {
         t.printStackTrace();
