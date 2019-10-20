@@ -498,7 +498,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 
   /**
    * Get a proxy to the dependency manager MBean in the driver.
-   * @return an instance of an implementation of {@link JobDependencyManagerMBean}.
+   * @return an instance of an implementation of the {@link JobDependencyManagerMBean} interface.
+   * This is a shortcut method for {@link JMXConnectionWrapper#getProxy(String, Class) getProxy(JobDependencyManagerMBean.MBEAN_NAME, JobDependencyManagerMBean.class)}.
    * @throws Exception if any error occurs.
    */
   public JobDependencyManagerMBean getJobDependencyManager() throws Exception {
