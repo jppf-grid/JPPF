@@ -20,7 +20,7 @@ package org.jppf.client;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import org.jppf.client.event.*;
@@ -387,6 +387,25 @@ public abstract class AbstractJPPFJob<J extends AbstractJPPFJob<J>> implements S
    */
   public AtomicBoolean getCancellingFlag() {
     return cancelling;
+  }
+
+  /**
+   * Wait until the job is complete or the timeout expires, whichever happens first.
+   * @param timeout the maximum time to wait for the job completion.
+   * @param raiseTimeoutException whether to raise a {@link TimeoutException} when the timeout expires.
+   * @throws TimeoutException if the timeout expired and {@code raiseTimeoutException == true}.
+   * @throws InterruptedException if the current thread is interrupted while wating for the results.
+   */
+  void await(final long timeout, final boolean raiseTimeoutException) throws TimeoutException, InterruptedException {
+    final long start = System.nanoTime();
+    long elapsed;
+    final int nbTasks = tasks.size();
+    synchronized(results) {
+      while (((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout) && ((results.size() < nbTasks) || !getStatus().isDone())) {
+        results.wait(timeout - elapsed);
+      }
+      if (!getStatus().isDone() && raiseTimeoutException) throw new TimeoutException("timeout expired");
+    }
   }
 
   /**

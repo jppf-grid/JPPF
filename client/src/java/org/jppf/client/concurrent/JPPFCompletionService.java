@@ -120,7 +120,7 @@ public class JPPFCompletionService<V> implements CompletionService<V> {
     try {
       future.getResult(0L);
     } catch (final TimeoutException e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
     queue.offer(future);
   }

@@ -84,7 +84,7 @@ public final class ConcurrentUtils {
       } catch (@SuppressWarnings("unused") final InterruptedException e) {
       }
     }
-    if (throwExceptionOnTImeout && (elapsed > timeout)) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d ms", timeout));
+    if (throwExceptionOnTImeout && (elapsed >= timeout)) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d ms", timeout));
     return fulfilled;
   }
 

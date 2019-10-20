@@ -118,20 +118,26 @@ public class ExcludeDoclet {
     Class<?> cls = obj.getClass();
     if (cls.getName().startsWith("com.sun.")) {
       return Proxy.newProxyInstance(cls.getClassLoader(), cls.getInterfaces(), new ExcludeHandler(obj));
-    } else if (obj instanceof Object[]) {
-      Class<?> componentType = expect.getComponentType();
+    } else if (cls.isArray()) {
       Object[] array = (Object[]) obj;
-      List<Object> list = new ArrayList<>(array.length);
-      for (int i = 0; i < array.length; i++) {
-        Object entry = array[i];
-        if ((entry instanceof Doc) && exclude((Doc) entry)) continue;
-        list.add(process(entry, componentType));
-      }
-      try {
-        return list.toArray((Object[]) Array.newInstance(componentType, list.size()));
-      } catch (Exception e) {
-        System.err.println(e.getClass().getName() + (e.getMessage() == null ? "" : ": " + e.getMessage()) + " for obj=" + obj + ", expect=" + expect);
-        return null;
+      if (array.length > 0) {
+        Class<?> componentType = expect.getComponentType();
+        if (componentType != null) {
+          List<Object> list = new ArrayList<>(array.length);
+          for (int i = 0; i < array.length; i++) {
+            Object entry = array[i];
+            if ((entry instanceof Doc) && exclude((Doc) entry)) continue;
+            list.add(process(entry, componentType));
+          }
+          try {
+            return list.toArray((Object[]) Array.newInstance(componentType, list.size()));
+          } catch (Exception e) {
+            System.out.println(e.getClass().getName() + (e.getMessage() == null ? "" : ": " + e.getMessage()) + " for obj=" + obj
+              + ", expect=" + expect + ", cls=" + cls + ", componentType=" + componentType + ", list=" + list);
+            //e.printStackTrace(System.out);
+            return null;
+          }
+        }
       }
     }
     return obj;

@@ -235,13 +235,13 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
     if (log.isDebugEnabled()) log.debug("firing {} event with {} tasks for {}, connection = {}", type, (tasks == null ? 0 : tasks.size()), this, channel);
     final JobEvent event = new JobEvent(this, channel, tasks);
     switch(type) {
-      case JOB_START: for (JobListener listener: listeners) listener.jobStarted(event);
+      case JOB_START: for (final JobListener listener: listeners) listener.jobStarted(event);
       break;
-      case JOB_END: for (JobListener listener: listeners) listener.jobEnded(event);
+      case JOB_END: for (final JobListener listener: listeners) listener.jobEnded(event);
       break;
-      case JOB_DISPATCH: for (JobListener listener: listeners) listener.jobDispatched(event);
+      case JOB_DISPATCH: for (final JobListener listener: listeners) listener.jobDispatched(event);
       break;
-      case JOB_RETURN: for (JobListener listener: listeners) listener.jobReturned(event);
+      case JOB_RETURN: for (final JobListener listener: listeners) listener.jobReturned(event);
       break;
     }
   }
@@ -382,25 +382,6 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
   }
 
   /**
-   * Wait until the job is complete or the timeout expires, whichever happens first.
-   * @param timeout the maximum time to wait for the job completion.
-   * @param raiseTimeoutException whether to raise a {@link TimeoutException} when the timeout expires.
-   * @throws TimeoutException if the timeout expired and {@code raiseTimeoutException == true}.
-   * @throws InterruptedException if the current thread is interrupted while wating for the results.
-   */
-  void await(final long timeout, final boolean raiseTimeoutException) throws TimeoutException, InterruptedException {
-    final long start = System.nanoTime();
-    long elapsed;
-    final int nbTasks = tasks.size();
-    synchronized(results) {
-      while (((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout) && ((results.size() < nbTasks) || !getStatus().isDone())) {
-        results.wait(timeout - elapsed);
-      }
-      if (!getStatus().isDone() && raiseTimeoutException) throw new TimeoutException("timeout expired");
-    }
-  }
-
-  /**
    * Called to notify that the results of a number of tasks have been received from the server.
    * @param tasks the list of tasks whose results have been received from the server.
    * @param throwable the throwable that was raised while receiving the results.
@@ -449,6 +430,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * This is a shortcut for {@code getSLA().getDependencySpec().setId(idSupplier.get())}.
    * @param idSupplier a {@link JobDependencyIdSupplier dependency id supplier} which computes a dependency id from this job's state.
    * @return this job, for method call chaining.
+   * @see JobDependencySpec#setId(String)
    * @since 6.2
    */
   public JPPFJob setDependencyId(final Supplier<String> idSupplier) {
@@ -461,6 +443,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * This is a shortcut for {@code getSLA().getDependencySpec().setId(idSupplier.getId(this))}.
    * @param idSupplier a {@link JobDependencyIdSupplier dependency id supplier} which computes a dependency id from this job's state.
    * @return this job, for method call chaining.
+   * @see JobDependencySpec#setId(String)
    * @since 6.2
    */
   public JPPFJob setDependencyId(final JobDependencyIdSupplier idSupplier) {
@@ -473,6 +456,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * This is a shortcut for {@code getSLA().getDependencySpec().setId(id)}.
    * @param id the id of this job in the job dependency graph.
    * @return this job, for method call chaining.
+   * @see JobDependencySpec#setId(String)
    * @since 6.2
    */
   public JPPFJob setDependencyId(final String id) {
@@ -484,6 +468,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * Convenience method to set this job's uuid as dependency id.
    * This is a shortcut for {@code setDependencyId(getUuid())}.
    * @return this job, for method call chaining.
+   * @see JobDependencySpec#setId(String)
    * @since 6.2
    */
   public JPPFJob setUuidAsDependencyId() {
@@ -494,6 +479,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * Convenience method to set this job's name as dpeendency id.
    * This is a shortcut for {@code setDependencyId(getName())}.
    * @return this job, for method call chaining.
+   * @see JobDependencySpec#setId(String)
    * @since 6.2
    */
   public JPPFJob setNameAsDependencyId() {
@@ -504,6 +490,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * Add the specified jobs as dependencies to this job.
    * @param dependencies the job to add as dependencies to this job.
    * @return this job, for method call chaining.
+   * @see JobDependencySpec#addDependencies(String[])
    * @since 6.2
    */
   public JPPFJob addDependencies(final JPPFJob...dependencies) {
@@ -516,11 +503,38 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * Add the specified jobs as dependencies to this job.
    * @param dependencies the job to add as dependencies to this job.
    * @return this job, for method call chaining.
+   * @see JobDependencySpec#addDependencies(Collection)
    * @since 6.2
    */
   public JPPFJob addDependencies(final Collection<JPPFJob> dependencies) {
     final JobDependencySpec spec = getSLA().getDependencySpec();
     for (final JPPFJob dependency: dependencies) spec.addDependencies(dependency.getSLA().getDependencySpec().getId());
+    return this;
+  }
+
+  /**
+   * Set whether this job is a root in a job dependency graph.
+   * This is a shortcut for {@code getSLA().getDependencySpec().setGraphRoot(graphRoot)}.
+   * @param graphRoot {@code true} if the job is a root in the dependency graph and should be removed from the graph after completion, {@code false} otherwise.
+   * @return this job, for method call chaining.
+   * @see JobDependencySpec#setGraphRoot(boolean)
+   * @since 6.2
+   */
+  public JPPFJob setGraphRoot(final boolean graphRoot) {
+    getSLA().getDependencySpec().setGraphRoot(graphRoot);
+    return this;
+  }
+
+  /**
+   * Set whether cancellation of this job should trigger the cancellation of the jobs that depend on it.
+   * This is a shortcut for {@code getSLA().getDependencySpec().setCascadeCancellation(cascadeCancellation)}.
+   * @param cascadeCancellation {@code true} (the default) if cancellation of this job should trigger the cancellation of its dependents, {@code false} otherwise.
+   * @return this job, for method call chaining.
+   * @see JobDependencySpec#setCascadeCancellation(boolean)
+   * @since 6.2
+   */
+  public JPPFJob setCascadeCancellation(final boolean cascadeCancellation) {
+    getSLA().getDependencySpec().setCascadeCancellation(cascadeCancellation);
     return this;
   }
 }
