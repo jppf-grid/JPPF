@@ -23,12 +23,17 @@ import java.util.List;
 /**
  * Exception raised when a dependency cycle is detected in a graph of jobs.
  * @author Laurent Cohen
+ * @since 6.2
  */
 public class JPPFJobDependencyCycleException extends JPPFDependencyCycleException {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * The dependency id of the job in which the insertion of a dependency causes a cycle.
+   */
+  private final String cycleStart;
   /**
    * An ordered list of dependency ids that make the path of the detected cycle.
    */
@@ -37,11 +42,21 @@ public class JPPFJobDependencyCycleException extends JPPFDependencyCycleExceptio
   /**
    * Initialize this exception with a specified message.
    * @param message the message for this exception.
-   * @param idPath an ordered list of dependency ids that make the path of the detected cycle.
+   * @param cycleStart the dependency id of the job in which the insertion of a dependency causes a cycle.
+   * @param idPath an ordered list of dependency ids that make the path of the detected cycle, excluding {@code cycleStart}.
    */
-  public JPPFJobDependencyCycleException(final String message, final List<String> idPath) {
+  public JPPFJobDependencyCycleException(final String message, final String cycleStart, final List<String> idPath) {
     super(message);
+    this.cycleStart = cycleStart;
     this.idPath = idPath;
+  }
+
+  /**
+   * Get the dependency id of the job in which the insertion of a dependency causes a cycle.
+   * @return the dependency id of the cycle start.
+   */
+  public String getCycleStart() {
+    return cycleStart;
   }
 
   /**

@@ -79,6 +79,7 @@ public class JobDependencyNode implements Serializable {
    * Create a new node with the specified id.
    * @param id the id of this node.
    * @param jobUuid the job uuid or {@code null} if the uuid is unknown.
+   * @exclude
    */
   public JobDependencyNode(final String id, final String jobUuid) {
     this.id = id;
@@ -107,7 +108,7 @@ public class JobDependencyNode implements Serializable {
       sb.append(getId());
       final String message = sb.toString();
       log.error("cycle detected while adding dependency '{}' to '{}' : {}", depId, getId(), message);
-      throw new JPPFJobDependencyCycleException(message, cycle);
+      throw new JPPFJobDependencyCycleException(message, getId(), cycle);
     }
     dependencies.put(depId, node);
     node.addDependedOn(this);
@@ -258,16 +259,16 @@ public class JobDependencyNode implements Serializable {
   }
 
   /**
-   * Determine whether this node should be removed from the graph upon the corresponding job completion.
-   * @return {@code true} if this node should be removed from the graph, {@code false} otherwise.
+   * Determine whether this node is a job dependency graph root.
+   * @return {@code true} if this node is a graph root, {@code false} otherwise.
    */
   public boolean isGraphRoot() {
     return graphRoot;
   }
 
   /**
-   * Specify whether this node should be removed from the graph upon the corresponding job completion.
-   * @param graphRoot {@code true} to specify that this node should be removed from the graph, {@code false} otherwise.
+   * Specify whether this node is a job dependency graph root.
+   * @param graphRoot {@code true} to specify that this node is a graph root, {@code false} otherwise.
    * @exclude
    */
   public void setGraphRoot(final boolean graphRoot) {

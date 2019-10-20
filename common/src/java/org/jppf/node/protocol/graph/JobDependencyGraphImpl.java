@@ -117,4 +117,9 @@ public class JobDependencyGraphImpl implements JobDependencyGraph {
       if (node.getJobUuid() != null) nodesByUuid.put(node.getJobUuid(), node);
     }
   }
+
+  @Override
+  public synchronized boolean isEmpty() {
+    return nodes.isEmpty();
+  }
 }

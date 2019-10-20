@@ -23,6 +23,7 @@ import org.jppf.JPPFException;
 /**
  * Exception raised when a dependency cycle is detected between tasks or between jobs.
  * @author Laurent Cohen
+ * ]since 6.2
  */
 public class JPPFDependencyCycleException extends JPPFException {
   /**

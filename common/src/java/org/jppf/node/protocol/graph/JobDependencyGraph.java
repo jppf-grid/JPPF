@@ -22,13 +22,12 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * 
+ * A representation of the jobs dependencies graph. This is a directed acyclic graph.
  * @author Laurent Cohen
  */
 public interface JobDependencyGraph extends Serializable {
-
   /**
-   * Get the node for the specified id.
+   * Get the node for the specified dependency id.
    * @param id the id of the node to retrieve.
    * @return a {@link JobDependencyNode} instance, or {@code null} if no node has the specified id.
    */
@@ -41,26 +40,26 @@ public interface JobDependencyGraph extends Serializable {
   int getSize();
 
   /**
-   * Get the ids of all trhe nodes currently in this graph.
+   * Get the dependency ids of all the nodes currently in this graph.
    * @return a Set of nodes ids, possibly empty.
    */
   Set<String> getNodeIds();
 
   /**
-   * Get the node for the specified id.
+   * Get the node whose corresponding job has the specified uuid.
    * @param jobUuid the id of job associated with the node to retrieve.
    * @return a {@link JobDependencyNode} instance, or {@code null} if no node as the specified job uuid.
    */
   JobDependencyNode getNodeByJobUuid(String jobUuid);
 
   /**
-   * Get the ids of all trhe nodes currently in this graph.
+   * Get the ids of all the nodes currently in this graph.
    * @return a Set of nodes ids, possibly empty.
    */
   Collection<JobDependencyNode> getAllNodes();
 
   /**
-   * Get the ids of all trhe nodes currently in this graph.
+   * Get the nodes in the job dependency graph, whose corresponding job has arrived in the job queue.
    * @return a Set of nodes ids, possibly empty.
    */
   Collection<JobDependencyNode> getQueuedNodes();
@@ -72,4 +71,9 @@ public interface JobDependencyGraph extends Serializable {
    */
   Collection<JobDependencyNode> getDependedOn(String id);
 
+  /**
+   * Determine whether this job dependency graph is empy.
+   * @return {@code true} if this graph is empty, {@code false} otherwise.
+   */
+  boolean isEmpty();
 }

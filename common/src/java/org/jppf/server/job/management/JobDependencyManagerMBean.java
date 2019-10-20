@@ -20,6 +20,7 @@ package org.jppf.server.job.management;
 
 import java.util.*;
 
+import org.jppf.job.JobSelector;
 import org.jppf.node.protocol.graph.*;
 
 /**
@@ -30,16 +31,10 @@ public interface JobDependencyManagerMBean {
   /**
    * Name of this server-side MBean.
    */
-  String MBEAN_NAME = "org.jppf:name=dependency.manager,type=driver";
+  String MBEAN_NAME = "org.jppf:name=jobDependencyManager,type=driver";
 
   /**
-   * Remove the jobs with the specified ids from the dependency graph.
-   * @param ids the ids of the jobs to remove.
-   */
-  void removeNodes(final String...ids);
-
-  /**
-   * Get the size - the number of nodes or vertices - of the job dependency grpah.
+   * Get the size - the number of nodes or vertices that represent jobs - of the job dependency grpah.
    * @return the graph size, always >= 0.
    */
   int getGraphSize();
@@ -57,10 +52,17 @@ public interface JobDependencyManagerMBean {
   Collection<JobDependencyNode> getAllNodes();
 
   /**
-   * Get the nodes in the job dependency graph, whose corresponding job has arrved int he job queue.
+   * Get the nodes in the job dependency graph, whose corresponding job has arrived in the job queue.
    * @return a collection of {@link JobDependencyNode} objects.
    */
   Collection<JobDependencyNode> getQueuedNodes();
+
+  /**
+   * Get the nodes in the job dependency graph, whose corresponding job has arrived in the job queue, filtered by the specified job selector.
+   * @param selector a {@link JobSelector} to filter the returned jobs. If {@code null} then all queued jobs are returned.
+   * @return a collection of {@link JobDependencyNode} objects, possibly empty.
+   */
+  Collection<JobDependencyNode> getQueuedNodes(JobSelector selector);
 
   /**
    * Get the node with the specified dependency id.

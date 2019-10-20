@@ -20,6 +20,8 @@ package org.jppf.server.job.management;
 
 import java.util.*;
 
+import org.jppf.job.JobSelector;
+import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.node.protocol.graph.*;
 import org.jppf.server.JPPFDriver;
 
@@ -34,24 +36,17 @@ public class JobDependencyManager implements JobDependencyManagerMBean {
    */
   final JPPFDriver driver;
   /**
-   * 
+   * Reference to the job dependency graph managed by the server.
    */
   private final MutableJobDependencyGraph graph;
 
   /**
-   * 
+   * Initialize this dependency manager with the specified JPPF driver.
    * @param driver the JPPF driver.
    */
   public JobDependencyManager(final JPPFDriver driver) {
     this.driver = driver;
     this.graph = driver.getQueue().getDependenciesHandler().getGraph();
-  }
-
-  @Override
-  public void removeNodes(final String... ids) {
-    for (final String id: ids) {
-      if (id != null) graph.removeNode(id);
-    }
   }
 
   @Override
@@ -71,7 +66,21 @@ public class JobDependencyManager implements JobDependencyManagerMBean {
 
   @Override
   public Collection<JobDependencyNode> getQueuedNodes() {
-    return null;
+    return graph.getQueuedNodes();
+  }
+
+  @Override
+  public Collection<JobDependencyNode> getQueuedNodes(final JobSelector selector) {
+    final Collection<JobDependencyNode> queuedNodes = graph.getQueuedNodes();
+    if (selector == null) return queuedNodes;
+    final List<JobDependencyNode> result = new ArrayList<>(queuedNodes.size());
+    for (final JobDependencyNode node: queuedNodes) {
+      final String uuid = node.getJobUuid();
+      if (uuid == null) continue;
+      final JPPFDistributedJob job = driver.getJob(uuid);
+      if ((job != null) && selector.accepts(job)) result.add(node);
+    }
+    return result;
   }
 
   @Override

@@ -27,6 +27,7 @@ import org.jppf.utils.stats.JPPFStatistics;
  * MBean interface for the management of a JPPF driver.
  * @author Laurent Cohen
  */
+@JPPFMBeanDescription("administration of the JPPF server")
 public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Name of the driver's admin MBean.
@@ -38,6 +39,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return a <code>JPPFStatistics</code> instance.
    * @throws Exception if any error occurs.
    */
+  @JPPFMBeanDescription("get the server statistics")
   JPPFStatistics statistics() throws Exception;
 
   /**

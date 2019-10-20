@@ -118,7 +118,7 @@ public class JobDependencySpec implements Serializable {
   }
 
   /**
-   * Specify whether the job is a root in the dependency graph it and its dependencies should be removed from the graph upon completetion.
+   * Specify whether the job is a root in the dependency graph, implying that it and its dependencies should be removed from the graph upon completetion.
    * For all practical purposes, this method should only be called for roots in a job dependency graph, that is, for jobs upon which no other job depends.
    * @param graphRoot {@code true} if the job is a root in the dependency graph and should be removed from the graph after completion, {@code false} otherwise.
    * @return this {@code JobDependencySpec}, for method call chaining.
