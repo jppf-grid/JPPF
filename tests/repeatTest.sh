@@ -27,7 +27,7 @@ fi
 echo "PATTERN = $PATTERN, repeats = $2"
 
 for i in `seq 1 $NB_REPEATS`; do
-  echo "\n"
+  echo ""
   echo "===== Test run $i ====="
   rm -f *.log > nul.tmp
   ant test.pattern2 -Dpattern=$PATTERN
@@ -40,6 +40,6 @@ done
 echo -n "end time:   " >> time.tmp
 date --iso-8601='seconds' >> time.tmp
 
-echo "\n"
+echo ""
 cat time.tmp
 rm -f *.tmp

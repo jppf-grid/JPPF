@@ -29,7 +29,7 @@ import org.jppf.job.JobEventType;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
-import org.junit.Test;
+import org.junit.*;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -153,6 +153,7 @@ public class TestJPPFJob extends Setup1D1N {
    * @throws Exception if any error occurs
    */
   @SuppressWarnings("deprecation")
+  @Ignore
   @Test(timeout=15000)
   public void testCancelImmediately() throws Exception {
     ///final String name  = ReflectionUtils.getCurrentMethodName();
