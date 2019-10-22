@@ -19,12 +19,12 @@
 package org.jppf.example.job.dependencies;
 
 import java.util.*;
+import java.util.stream.*;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
-import org.jppf.utils.Operator;
 
 /**
  * Run the dependencies managment sample.
@@ -43,30 +43,25 @@ public class JobDependenciesRunner {
 
   /**
    * Entry point for the Job Dependencies demo.
-   * @param args not used.
+   * @param args {@code args[0]} may contain the path of a dependency graph file to parse,
+   * otherwise "./dependency_graph.txt" is used.
    */
   public static void main(final String[] args) {
-    try (JPPFClient client = new JPPFClient()) {
-      // read the jobs and their dependencies from the "./dependency_graph.txt" file
-      final List<DependencySpec> dependencies = Utils.readDependencies();
-
-      // ensure all jobs can be submitted concurrently by adjusting the connection pool size
-      final int n = Math.max(dependencies.size(), 1);
-      final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
-      pool.setSize(n);
-      // wait until all connections are initialized
-      pool.awaitWorkingConnections(Operator.AT_LEAST, n);
+    try (final JPPFClient client = new JPPFClient()) {
+      // read the jobs and their dependencies from the specified or default file
+      final String filename = ((args == null) || (args.length < 1)) ? "./dependency_graph.txt" : args[0];
+      final List<DependencyDescriptor> dependencies = Utils.readDependencies(filename);
 
       // Create the jobs according to the dependency graph
-      final List<JPPFJob> jobs = new ArrayList<>();
-      for (final DependencySpec spec: dependencies) {
-        jobs.add(createJob(spec));
-      }
+      final List<JPPFJob> jobs = dependencies.stream()
+        .map(JobDependenciesRunner::createJob)
+        .collect(Collectors.toList());
 
       // submit all the jobs asynchronously
-      for (JPPFJob job: jobs) client.submit(job);
+      jobs.forEach(client::submitAsync);
+
       // await the jobs results and print them
-      for (JPPFJob job: jobs) printJobResults(job);
+      jobs.forEach(JobDependenciesRunner::printJobResults);
 
     } catch (final Exception e) {
       e.printStackTrace();
@@ -75,22 +70,32 @@ public class JobDependenciesRunner {
 
   /**
    * Create a job with the specified dependencies.
-   * @param spec the dependencies specification for the job.
+   * @param desc the dependencies specification for the job.
    * @return the newly created job.
-   * @throws Exception if any error occurs.
    */
-  private static JPPFJob createJob(final DependencySpec spec) throws Exception {
-    final JPPFJob job = new JPPFJob();
-    job.setName(spec.getId());
-    // add the dependencies information to the job metadata
-    job.getMetadata().setParameter(DependencySpec.DEPENDENCIES_METADATA_KEY, spec);
-    // the job MUST be suspended before submission
-    job.getSLA().setSuspended(true);
-    // add a single task and give it a readable id
-    job.add(new MyTask()).setId(spec.getId() + "-task");
-    // the job listener is not required, we just want to print a message when a job completes on the client side
-    job.addJobListener(JOB_LISTENER);
-    return job;
+  private static JPPFJob createJob(final DependencyDescriptor desc) {
+    try {
+      // create the job with a name equal to its dpeendency id
+      final JPPFJob job = new JPPFJob().setName(desc.getId());
+  
+      // retrieve the jkob's dpeendency specification and set its attributes
+      job.getSLA().getDependencySpec().setId(desc.getId())
+        .addDependencies(desc.getDependencies())
+        .setGraphRoot(desc.isGraphRoot());
+  
+      // add a single task and give it a readable id
+      job.add(new MyTask()).setId(desc.getId() + "-task");
+  
+      // the job listener is not required, we just want to print a message when a job completes on the client side
+      job.addJobListener(JOB_LISTENER);
+  
+      return job;
+
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

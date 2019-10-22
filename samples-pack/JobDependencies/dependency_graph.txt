@@ -1,12 +1,17 @@
 #-----------------------------------------------------------------------------#
-# This file is the definition of the dependencies graph used in the demo      #
-# It is expressed as a sequence of lines, where each line defines             #
-# a job id and the ids of the other jobs it depends on, with this format:     #
-#    jobId ==> dependencyId_1, ..., dependencyId_N | remove                   #
-# '==>' means 'depends on' and the list of dependcyId is comma-separated      #
-# and may be empty (i.e. no dependency) The optional '| remove' means that    #
-# the job and all its dependencies should be recursively removed from the     #
-# dependency graph upon its completion                                        #
+# This file is the definition of the dependency graph used in the demo        #
+# It is expressed as a sequence of lines, where each line defines a job       #
+# dependency id, along with the dependency ids of the other jobs it depends   #
+# on, in this format:                                                         #
+#                                                                             #
+#    jobId ==> dependencyId_1, ..., dependencyId_N | root                     #
+#                                                                             #
+# '==>' means 'depends on' and the list of dependencies is comma-separated    #
+# and may be empty (i.e. no dependency)                                       #
+#                                                                             #
+# The optional '| root' means that the job is a dependency graph root, and it #
+# and all its dependencies will be recursively removed from the graph upon    #
+# completion                                                                  #
 #                                                                             #
 # The jobs are submitted in the same order as they are defined in this file   #
 #-----------------------------------------------------------------------------#
@@ -16,7 +21,7 @@
 # of the dependencies to better illustrate how dependencies are resolved      #
 #-----------------------------------------------------------------------------#
 
-Job F ==> Job A, Job B, Job E | remove
+Job F ==> Job A, Job B, Job E | root
 Job E ==> Job C, Job D
 Job D ==> Job B, Job C
 Job C ==> Job A

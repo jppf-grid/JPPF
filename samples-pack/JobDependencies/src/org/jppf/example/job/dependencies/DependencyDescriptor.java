@@ -25,11 +25,7 @@ import java.io.Serializable;
  * and are intented to be sent with the job metadata.
  * @author Laurent Cohen
  */
-public class DependencySpec implements Serializable {
-  /**
-   * The job metadata key for instances of this class.
-   */
-  public static final String DEPENDENCIES_METADATA_KEY = "job.dependencies.info";
+public class DependencyDescriptor implements Serializable {
   /**
    * The application-defined id assigned to a job.
    */
@@ -39,20 +35,20 @@ public class DependencySpec implements Serializable {
    */
   private final String[] dependencies;
   /**
-   * Whether the job and its dependencies should be removed from the graph upon completetion.
+   * Whether the job is a dependency graph root.
    */
-  private final boolean removeUponCompletion;
+  private final boolean graphRoot;
 
   /**
    * Initialize this dependencies specification with the specified parameters.
    * @param id the application-defined id assigned to a job.
    * @param dependencies the application-defined ids of the job's dependencies.
-   * @param removeUponCompletion whether the job and its dependencies should be removed from the graph upon completetion.
+   * @param graphRoot whether the job is a dependency graph root.
    */
-  public DependencySpec(final String id, final String[] dependencies, final boolean removeUponCompletion) {
+  public DependencyDescriptor(final String id, final String[] dependencies, final boolean graphRoot) {
     this.id = id;
     this.dependencies = dependencies;
-    this.removeUponCompletion = removeUponCompletion;
+    this.graphRoot = graphRoot;
   }
 
   /**
@@ -72,10 +68,10 @@ public class DependencySpec implements Serializable {
   }
 
   /**
-   * Determine whether the job and its dependencies should be removed from the graph upon completetion.
-   * @return {@code true} if the job should be removed from the graph after completion, {@code false} otherwise.
+   * Determine whether the job is a dependency graph root.and should be removed from the graph upon completetion.
+   * @return {@code true} if the job is a dependency graph root, {@code false} otherwise.
    */
-  public boolean isRemoveUponCompletion() {
-    return removeUponCompletion;
+  public boolean isGraphRoot() {
+    return graphRoot;
   }
 }

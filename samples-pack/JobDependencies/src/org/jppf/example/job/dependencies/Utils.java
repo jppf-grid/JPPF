@@ -46,36 +46,46 @@ public class Utils {
   }
 
   /**
-   * Read the dependencies graph from a file.
+   * Read the dependency graph from a file.
+   * @param filename the path to the file to parse.
    * @return a mapping of job ids to the list of ids of the jobs they depend on.
    * @throws Exception if any error occurs.
    */
-  static List<DependencySpec> readDependencies() throws Exception {
-    final List<DependencySpec> result = new ArrayList<>();
-    try (final BufferedReader reader = new BufferedReader(new FileReader("dependency_graph.txt"))) {
-      String s;
-      while ((s = reader.readLine()) != null) {
-        s = s.trim();
+  static List<DependencyDescriptor> readDependencies(final String filename) throws Exception {
+    final List<DependencyDescriptor> result = new ArrayList<>();
+    try (final BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        line = line.trim();
         // skip empty lines and comments
-        if (s.isEmpty() || s.startsWith("#")) continue;
-        // each line is in the form jobId ==> dependency1, ..., dependencyN | remove
-        // the list of dependencies can be empty and the '| remove' flag is optional
-        final String[] keyValue = s.split("==>");
-        if ((keyValue == null) || (keyValue.length <= 0)) continue;
-        final String jobId = keyValue[0].trim();
+        if (line.isEmpty() || line.startsWith("#"))
+          continue;
+
+        // each line is in the form jobId ==> dependency1, ..., dependencyN | root
+        // the list of dependencies can be empty and the '| root' flag is optional
+        final String[] keyValue = line.split("==>");
+        if ((keyValue == null) || (keyValue.length <= 0))
+          continue;
+
+        final String jobDependencyId = keyValue[0].trim();
         String[] dependencies = NO_DEPENDENCY;
-        boolean removeUponCompletion = false;
+        boolean graphRoot = false;
         if (keyValue.length > 1) {
           final String val = keyValue[1].trim();
-          // check if we have '| remove' at the end
+          // check if we have '| root' at the end
           final String[] values = val.split("\\|");
-          if (values.length > 1) removeUponCompletion = true;
+          if ((values.length > 1) && "root".equalsIgnoreCase(values[1]))
+            graphRoot = true;
+
+          // parse the ids of the job's dependencies
           dependencies = values[0].split(",");
           if ((dependencies != null) && (dependencies.length > 0)) {
-            for (int i=0; i<dependencies.length; i++) dependencies[i] = dependencies[i].trim();
+            for (int i=0; i<dependencies.length; i++) {
+              dependencies[i] = dependencies[i].trim();
+            }
           }
         }
-        result.add(new DependencySpec(jobId, dependencies, removeUponCompletion));
+        result.add(new DependencyDescriptor(jobDependencyId, dependencies, graphRoot));
       }
     }
     return result;
