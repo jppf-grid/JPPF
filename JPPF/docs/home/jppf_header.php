@@ -39,6 +39,9 @@
               <?php $cl = (($currentPage == "Documentation") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
 <td class="<?php echo $cl; ?>">&nbsp;<a href="/doc" class="<?php echo $cl; ?>">Documentation</a>&nbsp;</td>
 <td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "On Github") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="https://github.com/jppf-grid/JPPF" class="<?php echo $cl; ?>">On Github</a>&nbsp;</td>
+<td style="width: 1px"></td>
               <?php $cl = (($currentPage == "Forums") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_end"; ?>
 <td class="<?php echo $cl; ?>">&nbsp;<a href="/forums" class="<?php echo $cl; ?>">Forums</a>&nbsp;</td>
 <td style="width: 1px"></td>
