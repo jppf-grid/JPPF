@@ -69,18 +69,15 @@ public class ClientConfigDriverDiscovery extends ClientDriverDiscovery {
         final boolean heartbeatEnabled = config.get(RECOVERY_ENABLED);
         if (debugEnabled) log.debug("initializing connections from discovery with priority = {} and acceptMultipleInterfaces = {}", priority, acceptMultipleInterfaces);
         final boolean ssl = config.get(SSL_ENABLED);
-        receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
-          @Override
-          public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-            if (info.hasValidPort(ssl)) {
-              final int poolSize = config.get(POOL_SIZE);
-              final int jmxPoolSize = config.get(JMX_POOL_SIZE);
-              final int maxJobs = config.get(MAX_JOBS);
-              newConnection(new ClientConnectionPoolInfo(name, ssl, info.host, info.getValidPort(ssl), priority, poolSize, jmxPoolSize, heartbeatEnabled, maxJobs));
-            } else {
-              final String type = ssl ? "secure" : "plain";
-              log.warn("cannot fulfill a {} connection request to {}:{} because the host does not expose this port as a {} port", type, info.host, info.getValidPort(ssl), type);
-            }
+        receiverThread = new JPPFMulticastReceiverThread((name, info) -> {
+          if (info.hasValidPort(ssl)) {
+            final int poolSize = config.get(POOL_SIZE);
+            final int jmxPoolSize = config.get(JMX_POOL_SIZE);
+            final int maxJobs = config.get(MAX_JOBS);
+            newConnection(new ClientConnectionPoolInfo(name, ssl, info.host, info.getValidPort(ssl), priority, poolSize, jmxPoolSize, heartbeatEnabled, maxJobs));
+          } else {
+            final String type = ssl ? "secure" : "plain";
+            log.warn("cannot fulfill a {} connection request to {}:{} because the host does not expose this port as a {} port", type, info.host, info.getValidPort(ssl), type);
           }
         }, new IPFilter(config), acceptMultipleInterfaces);
         ThreadUtils.startDaemonThread(receiverThread, "ReceiverThread");
@@ -113,12 +110,9 @@ public class ClientConfigDriverDiscovery extends ClientDriverDiscovery {
         }
         if (debugEnabled) log.debug("found {} pool definitions in the configuration", infoList.size());
         // order by decreasing priority before calling newConnection(), to ensure any submitted job is submitted to the connection pool with highest priority
-        Collections.sort(infoList, new Comparator<ClientConnectionPoolInfo>() {
-          @Override
-          public int compare(final ClientConnectionPoolInfo o1, final ClientConnectionPoolInfo o2) {
-            final int p1 = o1.getPriority(), p2 = o2.getPriority();
-            return p1 > p2 ? -1 : (p1 < p2 ? 1 : 0);
-          }
+        Collections.sort(infoList,(o1, o2) -> {
+          final int p1 = o1.getPriority(), p2 = o2.getPriority();
+          return p1 > p2 ? -1 : (p1 < p2 ? 1 : 0);
         });
         for (final ClientConnectionPoolInfo poolInfo: infoList) newConnection(poolInfo);
       }
