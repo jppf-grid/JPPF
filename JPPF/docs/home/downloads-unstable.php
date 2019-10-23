@@ -1,7 +1,7 @@
 <?php
   $currentPage = "download-unstable";
-  $tag1 = "v_6_2_alpha";
-  $ver1 = "6.2-alpha";
+  $tag1 = "v_6_2_alpha_2";
+  $ver1 = "6.2-alpha-2";
   $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
 ?>
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -116,7 +116,7 @@
         <br/>
 				</div>
 				<div class="jppf_content">
-  <h1 align="center">Downloads - JPPF 6.2 alpha preview</h1>
+  <h1 align="center">Downloads - JPPF 6.2 alpha 2 preview</h1>
   <div class="blockWithHighlightedTitle" style="vertical-align: middle">
     <div style="margin: 10px 5px">
       <img src="images/icons/folder-download.png" width="20"/>

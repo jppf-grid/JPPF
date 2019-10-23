@@ -178,11 +178,11 @@
     <br>
     <div class="blockWithHighlightedTitle">
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
-  <h2 style="margin: 10px 0px; font-weight: bold">&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF 6.2 alpha preview</h2>
+  <h2 style="margin: 10px 0px; font-weight: bold">&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF 6.2 alpha 2 preview</h2>
 </div>
       <div style="height: 5px"></div>
       <ul class="list_nomargin">
-        <li><a href="release_notes.php?version=6.2-alpha">Release notes</a></li>
+        <li><a href="release_notes.php?version=6.2-alpha-2">Release notes</a></li>
         <li><a href="downloads-unstable.php">Download</a></li>
       </ul>
     </div>
