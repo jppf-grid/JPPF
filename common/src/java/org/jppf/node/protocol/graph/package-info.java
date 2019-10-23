@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for graphs of tasks within jobs and graphs of jobs.
+ * Support for <a href="https://www.jppf.org/doc/6.2/index.php?title=Task_objects#Dependencies_between_tasks">graphs of tasks</a> within jobs and <a href="https://www.jppf.org/doc/6.2/index.php?title=Job_dependencies_and_job_graphs">graphs of jobs</a>.
  * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.node.protocol.graph;
