@@ -5,7 +5,7 @@ set -ex
 helm_repo="../../JPPF/docs/home/helm-charts"
 
 if [ -z $1 ]; then
-  version="6.2-alpha"
+  version="6.2-alpha-2"
 else
   version=$1
 fi
