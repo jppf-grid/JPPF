@@ -22,6 +22,7 @@ import java.io.Serializable;
 
 import javax.management.NotificationEmitter;
 
+import org.jppf.management.doc.*;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -29,6 +30,8 @@ import org.jppf.utils.TypedProperties;
  * @author Laurent Cohen
  * @since 4.1
  */
+@MBeanDescription("interface for provisioning, managing and monitoring slave nodes")
+@MBeanNotif(description = "notification that a slave node has started or stopped", userDataType = JPPFProvisioningInfo.class)
 public interface JPPFNodeProvisioningMBean extends Serializable, NotificationEmitter {
   /**
    * The object name of this MBean.
@@ -49,6 +52,7 @@ public interface JPPFNodeProvisioningMBean extends Serializable, NotificationEmi
    * Get the number of slave nodes started by this MBean.
    * @return the number of slave nodes as an integer value.
    */
+  @MBeanDescription("the number of slave nodes started by this MBean")
   int getNbSlaves();
 
   /**
@@ -56,7 +60,8 @@ public interface JPPFNodeProvisioningMBean extends Serializable, NotificationEmi
    * This is equivalent to calling {@code provisionSlaveNodes(nbNodes, null)}.
    * @param nbNodes the number of slave nodes to reach.
    */
-  void provisionSlaveNodes(int nbNodes);
+  @MBeanDescription("provision the specified number of slave nodes, starting new ones or stopping existing ones as needed")
+  void provisionSlaveNodes(@MBeanParamName("slaves") int nbNodes);
 
   /**
    * Start or stop the required number of slaves to reach the specified number.
@@ -64,7 +69,8 @@ public interface JPPFNodeProvisioningMBean extends Serializable, NotificationEmi
    * @param nbNodes the number of slave nodes to reach.
    * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
    */
-  void provisionSlaveNodes(int nbNodes, boolean interruptIfRunning);
+  @MBeanDescription("provision the specified number of slave nodes, starting new ones or stopping existing ones as needed")
+  void provisionSlaveNodes(@MBeanParamName("slaves") int nbNodes, @MBeanParamName("interruptIfRunning") boolean interruptIfRunning);
 
   /**
    * Start or stop the required number of slaves to reach the specified number,
@@ -74,7 +80,8 @@ public interface JPPFNodeProvisioningMBean extends Serializable, NotificationEmi
    * @param nbNodes the number of slave nodes to reach.
    * @param configOverrides the configuration overrides to apply.
    */
-  void provisionSlaveNodes(int nbNodes, TypedProperties configOverrides);
+  @MBeanDescription("provision the specified number of slave nodes, starting new ones or stopping existing ones as needed")
+  void provisionSlaveNodes(@MBeanParamName("slaves") int nbNodes, @MBeanParamName("configOverrides") TypedProperties configOverrides);
 
   /**
    * Start or stop the required number of slaves to reach the specified number,
@@ -85,5 +92,6 @@ public interface JPPFNodeProvisioningMBean extends Serializable, NotificationEmi
    * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
    * @param configOverrides the configuration overrides to apply.
    */
-  void provisionSlaveNodes(int nbNodes, boolean interruptIfRunning, TypedProperties configOverrides);
+  @MBeanDescription("provision the specified number of slave nodes, starting new ones or stopping existing ones as needed")
+  void provisionSlaveNodes(@MBeanParamName("slaves") int nbNodes, @MBeanParamName("interrupt") boolean interruptIfRunning, @MBeanParamName("configgOverrides") TypedProperties configOverrides);
 }

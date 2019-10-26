@@ -20,12 +20,14 @@ package org.jppf.management;
 
 import java.io.Serializable;
 
+import org.jppf.management.doc.MBeanDescription;
+
 /**
  * MBean interface for various maintenance operations on the nodes.
  * @author Laurent Cohen
  */
-public interface JPPFNodeMaintenanceMBean extends Serializable
-{
+@MBeanDescription("maintenance operations on the nodes")
+public interface JPPFNodeMaintenanceMBean extends Serializable {
   /**
    * Object name for this MBean.
    */
@@ -37,5 +39,6 @@ public interface JPPFNodeMaintenanceMBean extends Serializable
    * will take place when it is safe to do so, as part of the node's life cycle.
    * @throws Exception if any error occurs while requesting the reset.
    */
+  @MBeanDescription("request a reset of the resource caches of all the JPPF class loaders maintained by the node")
   void requestResourceCacheReset() throws Exception;
 }

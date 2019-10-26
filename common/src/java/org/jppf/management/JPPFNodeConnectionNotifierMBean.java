@@ -20,10 +20,14 @@ package org.jppf.management;
 
 import javax.management.NotificationEmitter;
 
+import org.jppf.management.doc.*;
+
 /**
  * This MBean provides notifications of nodes connecting to, or disconnecting from a JPPF driver.
  * @author Laurent Cohen
  */
+@MBeanDescription("monitoring of nodes connecting to, or disconnecting from, a JPPF driver")
+@MBeanNotif(description = "notifications of a node connection or disconnection. Notification.getType() returns either 'CONNECTED' or 'DISCONNECTED'", userDataType = JPPFManagementInfo.class)
 public interface JPPFNodeConnectionNotifierMBean extends NotificationEmitter {
   /**
    * The name of this MBean, used when it is registered with an MBean server.

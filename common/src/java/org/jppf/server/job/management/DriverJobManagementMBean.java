@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.management.NotificationEmitter;
 
 import org.jppf.job.*;
+import org.jppf.management.doc.*;
 import org.jppf.node.protocol.*;
 
 
@@ -30,6 +31,8 @@ import org.jppf.node.protocol.*;
  * This is the job management MBean interface.
  * @author Laurent Cohen
  */
+@MBeanDescription("the server-side job management interface")
+@MBeanNotif(description = "notification on the status of a job", notifClass = JobNotification.class)
 public interface DriverJobManagementMBean extends NotificationEmitter {
   /**
    * The name under which this MBean is registered with the MBean server.
@@ -41,7 +44,8 @@ public interface DriverJobManagementMBean extends NotificationEmitter {
    * @param jobUuid the uuid of the job to cancel.
    * @throws Exception if any error occurs.
    */
-  void cancelJob(String jobUuid) throws Exception;
+  @MBeanDescription("cancel the job with the specified uuid")
+  void cancelJob(@MBeanParamName("jobUuid") String jobUuid) throws Exception;
 
   /**
    * Cancel the jobs specified with a given job selector.
@@ -49,15 +53,17 @@ public interface DriverJobManagementMBean extends NotificationEmitter {
    * @throws Exception if any error occurs.
    * @since 5.1
    */
-  void cancelJobs(JobSelector selector) throws Exception;
+  @MBeanDescription("cancel the selected jobs")
+  void cancelJobs(@MBeanParamName("jobSelector") JobSelector selector) throws Exception;
 
   /**
-   * Suspend the job with the specified id.
+   * Suspend the job with the specified uuid.
    * @param jobUuid the uuid of the job to suspend.
    * @param requeue {@code true} if the sub-jobs running on each node should be canceled and requeued, {@code false} if they should be left to execute until completion.
    * @throws Exception if any error occurs.
    */
-  void suspendJob(String jobUuid, Boolean requeue) throws Exception;
+  @MBeanDescription("suspend the job with the specified uuid")
+  void suspendJob(@MBeanParamName("jobUuid") String jobUuid, @MBeanParamName("requeue") Boolean requeue) throws Exception;
 
   /**
    * Suspend the jobs specified with a given job selector.
@@ -66,14 +72,16 @@ public interface DriverJobManagementMBean extends NotificationEmitter {
    * @throws Exception if any error occurs.
    * @since 5.1
    */
-  void suspendJobs(JobSelector selector, Boolean requeue) throws Exception;
+  @MBeanDescription("suspend the selected jobs")
+  void suspendJobs(@MBeanParamName("jobSelector") JobSelector selector, @MBeanParamName("requeue") Boolean requeue) throws Exception;
 
   /**
-   * Resume the job with the specified id.
+   * Resume the job with the specified uuid.
    * @param jobUuid the uuid of the job to resume.
    * @throws Exception if any error occurs.
    */
-  void resumeJob(String jobUuid) throws Exception;
+  @MBeanDescription("resume the job with the specified uuid")
+  void resumeJob(@MBeanParamName("jobUuid") String jobUuid) throws Exception;
 
   /**
    * Resume the jobs specified with a given job selector.
@@ -81,15 +89,17 @@ public interface DriverJobManagementMBean extends NotificationEmitter {
    * @throws Exception if any error occurs.
    * @since 5.1
    */
-  void resumeJobs(JobSelector selector) throws Exception;
+  @MBeanDescription("resume the selected jobs")
+  void resumeJobs(@MBeanParamName("jobSelector") JobSelector selector) throws Exception;
 
   /**
-   * Update the maximum number of nodes a job can run on.
+   * Update the maximum number of nodes the job with the specified uuid can run on.
    * @param jobUuid the uuid of the job to update.
    * @param maxNodes the new maximum number of nodes for the job.
    * @throws Exception if any error occurs.
    */
-  void updateMaxNodes(String jobUuid, Integer maxNodes) throws Exception;
+  @MBeanDescription("update the maximum number of nodes the job with the specified uuid can run on")
+  void updateMaxNodes(@MBeanParamName("jobUuid") String jobUuid, @MBeanParamName("maxNodes") Integer maxNodes) throws Exception;
 
   /**
    * Update the maximum number of nodes the specified jobs can run on.
@@ -98,7 +108,8 @@ public interface DriverJobManagementMBean extends NotificationEmitter {
    * @throws Exception if any error occurs.
    * @since 5.1
    */
-  void updateMaxNodes(JobSelector selector, Integer maxNodes) throws Exception;
+  @MBeanDescription("update the maximum number of nodes the selected jobs can run on")
+  void updateMaxNodes(@MBeanParamName("jobSelector") JobSelector selector, @MBeanParamName("maxNodes") Integer maxNodes) throws Exception;
 
   /**
    * Get the set of uuids for all the jobs currently queued or executing.
@@ -106,24 +117,27 @@ public interface DriverJobManagementMBean extends NotificationEmitter {
    * @throws Exception if any error occurs.
    * @since 5.1
    */
+  @MBeanDescription("the set of uuids for all the jobs currently queued or executing")
   String[] getAllJobUuids() throws Exception;
 
   /**
-   * Get an object describing the job with the specified id.
+   * Get an object describing the job with the specified uuid.
    * @param jobUuid the uuid of the job to get information about.
    * @return an instance of <code>JobInformation</code>.
    * @throws Exception if any error occurs.
    */
-  JobInformation getJobInformation(String jobUuid) throws Exception;
+  @MBeanDescription("get an object describing the job with the specified uuid")
+  JobInformation getJobInformation(@MBeanParamName("jobUuid") String jobUuid) throws Exception;
 
   /**
-   * The job information for all the jobs accepted by the specified selector.
+   * Get the job information for all the jobs accepted by the specified selector.
    * @param selector determines for which jobs to return information.
    * @return an array of {@link JobInformation} objects, possibly empty if no job matches the selector.
    * @throws Exception if any error occurs.
    * @since 5.1
    */
-  JobInformation[] getJobInformation(JobSelector selector) throws Exception;
+  @MBeanDescription("get the job information for the selected jobs")
+  JobInformation[] getJobInformation(@MBeanParamName("jobSelector") JobSelector selector) throws Exception;
 
   /**
    * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
@@ -131,7 +145,8 @@ public interface DriverJobManagementMBean extends NotificationEmitter {
    * @return an array of <code>NodeManagementInfo</code>, <code>JobInformation</code> instances.
    * @throws Exception if any error occurs.
    */
-  NodeJobInformation[] getNodeInformation(String jobUuid) throws Exception;
+  @MBeanDescription("get a list of objects describing the nodes to which the whole or part of a job was dispatched")
+  NodeJobInformation[] getNodeInformation(@MBeanParamName("jobUuid") String jobUuid) throws Exception;
 
   /**
    * Get a list of objects describing the nodes to which the whole or part of a job was dispatched, for all the jobs specified by a job selector.
@@ -139,21 +154,24 @@ public interface DriverJobManagementMBean extends NotificationEmitter {
    * @return a mapping of job uuids to a corresponding array of {@link NodeJobInformation} instances.
    * @throws Exception if any error occurs.
    */
-  Map<String, NodeJobInformation[]> getNodeInformation(JobSelector selector) throws Exception;
+  @MBeanDescription("get, for the selected jobs, a mapping of job uuid to an object describing the nodes to which the whole or part of each job was dispatched")
+  Map<String, NodeJobInformation[]> getNodeInformation(@MBeanParamName("jobSelector") JobSelector selector) throws Exception;
 
   /**
-   * Update the priority of a job.
+   * Update the priority of the job with the specified uuid.
    * @param jobUuid the uuid of the job to update.
    * @param newPriority the job's new priority value.
    */
-  void updatePriority(String jobUuid, Integer newPriority);
+  @MBeanDescription("update the priority of the job with the specified uuid")
+  void updatePriority(@MBeanParamName("jobUuid") String jobUuid, @MBeanParamName("newPriority") Integer newPriority);
 
   /**
    * Update the priority of the jobs specified by a job selector.
    * @param selector determines for which jobs to change the maximum number of nodes.
    * @param newPriority the jobs new priority value.
    */
-  void updatePriority(JobSelector selector, Integer newPriority);
+  @MBeanDescription("update the priority of the selected jobs")
+  void updatePriority(@MBeanParamName("jobSelector") JobSelector selector, @MBeanParamName("newPriority") Integer newPriority);
 
   /**
    * Update the SLA and/or metadata of the specified jobs.
@@ -162,5 +180,6 @@ public interface DriverJobManagementMBean extends NotificationEmitter {
    * @param metadata the new job metadata; if {@code null} then the metadata is not changed.
    * @since 5.1
    */
-  void updateJobs(JobSelector selector, JobSLA sla, JobMetadata metadata);
+  @MBeanDescription("update the SLA and/or metadata of the selected jobs")
+  void updateJobs(@MBeanParamName("jobSelector") JobSelector selector, @MBeanParamName("sla") JobSLA sla, @MBeanParamName("metadata") JobMetadata metadata);
 }

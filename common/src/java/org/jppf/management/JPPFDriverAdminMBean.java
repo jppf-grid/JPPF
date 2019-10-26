@@ -21,13 +21,14 @@ package org.jppf.management;
 import java.util.*;
 
 import org.jppf.load.balancer.LoadBalancingInformation;
+import org.jppf.management.doc.*;
 import org.jppf.utils.stats.JPPFStatistics;
 
 /**
  * MBean interface for the management of a JPPF driver.
  * @author Laurent Cohen
  */
-@JPPFMBeanDescription("administration of the JPPF server")
+@MBeanDescription("administration of the JPPF server")
 public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Name of the driver's admin MBean.
@@ -39,7 +40,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return a <code>JPPFStatistics</code> instance.
    * @throws Exception if any error occurs.
    */
-  @JPPFMBeanDescription("get the server statistics")
+  @MBeanDescription("get the server statistics")
   JPPFStatistics statistics() throws Exception;
 
   /**
@@ -48,6 +49,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return the number of nodes, or -1 if information on the nodes could not be retrieved. The returned number does not include peer drivers.
    * @throws Exception if any error occurs.
    */
+  @MBeanDescription("get the number of nodes attached to the driver")
   Integer nbNodes() throws Exception;
 
   /**
@@ -57,7 +59,8 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    * @since 5.0
    */
-  Integer nbNodes(NodeSelector selector) throws Exception;
+  @MBeanDescription("get the number of selected nodes attached to the driver")
+  Integer nbNodes(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Request the JMX connection information for all the nodes attached to the server.
@@ -65,6 +68,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
+  @MBeanDescription("get the JMX connection information for all the nodes attached to the server")
   Collection<JPPFManagementInfo> nodesInformation() throws Exception;
 
   /**
@@ -74,7 +78,8 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
-  Collection<JPPFManagementInfo> nodesInformation(NodeSelector selector) throws Exception;
+  @MBeanDescription("get the JMX connection information for the selected nodes attached to the server")
+  Collection<JPPFManagementInfo> nodesInformation(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Request the JMX connection information for all the nodes attached to the server which satisfy the specified selector.
@@ -83,7 +88,8 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
-  Collection<JPPFManagementInfo> nodesInformation(NodeSelector selector, final boolean includePeers) throws Exception;
+  @MBeanDescription("get the JMX connection information for the selected nodes attached to the server, possibly including other peer drivers")
+  Collection<JPPFManagementInfo> nodesInformation(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("icludePeers") boolean includePeers) throws Exception;
 
   /**
    * Perform a shutdown or restart of the server.
@@ -92,7 +98,8 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return an acknowledgement message.
    * @throws Exception if any error occurs.
    */
-  String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception;
+  @MBeanDescription("perform a shutdown, possibly followed by a restart, of the server, with a specified delay before each")
+  String restartShutdown(@MBeanParamName("shutDownDelay") Long shutdownDelay, @MBeanParamName("restartDelay") Long restartDelay) throws Exception;
 
   /**
    * Change the bundle size tuning settings.
@@ -101,13 +108,15 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return an acknowledgement or error message.
    * @throws Exception if an error occurred while updating the settings.
    */
-  String changeLoadBalancerSettings(String algorithm, Map<Object, Object> parameters) throws Exception;
+  @MBeanDescription("change the load balancer settings")
+  String changeLoadBalancerSettings(@MBeanParamName("algorithm") String algorithm, @MBeanParamName("parameters") Map<Object, Object> parameters) throws Exception;
 
   /**
    * Obtain the current load-balancing settings.
    * @return an instance of <code>LoadBalancingInformation</code>.
    * @throws Exception if an error occurred while fetching the settings.
    */
+  @MBeanDescription("get the load balancer settings")
   LoadBalancingInformation loadBalancerInformation() throws Exception;
 
   /**
@@ -115,6 +124,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * This method triggers a <code>reset()</code> event via the <code>JPPFDriverStatsManager</code> instance.
    * @throws Exception if any error occurs.
    */
+  @MBeanDescription("reste the server statistics")
   void resetStatistics() throws Exception;
 
   /**
@@ -123,6 +133,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return the number of idle nodes, or -1 if information on the nodes could not be retrieved. The returned number does not include peer drivers.
    * @throws Exception if any error occurs.
    */
+  @MBeanDescription("get the number of attached nodes currently idle")
   Integer nbIdleNodes() throws Exception;
 
   /**
@@ -132,7 +143,8 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    * @since 5.0
    */
-  Integer nbIdleNodes(NodeSelector selector) throws Exception;
+  @MBeanDescription("get the number of selected attached nodes currently idle")
+  Integer nbIdleNodes(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Get the number of idle nodes attached to the driver that satisfy the specified selector.
@@ -142,7 +154,8 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    * @since 5.0
    */
-  Integer nbIdleNodes(NodeSelector selector, boolean includePeers) throws Exception;
+  @MBeanDescription("get the number of selected attached nodes currently idle, possibly including other peer drivers")
+  Integer nbIdleNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("includePeers") boolean includePeers) throws Exception;
 
   /**
    * Request the JMX connection information for all the idle nodes attached to the server.
@@ -150,6 +163,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
+  @MBeanDescription("get the JMX connection information for all the idle nodes attached to the server")
   Collection<JPPFManagementInfo> idleNodesInformation() throws Exception;
 
   /**
@@ -158,14 +172,16 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
-  Collection<JPPFManagementInfo> idleNodesInformation(NodeSelector selector) throws Exception;
+  @MBeanDescription("get the JMX connection information for all the selected idle nodes attached to the server")
+  Collection<JPPFManagementInfo> idleNodesInformation(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Toggle the activate state of the specified nodes. Nodes in 'active' state will be deactivated, nodes in 'inactive' state will be activated.
    * @param selector determines which nodes will be activated or deactivated.  If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
    * @throws Exception if any error occurs.
    */
-  void toggleActiveState(NodeSelector selector) throws Exception;
+  @MBeanDescription("toggle the activate state of the selected nodes")
+  void toggleActiveState(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Get the active states of the nodes specified vith a {@link NodeSelector}.
@@ -173,7 +189,8 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return a mmaping of node uuids to their active state.
    * @throws Exception if any error occurs.
    */
-  Map<String, Boolean> getActiveState(NodeSelector selector) throws Exception;
+  @MBeanDescription("get the activate state of the selected nodes")
+  Map<String, Boolean> getActiveState(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Set the active state of the specified nodes.
@@ -181,7 +198,8 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @param active specifies the activer state to set on the selected nodes.
    * @throws Exception if any error occurs.
    */
-  void setActiveState(NodeSelector selector, boolean active) throws Exception;
+  @MBeanDescription("set the active state of the selected nodes")
+  void setActiveState(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("active") boolean active) throws Exception;
 
   /**
    * Activate or deactivate the broadcasting of the driver's connection information.
@@ -189,6 +207,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @param broadcasting {@code true} to activate the broadcast, {@code false} to deactivate it.
    * @throws Exception if any error occurs.
    */
+  @MBeanDescription("whether the driver's connection information is broadcast via UDP multicast")
   void setBroadcasting(boolean broadcasting) throws Exception;
 
   /**
@@ -196,5 +215,6 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @return {@code true} if the broadcasting service is on, {@code false} if it is off.
    * @throws Exception if any error occurs.
    */
+  @MBeanDescription("whether the driver's connection information is broadcast via UDP multicast")
   boolean getBroadcasting() throws Exception;
 }

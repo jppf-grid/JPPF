@@ -16,35 +16,23 @@
  * limitations under the License.
  */
 
-package org.jppf.management;
+package org.jppf.management.doc;
 
 import java.lang.annotation.*;
 
 import javax.management.DescriptorKey;
 
 /**
- * Used to annotate MBean elements with a meaningful descritpion that can be retrieved at runtime.
+ * Used to annotate MBeans and MBean elements to specify whther they should be included in the reference documentation.
  * @author Laurent Cohen
  */
 //@Documented
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface JPPFMBeanDescription {
+public @interface MBeanExclude {
   /**
-   * @return the description for the mbean or mbean element.
+   * @return the exlucde form doc flag.
    */
-  @DescriptorKey("description")
-  String value();
-
-  /**
-   * @return the base resource bundle name for localization.
-  @DescriptorKey("i18n.base")
-  String i18nBase() default "";
-   */
-
-  /**
-   * @return the key in the base resource bundle for localization.
-  @DescriptorKey("i18n.key")
-  String i18nKey() default "";
-   */
+  @DescriptorKey(MBeanInfoExplorer.EXCLUDE_FIELD)
+  boolean value() default true;
 }

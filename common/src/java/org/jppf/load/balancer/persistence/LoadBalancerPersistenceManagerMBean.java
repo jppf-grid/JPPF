@@ -18,11 +18,14 @@
 
 package org.jppf.load.balancer.persistence;
 
+import org.jppf.management.doc.MBeanDescription;
+
 /**
  * MBean interface for remote management of a server-side load-balancing persistence store.
  * This interface has no method: it merely extends {@link LoadBalancerPersistenceManagement} and provides a constant for its {@link javax.management.ObjectName object name}.
  * @author Laurent Cohen
  */
+@MBeanDescription("interface for the remote management of a server-side load-balancing persistence store")
 public interface LoadBalancerPersistenceManagerMBean extends LoadBalancerPersistenceManagement {
   /**
    * The name under which this MBean is registered with the MBean server.

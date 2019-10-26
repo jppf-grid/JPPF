@@ -21,12 +21,14 @@ package org.jppf.server.job.management;
 import java.util.*;
 
 import org.jppf.job.JobSelector;
+import org.jppf.management.doc.*;
 import org.jppf.node.protocol.graph.*;
 
 /**
  * A simple management interface for the server-side job dependency graph.
  * @author Laurent Cohen
  */
+@MBeanDescription("management interface for the server-side job dependency graphs")
 public interface JobDependencyManagerMBean {
   /**
    * Name of this server-side MBean.
@@ -37,24 +39,28 @@ public interface JobDependencyManagerMBean {
    * Get the size - the number of nodes or vertices that represent jobs - of the job dependency grpah.
    * @return the graph size, always >= 0.
    */
+  @MBeanDescription("the size - the number of nodes or vertices that represent jobs - of the job dependency grpah")
   int getGraphSize();
 
   /**
-   * Get the ids of all the nodes currently in the graph
+   * Get the ids of all the nodes currently in the graph.
    * @return a set of node ids.
    */
+  @MBeanDescription("the ids of all the nodes currently in the graph")
   Set<String> getNodeIds();
 
   /**
    * Get all the nodes in the job dependency graph.
    * @return a collection of {@link JobDependencyNode} objects.
    */
+  @MBeanDescription("all the nodes currently in the job dependency graph")
   Collection<JobDependencyNode> getAllNodes();
 
   /**
    * Get the nodes in the job dependency graph, whose corresponding job has arrived in the job queue.
    * @return a collection of {@link JobDependencyNode} objects.
    */
+  @MBeanDescription("the nodes in the job dependency graph, whose corresponding job has arrived in the job queue")
   Collection<JobDependencyNode> getQueuedNodes();
 
   /**
@@ -62,18 +68,21 @@ public interface JobDependencyManagerMBean {
    * @param selector a {@link JobSelector} to filter the returned jobs. If {@code null} then all queued jobs are returned.
    * @return a collection of {@link JobDependencyNode} objects, possibly empty.
    */
-  Collection<JobDependencyNode> getQueuedNodes(JobSelector selector);
+  @MBeanDescription("get the nodes in the job dependency graph, whose corresponding job has arrived in the job queue, filtered by the specified job selector")
+  Collection<JobDependencyNode> getQueuedNodes(@MBeanParamName("jobSelector") JobSelector selector);
 
   /**
    * Get the node with the specified dependency id.
    * @param id the id of the job node to find.
    * @return a {@link JobDependencyNode}, or {@code null} if there is no node with this id in the job dependency graph.
    */
-  JobDependencyNode getNode(final String id);
+  @MBeanDescription("get the node with the specified dependency id")
+  JobDependencyNode getNode(@MBeanParamName("dependencyId") final String id);
 
   /**
-   * Get the grap of job dependencies.
+   * Get the graph of job dependencies.
    * @return an instance of {@link JobDependencyGraph}.
    */
+  @MBeanDescription("the graph of job dependencies")
   JobDependencyGraph getGraph();
 }

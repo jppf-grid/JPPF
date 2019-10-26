@@ -22,10 +22,15 @@ import java.io.Serializable;
 
 import javax.management.NotificationEmitter;
 
+import org.jppf.management.doc.*;
+import org.jppf.utils.TypedProperties;
+
 /**
  * This MBean notifies any listener of changes to the number of threads of a node.
  * @author Laurent Cohen
  */
+@MBeanDescription("interface listneing for specific configuration changes in a node")
+@MBeanNotif(description = "notifies of changes to the number of processing threads of a node", userDataType = TypedProperties.class, userDataDescritpion = "the configuration properties that changed")
 public interface NodeConfigNotifierMBean extends Serializable, NotificationEmitter {
   /**
    * The name under which this MBean is registered with the MBean server.

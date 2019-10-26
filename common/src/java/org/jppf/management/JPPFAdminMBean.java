@@ -20,17 +20,20 @@ package org.jppf.management;
 
 import java.io.Serializable;
 
+import org.jppf.management.doc.MBeanDescription;
+
 /**
  * Management interface for the administration of a JPPF component, driver or node.
  * @author Laurent Cohen
  */
-public interface JPPFAdminMBean extends Serializable
-{
+public interface JPPFAdminMBean extends Serializable {
   /**
    * Get detailed information about the node's JVM properties, environment variables
    * and runtime information such as memory usage and available processors.
    * @return a <code>JPPFSystemInformation</code> instance.
    * @throws Exception if any error occurs.
    */
+  @MBeanDescription("get detailed information on the system where the JPPF server or node is runnning: " +
+    "environement variables, JVM system properties, JPPF configuration, runtime information, storage details, network interfaces, statistics")
   JPPFSystemInformation systemInformation() throws Exception;
 }
