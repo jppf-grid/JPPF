@@ -26,7 +26,7 @@ import org.slf4j.*;
  *
  * @author Laurent Cohen
  */
-public class NodeJMXWrapperListener implements JMXWrapperListener {
+public class NodeJMXWrapperListener implements JMXConnectionWrapperListener {
   /**
    * Logger for this class.
    */
@@ -55,18 +55,18 @@ public class NodeJMXWrapperListener implements JMXWrapperListener {
   }
 
   @Override
-  public void jmxWrapperConnected(final JMXWrapperEvent event) {
+  public void onConnected(final JMXConnectionWrapperEvent event) {
     if (debugEnabled) log.debug("JMX connection established from {}, for {}", this, context);
-    if (context.getJmxConnection() != null) context.getJmxConnection().removeJMXWrapperListener(this);
-    else if (context.getPeerJmxConnection() != null) context.getPeerJmxConnection().removeJMXWrapperListener(this);
+    if (context.getJmxConnection() != null) context.getJmxConnection().removeJMXConnectionWrapperListener(this);
+    else if (context.getPeerJmxConnection() != null) context.getPeerJmxConnection().removeJMXConnectionWrapperListener(this);
     listener.nodeConnected(context);
   }
 
   @Override
-  public void jmxWrapperTimeout(final JMXWrapperEvent event) {
+  public void onConnectionTimeout(final JMXConnectionWrapperEvent event) {
     if (debugEnabled) log.debug("received jmxWrapperTimeout() for {}, exception: {}", context, ExceptionUtils.getStackTrace(event.getJMXConnectionWrapper().getLastConnectionException()));
-    if (context.getJmxConnection() != null) context.getJmxConnection().removeJMXWrapperListener(this);
-    else if (context.getPeerJmxConnection() != null) context.getPeerJmxConnection().removeJMXWrapperListener(this);
+    if (context.getJmxConnection() != null) context.getJmxConnection().removeJMXConnectionWrapperListener(this);
+    else if (context.getPeerJmxConnection() != null) context.getPeerJmxConnection().removeJMXConnectionWrapperListener(this);
     context.setJmxConnection(null);
     context.setPeerJmxConnection(null);
     listener.nodeConnected(context);

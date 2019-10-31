@@ -21,18 +21,18 @@ package org.jppf.management;
 import java.util.EventListener;
 
 /**
- * 
+ * Listner interface for objects that wish to be notified when a JMX connection is established or times out after a specified delay.
  * @author Laurent Cohen
  */
-public interface JMXWrapperListener extends EventListener {
+public interface JMXConnectionWrapperListener extends EventListener {
   /**
    * Notify listeners that a JMX connection wrapper successfully connected to the remote JMX server.
    * @param event the event encapsulating the connection.
    */
-  void jmxWrapperConnected(JMXWrapperEvent event);
+  void onConnected(JMXConnectionWrapperEvent event);
   /**
    * Notify listeners that a JMX connection wrapper failed to connect before the timeout specified in the configuration.
    * @param event the event encapsulating the connection.
    */
-  void jmxWrapperTimeout(JMXWrapperEvent event);
+  void onConnectionTimeout(JMXConnectionWrapperEvent event);
 }

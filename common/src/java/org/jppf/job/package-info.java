@@ -17,7 +17,8 @@
  */
 
 /**
- * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Server_management#Job-level_management_and_monitoring">job management</a> in the server.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Job_selectors">job selectors</a> and
+ * <a href="https://www.jppf.org/doc/@version@/index.php?title=Server_management#Job-level_management_and_monitoring">job management</a> in the server.
  * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.job;

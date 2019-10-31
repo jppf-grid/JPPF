@@ -26,7 +26,7 @@ import javax.management.DescriptorKey;
  * Used to annotate MBean elements with a meaningful descritpion that can be retrieved at runtime.
  * @author Laurent Cohen
  */
-@Documented
+//@Documented
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MBeanDescription {

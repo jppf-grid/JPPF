@@ -30,7 +30,6 @@ import org.slf4j.*;
 /**
  * A notification that can offload its user data to file to avoid OOMEs.
  * @author Laurent Cohen
- * @exclude
  */
 public class OffloadableNotification extends Notification {
   /**
@@ -60,10 +59,10 @@ public class OffloadableNotification extends Notification {
 
   /**
    * Initialize this notification with the specified parameters.
-   * @param type .
+   * @param type the notification type.
    * @param source the emitter MBean's object name.
    * @param sequenceNumber the notification sequence number.
-   * @param timestamp .
+   * @param timestamp the notification tumestamp.
    */
   public OffloadableNotification(final String type, final ObjectName source, final long sequenceNumber, final long timestamp) {
     super(type, source, sequenceNumber, timestamp);

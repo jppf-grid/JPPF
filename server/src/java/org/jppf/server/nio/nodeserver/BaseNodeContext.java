@@ -254,7 +254,7 @@ public abstract class BaseNodeContext extends AbstractNioContext implements  Exe
         }
         if (debugEnabled) log.debug("establishing JMX connection for {}", jmx);
       }
-      jmx.addJMXWrapperListener(new NodeJMXWrapperListener(this, listener));
+      jmx.addJMXConnectionWrapperListener(new NodeJMXWrapperListener(this, listener));
       jmx.connect();
     } else {
       log.warn("node closed: {}", this);

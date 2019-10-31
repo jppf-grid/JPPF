@@ -21,20 +21,20 @@ package org.jppf.management;
 import java.util.EventObject;
 
 /**
- * Event sent when a JMXConnectionWrapper is connected.
+ * Event sent when a JMXConnectionWrapper is connected or when the connection times out.
  * @author Laurent Cohen
  */
-public class JMXWrapperEvent extends EventObject {
+public class JMXConnectionWrapperEvent extends EventObject {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * Initialize this event witht he specified source.
+   * Initialize this event with the specified source.
    * @param jmxWrapper the jmx connection wrapper source of this event.
    */
-  public JMXWrapperEvent(final AbstractJMXConnectionWrapper jmxWrapper) {
+  public JMXConnectionWrapperEvent(final AbstractJMXConnectionWrapper jmxWrapper) {
     super(jmxWrapper);
   }
 

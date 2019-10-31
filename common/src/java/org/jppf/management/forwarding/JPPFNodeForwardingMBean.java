@@ -244,7 +244,7 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
   /**
    * Set the current class loader delegation model for the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
-   * @param model either either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#URL_FIRST URL_FIRST}.
+   * @param model either either {@link DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link DelegationModel#URL_FIRST URL_FIRST}.
    * If any other value is specified then this method has no effect.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * This map may be empty if no exception was raised.

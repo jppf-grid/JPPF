@@ -94,7 +94,7 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
     try {
       jmx = new JMXNodeConnectionWrapper();
       jmx.connect();
-      taskMonitor = jmx.getJPPFNodeTaskMonitorProxy();
+      taskMonitor = jmx.getNodeTaskMonitor();
       taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);

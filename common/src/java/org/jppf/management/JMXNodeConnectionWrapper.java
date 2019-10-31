@@ -249,8 +249,19 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    * @return a dynamic proxy implementing the {@link JPPFNodeMaintenanceMBean} interface.
    * @throws Exception if any error occurs.
    * @since 5.2
+   * @deprecated use {@link #getNodeMaintenance()} instead.
    */
   public JPPFNodeMaintenanceMBean getJPPFNodeMaintenanceMProxy() throws Exception {
+    return getNodeMaintenance();
+  }
+
+  /**
+   * A shortcut method for {@code getProxy(JPPFNodeMaintenanceMBean.MBEAN_NAME, JPPFNodeMaintenanceMBean.class)}.
+   * @return a dynamic proxy implementing the {@link JPPFNodeMaintenanceMBean} interface.
+   * @throws Exception if any error occurs.
+   * @since 6.2
+   */
+  public JPPFNodeMaintenanceMBean getNodeMaintenance() throws Exception {
     return getProxy(JPPFNodeMaintenanceMBean.MBEAN_NAME, JPPFNodeMaintenanceMBean.class);
   }
 
@@ -259,8 +270,19 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    * @return a dynamic proxy implementing the {@link JPPFNodeTaskMonitorMBean} interface.
    * @throws Exception if any error occurs.
    * @since 5.2
+   * @deprecated use {@link #getNodeTaskMonitor()} instead.
    */
   public JPPFNodeTaskMonitorMBean getJPPFNodeTaskMonitorProxy() throws Exception {
+    return getNodeTaskMonitor();
+  }
+
+  /**
+   * A shortcut method for {@code getProxy(JPPFNodeTaskMonitorMBean.MBEAN_NAME, JPPFNodeTaskMonitorMBean.class)}.
+   * @return a dynamic proxy implementing the {@link JPPFNodeTaskMonitorMBean} interface.
+   * @throws Exception if any error occurs.
+   * @since 6.2
+   */
+  public JPPFNodeTaskMonitorMBean getNodeTaskMonitor() throws Exception {
     return getProxy(JPPFNodeTaskMonitorMBean.MBEAN_NAME, JPPFNodeTaskMonitorMBean.class);
   }
 
@@ -269,8 +291,19 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    * @return a dynamic proxy implementing the {@link JPPFNodeProvisioningMBean} interface.
    * @throws Exception if any error occurs.
    * @since 5.2
+   * @deprecated use {@link #getNodeProvisioner()} instead.
    */
   public JPPFNodeProvisioningMBean getJPPFNodeProvisioningProxy() throws Exception {
+    return getNodeProvisioner();
+  }
+
+  /**
+   * A shortcut method for {@code getProxy(JPPFNodeProvisioningMBean.MBEAN_NAME, JPPFNodeProvisioningMBean.class)}.
+   * @return a dynamic proxy implementing the {@link JPPFNodeProvisioningMBean} interface.
+   * @throws Exception if any error occurs.
+   * @since 6.2
+   */
+  public JPPFNodeProvisioningMBean getNodeProvisioner() throws Exception {
     return getProxy(JPPFNodeProvisioningMBean.MBEAN_NAME, JPPFNodeProvisioningMBean.class);
   }
 }

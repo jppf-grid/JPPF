@@ -73,7 +73,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    * @param port the port used by the server.
    * @param sslEnabled specifies whether the jmx connection should be secure or not.
    */
-  public JMXConnectionWrapper(final String protocol, final String host, final int port, final boolean sslEnabled) {
+  JMXConnectionWrapper(final String protocol, final String host, final int port, final boolean sslEnabled) {
     super(protocol, host, port, sslEnabled);
   }
 

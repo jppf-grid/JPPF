@@ -81,7 +81,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
       nodeJmx = null;
       throw new Exception("could not connect to the node's JMX server");
     }
-    taskMonitor = nodeJmx.getJPPFNodeTaskMonitorProxy();
+    taskMonitor = nodeJmx.getNodeTaskMonitor();
   }
 
   /**

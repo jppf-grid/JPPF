@@ -52,7 +52,7 @@ public class TestJPPFNodeProvisioning extends Setup1D1N1C {
     assertTrue(nodeJmx.connectAndWait(5000L));
     final NodeProvisioningListener listener = new NodeProvisioningListener(false);
     nodeJmx.addNotificationListener(JPPFNodeProvisioningMBean.MBEAN_NAME, listener);
-    final JPPFNodeProvisioningMBean provisioner = nodeJmx.getJPPFNodeProvisioningProxy();
+    final JPPFNodeProvisioningMBean provisioner = nodeJmx.getNodeProvisioner();
     assertNotNull(provisioner);
     provisioner.provisionSlaveNodes(2);
     assertTrue(ConcurrentUtils.awaitCondition(() -> listener.notifs.size() == 2, 5000L, 250L, false));

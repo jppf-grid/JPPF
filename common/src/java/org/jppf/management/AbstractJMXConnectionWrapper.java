@@ -53,7 +53,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   /**
    * Prefix for the name given to the connection thread.
    */
-  public static final String CONNECTION_NAME_PREFIX = "jmx@";
+  static final String CONNECTION_NAME_PREFIX = "jmx@";
   /**
    * The timeout in millis for JMX connection attempts. A value of 0 or less means no timeout.
    */
@@ -61,55 +61,55 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   /**
    * URL of the MBean server, in a JMX-compliant format.
    */
-  protected JMXServiceURL url;
+  JMXServiceURL url;
   /**
    * The JMX client.
    */
-  protected JMXConnector jmxc;
+  JMXConnector jmxc;
   /**
    * A connection to the MBean server.
    */
-  protected AtomicReference<MBeanServerConnection> mbeanConnection = new AtomicReference<>(null);
+  AtomicReference<MBeanServerConnection> mbeanConnection = new AtomicReference<>(null);
   /**
    * The host the server is running on.
    */
-  protected String host;
+  String host;
   /**
    * The port used by the server.
    */
-  protected int port;
+  int port;
   /**
    * The connection thread that performs the connection to the management server.
    */
-  protected AtomicReference<JMXConnectionThread> connectionThread = new AtomicReference<>(null);
+  AtomicReference<JMXConnectionThread> connectionThread = new AtomicReference<>(null);
   /**
    * A string representing this connection, used for logging purposes.
    */
-  protected String idString;
+  String idString;
   /**
    * A string representing this connection, used for displaying in the admin conosle.
    */
-  protected String displayName;
+  String displayName;
   /**
    * Determines whether the connection to the JMX server has been established.
    */
-  protected AtomicBoolean connected = new AtomicBoolean(false);
+  AtomicBoolean connected = new AtomicBoolean(false);
   /**
    * Determines whether this connection has been closed by a all to the {@link #close()} method.
    */
-  protected AtomicBoolean closed = new AtomicBoolean(false);
+  AtomicBoolean closed = new AtomicBoolean(false);
   /**
    * Determines whether the connection to the JMX server has been established.
    */
-  protected boolean local;
+  boolean local;
   /**
    * JMX properties used for establishing the connection.
    */
-  protected Map<String, Object> env = new HashMap<>();
+  Map<String, Object> env = new HashMap<>();
   /**
    * Determines whether the JMX connection should be secure or not.
    */
-  protected boolean sslEnabled;
+  boolean sslEnabled;
   /**
    * Used to synchronize during the connection process.
    */
@@ -117,7 +117,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   /**
    * The list of listeners to this connection wrapper.
    */
-  final List<JMXWrapperListener> listeners = new CopyOnWriteArrayList<>();
+  final List<JMXConnectionWrapperListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * The time at which connection attempts started.
    */
@@ -162,7 +162,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * @param port the port used by the server.
    * @param sslEnabled specifies whether the jmx connection should be secure or not.
    */
-  public AbstractJMXConnectionWrapper(final String protocol, final String host, final int port, final boolean sslEnabled) {
+  AbstractJMXConnectionWrapper(final String protocol, final String host, final int port, final boolean sslEnabled) {
     this.protocol = protocol;
     try {
       this.host = (NetworkUtils.isIPv6Address(host)) ? "[" + host + "]" : host;
@@ -244,7 +244,6 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
         }, null, null);
       }
       jmxc.connect();
-      //connectionThread.get().close();
       connectionThread.get().setStopped(true);
       connectionThread.set(null);
     }
@@ -289,14 +288,14 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * Get the host the server is running on.
    * @param host the host as a string.
    */
-  public void setHost(final String host) {
+  private void setHost(final String host) {
     this.host = host;
     this.displayName = this.host + ':' + this.port;
   }
 
   /**
    * Get a string describing this connection.
-   * @return a string in the format host:port.
+   * @return a string in the format {@code host:port}.
    */
   public String getId() {
     return idString;
@@ -320,7 +319,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * Add a listener to this connection wrapper.
    * @param listener the listener to add.
    */
-  public void addJMXWrapperListener(final JMXWrapperListener listener) {
+  public void addJMXConnectionWrapperListener(final JMXConnectionWrapperListener listener) {
     listeners.add(listener);
   }
 
@@ -328,30 +327,24 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * Remove a listener from this connection wrapper.
    * @param listener the listener to add.
    */
-  public void removeJMXWrapperListener(final JMXWrapperListener listener) {
+  public void removeJMXConnectionWrapperListener(final JMXConnectionWrapperListener listener) {
     listeners.remove(listener);
   }
 
   /**
    * Notify all listeners that the connection was successful.
    */
-  protected void fireConnected() {
-    final JMXWrapperEvent event = new JMXWrapperEvent(this);
-    final Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        for (JMXWrapperListener listener: listeners) listener.jmxWrapperConnected(event);
-      }
-    };
-    r.run();
+  void fireConnected() {
+    final JMXConnectionWrapperEvent event = new JMXConnectionWrapperEvent(this);
+    for (final JMXConnectionWrapperListener listener: listeners) listener.onConnected(event);
   }
 
   /**
    * Notify all listeners that the connection could not be established before reaching the timeout.
    */
-  protected void fireTimeout() {
-    final JMXWrapperEvent event = new JMXWrapperEvent(this);
-    for (final JMXWrapperListener listener: listeners) listener.jmxWrapperTimeout(event);
+  void fireTimeout() {
+    final JMXConnectionWrapperEvent event = new JMXConnectionWrapperEvent(this);
+    for (final JMXConnectionWrapperListener listener: listeners) listener.onConnectionTimeout(event);
   }
 
   /**

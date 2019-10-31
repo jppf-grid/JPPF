@@ -142,7 +142,7 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean {
 
   /**
    * Get the current class loader delegation model for the node.
-   * @return either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#URL_FIRST LOCAL_FIRST}.
+   * @return either {@link DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link DelegationModel#URL_FIRST LOCAL_FIRST}.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("the current class loader delegation model for the node")
@@ -150,7 +150,7 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean {
 
   /**
    * Set the current class loader delegation model for the node.
-   * @param model either either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#URL_FIRST LOCAL_FIRST}.
+   * @param model either either {@link DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link DelegationModel#URL_FIRST LOCAL_FIRST}.
    * If any other value is specified then this method has no effect.
    * @throws Exception if any error occurs.
    */

@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for the <a href="https://www.jppf.org/doc/@version@/index.php?title=Management_and_monitoring">JMX-based management</a> of JPPF components.
- * <p>Found in: <b>jppf-common.jar, jppf-server.jar</b> 
+ * Support for generation of the <a href="https://www.jppf.org/doc/@version@/index.php?title=MBeans_reference">JPPF MBeans reference</a> documentation..
+ * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.management.doc;

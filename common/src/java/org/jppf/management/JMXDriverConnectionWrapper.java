@@ -263,50 +263,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   /**
-   * This convenience method creates a proxy to the driver's mbean which forwards requests to its nodes.
-   * It is equivalent to calling the more cumbersome {@code getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class)}.
-   * @return an instance of {@link JPPFNodeForwardingMBean}.
-   * @throws Exception if a proxy could not be created for any reason.
-   * @since 4.2
-   */
-  public JPPFNodeForwardingMBean getNodeForwarder() throws Exception {
-    return getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
-  }
-
-  /**
-   * This convenience method creates a proxy to the driver's mbean which manages and monitors jobs.
-   * It is equivalent to calling the more cumbersome {@code getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class)}.
-   * @return an instance of {@link DriverJobManagementMBean}.
-   * @throws Exception if a proxy could not be created for any reason.
-   * @since 4.2
-   */
-  public DriverJobManagementMBean getJobManager() throws Exception {
-    return getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
-  }
-
-  /**
-   * This convenience method creates a proxy to the driver's mbean which manages persisted jobs.
-   * It is equivalent to calling the more cumbersome {@code getProxy(PersistedJobsManagerMBean.MBEAN_NAME, PersistedJobsManagerMBean.class)}.
-   * @return an instance of {@link PersistedJobsManagerMBean}.
-   * @throws Exception if a proxy could not be created for any reason.
-   * @exclude
-   */
-  public PersistedJobsManagerMBean getPersistedJobsManager() throws Exception {
-    return getProxy(PersistedJobsManagerMBean.MBEAN_NAME, PersistedJobsManagerMBean.class);
-  }
-
-  /**
-   * This convenience method creates a proxy to the driver's mbean that manages the load-balancers persisted states.
-   * It is equivalent to calling the more cumbersome {@code getProxy(LoadBalancerPersistenceManagerMBean.MBEAN_NAME, LoadBalancerPersistenceManagerMBean.class)}.
-   * @return an instance of {@link PersistedJobsManagerMBean}.
-   * @throws Exception if a proxy could not be created for any reason.
-   * @since 6.0
-   */
-  public LoadBalancerPersistenceManagement getLoadBalancerPersistenceManagement() throws Exception {
-    return getProxy(LoadBalancerPersistenceManagerMBean.MBEAN_NAME, LoadBalancerPersistenceManagerMBean.class);
-  }
-
-  /**
    * Register a notification listener which will receive notifications from from the specified MBean on the selected nodes.
    * @param selector determines which nodes will be selected.
    * @param mBeanName the name of the MBean from which to receive notificaztions from the selected nodes.
@@ -491,6 +447,50 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
     }
   }
 
+  /**
+   * This convenience method creates a proxy to the driver's mbean which forwards requests to its nodes.
+   * It is equivalent to calling the more cumbersome {@code getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class)}.
+   * @return an instance of {@link JPPFNodeForwardingMBean}.
+   * @throws Exception if a proxy could not be created for any reason.
+   * @since 4.2
+   */
+  public JPPFNodeForwardingMBean getNodeForwarder() throws Exception {
+    return getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+  }
+
+  /**
+   * This convenience method creates a proxy to the driver's mbean which manages and monitors jobs.
+   * It is equivalent to calling the more cumbersome {@code getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class)}.
+   * @return an instance of {@link DriverJobManagementMBean}.
+   * @throws Exception if a proxy could not be created for any reason.
+   * @since 4.2
+   */
+  public DriverJobManagementMBean getJobManager() throws Exception {
+    return getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+  }
+
+  /**
+   * This convenience method creates a proxy to the driver's mbean which manages persisted jobs.
+   * It is equivalent to calling the more cumbersome {@code getProxy(PersistedJobsManagerMBean.MBEAN_NAME, PersistedJobsManagerMBean.class)}.
+   * @return an instance of {@link PersistedJobsManagerMBean}.
+   * @throws Exception if a proxy could not be created for any reason.
+   * @exclude
+   */
+  public PersistedJobsManagerMBean getPersistedJobsManager() throws Exception {
+    return getProxy(PersistedJobsManagerMBean.MBEAN_NAME, PersistedJobsManagerMBean.class);
+  }
+
+  /**
+   * This convenience method creates a proxy to the driver's mbean that manages the load-balancers persisted states.
+   * It is equivalent to calling the more cumbersome {@code getProxy(LoadBalancerPersistenceManagerMBean.MBEAN_NAME, LoadBalancerPersistenceManagerMBean.class)}.
+   * @return an instance of {@link PersistedJobsManagerMBean}.
+   * @throws Exception if a proxy could not be created for any reason.
+   * @since 6.0
+   */
+  public LoadBalancerPersistenceManagement getLoadBalancerPersistenceManagement() throws Exception {
+    return getProxy(LoadBalancerPersistenceManagerMBean.MBEAN_NAME, LoadBalancerPersistenceManagerMBean.class);
+  }
+
   @Override
   public DiagnosticsMBean getDiagnosticsProxy() throws Exception {
     return getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
@@ -501,6 +501,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @return an instance of an implementation of the {@link JobDependencyManagerMBean} interface.
    * This is a shortcut method for {@link JMXConnectionWrapper#getProxy(String, Class) getProxy(JobDependencyManagerMBean.MBEAN_NAME, JobDependencyManagerMBean.class)}.
    * @throws Exception if any error occurs.
+   * @since 6.2
    */
   public JobDependencyManagerMBean getJobDependencyManager() throws Exception {
     return getProxy(JobDependencyManagerMBean.MBEAN_NAME, JobDependencyManagerMBean.class);
