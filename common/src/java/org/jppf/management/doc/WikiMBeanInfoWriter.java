@@ -39,7 +39,7 @@ public class WikiMBeanInfoWriter extends MBeanInfoVisitorAdapter {
   /**
    * 
    */
-  private static final int START_HEADING_LEVEL = 2;
+  private static final int START_HEADING_LEVEL = 1;
   /**
    * A cache of converted types, for performance optimization.
    */
