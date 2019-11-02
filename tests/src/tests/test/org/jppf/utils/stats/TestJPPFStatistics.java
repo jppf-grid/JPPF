@@ -69,7 +69,7 @@ public class TestJPPFStatistics extends Setup1D1N1C {
     client.submitAsync(job);
     Thread.sleep(1000L);
     print(false, false, "restarting node");
-    jmx.getNodeForwarder().restart(NodeSelector.ALL_NODES);
+    jmx.getForwarder().restart(NodeSelector.ALL_NODES);
     print(false, false, "waiting for job results");
     final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);

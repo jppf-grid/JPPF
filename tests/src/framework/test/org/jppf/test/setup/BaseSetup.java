@@ -304,13 +304,13 @@ public class BaseSetup {
         final Collection<JPPFManagementInfo> infos = jmx.nodesInformation();
         final Map<String, JPPFManagementInfo> infoMap = new HashMap<>(infos.size());
         for (final JPPFManagementInfo info: infos) infoMap.put(info.getUuid(), info);
-        final Map<String, Object> dumpsMap = jmx.getNodeForwarder().threadDump(NodeSelector.ALL_NODES);
-        for (final Map.Entry<String, Object> entry: dumpsMap.entrySet()) {
+        final ResultsMap<String, ThreadDump> dumpsMap = jmx.getForwarder().threadDump(NodeSelector.ALL_NODES);
+        for (final Map.Entry<String, InvocationResult<ThreadDump>> entry: dumpsMap.entrySet()) {
           final String uuid = entry.getKey();
-          if (entry.getValue() instanceof Throwable) {
+          if (entry.getValue().isException()) {
             log.error("error getting thread dump for node {}", uuid, entry.getValue());
           } else {
-            final ThreadDump dump = (ThreadDump) entry.getValue();
+            final ThreadDump dump = entry.getValue().result();
             final JPPFManagementInfo info = infoMap.get(uuid);
             final String text = TextThreadDumpWriter.printToString(dump, "node thread dump for " + (info == null ? uuid : info.getHost() + ":" + info.getPort()));
             FileUtils.writeTextFile("node_thread_dump_" + (info == null ? uuid : info.getPort()) + ".log", text);

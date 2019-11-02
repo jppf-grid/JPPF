@@ -146,13 +146,13 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
   private static void checkNodes() throws Exception {
     final int nbNodes = BaseSetup.nbNodes();
     final JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
-    final JPPFNodeForwardingMBean nodeForwarder = driverJmx.getNodeForwarder();
+    final NodeForwardingMBean nodeForwarder = driverJmx.getForwarder();
     while (true) {
-      final Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);
+      final ResultsMap<String, JPPFNodeState> result = nodeForwarder.state(NodeSelector.ALL_NODES);
       if (result.size() == nbNodes) {
         int count = 0;
-        for (final Map.Entry<String, Object>entry: result.entrySet()) {
-          if (entry.getValue() instanceof JPPFNodeState) count++;
+        for (final Map.Entry<String, InvocationResult<JPPFNodeState>>entry: result.entrySet()) {
+          if (entry.getValue().result() != null) count++;
           else break;
         }
         if (count == nbNodes) break;

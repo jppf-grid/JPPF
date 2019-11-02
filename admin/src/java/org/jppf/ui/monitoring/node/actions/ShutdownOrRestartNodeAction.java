@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
@@ -82,7 +82,7 @@ public class ShutdownOrRestartNodeAction extends AbstractTopologyAction {
         final CollectionMap<TopologyDriver, String> map = getDriverMap();
         for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
           try {
-            final JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
+            final NodeForwardingMBean forwarder = entry.getKey().getForwarder();
             if (forwarder == null) continue;
             if (debugEnabled) log.debug("invoking {} with interrupt={} for the nodes: {}", (restart ? "restart()" : "shutdown()"), interruptIfRunning, entry.getValue());
             final NodeSelector selector = new UuidSelector(entry.getValue());

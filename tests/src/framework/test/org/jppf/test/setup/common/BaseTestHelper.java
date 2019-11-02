@@ -25,7 +25,7 @@ import java.util.concurrent.*;
 import org.jppf.JPPFError;
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -103,25 +103,7 @@ public class BaseTestHelper {
    * @throws Exception if any error occurs.
    */
   public static JPPFJob createJob(final String name, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception {
-    return createJob(name, null, broadcast, nbTasks, taskClass, params);
-  }
-
-  /**
-   * Create a job with the specified parameters.
-   * The type of the tasks is specified via their class, and the constructor to
-   * use is specified based on the number of parameters.
-   * @param name the job's name.
-   * @param uuid the job uuid.
-   * @param broadcast specifies whether the job is a broadcast job.
-   * @param nbTasks the number of tasks to add to the job.
-   * @param taskClass the class of the tasks to add to the job.
-   * @param params the parameters for the tasks constructor.
-   * @return a <code>JPPFJob</code> instance.
-   * @throws Exception if any error occurs.
-   * @deprecated
-   */
-  public static JPPFJob createJob(final String name, final String uuid, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception {
-    final JPPFJob job = new JPPFJob(uuid);
+    final JPPFJob job = new JPPFJob();
     job.setName(name);
     final int nbArgs = (params == null) ? 0 : params.length;
     // 0 padding of task number
@@ -328,7 +310,7 @@ public class BaseTestHelper {
     }
     if (toNodes) {
       try {
-        final JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
+        final NodeForwardingMBean forwarder = driver.getForwarder();
         if (forwarder != null) forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "log", new Object[] { messages }, LOG_METHOD_SIGNATURE);
       } catch (final Exception e) {
         System.err.printf("[%s] error invoking remote logging on the nodes of %s:%n%s%n", ReflectionUtils.getCurrentClassAndMethod(), driver, ExceptionUtils.getStackTrace(e));

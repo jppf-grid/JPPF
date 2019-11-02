@@ -39,8 +39,7 @@ import test.org.jppf.test.setup.common.*;
  * In this class, we test that the functionality of the DriverJobManagementMBean from the client point of view.
  * @author Laurent Cohen
  */
-@SuppressWarnings("deprecation")
-public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingMBean {
+public class TestNodeForwardingMBean extends AbstractTestNodeForwardingMBean {
   /** */
   private final Map<NodeSelector, String[]> selectorMap = new LinkedHashMap<NodeSelector, String[]>() {{
     put(new AllNodesSelector(), new String[] {"n1", "n2"});
@@ -70,10 +69,10 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
     final int nbNodes = expectedNodes.length;
     try {
       configureLoadBalancer();
-      Map<String, Object> result = nodeForwarder.state(selector);
+      ResultsMap<String, JPPFNodeState> result = nodeForwarder.state(selector);
       checkNodes(result, JPPFNodeState.class, expectedNodes);
-      for (final Map.Entry<String, Object> entry : result.entrySet()) {
-        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
+      for (final Map.Entry<String, InvocationResult<JPPFNodeState>> entry : result.entrySet()) {
+        final JPPFNodeState state = entry.getValue().result();
         assertEquals(1, state.getThreadPoolSize());
         assertEquals(Thread.NORM_PRIORITY, state.getThreadPriority());
         assertEquals(JPPFNodeState.ConnectionState.CONNECTED, state.getConnectionStatus());
@@ -85,16 +84,16 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       Thread.sleep(750L);
       result = nodeForwarder.state(selector);
       checkNodes(result, JPPFNodeState.class, expectedNodes);
-      for (final Map.Entry<String, Object> entry : result.entrySet()) {
-        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
+      for (final Map.Entry<String, InvocationResult<JPPFNodeState>> entry : result.entrySet()) {
+        final JPPFNodeState state = entry.getValue().result();
         assertEquals(0, state.getNbTasksExecuted());
         assertEquals(JPPFNodeState.ExecutionState.EXECUTING, state.getExecutionStatus());
       }
       job.awaitResults();
       result = nodeForwarder.state(selector);
       checkNodes(result, JPPFNodeState.class, expectedNodes);
-      for (final Map.Entry<String, Object> entry : result.entrySet()) {
-        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
+      for (final Map.Entry<String, InvocationResult<JPPFNodeState>> entry : result.entrySet()) {
+        final JPPFNodeState state = entry.getValue().result();
         assertEquals(1, state.getNbTasksExecuted());
         assertEquals(JPPFNodeState.ExecutionState.IDLE, state.getExecutionStatus());
       }
@@ -236,10 +235,10 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
   private static void testSystemInformation(final NodeSelector selector, final String... expectedNodes) throws Exception {
     final String selectorClass = selector.getClass().getSimpleName();
     BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> testing with %s, expectedNodes=%s", selectorClass, Arrays.toString(expectedNodes));
-    final Map<String, Object> result = nodeForwarder.systemInformation(selector);
+    final ResultsMap<String, JPPFSystemInformation> result = nodeForwarder.systemInformation(selector);
     checkNodes(result, JPPFSystemInformation.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFSystemInformation info = (JPPFSystemInformation) entry.getValue();
+    for (final Map.Entry<String, InvocationResult<JPPFSystemInformation>> entry : result.entrySet()) {
+      final JPPFSystemInformation info = entry.getValue().result();
       assertNotNull(info);
       assertNotNull(info.getEnv());
       assertFalse(info.getEnv().isEmpty());
@@ -279,11 +278,11 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
     BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> testing with %s, expectedNodes=%s", selectorClass, Arrays.toString(expectedNodes));
     TypedProperties oldConfig = null, newConfig = null;
     BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> getting system info");
-    Map<String, Object> result = nodeForwarder.systemInformation(selector);
+    ResultsMap<String, JPPFSystemInformation> result = nodeForwarder.systemInformation(selector);
     checkNodes(result, JPPFSystemInformation.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+    for (final Map.Entry<String, InvocationResult<JPPFSystemInformation>> entry : result.entrySet()) {
       final String uuid = entry.getKey();
-      final JPPFSystemInformation info = (JPPFSystemInformation) entry.getValue();
+      final JPPFSystemInformation info = entry.getValue().result();
       assertNotNull(info);
       final TypedProperties config = info.getJppf();
       assertNotNull(config);
@@ -294,14 +293,14 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       if (newConfig == null) newConfig = new TypedProperties(config).set(JPPFProperties.PROCESSING_THREADS, 8).setString("custom.property", "custom.value");
     }
     BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> updating config");
-    result = nodeForwarder.updateConfiguration(selector, newConfig, false);
-    checkNoException(result, expectedNodes);
+    final ResultsMap<String, Void> result2 = nodeForwarder.updateConfiguration(selector, newConfig, false);
+    checkNoException(result2, expectedNodes);
     BaseTestHelper.printToAll(driverJmx, true, true, true, true, false, ">>> getting new system info");
     result = nodeForwarder.systemInformation(selector);
     checkNodes(result, JPPFSystemInformation.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+    for (final Map.Entry<String, InvocationResult<JPPFSystemInformation>> entry : result.entrySet()) {
       final String uuid = entry.getKey();
-      final JPPFSystemInformation info = (JPPFSystemInformation) entry.getValue();
+      final JPPFSystemInformation info = entry.getValue().result();
       assertNotNull(info);
       newConfig = info.getJppf();
       assertNotNull(newConfig);
@@ -341,7 +340,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
     final String uuid = job.getUuid();
     client.submitAsync(job);
     Thread.sleep(1000L);
-    final Map<String, Object> result = nodeForwarder.cancelJob(selector, uuid, false);
+    final ResultsMap<String, Void> result = nodeForwarder.cancelJob(selector, uuid, false);
     checkNoException(result, expectedNodes);
     final List<Task<?>> jobResult = job.awaitResults();
     assertNotNull(jobResult);

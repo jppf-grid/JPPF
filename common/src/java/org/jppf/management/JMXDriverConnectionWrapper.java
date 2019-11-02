@@ -274,9 +274,9 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    */
   public String registerForwardingNotificationListener(final NodeSelector selector, final String mBeanName,
       final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
-    final String listenerID = (String) invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "registerForwardingNotificationListener", new Object[] {selector, mBeanName}, FORWARDING_LISTENER_SIGNATURE);
+    final String listenerID = (String) invoke(NodeForwardingMBean.MBEAN_NAME, "registerForwardingNotificationListener", new Object[] {selector, mBeanName}, FORWARDING_LISTENER_SIGNATURE);
     final InternalNotificationFilter internalFilter = new InternalNotificationFilter(listenerID, filter);
-    addNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, listener, internalFilter, handback);
+    addNotificationListener(NodeForwardingMBean.MBEAN_NAME, listener, internalFilter, handback);
     synchronized(forwardingListeners) {
       Map<String, ListenerWrapper> map = forwardingListeners.get(getId());
       if (map == null) {
@@ -302,14 +302,14 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
           map.remove(listenerID);
           if (map.isEmpty()) forwardingListeners.remove(getId());
           try {
-            removeNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, wrapper.getListener(), wrapper.getFilter(), wrapper.getHandback());
+            removeNotificationListener(NodeForwardingMBean.MBEAN_NAME, wrapper.getListener(), wrapper.getFilter(), wrapper.getHandback());
           } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }
       }
     }
-    invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "unregisterForwardingNotificationListener", new Object[] {listenerID}, new String[] {String.class.getName()});
+    invoke(NodeForwardingMBean.MBEAN_NAME, "unregisterForwardingNotificationListener", new Object[] {listenerID}, new String[] {String.class.getName()});
   }
 
   /**
@@ -327,11 +327,11 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
           result.add(listenerID);
           final ListenerWrapper wrapper = entry.getValue();
           try {
-            removeNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, wrapper.getListener(), wrapper.getFilter(), wrapper.getHandback());
+            removeNotificationListener(NodeForwardingMBean.MBEAN_NAME, wrapper.getListener(), wrapper.getFilter(), wrapper.getHandback());
           } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
-          invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "unregisterForwardingNotificationListener", new Object[] {listenerID}, new String[] {String.class.getName()});
+          invoke(NodeForwardingMBean.MBEAN_NAME, "unregisterForwardingNotificationListener", new Object[] {listenerID}, new String[] {String.class.getName()});
         }
       }
     }
@@ -348,6 +348,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @return a mapping of node uuids to the result of invoking the MBean method on the corresponding node. Each result may be an exception.
    * <br/>Additionally, each result may be <code>null</code>, in particular if the invoked method has a <code>void</code> return type.
    * @throws Exception if the invocation failed.
+   * @deprecated use {@link #getForwarder()}{@link NodeForwardingMBean#forwardInvoke(NodeSelector, String, String, Object[], String[]) .forwardInvoke(selector, name, methodName, params, signature)} instead.
    */
   public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
     return getNodeForwarder().forwardInvoke(selector, name, methodName, params, signature);
@@ -362,6 +363,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @return a mapping of node uuids to the result of invoking the MBean method on the corresponding node. Each result may be an exception.
    * <br/>Additionally, each result may be <code>null</code>, in particular if the invoked method has a <code>void</code> return type.
    * @throws Exception if the invocation failed.
+   * @deprecated use {@link #getForwarder()}{@link NodeForwardingMBean#forwardInvoke(NodeSelector, String, String) .forwardInvoke(selector, name, methodName)} instead.
    */
   public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName) throws Exception {
     return getNodeForwarder().forwardInvoke(selector, name, methodName);
@@ -374,6 +376,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param attribute the name of the MBean attribute to read.
    * @return a mapping of node uuids to the result of getting the MBean attribute on the corresponding node. Each result may be an exception.
    * @throws Exception if the invocation failed.
+   * @deprecated use {@link #getForwarder()}{@link NodeForwardingMBean#forwardGetAttribute(NodeSelector, String, String) .forwardGetAttribute(selector, name, attribute)} instead.
    */
   public Map<String, Object> forwardGetAttribute(final NodeSelector selector, final String name, final String attribute) throws Exception {
     return getNodeForwarder().forwardGetAttribute(selector, name, attribute);
@@ -388,6 +391,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @return a mapping of node uuids to an eventual exception resulting from setting the MBean attribute on the corresponding node.
    * This map may be empty if no exception was raised.
    * @throws Exception if the invocation failed.
+   * @deprecated use {@link #getForwarder()}{@link NodeForwardingMBean#forwardSetAttribute(NodeSelector, String, String, Object) .forwardSetAttribute(selector, name, attribute, value)} instead.
    */
   public Map<String, Object> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
     return getNodeForwarder().forwardSetAttribute(selector, name, attribute, value);
@@ -449,10 +453,23 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 
   /**
    * This convenience method creates a proxy to the driver's mbean which forwards requests to its nodes.
+   * It is equivalent to calling the more cumbersome {@code getProxy(NodeForwardingMBean.MBEAN_NAME, NodeForwardingMBean.class)}.
+   * @return an instance of {@link NodeForwardingMBean}.
+   * @throws Exception if a proxy could not be created for any reason.
+   * @since 4.2
+   */
+  public NodeForwardingMBean getForwarder() throws Exception {
+    return getProxy(NodeForwardingMBean.MBEAN_NAME, NodeForwardingMBean.class);
+  }
+
+
+  /**
+   * This convenience method creates a proxy to the driver's mbean which forwards requests to its nodes.
    * It is equivalent to calling the more cumbersome {@code getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class)}.
    * @return an instance of {@link JPPFNodeForwardingMBean}.
    * @throws Exception if a proxy could not be created for any reason.
    * @since 4.2
+   * @deprecated use {@link #getForwarder()} instead.
    */
   public JPPFNodeForwardingMBean getNodeForwarder() throws Exception {
     return getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
@@ -498,8 +515,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 
   /**
    * Get a proxy to the dependency manager MBean in the driver.
-   * @return an instance of an implementation of the {@link JobDependencyManagerMBean} interface.
    * This is a shortcut method for {@link JMXConnectionWrapper#getProxy(String, Class) getProxy(JobDependencyManagerMBean.MBEAN_NAME, JobDependencyManagerMBean.class)}.
+   * @return an instance of an implementation of the {@link JobDependencyManagerMBean} interface.
    * @throws Exception if any error occurs.
    * @since 6.2
    */

@@ -142,12 +142,12 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     try {
       final TopologyDriver parent = (TopologyDriver) data.getParent();
       if (parent == null) return "could not get the parent driver for the selected node";
-      final Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
+      final ResultsMap<String, JPPFSystemInformation> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
       if (result == null) return "could not retrieve system information for the selected node";
-      final Object o = result.get(data.getUuid());
+      final InvocationResult<JPPFSystemInformation> o = result.get(data.getUuid());
       if (o == null) return "could not retrieve system information for the selected node";
-      else if (o instanceof Exception) throw (Exception) o;
-      final JPPFSystemInformation info = (JPPFSystemInformation) o;
+      else if (o.isException()) throw o.exception();
+      final JPPFSystemInformation info = o.result();
       final TypedProperties props = info.getJppf();
       final Set<String> keys = new TreeSet<>();
       for (final Map.Entry<Object, Object> entry: props.entrySet()) keys.add((String) entry.getKey());

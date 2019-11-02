@@ -30,7 +30,7 @@ import javax.management.*;
 import org.jppf.client.JPPFJob;
 import org.jppf.job.*;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
@@ -402,21 +402,20 @@ public class TestJobReservation extends AbstractNonStandardSetup {
           }
         });
         BaseTestHelper.printToAll(BaseSetup.getClient(), true, true, true, false, "before resetting nodes configurations");
-        final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
-        final Map<String, Object> result = forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "executeScript",
+        final NodeForwardingMBean forwarder = jmx.getForwarder();
+        final ResultsMap<String, String> result = forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "executeScript",
           new Object[] { "javascript", NODE_RESET_SCRIPT }, new String[] { "java.lang.String", "java.lang.String" });
         assertEquals(n, result.size());
         final String[] uuids = new String[n];
         for (int i=0; i<n; i++) uuids[i] = "n" + (i + 1);
-        for (final Map.Entry<String, Object> entry: result.entrySet()) {
+        for (final Map.Entry<String, InvocationResult<String>> entry: result.entrySet()) {
           final String key = entry.getKey();
-          final Object value = entry.getValue();
+          final InvocationResult<String> value = entry.getValue();
           print(false, false, "read config for node '%s' : %s", key, value);
           assertTrue(StringUtils.isOneOf(key, false, uuids));
-          if (entry.getValue() instanceof Throwable) print(false, false, "throwable raised by node %s: %s", key, ExceptionUtils.getStackTrace((Throwable) value));
-          assertFalse(value instanceof Throwable);
-          assertTrue(value instanceof String);
-          final String script = SERVER_RESET_SCRIPT.replace("${uuid}", key).replace("${cfg}", (String) value);
+          if (entry.getValue().isException()) print(false, false, "throwable raised by node %s: %s", key, ExceptionUtils.getStackTrace(value.exception()));
+          assertFalse(value.isException());
+          final String script = SERVER_RESET_SCRIPT.replace("${uuid}", key).replace("${cfg}", value.result());
           BaseTestHelper.printToAll(BaseSetup.getClient(), true, true, true, false, "resetting config of node '%s' in the server, using script:\n%s", key, script);
           final Object o = executeScriptOnServer(jmx, script);
           BaseTestHelper.printToAll(BaseSetup.getClient(), true, true, true, false, "config reset for node '%s' done in the server, returned config: %s", key, o);

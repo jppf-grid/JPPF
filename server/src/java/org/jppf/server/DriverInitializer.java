@@ -32,7 +32,7 @@ import org.jppf.discovery.*;
 import org.jppf.jmx.JMXHelper;
 import org.jppf.load.balancer.ChannelAwareness;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
+import org.jppf.management.forwarding.*;
 import org.jppf.management.spi.*;
 import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.server.debug.*;
@@ -375,23 +375,20 @@ public class DriverInitializer {
    */
   void registerNodeConfigListener() {
     if (debugEnabled) log.debug("registering NodeConfigListener");
-    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper()) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper()) {
       jmx.connect();
-      final NotificationListener listener = new NotificationListener() {
-        @Override
-        public void handleNotification(final Notification notification, final Object handback) {
-          final Notification notif = ((JPPFNodeForwardingNotification) notification).getNotification();
-          final String nodeUuid = (String) notif.getSource();
-          final TypedProperties nodeConfig = (TypedProperties) notif.getUserData();
-          if (debugEnabled) log.debug("received notification for node {}, nb threads={}", nodeUuid, nodeConfig.get(JPPFProperties.PROCESSING_THREADS));
-          final BaseNodeContext node = driver.getAsyncNodeNioServer().getConnection(nodeUuid);
-          if (node == null) return;
-          synchronized(node.getMonitor()) {
-            final TypedProperties oldConfig = node.getSystemInformation().getJppf();
-            oldConfig.clear();
-            oldConfig.putAll(nodeConfig);
-            if (node.getBundler() instanceof ChannelAwareness) ((ChannelAwareness) node.getBundler()).setChannelConfiguration(node.getSystemInformation());
-          }
+      final ForwardingNotificationListener listener = (notification, handback) -> {
+        final Notification notif = notification.getNotification();
+        final String nodeUuid = (String) notif.getSource();
+        final TypedProperties nodeConfig = (TypedProperties) notif.getUserData();
+        if (debugEnabled) log.debug("received notification for node {}, nb threads={}", nodeUuid, nodeConfig.get(JPPFProperties.PROCESSING_THREADS));
+        final BaseNodeContext node = driver.getAsyncNodeNioServer().getConnection(nodeUuid);
+        if (node == null) return;
+        synchronized(node.getMonitor()) {
+          final TypedProperties oldConfig = node.getSystemInformation().getJppf();
+          oldConfig.clear();
+          oldConfig.putAll(nodeConfig);
+          if (node.getBundler() instanceof ChannelAwareness) ((ChannelAwareness) node.getBundler()).setChannelConfiguration(node.getSystemInformation());
         }
       };
       jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeConfigNotifierMBean.MBEAN_NAME, listener, null, null);

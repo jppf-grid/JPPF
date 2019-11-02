@@ -79,7 +79,7 @@ public class TestJPPFNodeProvisioning extends Setup1D1N1C {
     final NodeSelector selector = new UuidSelector(info.getUuid());
     final String listenerID = jmxDriver.registerForwardingNotificationListener(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, listener, null, null);
     print(false, false, "got listenerID = %s", listenerID);
-    final JPPFNodeForwardingMBean forwarder = jmxDriver.getNodeForwarder();
+    final NodeForwardingMBean forwarder = jmxDriver.getForwarder();
     assertNotNull(forwarder);
     forwarder.provisionSlaveNodes(selector, 2);
     assertTrue(ConcurrentUtils.awaitCondition(() -> listener.notifs.size() == 2, 5000L, 250L, false));
@@ -102,7 +102,7 @@ public class TestJPPFNodeProvisioning extends Setup1D1N1C {
     final Pair<JMXDriverConnectionWrapper, JPPFManagementInfo> pair = getManagementInfo();
     final JMXDriverConnectionWrapper jmxDriver = pair.first();
     final JPPFManagementInfo info = pair.second();
-    final JPPFNodeForwardingMBean forwarder = jmxDriver.getNodeForwarder();
+    final NodeForwardingMBean forwarder = jmxDriver.getForwarder();
     assertNotNull(forwarder);
     final TypedProperties overrides = new TypedProperties().setString("prop.string", "string value").setInt("prop.int", 11);
     final NodeSelector selector = new UuidSelector(info.getUuid());
@@ -111,11 +111,11 @@ public class TestJPPFNodeProvisioning extends Setup1D1N1C {
     print(false, false, "got listenerID = %s", listenerID);
     forwarder.provisionSlaveNodes(selector, 2, overrides);
     assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmxDriver.nbNodes() == 3, 5000L, 250L, false));
-    final Map<String, Object> resultMap = forwarder.systemInformation(NodeSelector.ALL_NODES);
-    for (final Map.Entry<String, Object> entry: resultMap.entrySet()) {
-      assertFalse(entry.getValue() instanceof Throwable);
+    final ResultsMap<String, JPPFSystemInformation> resultMap = forwarder.systemInformation(NodeSelector.ALL_NODES);
+    for (final Map.Entry<String, InvocationResult<JPPFSystemInformation>> entry: resultMap.entrySet()) {
+      assertFalse(entry.getValue().isException());
       final String uuid = entry.getKey();
-      final JPPFSystemInformation sysInfo = (JPPFSystemInformation) entry.getValue();
+      final JPPFSystemInformation sysInfo = entry.getValue().result();
       final TypedProperties config = sysInfo.getJppf();
       final boolean master = info.getUuid().equals(uuid);
       for (final Object o: overrides.keySet()) {

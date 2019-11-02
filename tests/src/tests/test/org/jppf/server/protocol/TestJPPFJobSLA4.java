@@ -26,7 +26,7 @@ import org.jppf.client.JPPFJob;
 import org.jppf.execute.async.AbstractAsyncExecutionManager;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.NodeInternal;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
@@ -179,13 +179,13 @@ public class TestJPPFJobSLA4 extends BaseTest {
   private static void checkNodes() throws Exception {
     final int nbNodes = BaseSetup.nbNodes();
     final JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
-    final JPPFNodeForwardingMBean nodeForwarder = driverJmx.getNodeForwarder();
+    final NodeForwardingMBean nodeForwarder = driverJmx.getForwarder();
     while (true) {
-      final Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);
+      final ResultsMap<String, JPPFNodeState> result = nodeForwarder.state(NodeSelector.ALL_NODES);
       if (result.size() == nbNodes) {
         int count = 0;
-        for (final Map.Entry<String, Object>entry: result.entrySet()) {
-          if (entry.getValue() instanceof JPPFNodeState) count++;
+        for (final Map.Entry<String, InvocationResult<JPPFNodeState>>entry: result.entrySet()) {
+          if (entry.getValue().result() != null) count++;
           else break;
         }
         if (count == nbNodes) break;

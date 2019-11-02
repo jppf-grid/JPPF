@@ -164,9 +164,9 @@ public class TopologyUtils {
     try {
       if (data.isNode()) {
         final TopologyDriver parent = (TopologyDriver) data.getParent();
-        final Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
-        final Object o = result.get(data.getUuid());
-        if (o instanceof JPPFSystemInformation) info = (JPPFSystemInformation) o;
+        final ResultsMap<String, JPPFSystemInformation> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
+        final InvocationResult<JPPFSystemInformation> o = result.get(data.getUuid());
+        if (o.result() != null) info = o.result();
       } else {
         if (data.isPeer()) {
           final String uuid = ((TopologyPeer) data).getUuid();

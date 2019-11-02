@@ -18,10 +18,13 @@
 
 package org.jppf.management.forwarding;
 
+import org.jppf.utils.InvocationResult;
+
 /**
- * Common super class for all forwrding tasks.
+ * Common super class for all forwarding tasks.
+ * @param <E> the type of result.
  */
-abstract class AbstractForwardingTask implements Runnable {
+abstract class AbstractForwardingTask<E> implements Runnable {
   /**
    * Represents the node to which a request is sent.
    */
@@ -29,28 +32,29 @@ abstract class AbstractForwardingTask implements Runnable {
   /**
    * The result.
    */
-  Object result;
+  InvocationResult<E> result;
   /**
    * 
    */
-  final ForwardCallback callback;
+  final ForwardCallback<E> callback;
 
   /**
    * Initialize this task.
    * @param uuid represents the node to which a request is sent.
    * @param callback .
    */
-  AbstractForwardingTask(final String uuid, final ForwardCallback callback) {
+  AbstractForwardingTask(final String uuid, final ForwardCallback<E> callback) {
     this.uuid = uuid;
     this.callback = callback;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void run() {
     try {
-      result = execute();
+      result = new InvocationResult<>(execute());
     } catch (final Exception e) {
-      result = e;
+      result = new InvocationResult<>(e);
     } finally {
       callback.gotResult(uuid, result);
     }
@@ -61,5 +65,5 @@ abstract class AbstractForwardingTask implements Runnable {
    * @return the result of the JMX invocation.
    * @throws Exception if any error occurs.
    */
-  abstract Object execute() throws Exception;
+  abstract E execute() throws Exception;
 }

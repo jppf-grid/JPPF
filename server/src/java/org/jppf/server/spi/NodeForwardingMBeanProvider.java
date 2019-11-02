@@ -25,12 +25,11 @@ import org.jppf.server.JPPFDriver;
 /**
  * Provider for the default JPPF driver management and monitoring features.
  * @author Laurent Cohen
- * @deprecated use {@link NodeForwardingMBeanProvider} instead.
  */
-public class JPPFNodeForwardingMBeanProvider implements JPPFDriverMBeanProvider {
+public class NodeForwardingMBeanProvider implements JPPFDriverMBeanProvider {
   @Override
   public String getMBeanInterfaceName() {
-    return JPPFNodeForwardingMBean.class.getName();
+    return NodeForwardingMBean.class.getName();
   }
 
   @Override
@@ -40,11 +39,11 @@ public class JPPFNodeForwardingMBeanProvider implements JPPFDriverMBeanProvider 
 
   @Override
   public Object createMBean(final JPPFDriver driver) {
-    return new JPPFNodeForwarding(driver);
+    return new NodeForwarding(driver);
   }
 
   @Override
   public String getMBeanName() {
-    return JPPFNodeForwardingMBean.MBEAN_NAME;
+    return NodeForwardingMBean.MBEAN_NAME;
   }
 }

@@ -28,7 +28,7 @@ import org.jppf.management.NodeSelector;
  * @author Laurent Cohen
  * @exclude
  */
-public final class NodeForwardingHelper {
+final class NodeForwardingHelper {
   /**
    * Singleton instance of this class.
    */

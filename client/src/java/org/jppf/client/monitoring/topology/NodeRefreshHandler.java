@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.jppf.client.monitoring.AbstractRefreshHandler;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -137,12 +137,12 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
       }
       if (!addedNodes.isEmpty() && loadSystemInfo) {
         try {
-          final Map<String, Object> map = jmx.getNodeForwarder().systemInformation(new UuidSelector(addedNodes));
-          for (final Map.Entry<String, Object> ent: map.entrySet()) {
-            final Object o = ent.getValue();
-            if (o instanceof JPPFSystemInformation) {
+          final ResultsMap<String, JPPFSystemInformation> map = jmx.getForwarder().systemInformation(new UuidSelector(addedNodes));
+          for (final Map.Entry<String, InvocationResult<JPPFSystemInformation>> ent: map.entrySet()) {
+            final JPPFSystemInformation o = ent.getValue().result();
+            if (o != null) {
               final TopologyNode node = manager.getNode(ent.getKey());
-              if (node != null) node.getManagementInfo().setSystemInfo((JPPFSystemInformation) o);
+              if (node != null) node.getManagementInfo().setSystemInfo(o);
             }
           }
         } catch(final Exception e) {
@@ -157,7 +157,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
    * @param driver the driver for which to update the nodes.
    */
   private void refreshNodeStates(final TopologyDriver driver) {
-    final JPPFNodeForwardingMBean forwarder = driver.getForwarder();
+    final NodeForwardingMBean forwarder = driver.getForwarder();
     if (forwarder == null) return;
     final List<AbstractTopologyComponent> children = driver.getChildren();
     // refresh the nodes execution states
@@ -165,7 +165,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
     for (final AbstractTopologyComponent child: children) {
       if (child.isNode()) uuidMap.put(child.getUuid(), (TopologyNode) child);
     }
-    Map<String, Object> result = null;
+    ResultsMap<String, JPPFNodeState> result = null;
     try {
       result = forwarder.state(new UuidSelector(uuidMap.keySet()));
     } catch(final Exception e) {
@@ -173,14 +173,14 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
     }
     if (result == null) return;
     final Set<TopologyNode> changedNodes = new HashSet<>();
-    for (final Map.Entry<String, Object> entry: result.entrySet()) {
+    for (final Map.Entry<String, InvocationResult<JPPFNodeState>> entry: result.entrySet()) {
       final TopologyNode node = uuidMap.get(entry.getKey());
       if (node == null) continue;
-      if (entry.getValue() instanceof Exception) {
+      if (entry.getValue().isException()) {
         node.setStatus(TopologyNodeStatus.DOWN);
-        if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
-      } else if (entry.getValue() instanceof JPPFNodeState) {
-        final JPPFNodeState oldState = (JPPFNodeState) entry.getValue();
+        if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage(entry.getValue().exception()));
+      } else if (entry.getValue().result() != null) {
+        final JPPFNodeState oldState = entry.getValue().result();
         if (!oldState.equals(node.getNodeState())) {
           changedNodes.add(node);
           node.refreshNodeState(oldState);
@@ -197,7 +197,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
    * @param forwarder used to forward the request to get the number of slaves to the nodes.
    * @param changedNodes collects the nodes for which an update occurred.
    */
-  private static void refreshProvisioningStates(final TopologyDriver driver, final JPPFNodeForwardingMBean forwarder, final Set<TopologyNode> changedNodes) {
+  private static void refreshProvisioningStates(final TopologyDriver driver, final NodeForwardingMBean forwarder, final Set<TopologyNode> changedNodes) {
     final Map<String, TopologyNode> uuidMap = new HashMap<>();
     for (final AbstractTopologyComponent child: driver.getChildren()) {
       if (child.isNode()) {
@@ -205,22 +205,22 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
         if (node.getManagementInfo().isMasterNode()) uuidMap.put(child.getUuid(), (TopologyNode) child);
       }
     }
-    Map<String, Object> result = null;
+    ResultsMap<String, Integer> result = null;
     try {
       result = forwarder.getNbSlaves(new UuidSelector(uuidMap.keySet()));
     } catch(final Exception e) {
       if (debugEnabled) log.debug("error getting number of slaves for driver " + driver.getUuid(), e);
     }
     if (result == null) return;
-    for (final Map.Entry<String, Object> entry: result.entrySet()) {
+    for (final Map.Entry<String, InvocationResult<Integer>> entry: result.entrySet()) {
       final TopologyNode node = uuidMap.get(entry.getKey());
       if (node == null) continue;
-      if (entry.getValue() instanceof Exception) {
+      if (entry.getValue().isException()) {
         node.setStatus(TopologyNodeStatus.DOWN);
-        if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
-      } else if (entry.getValue() instanceof Integer) {
+        if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage(entry.getValue().exception()));
+      } else if (entry.getValue().result() != null) {
         node.setStatus(TopologyNodeStatus.UP);
-        final int n = (Integer) entry.getValue();
+        final int n = entry.getValue().result();
         if (n != node.getNbSlaveNodes()) {
           changedNodes.add(node);
           node.setNbSlaveNodes(n);

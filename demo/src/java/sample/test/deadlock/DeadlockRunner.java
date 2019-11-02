@@ -29,7 +29,7 @@ import org.jppf.client.utils.AbstractJPPFJobStream;
 import org.jppf.job.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.policy.IsMasterNode;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
@@ -170,7 +170,7 @@ public class DeadlockRunner {
     print("ensuring %d slaves ...", nbSlaves);
     final JMXDriverConnectionWrapper jmx = getJmxConnection(client);
     if (jmx.nbNodes() == nbSlaves + 1) return;
-    final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+    final NodeForwardingMBean forwarder = jmx.getForwarder();
     final NodeSelector masterSelector = new ExecutionPolicySelector(new IsMasterNode());
     // request that <nbSlaves> slave nodes be provisioned
     final TimeMarker marker = new TimeMarker().start();
@@ -211,7 +211,7 @@ public class DeadlockRunner {
    * @throws Exception if any error occurs.
    */
   private static void printStats(final JMXDriverConnectionWrapper jmx, final AbstractJPPFJobStream jobProvider, final TimeMarker marker) throws Exception {
-    final Map<String, Object> map = jmx.getNodeForwarder().state(NodeSelector.ALL_NODES);
+    final ResultsMap<String, JPPFNodeState> map = jmx.getForwarder().state(NodeSelector.ALL_NODES);
     double total = 0d;
     double min = Double.MAX_VALUE;
     double max = 0d;
@@ -222,9 +222,9 @@ public class DeadlockRunner {
     double maxDev = 0d;
     final int[] nbTasks = new int[nbNodes];
     int count = 0;
-    for (final Map.Entry<String, Object> entry: map.entrySet()) {
-      final Object value = entry.getValue();
-      if (value instanceof JPPFNodeState) nbTasks[count++] = ((JPPFNodeState) value).getNbTasksExecuted();
+    for (final Map.Entry<String, InvocationResult<JPPFNodeState>> entry: map.entrySet()) {
+      final InvocationResult<JPPFNodeState> value = entry.getValue();
+      if (value.result() != null) nbTasks[count++] = value.result().getNbTasksExecuted();
       else nbTasks[count++] = 0;
     }
     for (final int nb: nbTasks) {

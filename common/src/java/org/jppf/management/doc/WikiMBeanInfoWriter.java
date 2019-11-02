@@ -37,9 +37,17 @@ public class WikiMBeanInfoWriter extends MBeanInfoVisitorAdapter {
    */
   private final Writer writer;
   /**
+   * 
+   */
+  private static final int START_HEADING_LEVEL = 2;
+  /**
    * A cache of converted types, for performance optimization.
    */
   private final Map<String, String> typeCache = new HashMap<>();
+  /**
+   * A cache of converted types, for performance optimization.
+   */
+  private final Map<Integer, String> headings = new HashMap<>();
 
   /**
    * Initialize this visitor witht he specified {@link Writer}.
@@ -52,7 +60,8 @@ public class WikiMBeanInfoWriter extends MBeanInfoVisitorAdapter {
 
   @Override
   public void start(final DriverConnectionInfo connectionInfo) throws Exception {
-    println("== MBeans in a JPPF %s ==", connectionInfo.getName()).println();
+    final String heading = getHeading(START_HEADING_LEVEL);
+    println("%s MBeans in a JPPF %s %s", heading, connectionInfo.getName(), heading).println();
   }
 
   @Override
@@ -64,14 +73,16 @@ public class WikiMBeanInfoWriter extends MBeanInfoVisitorAdapter {
   public void startMBean(final ObjectName name, final MBeanInfo info) throws Exception {
     final Descriptor descriptor = info.getDescriptor();
     final String inf = (String) descriptor.getFieldValue("interfaceClassName");
-    println("=== %s ===\n", inf.substring(inf.lastIndexOf('.') + 1));
+    String heading = getHeading(START_HEADING_LEVEL + 1);
+    println("%s %s %s", heading, inf.substring(inf.lastIndexOf('.') + 1), heading).println();
     println("* object name: '''%s'''", name);
     println("* interface name: <tt>%s</tt>", formatType(inf));
     final String desc = (String) descriptor.getFieldValue(MBeanInfoExplorer.DESCRIPTION_FIELD);
     if (desc != null) println("* description: %s", desc);
     final String notifDesc = (String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_DESCRIPTION_FIELD);
     if (notifDesc != null) {
-      println("==== Notifications ====");
+      heading = getHeading(START_HEADING_LEVEL + 2);
+      println("%s Notifications %s", heading, heading);
       println("* description: %s", notifDesc);
       println("* type: <tt>%s</tt>", formatType((String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_CLASS_FIELD)));
       final String userDataDesc = (String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_USER_DATA_DESCRIPTION_FIELD);
@@ -89,7 +100,8 @@ public class WikiMBeanInfoWriter extends MBeanInfoVisitorAdapter {
 
   @Override
   public void startAttributes(final MBeanAttributeInfo[] attributes) throws Exception {
-    if ((attributes != null) && (attributes.length > 0)) println("==== Attributes ====").println();
+    final String heading = getHeading(START_HEADING_LEVEL + 2);
+    if ((attributes != null) && (attributes.length > 0)) println("%s Attributes %s", heading, heading).println();
   }
 
   @Override
@@ -108,7 +120,8 @@ public class WikiMBeanInfoWriter extends MBeanInfoVisitorAdapter {
 
   @Override
   public void startOperations(final MBeanOperationInfo[] operations) throws Exception {
-    if ((operations != null) && (operations.length > 0)) println("==== Operations ====").println();
+    final String heading = getHeading(START_HEADING_LEVEL + 2);
+    if ((operations != null) && (operations.length > 0)) println("%s Operations %s", heading, heading).println();
   }
 
   @Override
@@ -186,6 +199,22 @@ public class WikiMBeanInfoWriter extends MBeanInfoVisitorAdapter {
   private WikiMBeanInfoWriter println() throws Exception {
     writer.write("\n");
    return this;
+  }
+
+  /**
+   * Get the heading marker for the pseicfied level. 
+   * @param level the heading level.
+   * @return the heading marker.
+   */
+  private String getHeading(final int level) {
+    if (level <= 0) return "";
+    String heading = headings.get(level);
+    if (heading == null) {
+      heading = "";
+      for (int i=0; i<level; i++) heading += "=";
+      headings.put(level, heading);
+    }
+    return heading;
   }
 
   /**

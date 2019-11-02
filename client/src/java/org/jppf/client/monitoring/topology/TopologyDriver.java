@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 
 /**
@@ -81,11 +81,11 @@ public class TopologyDriver extends AbstractTopologyComponent {
    * Get the proxy to the driver MBean that forwards node management requests.
    * @return an instance of {@link JPPFNodeForwardingMBean}.
    */
-  public JPPFNodeForwardingMBean getForwarder() {
+  public NodeForwardingMBean getForwarder() {
     final JMXDriverConnectionWrapper jmx = getJmx();
     if ((jmx != null) && jmx.isConnected()) {
       try {
-        return jmx.getNodeForwarder();
+        return jmx.getForwarder();
       } catch (@SuppressWarnings("unused") final Exception ignore) {
       }
     }

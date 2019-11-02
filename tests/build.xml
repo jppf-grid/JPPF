@@ -221,7 +221,7 @@
         <exclude name="**/TestJPPFDriverAdminMBean2.java"/>
         <exclude name="**/TestNodeRestart.java"/>
         <exclude name="**/TestJPPFNodeProvisioning.java"/>
-        <exclude name="**/TestJPPFNodeForwardingMBean2.java"/>
+        <exclude name="**/Test*NodeForwardingMBean2.java"/>
         <exclude name="**/TestJPPFNodeTaskMonitorMBean.java"/>
 
         <!-- serialization -->

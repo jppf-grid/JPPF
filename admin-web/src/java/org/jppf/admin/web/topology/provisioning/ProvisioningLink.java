@@ -90,7 +90,7 @@ public class ProvisioningLink extends AbstractModalLink<ProvisioningForm> {
       final TopologyDriver parent = entry.getKey();
       final NodeSelector selector = new UuidSelector(entry.getValue());
       try {
-        final Map<String, Object> result = parent.getForwarder().provisionSlaveNodes(selector, modalForm.getNbSlaves(), modalForm.isInterrupt(), props);
+        final ResultsMap<String, Void> result = parent.getForwarder().provisionSlaveNodes(selector, modalForm.getNbSlaves(), modalForm.isInterrupt(), props);
         printForwardingRequestErrors(result);
       } catch(final Exception e) {
         log.error(e.getMessage(), e);
@@ -102,11 +102,11 @@ public class ProvisioningLink extends AbstractModalLink<ProvisioningForm> {
    * Prints the eventual errors resulting from a node forwarding request.
    * @param result the map containing the results for the request.
    */
-  private static void printForwardingRequestErrors(final Map<String, Object> result) {
+  private static void printForwardingRequestErrors(final ResultsMap<String, Void> result) {
     if (debugEnabled) {
-      for (final Map.Entry<String, Object> entry: result.entrySet()) {
-        if (entry.getValue() instanceof Throwable) {
-          final Throwable t = (Throwable) entry.getValue();
+      for (final Map.Entry<String, InvocationResult<Void>> entry: result.entrySet()) {
+        if (entry.getValue().isException()) {
+          final Throwable t = entry.getValue().exception();
           if (debugEnabled) log.debug("provisioning request for node '{}' resulted in error: {}", entry.getKey(), ExceptionUtils.getStackTrace(t));
         }
       }

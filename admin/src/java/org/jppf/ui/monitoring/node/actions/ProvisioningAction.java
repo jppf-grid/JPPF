@@ -133,7 +133,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
           final TopologyDriver parent = en.getKey();
           final NodeSelector selector = new UuidSelector(en.getValue());
           try {
-            final Map<String, Object> result = parent.getForwarder().provisionSlaveNodes(selector, nbSlaves, interruptIfRunning, props);
+            final ResultsMap<String, Void> result = parent.getForwarder().provisionSlaveNodes(selector, nbSlaves, interruptIfRunning, props);
             printForwardingRequestErrors(result);
           } catch(final Exception e) {
             log.error(e.getMessage(), e);
@@ -163,11 +163,11 @@ public class ProvisioningAction extends AbstractTopologyAction {
    * Prints the eventual errors resulting from a node forwarding request.
    * @param result the map containing the results for the request.
    */
-  private static void printForwardingRequestErrors(final Map<String, Object> result) {
+  private static void printForwardingRequestErrors(final ResultsMap<String, Void> result) {
     if (debugEnabled) {
-      for (Map.Entry<String, Object> en2: result.entrySet()) {
-        if (en2.getValue() instanceof Throwable) {
-          final Throwable t = (Throwable) en2.getValue();
+      for (Map.Entry<String, InvocationResult<Void>> en2: result.entrySet()) {
+        if (en2.getValue().isException()) {
+          final Throwable t = en2.getValue().exception();
           if (debugEnabled) log.debug("provisioning request for node '{}' resulted in error: {}", en2.getKey(), ExceptionUtils.getStackTrace(t));
         }
       }

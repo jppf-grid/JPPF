@@ -25,7 +25,7 @@ import java.util.*;
 import org.jppf.classloader.DelegationModel;
 import org.jppf.jmx.JMXHelper;
 import org.jppf.management.*;
-import org.jppf.management.diagnostics.DiagnosticsMBean;
+import org.jppf.management.diagnostics.*;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.BaseNodeContext;
@@ -36,17 +36,12 @@ import org.slf4j.Logger;
  * Implementation of the <code>JPPFNodeForwardingMBean</code> interface.
  * @author Laurent Cohen
  * @exclude
- * @deprecated use {@link NodeForwarding} instead.
  */
-public class JPPFNodeForwarding extends AbstractNodeForwarding implements JPPFNodeForwardingMBean {
-  /**
-   * Explicit serialVersionUID.
-   */
-  private static final long serialVersionUID = 1L;
+public class NodeForwarding extends AbstractNodeForwarding implements NodeForwardingMBean {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggingUtils.getLogger(JPPFNodeForwarding.class, false);
+  private static final Logger log = LoggingUtils.getLogger(NodeForwarding.class, false);
   /**
    * Determines whether debug log statements are enabled.
    */
@@ -56,159 +51,160 @@ public class JPPFNodeForwarding extends AbstractNodeForwarding implements JPPFNo
    * Initialize this MBean implementation.
    * @param driver reference to the JPPF driver.
    */
-  public JPPFNodeForwarding(final JPPFDriver driver) {
+  public NodeForwarding(final JPPFDriver driver) {
     super(driver);
+    
   }
 
   @Override
-  public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
+  public <E> ResultsMap<String, E> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
     final Set<BaseNodeContext> channels = selectionHelper.getChannels(selector);
     if (debugEnabled) log.debug("invoking {}() on mbean={} for selector={} ({} channels)", new Object[] {methodName, name, selector, channels.size()});
     return forward(JMXHelper.INVOKE, channels, name, methodName, params, signature);
   }
 
   @Override
-  public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName) throws Exception {
+  public <E> ResultsMap<String, E> forwardInvoke(final NodeSelector selector, final String name, final String methodName) throws Exception {
     return forwardInvoke(selector, name, methodName, (Object[]) null, (String[]) null);
   }
 
   @Override
-  public Map<String, Object> forwardGetAttribute(final NodeSelector selector, final String name, final String attribute) throws Exception {
-    final Set<BaseNodeContext> channels = selectionHelper.getChannels(selector);
-    return forward(JMXHelper.GET_ATTRIBUTE, channels, name, attribute);
+  public <E> ResultsMap<String, E> forwardGetAttribute(final NodeSelector selector, final String name, final String attribute) throws Exception {
+    return forward(JMXHelper.GET_ATTRIBUTE, selectionHelper.getChannels(selector), name, attribute);
   }
 
   @Override
-  public Map<String, Object> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
-    final Set<BaseNodeContext> channels = selectionHelper.getChannels(selector);
-    return forward(JMXHelper.SET_ATTRIBUTE, channels, name, attribute, value);
+  public <E> ResultsMap<String, E> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
+    return forward(JMXHelper.SET_ATTRIBUTE, selectionHelper.getChannels(selector), name, attribute, value);
   }
 
   @Override
-  public Map<String, Object> state(final NodeSelector selector) throws Exception {
+  public ResultsMap<String, JPPFNodeState> state(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "state");
   }
 
   @Override
-  public Map<String, Object> updateThreadPoolSize(final NodeSelector selector, final Integer size) throws Exception {
+  public ResultsMap<String, Void> updateThreadPoolSize(final NodeSelector selector, final Integer size) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateThreadPoolSize", array(size), array("java.lang.Integer"));
   }
 
   @Override
-  public Map<String, Object> updateThreadsPriority(final NodeSelector selector, final Integer newPriority) throws Exception {
+  public ResultsMap<String, Void> updateThreadsPriority(final NodeSelector selector, final Integer newPriority) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateThreadsPriority", array(newPriority), array("java.lang.Integer"));
   }
 
   @Override
-  public Map<String, Object> restart(final NodeSelector selector) throws Exception {
+  public ResultsMap<String, Void> restart(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "restart");
   }
 
   @Override
-  public Map<String, Object> restart(final NodeSelector selector, final Boolean interruptIfRunning) throws Exception {
+  public ResultsMap<String, Void> restart(final NodeSelector selector, final Boolean interruptIfRunning) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "restart", array(interruptIfRunning), array("java.lang.Boolean"));
   }
 
   @Override
-  public Map<String, Object> shutdown(final NodeSelector selector) throws Exception {
+  public ResultsMap<String, Void> shutdown(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "shutdown");
   }
 
   @Override
-  public Map<String, Object> shutdown(final NodeSelector selector, final Boolean interruptIfRunning) throws Exception {
+  public ResultsMap<String, Void> shutdown(final NodeSelector selector, final Boolean interruptIfRunning) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "shutdown", array(interruptIfRunning), array("java.lang.Boolean"));
   }
 
   @Override
-  public Map<String, Object> resetTaskCounter(final NodeSelector selector) throws Exception {
+  public ResultsMap<String, Void> resetTaskCounter(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "resetTaskCounter");
   }
 
   @Override
-  public Map<String, Object> setTaskCounter(final NodeSelector selector, final Integer n) throws Exception {
-    return forwardSetAttribute(selector, JPPFNodeAdminMBean.MBEAN_NAME, "TaskCounter", n);
+  public ResultsMap<String, Void> setTaskCounter(final NodeSelector selector, final Integer n) throws Exception {
+    return forward(JMXHelper.SET_ATTRIBUTE, selectionHelper.getChannels(selector), JPPFNodeAdminMBean.MBEAN_NAME, "TaskCounter", n);
   }
 
   @Override
-  public Map<String, Object> updateConfiguration(final NodeSelector selector, final Map<Object, Object> configOverrides, final Boolean restart, final Boolean interruptIfRunning) throws Exception {
+  public ResultsMap<String, Void> updateConfiguration(final NodeSelector selector, final Map<Object, Object> configOverrides, final Boolean restart, final Boolean interruptIfRunning)
+    throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration",
       new Object[] {configOverrides, restart, interruptIfRunning}, array("java.util.Map", "java.lang.Boolean", "java.lang.Boolean"));
   }
 
   @Override
-  public Map<String, Object> updateConfiguration(final NodeSelector selector, final Map<Object, Object> configOverrides, final Boolean restart) throws Exception {
+  public ResultsMap<String, Void> updateConfiguration(final NodeSelector selector, final Map<Object, Object> configOverrides, final Boolean restart) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration", new Object[] {configOverrides, restart}, array("java.util.Map", "java.lang.Boolean"));
   }
 
   @Override
-  public Map<String, Object> cancelJob(final NodeSelector selector, final String jobUuid, final Boolean requeue) throws Exception {
+  public ResultsMap<String, Void> cancelJob(final NodeSelector selector, final String jobUuid, final Boolean requeue) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "cancelJob", new Object[] {jobUuid, requeue}, array("java.lang.String", "java.lang.Boolean"));
   }
 
   @Override
-  public Map<String, Object> getDelegationModel(final NodeSelector selector) throws Exception {
-    return forwardGetAttribute(selector, JPPFNodeAdminMBean.MBEAN_NAME, "DelegationModel");
+  public ResultsMap<String, DelegationModel> getDelegationModel(final NodeSelector selector) throws Exception {
+    return forward(JMXHelper.GET_ATTRIBUTE, selectionHelper.getChannels(selector), JPPFNodeAdminMBean.MBEAN_NAME, "DelegationModel");
   }
 
   @Override
-  public Map<String, Object> setDelegationModel(final NodeSelector selector, final DelegationModel model) throws Exception {
-    return forwardSetAttribute(selector, JPPFNodeAdminMBean.MBEAN_NAME, "DelegationModel", model);
+  public ResultsMap<String, Void> setDelegationModel(final NodeSelector selector, final DelegationModel model) throws Exception {
+    return forward(JMXHelper.SET_ATTRIBUTE, selectionHelper.getChannels(selector), JPPFNodeAdminMBean.MBEAN_NAME, "DelegationModel", model);
   }
 
   @Override
-  public Map<String, Object> systemInformation(final NodeSelector selector) throws Exception {
+  public ResultsMap<String, JPPFSystemInformation> systemInformation(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "systemInformation");
   }
 
   @Override
-  public Map<String, Object> healthSnapshot(final NodeSelector selector) throws Exception {
+  public ResultsMap<String, HealthSnapshot> healthSnapshot(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "healthSnapshot");
   }
 
   @Override
-  public Map<String, Object> threadDump(final NodeSelector selector) throws Exception {
+  public ResultsMap<String, Void> gc(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "threadDump");
   }
 
   @Override
-  public Map<String, Object> gc(final NodeSelector selector) throws Exception {
+  public ResultsMap<String, String> heapDump(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "gc");
   }
 
   @Override
-  public Map<String, Object> heapDump(final NodeSelector selector) throws Exception {
+  public ResultsMap<String, ThreadDump> threadDump(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "heapDump");
   }
 
   @Override
-  public Map<String, Object> getNbSlaves(final NodeSelector selector) throws Exception {
-    return forwardGetAttribute(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
+  public ResultsMap<String, Integer> getNbSlaves(final NodeSelector selector) throws Exception {
+    return forward(JMXHelper.GET_ATTRIBUTE, selectionHelper.getChannels(selector), JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
   }
 
   @Override
-  public Map<String, Object> provisionSlaveNodes(final NodeSelector selector, final int nbNodes) throws Exception {
+  public ResultsMap<String, Void> provisionSlaveNodes(final NodeSelector selector, final int nbNodes) throws Exception {
     return forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] { nbNodes }, new String[] { "int" });
   }
 
   @Override
-  public Map<String, Object> provisionSlaveNodes(final NodeSelector selector, final int nbNodes, final boolean interruptIfRunning) throws Exception {
+  public ResultsMap<String, Void> provisionSlaveNodes(final NodeSelector selector, final int nbNodes, final boolean interruptIfRunning) throws Exception {
     return forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] { nbNodes, interruptIfRunning }, new String[] { "int", "boolean" });
   }
 
   @Override
-  public Map<String, Object> provisionSlaveNodes(final NodeSelector selector, final int nbNodes, final TypedProperties configOverrides) throws Exception {
+  public ResultsMap<String, Void> provisionSlaveNodes(final NodeSelector selector, final int nbNodes, final TypedProperties configOverrides) throws Exception {
     return forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes",
       new Object[] { nbNodes, configOverrides }, new String[] { "int", TypedProperties.class.getName() });
   }
 
   @Override
-  public Map<String, Object> provisionSlaveNodes(final NodeSelector selector, final int nbNodes, final boolean interruptIfRunning, final TypedProperties configOverrides) throws Exception {
+  public ResultsMap<String, Void> provisionSlaveNodes(final NodeSelector selector, final int nbNodes, final boolean interruptIfRunning, final TypedProperties configOverrides) throws Exception {
     return forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes",
       new Object[] { nbNodes, interruptIfRunning, configOverrides }, new String[] { "int", "boolean", TypedProperties.class.getName() });
   }
 
   /**
    * Forward the specified operation to the specified nodes.
+   * @param <E> the type of results.
    * @param type the type of operation to forward.
    * @param nodes the nodes to forward to.
    * @param mbeanName the name of the node MBean to which the request is sent.
@@ -218,35 +214,37 @@ public class JPPFNodeForwarding extends AbstractNodeForwarding implements JPPFNo
    * Additionally, each result may be {@code null}, in particular if the invoked method has a {@code void} return type.
    * @throws Exception if the invocation failed.
    */
-  Map<String, Object> forward(final byte type, final Set<BaseNodeContext> nodes, final String mbeanName, final String memberName, final Object...params) throws Exception {
+  <E> ResultsMap<String, E> forward(final byte type, final Set<BaseNodeContext> nodes, final String mbeanName, final String memberName, final Object...params) throws Exception {
     try {
       final int size = nodes.size();
-      if (size <= 0) return Collections.<String, Object>emptyMap();
-      final ForwardCallbackImpl callback = new ForwardCallbackImpl(size);
-      AbstractForwardingTask<?> task;
+      if (size <= 0) return new ResultsMap<>();
+      final ForwardCallbackImpl<E> callback = new ForwardCallbackImpl<>(size);
+      AbstractForwardingTask<E> task;
       for (final BaseNodeContext node: nodes) {
         final JMXConnectionWrapper jmx = node.getJmxConnection();
         switch(type) {
           case JMXHelper.INVOKE:
-            task = new AbstractForwardingTask<Object>(node.getUuid(), callback) {
+            task = new AbstractForwardingTask<E>(node.getUuid(), callback) {
+              @SuppressWarnings("unchecked")
               @Override
-              Object execute() throws Exception {
-                return jmx.invoke(mbeanName, memberName, (Object[]) params[0], (String[]) params[1]);
+              E execute() throws Exception {
+                return (E) jmx.invoke(mbeanName, memberName, (Object[]) params[0], (String[]) params[1]);
               }
             };
             break;
           case JMXHelper.GET_ATTRIBUTE:
-            task = new AbstractForwardingTask<Object>(node.getUuid(), callback) {
+            task = new AbstractForwardingTask<E>(node.getUuid(), callback) {
+              @SuppressWarnings("unchecked")
               @Override
-              Object execute() throws Exception {
-                return jmx.getAttribute(mbeanName, memberName);
+              E execute() throws Exception {
+                return (E) jmx.getAttribute(mbeanName, memberName);
               }
             };
             break;
           case JMXHelper.SET_ATTRIBUTE:
-            task = new AbstractForwardingTask<Object>(node.getUuid(), callback) {
+            task = new AbstractForwardingTask<E>(node.getUuid(), callback) {
               @Override
-              Object execute() throws Exception {
+              E execute() throws Exception {
                 jmx.setAttribute(mbeanName, memberName, params[0]);
                 return null;
               }
@@ -271,12 +269,13 @@ public class JPPFNodeForwarding extends AbstractNodeForwarding implements JPPFNo
 
   /**
    * A callback invoked by each submitted forwarding task to notify that results have arrived from a node.
+   * @param <E> the type of result.
    */
-  private static class ForwardCallbackImpl implements ForwardCallback<Object> {
+  private static class ForwardCallbackImpl<E> implements ForwardCallback<E> {
     /**
      * The map holding the results from all nodes.
      */
-    private final Map<String, Object> resultMap;
+    private final ResultsMap<String, E> resultMap;
     /**
      * The expected total number of results.
      */
@@ -291,16 +290,14 @@ public class JPPFNodeForwarding extends AbstractNodeForwarding implements JPPFNo
      * @param expectedCount the expected total number of results.
      */
     ForwardCallbackImpl(final int expectedCount) {
-      this.resultMap = new HashMap<>(expectedCount);
+      this.resultMap = new ResultsMap<>();
       this.expectedCount = expectedCount;
     }
 
     @Override
-    public void gotResult(final String uuid, final InvocationResult<Object> result) {
-      synchronized(this) {
-        resultMap.put(uuid, result.isException() ? result.exception() : result.result());
-        if (++count == expectedCount) notify();
-      }
+    public synchronized void gotResult(final String uuid, final InvocationResult<E> result) {
+      resultMap.put(uuid, result);
+      if (++count == expectedCount) notify();
     }
 
     /**
@@ -308,10 +305,8 @@ public class JPPFNodeForwarding extends AbstractNodeForwarding implements JPPFNo
      * @return the results map;
      * @throws Exception if any error occurs.
      */
-    public Map<String, Object> await() throws Exception {
-      synchronized(this) {
-        while (count < expectedCount) wait();
-      }
+    public synchronized ResultsMap<String, E> await() throws Exception {
+      while (count < expectedCount) wait();
       return resultMap;
     }
   }

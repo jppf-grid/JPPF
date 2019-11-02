@@ -20,10 +20,9 @@ package org.jppf.example.adaptivegrid;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.policy.*;
-import org.jppf.utils.Operator;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 
 /**
  * This class encapsulates the functionality for managing a JPPF driver
@@ -34,7 +33,7 @@ public class DriverConnectionManager {
   /**
    * A proxy to the driver MBean which forwards management requests to the nodes.
    */
-  private JPPFNodeForwardingMBean forwarder;
+  private NodeForwardingMBean forwarder;
   /**
    * The client connection pool holding the connections to the driver.
    */
@@ -69,7 +68,7 @@ public class DriverConnectionManager {
     connectionPool = client.awaitActiveConnectionPool();
     // wait until at least one JMX connection wrapper is established
     final JMXDriverConnectionWrapper jmx = connectionPool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
-    this.forwarder = jmx.getNodeForwarder();
+    this.forwarder = jmx.getForwarder();
     // create a node selector that only selects master nodes
     final ExecutionPolicy masterPolicy = new IsMasterNode();
     this.masterSelector = new ExecutionPolicySelector(masterPolicy);

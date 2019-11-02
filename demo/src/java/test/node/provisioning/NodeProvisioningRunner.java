@@ -22,11 +22,10 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.policy.*;
+import org.jppf.management.forwarding.*;
+import org.jppf.node.policy.IsMasterNode;
 import org.jppf.node.protocol.*;
-import org.jppf.utils.ExceptionUtils;
-import org.jppf.utils.Operator;
+import org.jppf.utils.*;
 
 import sample.dist.tasklength.LongTask;
 
@@ -62,7 +61,7 @@ public class NodeProvisioningRunner {
   private static void perform1(final JPPFClient client) throws Exception {
     final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
     final JMXDriverConnectionWrapper jmxDriver = pool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
-    final JPPFNodeForwardingMBean forwarder = jmxDriver.getNodeForwarder();
+    final NodeForwardingMBean forwarder = jmxDriver.getForwarder();
     
     final int nbSlaves = 3;
     System.out.printf("provisioning %d slaves%n", nbSlaves);
@@ -106,7 +105,7 @@ public class NodeProvisioningRunner {
    */
   private static void perform2(final JPPFClient client) throws Exception {
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitJMXConnection(true);
-    final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+    final NodeForwardingMBean forwarder = jmx.getForwarder();
     final int nbSlaves = 10;
     long totalElapsed = 0L;
     for (int i=1; i<=10; i++) {
@@ -135,10 +134,10 @@ public class NodeProvisioningRunner {
    * @param forwarder .
    * @throws Exception .
    */
-  private static void printNbSlaves(final JPPFNodeForwardingMBean forwarder) throws Exception {
-    final Map<String, Object> resultsMap = forwarder.getNbSlaves(masterSelector);
-    for (final Map.Entry<String, Object> entry: resultsMap.entrySet()) {
-      if (entry.getValue() instanceof Throwable) System.out.printf("node %s raised %s%n", entry.getKey(), ExceptionUtils.getStackTrace((Throwable) entry.getValue()));
+  private static void printNbSlaves(final NodeForwardingMBean forwarder) throws Exception {
+    final ResultsMap<String, Integer> resultsMap = forwarder.getNbSlaves(masterSelector);
+    for (final Map.Entry<String, InvocationResult<Integer>> entry: resultsMap.entrySet()) {
+      if (entry.getValue().isException()) System.out.printf("node %s raised %s%n", entry.getKey(), ExceptionUtils.getStackTrace(entry.getValue().exception()));
       else System.out.printf("master node %s has %d slaves%n", entry.getKey(), entry.getValue());
     }
   }

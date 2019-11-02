@@ -25,7 +25,7 @@ import javax.management.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.utils.*;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
@@ -87,7 +87,7 @@ public class TestNodeRestart extends BaseTest {
     final MyNodeConnectionListener myListener = new MyNodeConnectionListener();
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, myListener);
     print(false, false, ">>> getting forwarder");
-    final JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
+    final NodeForwardingMBean forwarder = driver.getForwarder();
     print(false, false, ">>> got JPPFNodeForwardingMBean");
     for (int i=0; i<nbRestarts; i++) {
       myListener.reset();

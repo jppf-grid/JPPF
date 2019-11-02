@@ -21,30 +21,31 @@ package org.jppf.management.forwarding;
 import java.io.Serializable;
 import java.util.Map;
 
-import javax.management.*;
+import javax.management.NotificationEmitter;
 
 import org.jppf.classloader.DelegationModel;
-import org.jppf.management.NodeSelector;
+import org.jppf.management.*;
+import org.jppf.management.diagnostics.*;
 import org.jppf.management.doc.*;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 
 /**
  * MBean interface for forwarding node management requests and monitoring notfications via the driver.
- * @deprecated use {@link NodeForwardingMBean} insead.
  * @author Laurent Cohen
+ * @since 6.2
  */
 @MBeanDescription("interface for forwarding node management requests and monitoring notfications through a driver")
 @MBeanNotif(description = "notifications emitted by this MBean wrap actual notifications received from the nodes, " + 
   "then are forwarded to the JMX notification listeners whose node selector matches the emitting nodes", notifClass = JPPFNodeForwardingNotification.class)
-@MBeanExclude
-public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitter, ForwardingNotficationEmitter {
+public interface NodeForwardingMBean extends Serializable, NotificationEmitter, ForwardingNotficationEmitter {
   /**
    * Name of the driver's admin MBean.
    */
-  String MBEAN_NAME = "org.jppf:name=nodeForwarding,type=driver";
+  String MBEAN_NAME = "org.jppf:name=nodeForwardingEx,type=driver";
 
   /**
    * Invoke a method on the specified MBean of the selected nodes attached to the driver.
+   * @param <E> the type of results.
    * @param selector a filter on the nodes attached tot he driver, determines the nodes to which this method applies.
    * @param name the name of the MBean.
    * @param methodName the name of the method to invoke.
@@ -55,12 +56,13 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @throws Exception if the invocation failed.
    */
   @MBeanDescription("invoke a method on the specified MBean of the selected nodes")
-  Map<String, Object> forwardInvoke(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name, @MBeanParamName("methodName") String methodName,
+  <E> ResultsMap<String, E> forwardInvoke(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name, @MBeanParamName("methodName") String methodName,
     @MBeanParamName("params") Object[] params, @MBeanParamName("signature") String[] signature) throws Exception;
 
   /**
    * Convenience method to invoke an MBean method that has no parameter.
    * <br/>This is equivalent to calling {@code forwardInvoke(selector, name, methodName, (Object[]) null, (String[]) null)}.
+   * @param <E> the type of results.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @param name the name of the node MBean to invoke.
    * @param methodName the name of the method to invoke.
@@ -69,10 +71,12 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @throws Exception if the invocation failed.
    */
   @MBeanDescription("invoke an MBean method with no parameter on the selected nodes")
-  Map<String, Object> forwardInvoke(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name, @MBeanParamName("methodName") String methodName) throws Exception;
+  <E> ResultsMap<String, E> forwardInvoke(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name,
+    @MBeanParamName("methodName") String methodName) throws Exception;
 
   /**
    * Get the value of an attribute of the specified MBean for each specified node.
+   * @param <E> the type of results.
    * @param selector a filter on the nodes attached tot he driver, determines the nodes to which this method applies.
    * @param name the name of the MBean to invoke for each node.
    * @param attribute the name of the MBean attribute to read.
@@ -80,20 +84,21 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @throws Exception if the invocation failed.
    */
   @MBeanDescription("get the value of an attribute of the specified MBean for each selected node")
-  Map<String, Object> forwardGetAttribute(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name, @MBeanParamName("attribute") String attribute) throws Exception;
+  <E> ResultsMap<String, E> forwardGetAttribute(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name,
+    @MBeanParamName("attribute") String attribute) throws Exception;
 
   /**
    * Set the value of an attribute of the specified MBean on the specified nodes attached to the driver.
+   * @param <E> the type of results.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @param name the name of the MBean to invoke for each node.
    * @param attribute the name of the MBean attribute to set.
    * @param value the value to set on the attribute.
    * @return a mapping of node uuids to an eventual exception resulting from setting the MBean attribute on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if the invocation failed.
    */
   @MBeanDescription("set the value of an attribute of the specified MBean on the selected nodes")
-  Map<String, Object> forwardSetAttribute(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name, @MBeanParamName("attribute") String attribute,
+  <E> ResultsMap<String, E> forwardSetAttribute(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name, @MBeanParamName("attribute") String attribute,
     @MBeanParamName("value") Object value) throws Exception;
 
   /**
@@ -104,92 +109,84 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the latest state information from the selected nodes")
-  Map<String, Object> state(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, JPPFNodeState> state(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Set the size of the specified nodes' thread pool.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @param size the size as an int.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("set the number of processing threads on the selected nodes")
-  Map<String, Object> updateThreadPoolSize(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("size") Integer size) throws Exception;
+  ResultsMap<String, Void> updateThreadPoolSize(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("size") Integer size) throws Exception;
 
   /**
    * Update the priority of all execution threads for the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @param newPriority the new priority to set.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if an error is raised when invoking the node mbean.
    */
   @MBeanDescription("set the priority of the processing threads on the selected nodes")
-  Map<String, Object> updateThreadsPriority(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("newPriority") Integer newPriority) throws Exception;
+  ResultsMap<String, Void> updateThreadsPriority(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("newPriority") Integer newPriority) throws Exception;
 
   /**
    * Restart the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("restart the selected nodes")
-  Map<String, Object> restart(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, Void> restart(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Restart the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @param interruptIfRunning whether to restart immediately or wait until each node is idle.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("restart the selected nodes, specifying whther to wait until they are no longer executing jobs")
-  Map<String, Object> restart(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
+  ResultsMap<String, Void> restart(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
 
   /**
    * Shutdown the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("shutdown the selected nodes")
-  Map<String, Object> shutdown(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, Void> shutdown(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Shutdown the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @param interruptIfRunning whether to shutdown immediately or wait until each node is idle.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("shutdown the selected nodes, specifying whther to wait until they are no longer executing jobs")
-  Map<String, Object> shutdown(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
+  ResultsMap<String, Void> shutdown(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
 
   /**
    * Reset the specified nodes' executed tasks counter to zero.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("reset the executed tasks count on the selected nodes to zero")
-  Map<String, Object> resetTaskCounter(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, Void> resetTaskCounter(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Reset the specified nodes' executed tasks counter to the specified value.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @param n the number to set the task counter to.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("set the executed tasks count on the selected nodes to a specified value")
-  Map<String, Object> setTaskCounter(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("taskCount") Integer n) throws Exception;
+  ResultsMap<String, Void> setTaskCounter(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("taskCount") Integer n) throws Exception;
 
   /**
    * Update the configuration properties of the specified nodes.
@@ -199,12 +196,10 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @param interruptIfRunning when {@code true}, then restart the node even if it is executing tasks, when {@code false}, then only shutdown the node when it is no longer executing.
    * This parameter only applies when the {@code restart} parameter is {@code true}.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
-   * @since 5.2
    */
   @MBeanDescription("update the configuration properties of the selected nodes")
-  Map<String, Object> updateConfiguration(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("configOverrides") Map<Object, Object> configOverrides,
+  ResultsMap<String, Void> updateConfiguration(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("configOverrides") Map<Object, Object> configOverrides,
     @MBeanParamName("restart") Boolean restart, @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
 
   /**
@@ -213,11 +208,10 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @param configOverrides the set of properties to update.
    * @param restart specifies whether the node should be restarted after updating the properties.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("update the configuration properties of the selected nodes")
-  Map<String, Object> updateConfiguration(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("configOverrides") Map<Object, Object> configOverrides,
+  ResultsMap<String, Void> updateConfiguration(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("configOverrides") Map<Object, Object> configOverrides,
     @MBeanParamName("restart") Boolean restart) throws Exception;
 
   /**
@@ -226,11 +220,10 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @param jobId the id of the job to cancel.
    * @param requeue true if the job should be requeued on the server side, false otherwise.
    * @return a mapping of node uuids to an eventual exception resulting invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("cancel the job with the specified uuid in the selected nodes")
-  Map<String, Object> cancelJob(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("jobUuid") String jobId, @MBeanParamName("requeue") Boolean requeue) throws Exception;
+  ResultsMap<String, Void> cancelJob(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("jobUuid") String jobId, @MBeanParamName("requeue") Boolean requeue) throws Exception;
 
   /**
    * Get the current class loader delegation model for the specified nodes.
@@ -241,7 +234,7 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @see org.jppf.classloader.AbstractJPPFClassLoader#getDelegationModel()
    */
   @MBeanDescription("get the current class loader delegation model for the selected nodes")
-  Map<String, Object> getDelegationModel(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, DelegationModel> getDelegationModel(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Set the current class loader delegation model for the specified nodes.
@@ -249,91 +242,88 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @param model either either {@link DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link DelegationModel#URL_FIRST URL_FIRST}.
    * If any other value is specified then this method has no effect.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    * @see org.jppf.classloader.AbstractJPPFClassLoader#setDelegationModel(org.jppf.classloader.DelegationModel)
    */
   @MBeanDescription("set the class loader delegation model onr the selected nodes")
-  Map<String, Object> setDelegationModel(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("delegationModel") DelegationModel model) throws Exception;
+  ResultsMap<String, Void> setDelegationModel(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("delegationModel") DelegationModel model) throws Exception;
 
   /**
    * Get the system information for the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the system information for the selected nodes")
-  Map<String, Object> systemInformation(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, JPPFSystemInformation> systemInformation(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Get the JVM health snapshot for the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get a JVM health snapshot for the selected nodes")
-  Map<String, Object> healthSnapshot(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, HealthSnapshot> healthSnapshot(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Invoke {@code System.gc()} on the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
-   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("invoke System.gc(} on the selected nodes")
-  Map<String, Object> gc(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, Void> gc(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Trigger a heap dump on the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
-   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @return a mapping of node uuids to a string holding the path to the heap dump in each node's file system.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("trigger a heap dump on the selected nodes")
-  Map<String, Object> heapDump(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, String> heapDump(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Get a JVM thread dump for the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
-   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get a thread dump for the selected nodes")
-  Map<String, Object> threadDump(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, ThreadDump> threadDump(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Get the number of provisioned slave nodes for the selected nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
-   * @return a mapping of node uuids to either an {@code int} corresponding tot he number of slaves provisioned by the node,
-   * or an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @return a mapping of node uuids to either an {@code int} corresponding to the number of slaves provisioned by the node,
+   * or an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the number of provisioned slave nodes for the selected nodes")
-  Map<String, Object> getNbSlaves(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
+  ResultsMap<String, Integer> getNbSlaves(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
    * Start or stop the required number of slaves to reach the specified number on the selected nodes.
    * This is equivalent to calling {@code provisionSlaveNodes(nbNodes, null)}.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @param nbNodes the number of slave nodes to reach.
-   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes")
-  Map<String, Object> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("nbSlaves") int nbNodes) throws Exception;
+  ResultsMap<String, Void> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("nbSlaves") int nbNodes) throws Exception;
 
   /**
    * Start or stop the required number of slaves to reach the specified number on the selected nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @param nbNodes the number of slave nodes to reach.
    * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
-   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes, specifying whether to wait for slave nodes to be idle before stopping them")
-  Map<String, Object> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("nbSlaves") int nbNodes,
+  ResultsMap<String, Void> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("nbSlaves") int nbNodes,
     @MBeanParamName("interruptIfRunning") boolean interruptIfRunning) throws Exception;
 
   /**
@@ -342,11 +332,11 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @param nbNodes the number of slave nodes to reach.
    * @param configOverrides the configuration overrides to apply.
-   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes, specifying configuration overrides")
-  Map<String, Object> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("slaves") int nbNodes,
+  ResultsMap<String, Void> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("slaves") int nbNodes,
     @MBeanParamName("cfgOverrides") TypedProperties configOverrides) throws Exception;
 
   /**
@@ -356,10 +346,10 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @param nbNodes the number of slave nodes to reach.
    * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
    * @param configOverrides the configuration overrides to apply.
-   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes, specifying configuration overrides")
-  Map<String, Object> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("nbSlaves") int nbNodes,
+  ResultsMap<String, Void> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("nbSlaves") int nbNodes,
     @MBeanParamName("interruptIfRunning") boolean interruptIfRunning, @MBeanParamName("configOverrides") TypedProperties configOverrides) throws Exception;
 }

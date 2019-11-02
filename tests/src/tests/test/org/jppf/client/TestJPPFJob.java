@@ -165,7 +165,7 @@ public class TestJPPFJob extends Setup1D1N {
       int totalCancelCount = 0;
       for (int i=1; i<=nbJobs; i++) {
         print(false, false, ">>> test iteration %d", i);
-        final JPPFJob job = BaseTestHelper.createJob(name + "-" + i, "tci-" + i, false, nbTasks, LifeCycleTask.class, 1000L);
+        final JPPFJob job = BaseTestHelper.createJob(name + "-" + i, false, nbTasks, LifeCycleTask.class, 1000L);
         client.submitAsync(job);
         //Thread.sleep(1L);
         print(false, false, ">>> cancelling job %d", i);

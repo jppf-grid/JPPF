@@ -22,13 +22,12 @@ import java.io.IOException;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
 import org.jppf.management.diagnostics.provider.MonitoringConstants;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.utils.ExceptionUtils;
-import org.jppf.utils.Operator;
+import org.jppf.management.forwarding.NodeForwardingMBean;
+import org.jppf.utils.*;
 
 /**
  * 
@@ -42,7 +41,7 @@ public class TestDriverRestart {
   /** */
   private static AtomicBoolean initializing = new AtomicBoolean(false);
   /** */
-  private static JPPFNodeForwardingMBean nodeForwarder = null;
+  private static NodeForwardingMBean nodeForwarder = null;
   /** */
   private static DiagnosticsMBean diagnostics = null;
 
@@ -136,7 +135,7 @@ public class TestDriverRestart {
           final JMXDriverConnectionWrapper jmxWrapper = getJmxWrapper();
           if (jmxWrapper != null) {
             try {
-              if (nodeForwarder == null) nodeForwarder = jmxWrapper.getNodeForwarder();
+              if (nodeForwarder == null) nodeForwarder = jmxWrapper.getForwarder();
             } catch (final Exception ignore) {
             }
             try {

@@ -55,7 +55,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   /**
    * Reference to the MBean which forwards the notifications.
    */
-  private final JPPFNodeForwarding forwarder;
+  private final AbstractNodeForwarding forwarder;
   /**
    * Mapping of node uuids to corresponding notification dispatchers.
    */
@@ -85,7 +85,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
    * Initialize this manager.
    * @param forwarder the forwarding mbean instance.
    */
-  public ForwardingNotificationManager(final JPPFNodeForwarding forwarder) {
+  public ForwardingNotificationManager(final AbstractNodeForwarding forwarder) {
     this.forwarder = forwarder;
     this.selectionHelper = forwarder.getSelectionHelper();
     this.driver = forwarder.driver;
@@ -166,7 +166,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   public void removeNotificationListener(final NotificationListenerWrapper wrapper) throws ListenerNotFoundException {
     if (debugEnabled) log.debug("removing notification listeners for {}", wrapper);
     final NodeSelector selector = wrapper.getSelector();
-    final Set<BaseNodeContext> nodes = forwarder.getSelectionHelper().getChannels(selector);
+    final Set<BaseNodeContext> nodes = selectionHelper.getChannels(selector);
     final Runnable r = () -> {
       lock.lock();
       try {

@@ -26,7 +26,7 @@ import java.util.*;
 import org.jppf.JPPFTimeoutException;
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.ssl.SSLHelper;
@@ -254,7 +254,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    */
   protected void testForwardingMBean() throws Exception {
     final JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
-    final JPPFNodeForwardingMBean nodeForwarder = driverJmx.getNodeForwarder();
+    final NodeForwardingMBean nodeForwarder = driverJmx.getForwarder();
     boolean ready = false;
     long elapsed = 0L;
     final long start = System.nanoTime();
@@ -262,10 +262,10 @@ public class AbstractNonStandardSetup extends BaseTest {
       elapsed = DateTimeUtils.elapsedFrom(start);
       assertTrue((elapsed < 20_000L));
       try {
-        final Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);
+        final ResultsMap<String, JPPFNodeState> result = nodeForwarder.state(NodeSelector.ALL_NODES);
         assertNotNull(result);
         assertEquals(getNbNodes(), result.size());
-        for (final Map.Entry<String, Object> entry: result.entrySet()) assertTrue(entry.getValue() instanceof JPPFNodeState);
+        for (final Map.Entry<String, InvocationResult<JPPFNodeState>> entry: result.entrySet()) assertNotNull(entry.getValue().result());
         ready = true;
       } catch (@SuppressWarnings("unused") final Exception|AssertionError e) {
         Thread.sleep(100L);

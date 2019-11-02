@@ -25,8 +25,8 @@ import java.util.function.Predicate;
 
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.utils.TypedProperties;
+import org.jppf.management.forwarding.NodeForwardingMBean;
+import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
@@ -41,8 +41,7 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * In this class, we test that the functionality of the DriverJobManagementMBean from the client point of view.
  * @author Laurent Cohen
  */
-@SuppressWarnings("deprecation")
-public abstract class AbstractTestJPPFNodeForwardingMBean extends AbstractNonStandardSetup {
+public abstract class AbstractTestNodeForwardingMBean extends AbstractNonStandardSetup {
   /**
    * Connection to the driver's JMX server.
    */
@@ -50,7 +49,7 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends AbstractNonSta
   /**
    * The driver mbean which delegates operations to specified nodes.
    */
-  protected static JPPFNodeForwardingMBean nodeForwarder;
+  protected static NodeForwardingMBean nodeForwarder;
   /**
    * The uuids of all nodes.
    */
@@ -81,7 +80,7 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends AbstractNonSta
     driverJmx = BaseSetup.getJMXConnection(client);
     assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> driverJmx.nbNodes() == nbNodes, 5000L, 250L, false));
     for (int i = 1; i <= nbNodes; i++) allNodes.add("n" + i);
-    nodeForwarder = driverJmx.getNodeForwarder();
+    nodeForwarder = driverJmx.getForwarder();
   }
 
   /**
@@ -95,20 +94,22 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends AbstractNonSta
 
   /**
    * Check that there are results for all the expected nodes, and only these nodes.
+   * @param <T> the type of expected results.
    * @param result the result to chek.
    * @param expectedClass the expected class of each result value.
    * @param expectedNodes the list of expected nodes.
    * @throws Exception if any error occurs or the check fails.
    */
-  protected static void checkNodes(final Map<String, Object> result, final Class<?> expectedClass, final String... expectedNodes) throws Exception {
+  protected static <T> void checkNodes(final ResultsMap<String, T> result, final Class<T> expectedClass, final String... expectedNodes) throws Exception {
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedNodes.length, result.size());
     for (final String uuid : expectedNodes) {
       assertTrue(result.containsKey(uuid));
-      final Object value = result.get(uuid);
+      final InvocationResult<T> value = result.get(uuid);
       assertNotNull(value);
-      assertEquals(expectedClass, value.getClass());
+      assertNotNull(value.result());
+      assertEquals(expectedClass, value.result().getClass());
     }
   }
 
@@ -122,26 +123,28 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends AbstractNonSta
    * @throws Exception if any error occurs or the check fails.
    */
   @SuppressWarnings("unchecked")
-  protected static <T> void checkNodes(final Map<String, Object> result, final Class<T> expectedClass, final Predicate<T> predicate, final String... expectedNodes) throws Exception {
+  protected static <T> void checkNodes(final ResultsMap<String, T> result, final Class<T> expectedClass, final Predicate<T> predicate, final String... expectedNodes) throws Exception {
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedNodes.length, result.size());
     for (final String uuid : expectedNodes) {
       assertTrue(result.containsKey(uuid));
-      final Object value = result.get(uuid);
+      final InvocationResult<T> value = result.get(uuid);
       assertNotNull(value);
-      assertEquals(expectedClass, value.getClass());
-      assertTrue(predicate.test((T) value));
+      assertNotNull(value.result());
+      assertEquals(expectedClass, value.result().getClass());
+      assertTrue(predicate.test(value.result()));
     }
   }
 
   /**
    * Check that there are null results for all the expected nodes, and only these nodes.
+   * @param <T> the type of expected results.
    * @param result the result to chek.
    * @param expectedNodes the list of expected nodes.
    * @throws Exception if any error occurs or the check fails.
    */
-  protected static void checkNullResults(final Map<String, Object> result, final String... expectedNodes) throws Exception {
+  protected static <T> void checkNullResults(final ResultsMap<String, T> result, final String... expectedNodes) throws Exception {
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedNodes.length, result.size());
@@ -150,35 +153,39 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends AbstractNonSta
     }
     for (final String uuid : expectedNodes) {
       assertTrue(result.containsKey(uuid));
-      final Object value = result.get(uuid);
-      assertNull(value);
+      final InvocationResult<T> value = result.get(uuid);
+      assertNotNull(value);
+      assertFalse(value.isException());
+      assertNull(value.result());
     }
   }
 
   /**
    * Check that the specified map is empty.
+   * @param <T> the type of expected results.
    * @param result the result map to chek.
    * @throws Exception if any error occurs or the check fails.
    */
-  protected static void checkEmpty(final Map<String, Object> result) throws Exception {
+  protected static <T> void checkEmpty(final ResultsMap<String, T> result) throws Exception {
     assertNotNull(result);
     assertTrue(result.isEmpty());
   }
 
   /**
    * Check that the specified map contains no exception among its values.
+   * @param <T> the type of expected results.
    * @param result the result map to chek.
    * @param expectedNodes the list of expectd nodes.
    * @throws Exception if any error occurs or the check fails.
    */
-  protected static void checkNoException(final Map<String, Object> result, final String... expectedNodes) throws Exception {
+  protected static <T> void checkNoException(final ResultsMap<String, T> result, final String... expectedNodes) throws Exception {
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedNodes.length, result.size());
     for (final String uuid : expectedNodes) {
       assertTrue(result.containsKey(uuid));
-      final Object value = result.get(uuid);
-      assertFalse(value instanceof Exception);
+      final InvocationResult<T> value = result.get(uuid);
+      assertFalse(value.isException());
     }
   }
 

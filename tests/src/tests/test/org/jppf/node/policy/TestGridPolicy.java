@@ -219,7 +219,7 @@ public class TestGridPolicy extends Setup1D2N1C {
       overrides.setString("jppf.node.uuid", "$script{ java.util.UUID.randomUUID().toString(); }$");
       // start 1 slave node for each master
       BaseTestHelper.printToAll(client, true, true, true, true, false, "provisioning slave nodes");
-      jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 1, overrides);
+      jmx.getForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 1, overrides);
       BaseTestHelper.printToAll(client, true, true, true, true, false, "awaiting job results");
       final List<Task<?>> results = job.awaitResults();
       BaseTestHelper.printToAll(client, true, true, true, true, false, "got job results");
@@ -233,7 +233,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     } finally {
       // terminate the slave nodes
       BaseTestHelper.printToAll(client, true, true, true, true, false, "stopping slave nodes");
-      jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
+      jmx.getForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
       ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() == 2, 5000L, 250L, true);
     }
   }

@@ -90,7 +90,7 @@ public class StatsTest {
   private static void doProvisioning(final JPPFClient client, final int nbSlaves) throws Exception {
     System.out.printf("provisioning %d slaves%n", nbSlaves);
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
-    jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, nbSlaves);
+    jmx.getForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, nbSlaves);
     while (jmx.nbNodes() != nbSlaves + 1) Thread.sleep(10L);
   }
 

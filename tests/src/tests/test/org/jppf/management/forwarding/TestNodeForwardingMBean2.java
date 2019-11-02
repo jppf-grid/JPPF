@@ -41,8 +41,7 @@ import test.org.jppf.test.setup.common.*;
  * In this class, we test that the notifications mechanism provided by <code>JPPFNodeForwardingMBean</code>.
  * @author Laurent Cohen
  */
-@SuppressWarnings("deprecation")
-public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwardingMBean {
+public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
   /**
    * Test getting notifications with an <code>AllNodesSelector</code> selector.
    * @throws Exception if any error occurs.

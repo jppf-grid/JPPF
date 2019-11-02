@@ -20,16 +20,14 @@ package test.jmx.canceljob;
 
 import java.util.Collection;
 
-import javax.management.*;
-
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
+import org.jppf.management.forwarding.*;
 
 /**
  * A notification listener that can wait until a specified task notification is sent.
  */
-public class AwaitTaskNotificationListener implements NotificationListener {
+public class AwaitTaskNotificationListener implements ForwardingNotificationListener {
   /**
    * A message we expect to receive as a notification.
    */
@@ -81,8 +79,7 @@ public class AwaitTaskNotificationListener implements NotificationListener {
   }
 
   @Override
-  public synchronized void handleNotification(final Notification notification, final Object handback) {
-    final JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
+  public synchronized void handleNotification(final JPPFNodeForwardingNotification wrapping, final Object handback) {
     final TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
     if (!actualNotif.isUserNotification()) return;
     final String data = (String) actualNotif.getUserData();

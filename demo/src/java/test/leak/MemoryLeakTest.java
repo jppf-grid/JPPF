@@ -21,12 +21,10 @@ package test.leak;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.*;
-
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
+import org.jppf.management.forwarding.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -98,7 +96,7 @@ public class MemoryLeakTest {
   /**
    * This JMX notification listener cancels a job once it receives a specific notification from its task.
    */
-  private static class MyNotificationHandler implements NotificationListener {
+  private static class MyNotificationHandler implements ForwardingNotificationListener {
     /**
      */
     private final JPPFClient client;
@@ -111,9 +109,8 @@ public class MemoryLeakTest {
     }
 
     @Override
-    public void handleNotification(final Notification notification, final Object handback) {
+    public void handleNotification(final JPPFNodeForwardingNotification wrapping, final Object handback) {
       try {
-        final JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
         final TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
         if (MyTask.NOTIF_MESSAGE.equals(actualNotif.getUserData())) {
           client.cancelJob(actualNotif.getTaskInformation().getJobId());

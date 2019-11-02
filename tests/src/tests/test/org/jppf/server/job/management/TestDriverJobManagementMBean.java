@@ -29,7 +29,7 @@ import org.jppf.client.*;
 import org.jppf.job.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
@@ -66,7 +66,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   @Before
   public void showIdleNodes() throws Exception {
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+    final NodeForwardingMBean forwarder = jmx.getForwarder();
     // cancel currently executing jobs in all nodes
     forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "cancel");
     print(false, "nb idle nodes = %d", jmx.nbIdleNodes());

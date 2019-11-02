@@ -22,7 +22,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.job.JobSelector;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.Operator;
 import org.slf4j.*;
@@ -56,7 +56,7 @@ public class CancelJobRunner {
       print("waiting for " + n + " client connections ...");
       client.awaitConnectionPools(Operator.EQUAL, n, 100_000L, JPPFClientConnectionStatus.workingStatuses());
       final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
-      final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+      final NodeForwardingMBean forwarder = jmx.getForwarder();
       final DriverJobManagementMBean jobManager = jmx.getJobManager();
       forwarder.provisionSlaveNodes(NodeSelector.ALL_NODES, n - 1);
       int idleNodes;

@@ -76,7 +76,7 @@ public class GCLink extends AbstractActionLink {
       for (final Map.Entry<TopologyDriver, Collection<String>> entry: nodesMap.entrySet()) {
         try {
           final JMXDriverConnectionWrapper jmx = entry.getKey().getJmx();
-          if ((jmx != null) && jmx.isConnected()) jmx.getNodeForwarder().gc(new UuidSelector(entry.getValue()));
+          if ((jmx != null) && jmx.isConnected()) jmx.getForwarder().gc(new UuidSelector(entry.getValue()));
         } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }

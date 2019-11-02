@@ -25,7 +25,7 @@ import java.util.*;
 import javax.management.*;
 
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.policy.IsMasterNode;
 import org.junit.*;
 
@@ -62,7 +62,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
     print(false, false, "waiting for master node");
     while (driver.nbIdleNodes() < 1) Thread.sleep(10L);
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
-    final JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
+    final NodeForwardingMBean forwarder = driver.getForwarder();
     final NodeSelector selector = new ExecutionPolicySelector(new IsMasterNode());
     forwarder.provisionSlaveNodes(selector, nbSlaves);
     print(false, false, "waiting for %d slave nodes", nbSlaves);

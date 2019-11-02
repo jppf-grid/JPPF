@@ -25,11 +25,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
-import org.jppf.admin.web.tabletree.*;
+import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.utils.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
@@ -66,7 +66,7 @@ public class ResetTaskCounterLink extends AbstractActionLink {
       final CollectionMap<TopologyDriver, String> map = TopologyTreeData.getNodesMultimap(selectedNodes);
       for (final Map.Entry<TopologyDriver, Collection<String>> entry : map.entrySet()) {
         try {
-          final JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
+          final NodeForwardingMBean forwarder = entry.getKey().getForwarder();
           if (forwarder == null) continue;
           final NodeSelector selector = new UuidSelector(entry.getValue());
           forwarder.resetTaskCounter(selector);

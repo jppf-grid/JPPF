@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.ThreadDump;
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -54,9 +54,9 @@ public class HealthUtils {
     try {
       if (data.isNode()) {
         final TopologyDriver parent = (TopologyDriver) data.getParent();
-        final Map<String, Object> result = parent.getForwarder().threadDump(new UuidSelector(data.getUuid()));
-        final Object o = result.get(data.getUuid());
-        if (o instanceof ThreadDump) info = (ThreadDump) o;
+        final ResultsMap<String, ThreadDump> result = parent.getForwarder().threadDump(new UuidSelector(data.getUuid()));
+        final InvocationResult<ThreadDump> o = result.get(data.getUuid());
+        if (o .result() != null) info = o.result();
       }
       else info = ((TopologyDriver) data).getDiagnostics().threadDump();
     } catch (final Exception e) {

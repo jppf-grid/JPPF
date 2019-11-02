@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
@@ -81,7 +81,7 @@ public class HeapDumpAction extends AbstractTopologyAction {
       CollectionMap<TopologyDriver, String> map = getDriverMap();
       for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
         try {
-          final JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
+          final NodeForwardingMBean forwarder = entry.getKey().getForwarder();
           if (forwarder == null) continue;
           final NodeSelector selector = new UuidSelector(entry.getValue());
           forwarder.gc(selector);

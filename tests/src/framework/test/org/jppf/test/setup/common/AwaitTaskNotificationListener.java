@@ -18,11 +18,9 @@
 
 package test.org.jppf.test.setup.common;
 
-import javax.management.*;
-
 import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
+import org.jppf.management.forwarding.*;
 import org.slf4j.*;
 
 import test.org.jppf.test.setup.BaseSetup;
@@ -30,7 +28,7 @@ import test.org.jppf.test.setup.BaseSetup;
 /**
  * A notification listener that can wait until a specified task notification is sent.
  */
-public class AwaitTaskNotificationListener implements NotificationListener {
+public class AwaitTaskNotificationListener implements ForwardingNotificationListener {
   /**
    * Logger for this class.
    */
@@ -79,8 +77,7 @@ public class AwaitTaskNotificationListener implements NotificationListener {
   }
 
   @Override
-  public void handleNotification(final Notification notification, final Object handback) {
-    final JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
+  public void handleNotification(final JPPFNodeForwardingNotification wrapping, final Object handback) {
     final TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
     final Object data = actualNotif.getUserData();
     if ((expectedMessage == null) || expectedMessage.equals(data)) {

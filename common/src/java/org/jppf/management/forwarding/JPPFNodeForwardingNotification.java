@@ -56,7 +56,7 @@ public class JPPFNodeForwardingNotification extends Notification {
    * @param mBeanName name of the originating MBean in the node.
    */
   public JPPFNodeForwardingNotification(final Notification notification, final String nodeUuid, final String mBeanName) {
-    super("NodeForwardingNotification", JPPFNodeForwardingMBean.MBEAN_NAME, sequence.incrementAndGet());
+    super("NodeForwardingNotification", NodeForwardingMBean.MBEAN_NAME, sequence.incrementAndGet());
     this.notification = notification;
     this.nodeUuid = nodeUuid;
     this.mBeanName = mBeanName;

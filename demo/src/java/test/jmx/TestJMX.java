@@ -136,7 +136,7 @@ public class TestJMX {
   /**
    * 
    */
-  public static class NodeNotificationListener implements NotificationListener {
+  public static class NodeNotificationListener implements ForwardingNotificationListener {
     /**
      * The task information received as notifications from the node.
      */
@@ -147,12 +147,11 @@ public class TestJMX {
     public Exception exception = null;
 
     @Override
-    public void handleNotification(final Notification notification, final Object handback) {
+    public void handleNotification(final JPPFNodeForwardingNotification notif, final Object handback) {
       try {
-        System.out.println("received notification " + notification);
-        final JPPFNodeForwardingNotification notif = (JPPFNodeForwardingNotification) notification;
+        System.out.println("received notification " + notif);
         System.out.println("nodeUuid=" + notif.getNodeUuid() + ", mBeanName='" + notif.getMBeanName() + "', inner notification=" + notif.getNotification());
-        notifs.add(notification);
+        notifs.add(notif);
       } catch (final Exception e) {
         if (exception == null) exception = e;
       }

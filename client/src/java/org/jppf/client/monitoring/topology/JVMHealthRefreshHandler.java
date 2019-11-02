@@ -78,25 +78,25 @@ class JVMHealthRefreshHandler extends AbstractRefreshHandler {
         final TopologyNode node = (TopologyNode) comp;
         uuidMap.put(node.getUuid(), node);
       }
-      Map<String, Object> result = null;
+      ResultsMap<String, HealthSnapshot> result = null;
       try {
         result = driver.getForwarder().healthSnapshot(new UuidSelector(new HashSet<>(uuidMap.keySet())));
       } catch(final Exception e) {
         if (debugEnabled) log.debug("error getting nodes health for driver {} : {}" + driver, ExceptionUtils.getMessage(e));
       }
       if (result == null) continue;
-      for (final Map.Entry<String, Object> entry: result.entrySet()) {
+      for (final Map.Entry<String, InvocationResult<HealthSnapshot>> entry: result.entrySet()) {
         final TopologyNode node = uuidMap.get(entry.getKey());
         if (node == null) continue;
-        if (entry.getValue() instanceof Exception) {
+        if (entry.getValue().isException()) {
           node.setStatus(TopologyNodeStatus.DOWN);
-          if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
-        } else if (entry.getValue() instanceof HealthSnapshot) {
-          final HealthSnapshot health = (HealthSnapshot) entry.getValue();
+          if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage(entry.getValue().exception()));
+        } else if (entry.getValue().result() != null) {
+          final HealthSnapshot health = entry.getValue().result();
           if (!health.equals(node.getHealthSnapshot())) {
-            node.refreshHealthSnapshot((HealthSnapshot) entry.getValue());
+            node.refreshHealthSnapshot(health);
             manager.nodeUpdated(driver, node, TopologyEvent.UpdateType.JVM_HEALTH);
-            if (log.isTraceEnabled()) log.trace("got new node health snapshot: " + entry.getValue());
+            if (log.isTraceEnabled()) log.trace("got new node health snapshot: " + health);
           }
         }
       }
