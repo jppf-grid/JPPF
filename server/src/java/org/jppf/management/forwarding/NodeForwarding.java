@@ -162,17 +162,17 @@ public class NodeForwarding extends AbstractNodeForwarding implements NodeForwar
 
   @Override
   public ResultsMap<String, Void> gc(final NodeSelector selector) throws Exception {
-    return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "threadDump");
-  }
-
-  @Override
-  public ResultsMap<String, String> heapDump(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "gc");
   }
 
   @Override
-  public ResultsMap<String, ThreadDump> threadDump(final NodeSelector selector) throws Exception {
+  public ResultsMap<String, String> heapDump(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "heapDump");
+  }
+
+  @Override
+  public ResultsMap<String, ThreadDump> threadDump(final NodeSelector selector) throws Exception {
+    return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "threadDump");
   }
 
   @Override
