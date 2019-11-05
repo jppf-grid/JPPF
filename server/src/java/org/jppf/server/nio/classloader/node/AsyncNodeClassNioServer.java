@@ -33,7 +33,6 @@ import org.jppf.server.nio.client.AsyncClientContext;
 import org.jppf.server.nio.nodeserver.BaseNodeContext;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
-import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
 /**
@@ -111,7 +110,6 @@ public final class AsyncNodeClassNioServer extends StatelessNioServer<AsyncNodeC
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-    driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, 1);
   }
 
   /**
@@ -189,8 +187,6 @@ public final class AsyncNodeClassNioServer extends StatelessNioServer<AsyncNodeC
       }
     } catch (final Exception e) {
       log.error("error closing channel {}: {}", context, ExceptionUtils.getStackTrace(e));
-    } finally {
-      driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, -1);
     }
   }
 
