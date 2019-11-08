@@ -549,7 +549,7 @@ div.topNav div.aboutLanguage {
 span.deprecatedLabel + div.block span.deprecationComment {
   margin-left: -0px;
   padding-left: 8px;
-  display: none;
+  display: inline;
 }
 
 span.deprecatedLabel, span.deprecationComment {
@@ -562,7 +562,7 @@ span.deprecatedLabel + span.deprecationComment {
 }
 
 .deprecatedLabel, .deprecationComment, span.deprecatedLabel + div.block, div.block span.deprecatedLabel {
-  display: inline-block;
-  white-space: nowrap;
+  display: inline;
+  /*white-space: nowrap;*/
   background-color: #FFFFCC;
 }
