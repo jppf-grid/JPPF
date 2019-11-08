@@ -196,7 +196,7 @@ public class TestJobDependencies extends BaseTest {
       final JobEndedListener jobListener = new JobEndedListener();
       final List<JPPFJob> jobs = createLayeredJobs(layers, jobsPerLayer, "job", nbTasks, 5000L);
       // last job depends on the first one, creating a cycle
-      jobs.get(layers - 1).getSLA().getDependencySpec().addDependencies(jobs.get(0).getSLA().getDependencySpec().getId());
+      jobs.get(layers - 1).addDependencies(jobs.get(0));
       for (final JPPFJob job: jobs) job.addJobListener(jobListener);
       for (final JPPFJob job: jobs) client.submitAsync(job);
       for (final JPPFJob job: jobs) checkJobResults(job, true);

@@ -70,13 +70,13 @@ public class JobDependenciesHandler {
         return node.isCancelled();
       } catch (final JPPFJobDependencyCycleException e) {
         final JobDependencyNode node = graph.getNode(spec.getId());
-        log.error("detected dependency cycle when queuing {}, node = {}", job, node, e);
+        log.error("detected dependency cycle when queuing {}, spec = {}", job, spec, e);
         if (node != null) node.setGraphRoot(true);
-        final List<String> toCancel = e.getIdPath();
-        if ((toCancel != null) && !toCancel.isEmpty()) {
-          if (debugEnabled) log.debug("cycle id path: {}", toCancel);
-          cancelNodes(toCancel);
-        }
+        List<String> toCancel = e.getIdPath();
+        if (toCancel == null) toCancel = Collections.singletonList(spec.getId());
+        else toCancel.add(spec.getId());
+        if (debugEnabled) log.debug("cycle id path: {}", toCancel);
+        cancelNodes(toCancel);
       }
     }
     return true;
