@@ -245,6 +245,7 @@
         <exclude name="**/TestSSL2.java"/>
         <exclude name="**/TestSSL3.java"/>
         <exclude name="**/TestJPPFStatistics.java"/>
+        <exclude name="**/Test*Forwarder.java"/>
       </fileset-elements>
     </test>
   </target>

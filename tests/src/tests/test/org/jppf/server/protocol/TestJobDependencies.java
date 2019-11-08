@@ -184,7 +184,7 @@ public class TestJobDependencies extends BaseTest {
    * Test the submissioon of a job graph with a cycle.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10_000L)
+  @Test(timeout = 10_000L)
   public void testDependencyCycle() throws Exception {
     int oldMaxJobs = 1;
     JPPFConnectionPool pool = null;
