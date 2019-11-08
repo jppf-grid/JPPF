@@ -412,3 +412,14 @@ ul.inline li {
   display: inline;
   margin-left: 10px;
 }
+
+.mbean {
+  white-space: pre-wrap;
+  text-align: left;
+  background-color: #E9E9E9;
+  font-family: Courier New,Source Code Pro,monospace;
+  font-size: 10pt;
+  border: 1px dotted #2F6FAB;
+  line-height: 1.1em;
+  padding: 4px 2px;
+}
