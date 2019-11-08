@@ -69,6 +69,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the JMX connection information for all the nodes attached to the server")
+  @MBeanElementType(type = Collection.class, parameters = { "org.jppf.management.JPPFManagementInfo" })
   Collection<JPPFManagementInfo> nodesInformation() throws Exception;
 
   /**
@@ -79,6 +80,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the JMX connection information for the selected nodes attached to the server")
+  @MBeanElementType(type = Collection.class, parameters = { "org.jppf.management.JPPFManagementInfo" })
   Collection<JPPFManagementInfo> nodesInformation(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -89,6 +91,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the JMX connection information for the selected nodes attached to the server, possibly including other peer drivers")
+  @MBeanElementType(type = Collection.class, parameters = { "org.jppf.management.JPPFManagementInfo" })
   Collection<JPPFManagementInfo> nodesInformation(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("icludePeers") boolean includePeers) throws Exception;
 
   /**
@@ -164,6 +167,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the JMX connection information for all the idle nodes attached to the server")
+  @MBeanElementType(type = Collection.class, parameters = { "org.jppf.management.JPPFManagementInfo" })
   Collection<JPPFManagementInfo> idleNodesInformation() throws Exception;
 
   /**
@@ -173,6 +177,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the JMX connection information for all the selected idle nodes attached to the server")
+  @MBeanElementType(type = Collection.class, parameters = { "org.jppf.management.JPPFManagementInfo" })
   Collection<JPPFManagementInfo> idleNodesInformation(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -190,6 +195,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the activate state of the selected nodes")
+  @MBeanElementType(type = Collection.class, parameters = { "java.lang.String", "java.lang.Boolean" })
   Map<String, Boolean> getActiveState(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**

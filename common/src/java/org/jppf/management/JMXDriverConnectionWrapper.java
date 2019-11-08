@@ -18,6 +18,7 @@
 
 package org.jppf.management;
 
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 import javax.management.*;
@@ -398,60 +399,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   /**
-   * Wraps the information for each registered node forwarding listener.
-   */
-  private static class ListenerWrapper {
-    /**
-     * The registered listener.
-     */
-    private final NotificationListener listener;
-    /**
-     * The notification filter.
-     */
-    private final InternalNotificationFilter filter;
-    /**
-     * the handback object.
-     */
-    private final Object handback;
-
-    /**
-     * Initialize this wrapper with the specified listener information.
-     * @param listener the registered listener.
-     * @param filter the notification filter.
-     * @param handback the handback object.
-     */
-    ListenerWrapper(final NotificationListener listener, final InternalNotificationFilter filter, final Object handback) {
-      this.listener = listener;
-      this.filter = filter;
-      this.handback = handback;
-    }
-
-    /**
-     * Get the registered listener.
-     * @return a {@link NotificationListener} instance.
-     */
-    public NotificationListener getListener() {
-      return listener;
-    }
-
-    /**
-     * Get the notification filter.
-     * @return an <code>InternalNotificationFilter</code> instance.
-     */
-    public InternalNotificationFilter getFilter() {
-      return filter;
-    }
-
-    /**
-     * Get the handback object.
-     * @return the handback object.
-     */
-    public Object getHandback() {
-      return handback;
-    }
-  }
-
-  /**
    * This convenience method creates a proxy to the driver's mbean which forwards requests to its nodes.
    * It is equivalent to calling the more cumbersome {@code getProxy(NodeForwardingMBean.MBEAN_NAME, NodeForwardingMBean.class)}.
    * @return an instance of {@link NodeForwardingMBean}.
@@ -522,5 +469,25 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    */
   public JobDependencyManagerMBean getJobDependencyManager() throws Exception {
     return getProxy(JobDependencyManagerMBean.MBEAN_NAME, JobDependencyManagerMBean.class);
+  }
+
+  /**
+   * 
+   * @param <E> the type of mbean interface.
+   * @param inf the MBean nterface.
+   * @return a forwarding proxy to the specified MBean.
+   * @throws Exception if any error occurs.
+   * @since 6.2
+   */
+  public <E> AbstractNodeForwardingProxy getForwardingProxy(final Class<E> inf) throws Exception {
+    final String proxyClassName = "org.jppf.management.forwarding.generated." + inf.getSimpleName() + "Forwarder";
+    Class<?> clazz = null;
+    try {
+      clazz = Class.forName(proxyClassName);
+    } catch (final ClassNotFoundException e) {
+      throw new ClassNotFoundException("could not find a class named " + proxyClassName, e);
+    }
+    final Constructor<?> c = clazz.getConstructor(getClass());
+    return (AbstractNodeForwardingProxy) c.newInstance(this);
   }
 }

@@ -56,6 +56,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if the invocation failed.
    */
   @MBeanDescription("invoke a method on the specified MBean of the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "E" })
   <E> ResultsMap<String, E> forwardInvoke(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name, @MBeanParamName("methodName") String methodName,
     @MBeanParamName("params") Object[] params, @MBeanParamName("signature") String[] signature) throws Exception;
 
@@ -71,6 +72,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if the invocation failed.
    */
   @MBeanDescription("invoke an MBean method with no parameter on the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "E" })
   <E> ResultsMap<String, E> forwardInvoke(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name,
     @MBeanParamName("methodName") String methodName) throws Exception;
 
@@ -84,6 +86,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if the invocation failed.
    */
   @MBeanDescription("get the value of an attribute of the specified MBean for each selected node")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "E" })
   <E> ResultsMap<String, E> forwardGetAttribute(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name,
     @MBeanParamName("attribute") String attribute) throws Exception;
 
@@ -98,6 +101,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if the invocation failed.
    */
   @MBeanDescription("set the value of an attribute of the specified MBean on the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "E" })
   <E> ResultsMap<String, E> forwardSetAttribute(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name, @MBeanParamName("attribute") String attribute,
     @MBeanParamName("value") Object value) throws Exception;
 
@@ -109,6 +113,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the latest state information from the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "org.jppf.management.JPPFNodeState" })
   ResultsMap<String, JPPFNodeState> state(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -119,6 +124,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("set the number of processing threads on the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> updateThreadPoolSize(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("size") Integer size) throws Exception;
 
   /**
@@ -129,6 +135,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if an error is raised when invoking the node mbean.
    */
   @MBeanDescription("set the priority of the processing threads on the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> updateThreadsPriority(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("newPriority") Integer newPriority) throws Exception;
 
   /**
@@ -138,6 +145,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("restart the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> restart(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -148,6 +156,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("restart the selected nodes, specifying whther to wait until they are no longer executing jobs")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> restart(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
 
   /**
@@ -157,6 +166,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("shutdown the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> shutdown(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -167,6 +177,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("shutdown the selected nodes, specifying whther to wait until they are no longer executing jobs")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> shutdown(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
 
   /**
@@ -176,6 +187,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("reset the executed tasks count on the selected nodes to zero")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> resetTaskCounter(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -186,6 +198,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("set the executed tasks count on the selected nodes to a specified value")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> setTaskCounter(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("taskCount") Integer n) throws Exception;
 
   /**
@@ -199,6 +212,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("update the configuration properties of the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> updateConfiguration(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("configOverrides") Map<Object, Object> configOverrides,
     @MBeanParamName("restart") Boolean restart, @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
 
@@ -211,6 +225,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("update the configuration properties of the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> updateConfiguration(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("configOverrides") Map<Object, Object> configOverrides,
     @MBeanParamName("restart") Boolean restart) throws Exception;
 
@@ -223,6 +238,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("cancel the job with the specified uuid in the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> cancelJob(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("jobUuid") String jobId, @MBeanParamName("requeue") Boolean requeue) throws Exception;
 
   /**
@@ -234,6 +250,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @see org.jppf.classloader.AbstractJPPFClassLoader#getDelegationModel()
    */
   @MBeanDescription("get the current class loader delegation model for the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "org.jppf.classloader.DelegationModel" })
   ResultsMap<String, DelegationModel> getDelegationModel(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -246,6 +263,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @see org.jppf.classloader.AbstractJPPFClassLoader#setDelegationModel(org.jppf.classloader.DelegationModel)
    */
   @MBeanDescription("set the class loader delegation model onr the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> setDelegationModel(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("delegationModel") DelegationModel model) throws Exception;
 
   /**
@@ -255,6 +273,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the system information for the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "org.jppf.management.JPPFSystemInformation" })
   ResultsMap<String, JPPFSystemInformation> systemInformation(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -264,6 +283,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get a JVM health snapshot for the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "org.jppf.management.diagnostics.HealthSnapshot" })
   ResultsMap<String, HealthSnapshot> healthSnapshot(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -273,6 +293,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("invoke System.gc(} on the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> gc(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -282,6 +303,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("trigger a heap dump on the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.String" })
   ResultsMap<String, String> heapDump(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -291,6 +313,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get a thread dump for the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "org.jppf.management.diagnostics.ThreadDump" })
   ResultsMap<String, ThreadDump> threadDump(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -301,6 +324,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get the number of provisioned slave nodes for the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Integer" })
   ResultsMap<String, Integer> getNbSlaves(@MBeanParamName("nodeSelector") NodeSelector selector) throws Exception;
 
   /**
@@ -312,6 +336,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("nbSlaves") int nbNodes) throws Exception;
 
   /**
@@ -323,6 +348,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes, specifying whether to wait for slave nodes to be idle before stopping them")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("nbSlaves") int nbNodes,
     @MBeanParamName("interruptIfRunning") boolean interruptIfRunning) throws Exception;
 
@@ -336,6 +362,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes, specifying configuration overrides")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("slaves") int nbNodes,
     @MBeanParamName("cfgOverrides") TypedProperties configOverrides) throws Exception;
 
@@ -350,6 +377,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes, specifying configuration overrides")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
   ResultsMap<String, Void> provisionSlaveNodes(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("nbSlaves") int nbNodes,
     @MBeanParamName("interruptIfRunning") boolean interruptIfRunning, @MBeanParamName("configOverrides") TypedProperties configOverrides) throws Exception;
 }

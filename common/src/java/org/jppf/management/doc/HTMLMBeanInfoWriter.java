@@ -31,28 +31,23 @@ import org.jppf.utils.StringUtils;
  * in wikimedia format.
  * @author Laurent Cohen
  */
-public class WikiMBeanInfoWriter extends AbstractMBeanInfoWriter<WikiMBeanInfoWriter> {
+public class HTMLMBeanInfoWriter extends AbstractMBeanInfoWriter<HTMLMBeanInfoWriter> {
   /**
    * 
    */
-  private static final int START_HEADING_LEVEL = 1;
-  /**
-   * A cache of converted types, for performance optimization.
-   */
-  private final Map<Integer, String> headings = new HashMap<>();
+  private static final int START_HEADING_LEVEL = 3;
 
   /**
    * Initialize this visitor witht he specified {@link Writer}.
    * @param writer the writer in which to print the generated wiki code.
    */
-  public WikiMBeanInfoWriter(final Writer writer) {
+  public HTMLMBeanInfoWriter(final Writer writer) {
     super(writer);
   }
 
   @Override
   public void start(final DriverConnectionInfo connectionInfo) throws Exception {
-    final String heading = getHeading(START_HEADING_LEVEL);
-    println("%s MBeans in a JPPF %s %s", heading, connectionInfo.getName(), heading).println();
+    println(applyHeading("MBeans in a JPPF " + connectionInfo.getName(), START_HEADING_LEVEL)).println();
   }
 
   @Override
@@ -64,111 +59,115 @@ public class WikiMBeanInfoWriter extends AbstractMBeanInfoWriter<WikiMBeanInfoWr
   public void startMBean(final ObjectName name, final MBeanInfo info) throws Exception {
     final Descriptor descriptor = info.getDescriptor();
     final String inf = (String) descriptor.getFieldValue("interfaceClassName");
-    String heading = getHeading(START_HEADING_LEVEL + 1);
-    println("%s %s %s", heading, inf.substring(inf.lastIndexOf('.') + 1), heading).println();
-    println("* object name: '''%s'''", name);
-    println("* interface name: <tt>%s</tt>", formatType(inf));
+    println(applyHeading(inf.substring(inf.lastIndexOf('.') + 1), START_HEADING_LEVEL + 1)).println();
+    println("<ul>");
+    print("  ").println(applyTag("object name: " + applyTag(name.toString(), "b"), "li"));
+    print("  ").println(applyTag("interface name: " + applyTag(name.toString(), "tt"), "li"));
     final String desc = (String) descriptor.getFieldValue(MBeanInfoExplorer.DESCRIPTION_FIELD);
-    if (desc != null) println("* description: %s", desc);
+    if (desc != null) print("  ").println(applyTag("description: " + desc, "li"));
+    println("</ul><br>");
     final String notifDesc = (String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_DESCRIPTION_FIELD);
     if (notifDesc != null) {
       println();
-      heading = getHeading(START_HEADING_LEVEL + 2);
-      println("%s Notifications %s", heading, heading).println();
-      println("* description: %s", notifDesc);
-      println("* type: <tt>%s</tt>", formatType((String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_CLASS_FIELD)));
+      println(applyHeading("Notifications", START_HEADING_LEVEL + 2)).println();
+      println("<ul>");
+      print("  ").println(applyTag("description: " + notifDesc, "li"));
+      print("  ").println(applyTag("description: " + applyTag(formatType((String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_CLASS_FIELD)), "tt"), "li"));
       final String userDataDesc = (String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_USER_DATA_DESCRIPTION_FIELD);
       final String userDataType = (String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_USER_DATA_CLASS_FIELD);
       if (!isEmpty(userDataDesc)) {
-        println("* user data: %s", userDataDesc);
+        print("  ").println(applyTag("user data: " + userDataDesc, "li"));
         final String type = Object.class.getName().equals(userDataType) ? "any type" : formatType(userDataType);
-        println("* user data type: <tt>%s</tt>", type);
+        print("  ").println(applyTag("user data type: " + applyTag(type, "tt"), "li"));
       } else {
-        if (!Object.class.getName().equals(userDataType)) println("* user data type: <tt>%s</tt>", formatType(userDataType));
+        if (!Object.class.getName().equals(userDataType)) print("  ").println(applyTag("user data type: " + applyTag(formatType(userDataType), "tt"), "li"));
       }
+      println("</ul><br>");
     }
     println();
   }
 
   @Override
   public void startAttributes(final MBeanAttributeInfo[] attributes) throws Exception {
-    final String heading = getHeading(START_HEADING_LEVEL + 2);
-    if ((attributes != null) && (attributes.length > 0)) println("%s Attributes %s", heading, heading).println();
+    if ((attributes != null) && (attributes.length > 0)) println(applyHeading("Attributes", START_HEADING_LEVEL + 2)).println();
   }
 
   @Override
   public void visitAttribute(final MBeanAttributeInfo attribute) throws Exception {
     final Descriptor descriptor = attribute.getDescriptor();
     final String desc = (String) descriptor.getFieldValue(MBeanInfoExplorer.DESCRIPTION_FIELD);
-    print("'''%s''':", attribute.getName());
-    if (desc != null) print(" %s", desc);
-    println().println();
-    println("* type: <tt>%s</tt>", handleType(attribute.getType(), descriptor));
+    print("<p>" + applyTag(attribute.getName(), "b") + ":");
+    if (desc != null) print(" " + desc);
+    println();
+    println("<ul>");
+    print("  ").println(applyTag("type: " + applyTag(handleType(attribute.getType(), descriptor), "tt"), "li"));
     final boolean r = attribute.isReadable(), w = attribute.isWritable();
-    if (r && w) println("* readable / writable");
-    else if (r) println("* readable");
-    else if (w) println("* writable");
+    String s = null;
+    if (r && w) s = "readable / writable";
+    else if (r) s = "readable";
+    else if (w) s = "writable";
+    if (s != null) print("  ").println(applyTag(s, "li"));
+    println("</ul><br>");
     println();
   }
 
   @Override
   public void startOperations(final MBeanOperationInfo[] operations) throws Exception {
-    final String heading = getHeading(START_HEADING_LEVEL + 2);
-    if ((operations != null) && (operations.length > 0)) println("%s Operations %s", heading, heading).println();
+    if ((operations != null) && (operations.length > 0)) println(applyHeading("Operations", START_HEADING_LEVEL + 2)).println();
   }
 
   @Override
   public void visitOperation(final MBeanOperationInfo operation) throws Exception {
     final Descriptor descriptor = operation.getDescriptor();
     final String desc = (String) descriptor.getFieldValue(MBeanInfoExplorer.DESCRIPTION_FIELD);
-    print("'''%s''':", operation.getName());
-    if (desc != null) print(" %s", desc);
-    println().println();
+    print("<p>" + applyTag(operation.getName(), "b") + ":");
+    if (desc != null) print(" " + desc);
+    println();
     final StringBuilder sb = new StringBuilder();
     final MBeanParameterInfo[] params = operation.getSignature();
     int count = 0;
     for (final MBeanParameterInfo param: params) {
       count++;
-      if ((count % 2 == 1) && (count > 1)) sb.append(",<br>&nbsp;&nbsp;&nbsp;&nbsp;");
-      else if (count > 1) sb.append(", ");
+      /*if ((count % 2 == 1) && (count > 1)) sb.append(",<br>&nbsp;&nbsp;&nbsp;&nbsp;");
+      else*/ if (count > 1) sb.append(", ");
       sb.append(formatType(param.getType()));
       final String name = (String) param.getDescriptor().getFieldValue(MBeanInfoExplorer.PARAM_NAME_FIELD);
       if (name != null) sb.append(' ').append(name);
     }
     
-    println("<div class='mbean'>%s %s(%s)</div>", handleType(operation.getReturnType(), descriptor), operation.getName(), sb);
+    //println("<div class='mbean'>%s %s(%s)</div>", handleType(operation.getReturnType(), descriptor), operation.getName(), sb);
+    println("<pre class='mbean'>%s %s(%s)</pre>", handleType(operation.getReturnType(), descriptor), operation.getName(), sb);
     println();
   }
 
   /**
-   * Get the heading marker for the pseicfied level. 
+   * Apply the specified heading level to the specified source String.
+   * @param source the string to surround with heading tags.
    * @param level the heading level.
-   * @return the heading marker.
+   * @return the source string surrounded by the heading tag.
    */
-  private String getHeading(final int level) {
-    if (level <= 0) return "";
-    String heading = headings.get(level);
-    if (heading == null) {
-      heading = "";
-      for (int i=0; i<level; i++) heading += "=";
-      headings.put(level, heading);
-    }
-    return heading;
+  private static String applyHeading(final String source, final int level) {
+    return applyTag(source, "h" + level);
   }
 
   /**
-   * Convert the specified string into a javadoc URL.
-   * @param type the type to convert.
-   * @return the converted type.
+   * Apply the specified heading level to the specified source String.
+   * @param source the string to surround with heading tags.
+   * @param tag the name of the tag to apply. 
+   * @return the source string surrounded by the tag.
    */
+  private static String applyTag(final String source, final String tag) {
+    return new StringBuilder("<").append(tag).append(">").append(source).append("</").append(tag).append('>').toString();
+  }
+
   @Override
   String formatObjectType(final String type) {
     final String name = type.startsWith("L") ? type.substring(1, type.length() - 1) : type;
     final String url = (name.startsWith("org.jppf."))
-      ? "[{{SERVER}}/javadoc/6.2/index.html?" + name.replace(".", "/") + ".html"
+      ? "https://www.jppf.org/javadoc/6.2/index.html?" + name.replace(".", "/") + ".html"
       : "https://docs.oracle.com/javase/8/docs/api/index.html?" + name.replace(".", "/") + ".html";
     final String label = name.substring(name.lastIndexOf('.') + 1);
-    return "[" + url + " " + label + "]";
+    return "<a href='" + url + "'>" + label + "</a>";
   }
 
   /**
@@ -187,7 +186,7 @@ public class WikiMBeanInfoWriter extends AbstractMBeanInfoWriter<WikiMBeanInfoWr
         return !StringUtils.isOneOf(inf.substring(inf.lastIndexOf('.') + 1), false, filteredMBeans);
       };
       for (final DriverConnectionInfo remote: remotes) {
-        MBeanInfoExplorer.visit(new WikiMBeanInfoWriter(writer), remote, mbeanFilter, feature -> !StringUtils.isOneOf(feature.getName(), false, filteredElements));
+        MBeanInfoExplorer.visit(new HTMLMBeanInfoWriter(writer), remote, mbeanFilter, feature -> !StringUtils.isOneOf(feature.getName(), false, filteredElements));
       }
       writer.append("</div>\n");
       writer.append("{{NavPathBottom|[[Main Page]] > [[Management and monitoring]] > [[MBeans reference]]}}");

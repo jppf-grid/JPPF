@@ -18,7 +18,7 @@
 
 package org.jppf.server.job.management;
 
-import java.util.Map;
+import java.util.*;
 
 import javax.management.NotificationEmitter;
 
@@ -155,6 +155,7 @@ public interface DriverJobManagementMBean extends NotificationEmitter {
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("get, for the selected jobs, a mapping of job uuid to an object describing the nodes to which the whole or part of each job was dispatched")
+  @MBeanElementType(type = Map.class, parameters = { "java.lang.String", "[Lorg.jppf.server.job.management.NodeJobInformation;" })
   Map<String, NodeJobInformation[]> getNodeInformation(@MBeanParamName("jobSelector") JobSelector selector) throws Exception;
 
   /**

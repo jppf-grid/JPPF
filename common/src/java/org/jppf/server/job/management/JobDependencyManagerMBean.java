@@ -47,6 +47,7 @@ public interface JobDependencyManagerMBean {
    * @return a set of node ids.
    */
   @MBeanDescription("the ids of all the nodes currently in the graph")
+  @MBeanElementType(type = Set.class, parameters = { "java.lang.String" })
   Set<String> getNodeIds();
 
   /**
@@ -54,6 +55,7 @@ public interface JobDependencyManagerMBean {
    * @return a collection of {@link JobDependencyNode} objects.
    */
   @MBeanDescription("all the nodes currently in the job dependency graph")
+  @MBeanElementType(type = Collection.class, parameters = { "org.jppf.node.protocol.graph.JobDependencyNode" })
   Collection<JobDependencyNode> getAllNodes();
 
   /**
@@ -61,6 +63,7 @@ public interface JobDependencyManagerMBean {
    * @return a collection of {@link JobDependencyNode} objects.
    */
   @MBeanDescription("the nodes in the job dependency graph, whose corresponding job has arrived in the job queue")
+  @MBeanElementType(type = Collection.class, parameters = { "org.jppf.node.protocol.graph.JobDependencyNode" })
   Collection<JobDependencyNode> getQueuedNodes();
 
   /**
@@ -69,6 +72,7 @@ public interface JobDependencyManagerMBean {
    * @return a collection of {@link JobDependencyNode} objects, possibly empty.
    */
   @MBeanDescription("get the nodes in the job dependency graph, whose corresponding job has arrived in the job queue, filtered by the specified job selector")
+  @MBeanElementType(type = Collection.class, parameters = { "org.jppf.node.protocol.graph.JobDependencyNode" })
   Collection<JobDependencyNode> getQueuedNodes(@MBeanParamName("jobSelector") JobSelector selector);
 
   /**

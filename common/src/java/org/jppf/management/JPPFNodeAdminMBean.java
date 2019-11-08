@@ -18,7 +18,7 @@
 
 package org.jppf.management;
 
-import java.util.Map;
+import java.util.*;
 
 import org.jppf.classloader.DelegationModel;
 import org.jppf.management.doc.*;
@@ -57,7 +57,7 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean {
    * @throws Exception if an error is raised when invoking the node mbean.
    */
   @MBeanDescription("update the priority of all processing threads")
-  void updateThreadsPriority(@MBeanParamName("") Integer newPriority) throws Exception;
+  void updateThreadsPriority(@MBeanParamName("newPriority") Integer newPriority) throws Exception;
 
   /**
    * Restart the node.
@@ -119,7 +119,9 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean {
    * @since 5.2
    */
   @MBeanDescription("update the configuration properties of the node")
-  void updateConfiguration(@MBeanParamName("cfgUpdates") Map<Object, Object> configUpdates, @MBeanParamName("restartNode") Boolean restart,
+  void updateConfiguration(@MBeanElementType(type = Map.class, parameters = { "java.lang.Object", "java.lang.Object" })
+    @MBeanParamName("cfgUpdates") Map<Object, Object> configUpdates,
+    @MBeanParamName("restartNode") Boolean restart,
     @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
 
   /**
@@ -129,7 +131,8 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    */
   @MBeanDescription("update the configuration properties of the node")
-  void updateConfiguration(@MBeanParamName("configUpdates") Map<Object, Object> configOverrides, @MBeanParamName("restartNode") Boolean restart) throws Exception;
+  void updateConfiguration(@MBeanElementType(type = Map.class, parameters = { "java.lang.Object", "java.lang.Object" })
+    @MBeanParamName("configUpdates") Map<Object, Object> configOverrides, @MBeanParamName("restartNode") Boolean restart) throws Exception;
 
   /**
    * Cancel the job with the specified uuid.

@@ -18,7 +18,7 @@
 
 package org.jppf.load.balancer.persistence;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.management.doc.*;
 
@@ -40,6 +40,7 @@ public interface LoadBalancerPersistenceManagement {
    * @throws LoadBalancerPersistenceException if any error occurs.
    */
   @MBeanDescription("list all the channels that have an entry in the persistence store")
+  @MBeanElementType(type = List.class, parameters = { "java.lang.String" })
   List<String> listAllChannels() throws LoadBalancerPersistenceException;
 
   /**
@@ -49,6 +50,7 @@ public interface LoadBalancerPersistenceManagement {
    * @throws LoadBalancerPersistenceException if any error occurs.
    */
   @MBeanDescription("list all the algorithms for which the specified channel has an entry in the persistence store")
+  @MBeanElementType(type = List.class, parameters = { "java.lang.String" })
   List<String> listAlgorithms(@MBeanParamName("channelID") String channelID) throws LoadBalancerPersistenceException;
   
   /**
@@ -58,6 +60,7 @@ public interface LoadBalancerPersistenceManagement {
    * @throws LoadBalancerPersistenceException if any error occurs.
    */
   @MBeanDescription("list all the channels that have an entry in the persistence store for the specified algorithm")
+  @MBeanElementType(type = List.class, parameters = { "java.lang.String" })
   List<String> listAllChannelsWithAlgorithm(@MBeanParamName("algorithm") String algorithm) throws LoadBalancerPersistenceException;
 
   /**

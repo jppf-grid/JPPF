@@ -61,6 +61,14 @@ class MBeanInfoExplorer {
    * Descriptor field name for whether to exclude an mbean or mbean element when visiting an mbean info tree.
    */
   static final String EXCLUDE_FIELD = "mbean.exclude";
+  /**
+   * Descriptor field name for the raw type of a field or of a method return type.
+   */
+  static final String RAW_TYPE_FIELD = "mbean.raw.type";
+  /**
+   * Descriptor field name for the raw types of a a generic declaration instance.
+   */
+  static final String RAW_TYPE_PARAMS_FIELD = "mbean.raw.type.params";
 
   /**
    * Perform the visit.
@@ -73,7 +81,7 @@ class MBeanInfoExplorer {
   static void visit(final MBeanInfoVisitor visitor, final DriverConnectionInfo connectionInfo, final MBeanFilter mbeanFilter, final MBeanFeatureFilter featureFilter) throws Exception {
     visitor.start(connectionInfo);
     try (final JMXConnectionWrapper jmx = new JMXConnectionWrapper(connectionInfo.getHost(), connectionInfo.getPort(), false)) {
-      if (!jmx.connectAndWait(5000L)) throw new JPPFTimeoutException("could not connect to remote JVM");
+      if (!jmx.connectAndWait(5000L)) throw new JPPFTimeoutException("could not connect to remote JVM " + connectionInfo);
       final MBeanServerConnection mbsc = jmx.getMbeanConnection();
       final Set<ObjectName> names = mbsc.queryNames(ObjectNameCache.getObjectName("org.jppf:*"), null);
       for (final ObjectName name: names) {

@@ -17,7 +17,7 @@
  */
 
 /**
- * Unit tests for <code>org.jppf.management.forwarding</code> classes.
- * @exclude
+ * This package is a place holder for static proxies to nodes MBeans whose requests and notifications are fowrarded through a driver.
+ * <p>Found in: <b>jppf-common.jar</b>
  */
-package test.org.jppf.management.forwarding;
+package org.jppf.management.forwarding.generated;
