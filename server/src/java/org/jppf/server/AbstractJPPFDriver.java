@@ -306,6 +306,7 @@ abstract class AbstractJPPFDriver {
 
   /**
    * @return the MBean handling changes in number of nodes/processing threads.
+   * @exclude
    */
   public PeerDriver getPeerDriver() {
     return peerDriver;
@@ -314,6 +315,7 @@ abstract class AbstractJPPFDriver {
   /**
    * 
    * @param peerDriver the MBean handling changes in number of nodes/processing threads.
+   * @exclude
    */
   public void setPeerDriver(final PeerDriver peerDriver) {
     this.peerDriver = peerDriver;
