@@ -62,7 +62,7 @@ public class HTMLMBeanInfoWriter extends AbstractMBeanInfoWriter<HTMLMBeanInfoWr
     println(applyHeading(inf.substring(inf.lastIndexOf('.') + 1), START_HEADING_LEVEL + 1)).println();
     println("<ul>");
     print("  ").println(applyTag("object name: " + applyTag(name.toString(), "b"), "li"));
-    print("  ").println(applyTag("interface name: " + applyTag(name.toString(), "tt"), "li"));
+    print("  ").println(applyTag("interface name: " + applyTag(formatType(inf), "tt"), "li"));
     final String desc = (String) descriptor.getFieldValue(MBeanInfoExplorer.DESCRIPTION_FIELD);
     if (desc != null) print("  ").println(applyTag("description: " + desc, "li"));
     println("</ul><br>");
@@ -72,7 +72,7 @@ public class HTMLMBeanInfoWriter extends AbstractMBeanInfoWriter<HTMLMBeanInfoWr
       println(applyHeading("Notifications", START_HEADING_LEVEL + 2)).println();
       println("<ul>");
       print("  ").println(applyTag("description: " + notifDesc, "li"));
-      print("  ").println(applyTag("description: " + applyTag(formatType((String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_CLASS_FIELD)), "tt"), "li"));
+      print("  ").println(applyTag("type: " + applyTag(formatType((String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_CLASS_FIELD)), "tt"), "li"));
       final String userDataDesc = (String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_USER_DATA_DESCRIPTION_FIELD);
       final String userDataType = (String) descriptor.getFieldValue(MBeanInfoExplorer.NOTIF_USER_DATA_CLASS_FIELD);
       if (!isEmpty(userDataDesc)) {
@@ -135,7 +135,6 @@ public class HTMLMBeanInfoWriter extends AbstractMBeanInfoWriter<HTMLMBeanInfoWr
       if (name != null) sb.append(' ').append(name);
     }
     
-    //println("<div class='mbean'>%s %s(%s)</div>", handleType(operation.getReturnType(), descriptor), operation.getName(), sb);
     println("<pre class='mbean'>%s %s(%s)</pre>", handleType(operation.getReturnType(), descriptor), operation.getName(), sb);
     println();
   }
