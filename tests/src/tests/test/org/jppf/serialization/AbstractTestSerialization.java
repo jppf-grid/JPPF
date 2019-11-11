@@ -28,9 +28,12 @@ import javax.management.*;
 import org.jppf.management.*;
 import org.jppf.serialization.*;
 import org.jppf.utils.SystemUtils;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
-import test.org.jppf.test.setup.AbstractNonStandardSetup;
+import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Unit tests for the JPPF serialization scheme.
@@ -45,6 +48,27 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Whether the serialization scheme allows non-serializable classes.
    */
   static boolean allowsNonSerializable = true;
+  /** */
+  @Rule
+  public TestWatcher serailzationInstanceWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      BaseTestHelper.printToAll(client, false, false, true, true, true, "start of method %s()", description.getMethodName());
+    }
+  };
+
+  /**
+   * Create the drivers and nodes configuration.
+   * @param prefix prefix to use to locate the configuration files.
+   * @return a {@link TestConfiguration} instance.
+   * @throws Exception if a process could not be started.
+   */
+  protected static TestConfiguration createConfig(final String prefix) throws Exception {
+    final TestConfiguration testConfig = AbstractNonStandardSetup.createConfig(prefix);
+    testConfig.driver.log4j = "classes/tests/config/log4j-driver.serialization.properties";
+    testConfig.node.log4j = "classes/tests/config/log4j-node.serialization.properties";
+    return testConfig;
+  }
 
   /**
    * Test a simple job.
