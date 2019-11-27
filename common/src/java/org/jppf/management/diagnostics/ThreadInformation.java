@@ -27,6 +27,7 @@ import org.slf4j.*;
 
 /**
  * Information about a thread, including the stack trace and associated locks.
+ * This class is a serializable representation of the JDK's {@link ThreadInfo} class.
  * @author Laurent Cohen
  */
 public class ThreadInformation implements Serializable {

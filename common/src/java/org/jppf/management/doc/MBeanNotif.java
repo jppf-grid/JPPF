@@ -23,11 +23,12 @@ import java.lang.annotation.*;
 import javax.management.*;
 
 /**
- * Used to annotate MBean elements with a meaningful descritpion that can be retrieved at runtime.
+ * Used to annotate MBean interfaces with a meaningful descritpion of the notifications they emit.
+ * This description can then be retrieved at runtime.
  * @author Laurent Cohen
  */
-//@Documented
-@Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
+@Documented
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MBeanNotif {
   /**

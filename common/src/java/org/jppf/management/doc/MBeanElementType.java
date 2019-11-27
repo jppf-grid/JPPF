@@ -23,7 +23,8 @@ import java.lang.annotation.*;
 import javax.management.DescriptorKey;
 
 /**
- * Used to annotate MBean elements with a meaningful descritpion that can be retrieved at runtime.
+ * This annotation describes MBean method return types or parmaters types, when the types are instances of generic types.
+ * For instance, a method whch returns {@code List<String>} would be annotated with {@code @MBeanNotif(type = List.class, parameters = { "java.lang.String" })}.
  * @author Laurent Cohen
  */
 //@Documented

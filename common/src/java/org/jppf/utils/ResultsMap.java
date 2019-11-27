@@ -233,7 +233,7 @@ public class ResultsMap<K, V> implements Serializable {
     /**
      * This method does nothing and merely returns {@code null}.
      * @param value not used.
-     * @return {@link null}.
+     * @return {@code null}.
      */
     @Override
     public V setValue(final V value) {

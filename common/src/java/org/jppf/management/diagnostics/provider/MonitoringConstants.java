@@ -19,7 +19,8 @@
 package org.jppf.management.diagnostics.provider;
 
 /**
- * ENumeration of the built-in monitoring data fields.
+ * Enumeration of the built-in monitoring data fields.
+ * These are the names of the properties found in a {@link org.jppf.management.diagnostics.HealthSnapshot HealthSnapshot}.
  * @author Laurent Cohen
  */
 public class MonitoringConstants {

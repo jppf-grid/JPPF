@@ -64,11 +64,15 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * Information that the node is initialized with a .Net bridge and can execute .Net tasks. Value of this constant can be changed in future!
    * @since 5.0
+   * @deprecated the .Net bridge feature is no longer part of JPPF
+   * @exclude
    */
   public static final int DOTNET = 0x0008_0000;
   /**
    * Information that the node is an Android node.
    * @since 5.1
+   * @deprecated the Android node feature is no longer part of JPPF
+   * @exclude
    */
   public static final int ANDROID = 0x0010_0000;
   /**
@@ -309,6 +313,8 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * Determine whether this information represents a node than can execute .Net tasks.
    * @return {@code true} if the node is .Net-capable, {@code false} otherwise.
    * @since 5.0
+   * @deprecated the .Net bridge feature is no longer part of JPPF
+   * @exclude
    */
   public boolean isDotnetCapable() {
     return (type & DOTNET) == DOTNET;
@@ -318,6 +324,8 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * Determine whether this information represents an Android node.
    * @return {@code true} if the node an Android node, {@code false} otherwise.
    * @since 5.1
+   * @deprecated the Android node feature is no longer part of JPPF
+   * @exclude
    */
   public boolean isAndroidNode() {
     return (type & ANDROID) == ANDROID;

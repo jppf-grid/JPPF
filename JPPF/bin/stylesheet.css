@@ -481,6 +481,7 @@ Content styles
 */
 .description pre {
     margin-top:0;
+    white-space: pre-wrap;
 }
 .deprecatedContent {
     margin:0;

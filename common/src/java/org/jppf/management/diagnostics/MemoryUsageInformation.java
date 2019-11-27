@@ -24,7 +24,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
- * A <code>Serializable</code> implementation of {@link MemoryUsage}.
+ * A {@link Serializable} implementation of {@link MemoryUsage}.
  * @author Laurent Cohen
  */
 public class MemoryUsageInformation implements Serializable {

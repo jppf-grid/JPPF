@@ -22,7 +22,8 @@ import java.io.Serializable;
 import java.lang.management.LockInfo;
 
 /**
- * Information about a lock found in a <code>ThreadInfo</code> object.
+ * Information about a lock found in a {@link ThreadInformation} object.
+ * This class is a serializable representation of the JDK's {@link LockInfo} and {@link java.lang.management.MonitorInfo MonitorInfo} classes.
  * @author Laurent Cohen
  */
 public class LockInformation implements Serializable {

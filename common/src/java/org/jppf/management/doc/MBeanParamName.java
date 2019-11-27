@@ -23,7 +23,7 @@ import java.lang.annotation.*;
 import javax.management.DescriptorKey;
 
 /**
- * Used to annotate MBean elements with a meaningful descritpion that can be retrieved at runtime.
+ * Used to annotate MBean method or constructor parametrs to assign them a meaningful nme, which can be applied to the automatically generated docupentation.
  * @author Laurent Cohen
  */
 //@Documented

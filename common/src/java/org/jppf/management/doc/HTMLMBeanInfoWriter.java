@@ -27,13 +27,13 @@ import org.jppf.discovery.DriverConnectionInfo;
 import org.jppf.utils.StringUtils;
 
 /**
- * Visits the JPPF MBean in a remote JVM and generates a reference documentation page
- * in wikimedia format.
+ * Visits the JPPF MBean in a remote JVM and generates a reference documentation page in HTML format.
+ * The intent is to be able to copy  the HTLK page and paste it into a Libre Office document, with minimal manual reformatting.
  * @author Laurent Cohen
  */
 public class HTMLMBeanInfoWriter extends AbstractMBeanInfoWriter<HTMLMBeanInfoWriter> {
   /**
-   * 
+   * The highest headling level used in the generated HTML.
    */
   private static final int START_HEADING_LEVEL = 3;
 

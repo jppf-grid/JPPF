@@ -23,7 +23,7 @@ import java.lang.management.*;
 import java.util.*;
 
 /**
- * This class encapsulates a JVM thread dump, including dealocks information when available.
+ * This class encapsulates a JVM thread dump, including deadlocks information when available.
  * @author Laurent Cohen
  */
 public class ThreadDump implements Serializable {
@@ -57,7 +57,7 @@ public class ThreadDump implements Serializable {
 
   /**
    * Get information on the threads.
-   * @return a mapping of {@link ThreadInformation} objects to their thread id, or <code>null</code> if no thread information is available.
+   * @return a mapping of {@link ThreadInformation} objects to their thread id, or {@code null} if no thread information is available.
    */
   public Map<Long, ThreadInformation> getThreads() {
     return threads;
@@ -65,7 +65,7 @@ public class ThreadDump implements Serializable {
 
   /**
    * Get the ids of the deadlock threads, if any.
-   * @return the ids as an array of <code>long</code> values, or <code>null</code> if none exists.
+   * @return the ids as an array of {@code long} values, or {@code null} if none exists.
    */
   public long[] getDeadlockedThreads() {
     return deadlockedThreads;

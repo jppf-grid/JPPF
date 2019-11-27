@@ -27,8 +27,8 @@ import org.jppf.discovery.DriverConnectionInfo;
 import org.jppf.utils.StringUtils;
 
 /**
- * Visits the JPPF MBean in a remote JVM and generates a reference documentation page
- * in wikimedia format.
+ * Visits the JPPF MBean in a remote JVM and generates a reference documentation page in wikimedia format.
+ * The intent is to copy/paste the generated wikimedia markup into the JPPF online doc wiki.
  * @author Laurent Cohen
  */
 public class WikiMBeanInfoWriter extends AbstractMBeanInfoWriter<WikiMBeanInfoWriter> {

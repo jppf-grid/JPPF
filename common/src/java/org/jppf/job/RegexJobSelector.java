@@ -23,7 +23,7 @@ import java.util.regex.*;
 import org.jppf.node.protocol.JPPFDistributedJob;
 
 /**
- * Performs a regular expression match test comparison between pn either a job name or a job metadata value specified by its key.
+ * Performs a regular expression match on either a job name or a job metadata value specified by its key.
  * If the specified metadata key is {@code null}, is not part of a job's metadata, or is not a string, then this selector's {@code accepts()} method will return {@code false}. 
  * @author Laurent Cohen
  * @since 6.2
