@@ -236,6 +236,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   public JPPFManagementInfo getManagementInfo() {
     try {
       final JMXServer server = getJmxServer();
+      @SuppressWarnings("deprecation")
       final int type = NODE
         | (isMasterNode() ? MASTER : (isSlaveNode() ? SLAVE : 0))
         | (isAndroid() ? ANDROID : 0)

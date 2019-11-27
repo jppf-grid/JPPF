@@ -106,6 +106,7 @@ public class AsyncNodeMessageHandler {
    * @param message the handshake response.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("deprecation")
   public void handshakeReceived(final AsyncNodeContext context, final AbstractTaskBundleMessage message)  throws Exception {
     final NodeBundleResults received = context.deserializeBundle(message);
     if (debugEnabled) log.debug("received handshake response for channel {} : {}", context, received);
