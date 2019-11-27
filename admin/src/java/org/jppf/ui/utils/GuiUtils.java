@@ -225,6 +225,7 @@ public final class GuiUtils {
    * @param node the node for which to compute the key.
    * @return the icon cache key as a string.
    */
+  @SuppressWarnings("deprecation")
   public static String computeNodeIconKey(final TopologyNode node) {
     final StringBuilder sb = new StringBuilder("node");
     final JPPFManagementInfo info = node.getManagementInfo();

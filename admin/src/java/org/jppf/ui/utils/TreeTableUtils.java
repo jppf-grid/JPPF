@@ -79,6 +79,7 @@ public final class TreeTableUtils {
    * @param info represents the the node.
    * @return the path to an icon.
    */
+  @SuppressWarnings("deprecation")
   public static String getNodeIconPath(final JPPFManagementInfo info) {
     if (info.isMasterNode()) return info.isDotnetCapable() ? AbstractTreeCellRenderer.NODE_MASTER_DOTNET_ICON : AbstractTreeCellRenderer.NODE_MASTER_ICON;
     return info.isDotnetCapable() ? AbstractTreeCellRenderer.NODE_DOTNET_ICON : AbstractTreeCellRenderer.NODE_ICON;
