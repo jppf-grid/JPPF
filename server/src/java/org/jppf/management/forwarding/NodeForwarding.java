@@ -74,7 +74,7 @@ public class NodeForwarding extends AbstractNodeForwarding implements NodeForwar
   }
 
   @Override
-  public <E> ResultsMap<String, E> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
+  public ResultsMap<String, Void> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
     return forward(JMXHelper.SET_ATTRIBUTE, selectionHelper.getChannels(selector), name, attribute, value);
   }
 

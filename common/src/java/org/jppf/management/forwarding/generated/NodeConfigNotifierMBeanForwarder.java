@@ -21,7 +21,7 @@ package org.jppf.management.forwarding.generated;
 import javax.management.Notification;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.NodeConfigNotifierMBean;
-import org.jppf.management.forwarding.AbstractNodeForwardingProxy;
+import org.jppf.management.forwarding.AbstractMBeanForwarder;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -33,7 +33,7 @@ import org.jppf.utils.TypedProperties;
  * <br>- user data type: {@link TypedProperties}.
  * @since 6.2
  */
-public class NodeConfigNotifierMBeanForwarder extends AbstractNodeForwardingProxy {
+public class NodeConfigNotifierMBeanForwarder extends AbstractMBeanForwarder {
   /**
    * Initialize this proxy.
    * @param jmx a {@link JMXDriverConnectionWrapper} instance.

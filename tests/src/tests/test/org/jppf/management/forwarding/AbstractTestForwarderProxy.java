@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.jppf.management.forwarding.AbstractNodeForwardingProxy;
+import org.jppf.management.forwarding.AbstractMBeanForwarder;
 import org.jppf.utils.*;
 
 import test.org.jppf.test.setup.*;
@@ -51,11 +51,11 @@ public class AbstractTestForwarderProxy extends Setup1D2N1C {
   /**
    * Get a forwarding proxy for the specified node MBean interface.
    * @param inf the node MBean interface
-   * @return an iinstance of a subclass of {@link AbstractNodeForwardingProxy}.
+   * @return an iinstance of a subclass of {@link AbstractMBeanForwarder}.
    * @throws Exception if any error occurs.
    */
-  protected static AbstractNodeForwardingProxy getForwardingProxy(final Class<?> inf) throws Exception {
-    return BaseSetup.getJMXConnection().getForwardingProxy(inf);
+  protected static AbstractMBeanForwarder getForwardingProxy(final Class<?> inf) throws Exception {
+    return BaseSetup.getJMXConnection().getMBeanForwarder(inf);
   }
 
   /**

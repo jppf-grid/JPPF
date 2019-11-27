@@ -21,7 +21,7 @@ package org.jppf.management.forwarding.generated;
 import javax.management.Notification;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.NodeSelector;
-import org.jppf.management.forwarding.AbstractNodeForwardingProxy;
+import org.jppf.management.forwarding.AbstractMBeanForwarder;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.node.provisioning.JPPFProvisioningInfo;
 import org.jppf.utils.ResultsMap;
@@ -35,7 +35,7 @@ import org.jppf.utils.TypedProperties;
  * <br>- user data type: {@link JPPFProvisioningInfo}.
  * @since 6.2
  */
-public class JPPFNodeProvisioningMBeanForwarder extends AbstractNodeForwardingProxy {
+public class JPPFNodeProvisioningMBeanForwarder extends AbstractMBeanForwarder {
   /**
    * Initialize this proxy.
    * @param jmx a {@link JMXDriverConnectionWrapper} instance.

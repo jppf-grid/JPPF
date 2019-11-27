@@ -30,31 +30,31 @@ import org.jppf.utils.ResultsMap;
  * @author Laurent Cohen
  * @since 6.2
  */
-public class AbstractNodeForwardingProxy {
+public class AbstractMBeanForwarder {
   /**
    * A wrapper for the JMX connection to the driver.
    */
-  protected final JMXDriverConnectionWrapper jmx;
+  private final JMXDriverConnectionWrapper jmx;
   /**
    * Proxy to the node forwarding MBean in the driver.
    */
-  protected final NodeForwardingMBean forwarder;
+  private final NodeForwardingMBean forwarder;
   /**
    * The mbean name of the MBean to which the methods apply.
    */
-  protected final String mbeanName;
+  private final String mbeanName;
   /**
-   * 
+   * The set of lisnterIds for the notification listners registered with this proxy instance. 
    */
   private final Set<String> listenerIDs = new HashSet<>();
 
   /**
-   * 
+   * Initialize this forwarding proxy with the specified driver jmx connection and mbean name. 
    * @param jmx a wrapper for the JMX connection to the driver.
    * @param mbeanName the name of the mbean to proxy for.
    * @throws Exception if any error occurs.
    */
-  public AbstractNodeForwardingProxy(final JMXDriverConnectionWrapper jmx, final String mbeanName) throws Exception {
+  public AbstractMBeanForwarder(final JMXDriverConnectionWrapper jmx, final String mbeanName) throws Exception {
     this.jmx = jmx;
     this.forwarder = jmx.getForwarder();
     this.mbeanName = mbeanName;
@@ -63,7 +63,7 @@ public class AbstractNodeForwardingProxy {
   /**
    * Invoke a method on the specified MBean of the selected nodes attached to the driver.
    * @param <E> the type of results.
-   * @param selector a filter on the nodes attached tot he driver, determines the nodes to which this method applies.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes this method applies to.
    * @param methodName the name of the method to invoke.
    * @param params the method parameter values.
    * @param signature the types of the method parameters.
@@ -79,7 +79,7 @@ public class AbstractNodeForwardingProxy {
    * Convenience method to invoke an MBean method that has no parameter.
    * <br/>This is equivalent to calling {@code forwardInvoke(selector, name, methodName, (Object[]) null, (String[]) null)}.
    * @param <E> the type of results.
-   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes this method applies to.
    * @param methodName the name of the method to invoke.
    * @return a mapping of node uuids to the result of invoking the MBean method on the corresponding node. Each result may be an exception.
    * <br/>Additionally, each result may be {@code null}, in particular if the invoked method has a {@code void} return type.
@@ -92,7 +92,7 @@ public class AbstractNodeForwardingProxy {
   /**
    * Get the value of an attribute of the specified MBean for each specified node.
    * @param <E> the type of results.
-   * @param selector a filter on the nodes attached tot he driver, determines the nodes to which this method applies.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes this method applies to.
    * @param attribute the name of the MBean attribute to read.
    * @return a mapping of node uuids to the result of getting the MBean attribute on the corresponding node. Each result may be an exception.
    * @throws Exception if the invocation failed.
@@ -104,7 +104,7 @@ public class AbstractNodeForwardingProxy {
   /**
    * Set the value of an attribute of the specified MBean on the specified nodes attached to the driver.
    * @param <E> the type of the value to set.
-   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes this method applies to.
    * @param attribute the name of the MBean attribute to set.
    * @param value the value to set on the attribute.
    * @return a mapping of node uuids to an eventual exception resulting from setting the MBean attribute on the corresponding node.
@@ -115,8 +115,8 @@ public class AbstractNodeForwardingProxy {
   }
 
   /**
-   * Adds a listener to this MBean for all selected nodes.
-   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * Add a listener to the MBean for all selected nodes, without filter or handback object.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes this method applies to.
    * @param listener The listener object which will handle the notifications emitted by the broadcaster.
    * @return a string which uniquely identifies the registered notification listener.
    * @throws Exception if any error occurs.
@@ -126,10 +126,10 @@ public class AbstractNodeForwardingProxy {
   }
 
   /**
-   * Adds a listener to this MBean for all selected nodes.
-   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * Add a listener to the MBean for all selected nodes.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes this method applies to.
    * @param listener The listener object which will handle the notifications emitted by the broadcaster.
-   * @param filter The filter object. If filter is null, no
+   * @param filter The filter object. If filter is null, no filtering occurs.
    * @param handback An opaque object to be sent back to the listener when a notification is emitted
    * @return a string which uniquely identifies the registered notification listener.
    * @throws Exception if any error occurs.
@@ -141,7 +141,7 @@ public class AbstractNodeForwardingProxy {
   }
 
   /**
-   * Removes a listener from this MBean. 
+   * Remove a listener from this MBean forwarder. 
    * @param listenerID a string which uniquely identifies the notification listener to remove.
    * @throws Exception if any error occurs.
    */

@@ -20,7 +20,6 @@ package org.jppf.management;
 
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.*;
 
 import javax.management.MBeanServerConnection;
@@ -114,10 +113,6 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * Used to synchronize during the connection process.
    */
   final Object connectionLock = new Object();
-  /**
-   * The list of listeners to this connection wrapper.
-   */
-  final List<JMXConnectionWrapperListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * The time at which connection attempts started.
    */
@@ -278,14 +273,6 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
 
   /**
    * Get the host the server is running on.
-   * @return the host as a string.
-   */
-  public String getHost() {
-    return host;
-  }
-
-  /**
-   * Get the host the server is running on.
    * @param host the host as a string.
    */
   private void setHost(final String host) {
@@ -316,38 +303,6 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   }
 
   /**
-   * Add a listener to this connection wrapper.
-   * @param listener the listener to add.
-   */
-  public void addJMXConnectionWrapperListener(final JMXConnectionWrapperListener listener) {
-    listeners.add(listener);
-  }
-
-  /**
-   * Remove a listener from this connection wrapper.
-   * @param listener the listener to add.
-   */
-  public void removeJMXConnectionWrapperListener(final JMXConnectionWrapperListener listener) {
-    listeners.remove(listener);
-  }
-
-  /**
-   * Notify all listeners that the connection was successful.
-   */
-  void fireConnected() {
-    final JMXConnectionWrapperEvent event = new JMXConnectionWrapperEvent(this);
-    for (final JMXConnectionWrapperListener listener: listeners) listener.onConnected(event);
-  }
-
-  /**
-   * Notify all listeners that the connection could not be established before reaching the timeout.
-   */
-  void fireTimeout() {
-    final JMXConnectionWrapperEvent event = new JMXConnectionWrapperEvent(this);
-    for (final JMXConnectionWrapperListener listener: listeners) listener.onConnectionTimeout(event);
-  }
-
-  /**
    * @return Whether this connection wrapper reconnects on error.
    * @exclude
    */
@@ -367,6 +322,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   /**
    * Get the JMX remote protocol used.
    * @return the JMX remote protocol string.
+   * @exclude
    */
   public String getProtocol() {
     return protocol;
@@ -379,4 +335,14 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   public Throwable getLastConnectionException() {
     return lastConnectionException;
   }
+
+  /**
+   * Notify all listeners that the connection was successful.
+   */
+  abstract void fireConnected();
+
+  /**
+   * Notify all listeners that the connection could not be established before reaching the timeout.
+   */
+  abstract void fireTimeout();
 }

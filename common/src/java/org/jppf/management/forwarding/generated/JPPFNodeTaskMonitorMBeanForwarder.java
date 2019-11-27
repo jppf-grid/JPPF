@@ -22,7 +22,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.JPPFNodeTaskMonitorMBean;
 import org.jppf.management.NodeSelector;
 import org.jppf.management.TaskExecutionNotification;
-import org.jppf.management.forwarding.AbstractNodeForwardingProxy;
+import org.jppf.management.forwarding.AbstractMBeanForwarder;
 import org.jppf.utils.ResultsMap;
 
 /**
@@ -34,7 +34,7 @@ import org.jppf.utils.ResultsMap;
  * <br>- user data type: any type.
  * @since 6.2
  */
-public class JPPFNodeTaskMonitorMBeanForwarder extends AbstractNodeForwardingProxy {
+public class JPPFNodeTaskMonitorMBeanForwarder extends AbstractMBeanForwarder {
   /**
    * Initialize this proxy.
    * @param jmx a {@link JMXDriverConnectionWrapper} instance.

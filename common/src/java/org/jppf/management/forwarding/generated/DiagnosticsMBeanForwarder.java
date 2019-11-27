@@ -24,7 +24,7 @@ import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.management.diagnostics.MemoryInformation;
 import org.jppf.management.diagnostics.ThreadDump;
-import org.jppf.management.forwarding.AbstractNodeForwardingProxy;
+import org.jppf.management.forwarding.AbstractMBeanForwarder;
 import org.jppf.utils.ResultsMap;
 
 /**
@@ -32,7 +32,7 @@ import org.jppf.utils.ResultsMap;
  * MBean description: management and monitoring of the JVM health.
  * @since 6.2
  */
-public class DiagnosticsMBeanForwarder extends AbstractNodeForwardingProxy {
+public class DiagnosticsMBeanForwarder extends AbstractMBeanForwarder {
   /**
    * Initialize this proxy.
    * @param jmx a {@link JMXDriverConnectionWrapper} instance.

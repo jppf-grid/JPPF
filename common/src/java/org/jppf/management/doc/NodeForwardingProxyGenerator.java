@@ -24,7 +24,7 @@ import javax.management.*;
 
 import org.jppf.discovery.DriverConnectionInfo;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.AbstractNodeForwardingProxy;
+import org.jppf.management.forwarding.AbstractMBeanForwarder;
 import org.jppf.utils.*;
 
 /**
@@ -62,7 +62,7 @@ public class NodeForwardingProxyGenerator extends AbstractForwardingCodeGenerato
     }
     println(" * @since 6.2");
     println(" */");
-    println("public class " + className + " extends " + AbstractNodeForwardingProxy.class.getSimpleName() + " {");
+    println("public class " + className + " extends " + AbstractMBeanForwarder.class.getSimpleName() + " {");
     println("  /**");
     println("   * Initialize this proxy.");
     println("   * @param jmx a {@link %s} instance.", JMXDriverConnectionWrapper.class.getSimpleName());
@@ -75,7 +75,7 @@ public class NodeForwardingProxyGenerator extends AbstractForwardingCodeGenerato
 
   @Override
   void finalizeImports(final ObjectName name, final MBeanInfo info) throws Exception {
-    importedTypes.add(AbstractNodeForwardingProxy.class.getName());
+    importedTypes.add(AbstractMBeanForwarder.class.getName());
     importedTypes.add(JMXDriverConnectionWrapper.class.getName());
     if ((nbAttributes > 0) || (nbOperations > 0)) {
       importedTypes.add(ResultsMap.class.getName());

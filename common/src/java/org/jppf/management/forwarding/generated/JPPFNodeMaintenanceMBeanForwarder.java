@@ -21,7 +21,7 @@ package org.jppf.management.forwarding.generated;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.JPPFNodeMaintenanceMBean;
 import org.jppf.management.NodeSelector;
-import org.jppf.management.forwarding.AbstractNodeForwardingProxy;
+import org.jppf.management.forwarding.AbstractMBeanForwarder;
 import org.jppf.utils.ResultsMap;
 
 /**
@@ -29,7 +29,7 @@ import org.jppf.utils.ResultsMap;
  * MBean description: maintenance operations on the nodes.
  * @since 6.2
  */
-public class JPPFNodeMaintenanceMBeanForwarder extends AbstractNodeForwardingProxy {
+public class JPPFNodeMaintenanceMBeanForwarder extends AbstractMBeanForwarder {
   /**
    * Initialize this proxy.
    * @param jmx a {@link JMXDriverConnectionWrapper} instance.

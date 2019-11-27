@@ -26,7 +26,7 @@ import org.jppf.management.JPPFNodeState;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.management.NodePendingAction;
 import org.jppf.management.NodeSelector;
-import org.jppf.management.forwarding.AbstractNodeForwardingProxy;
+import org.jppf.management.forwarding.AbstractMBeanForwarder;
 import org.jppf.utils.ResultsMap;
 
 /**
@@ -34,7 +34,7 @@ import org.jppf.utils.ResultsMap;
  * MBean description: management and monitoring of a JPPF node.
  * @since 6.2
  */
-public class JPPFNodeAdminMBeanForwarder extends AbstractNodeForwardingProxy {
+public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
   /**
    * Initialize this proxy.
    * @param jmx a {@link JMXDriverConnectionWrapper} instance.

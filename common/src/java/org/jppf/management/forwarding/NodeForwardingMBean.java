@@ -47,7 +47,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * Invoke a method on the specified MBean of the selected nodes attached to the driver.
    * @param <E> the type of results.
    * @param selector a filter on the nodes attached tot he driver, determines the nodes to which this method applies.
-   * @param name the name of the MBean.
+   * @param mbeanName the name of the MBean.
    * @param methodName the name of the method to invoke.
    * @param params the method parameter values.
    * @param signature the types of the method parameters.
@@ -57,7 +57,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    */
   @MBeanDescription("invoke a method on the specified MBean of the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "E" })
-  <E> ResultsMap<String, E> forwardInvoke(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name, @MBeanParamName("methodName") String methodName,
+  <E> ResultsMap<String, E> forwardInvoke(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String mbeanName, @MBeanParamName("methodName") String methodName,
     @MBeanParamName("params") Object[] params, @MBeanParamName("signature") String[] signature) throws Exception;
 
   /**
@@ -65,7 +65,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * <br/>This is equivalent to calling {@code forwardInvoke(selector, name, methodName, (Object[]) null, (String[]) null)}.
    * @param <E> the type of results.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
-   * @param name the name of the node MBean to invoke.
+   * @param mbeanName the name of the node MBean to invoke.
    * @param methodName the name of the method to invoke.
    * @return a mapping of node uuids to the result of invoking the MBean method on the corresponding node. Each result may be an exception.
    * <br/>Additionally, each result may be {@code null}, in particular if the invoked method has a {@code void} return type.
@@ -73,36 +73,35 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    */
   @MBeanDescription("invoke an MBean method with no parameter on the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "E" })
-  <E> ResultsMap<String, E> forwardInvoke(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name,
+  <E> ResultsMap<String, E> forwardInvoke(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String mbeanName,
     @MBeanParamName("methodName") String methodName) throws Exception;
 
   /**
    * Get the value of an attribute of the specified MBean for each specified node.
    * @param <E> the type of results.
    * @param selector a filter on the nodes attached tot he driver, determines the nodes to which this method applies.
-   * @param name the name of the MBean to invoke for each node.
+   * @param mbeanName the name of the MBean to invoke for each node.
    * @param attribute the name of the MBean attribute to read.
    * @return a mapping of node uuids to the result of getting the MBean attribute on the corresponding node. Each result may be an exception.
    * @throws Exception if the invocation failed.
    */
   @MBeanDescription("get the value of an attribute of the specified MBean for each selected node")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "E" })
-  <E> ResultsMap<String, E> forwardGetAttribute(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name,
+  <E> ResultsMap<String, E> forwardGetAttribute(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String mbeanName,
     @MBeanParamName("attribute") String attribute) throws Exception;
 
   /**
    * Set the value of an attribute of the specified MBean on the specified nodes attached to the driver.
-   * @param <E> the type of results.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
-   * @param name the name of the MBean to invoke for each node.
+   * @param mbeanName the name of the MBean to invoke for each node.
    * @param attribute the name of the MBean attribute to set.
    * @param value the value to set on the attribute.
    * @return a mapping of node uuids to an eventual exception resulting from setting the MBean attribute on the corresponding node.
    * @throws Exception if the invocation failed.
    */
   @MBeanDescription("set the value of an attribute of the specified MBean on the selected nodes")
-  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "E" })
-  <E> ResultsMap<String, E> forwardSetAttribute(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String name, @MBeanParamName("attribute") String attribute,
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
+  ResultsMap<String, Void> forwardSetAttribute(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("mbeanName") String mbeanName, @MBeanParamName("attribute") String attribute,
     @MBeanParamName("value") Object value) throws Exception;
 
   /**
@@ -111,6 +110,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @return a mapping of node uuids to the result of invoking the MBean method on the corresponding node.
    * Each result may be either a {@link org.jppf.management.JPPFNodeState} object, or an exception if the invocation failed for the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#state()
    */
   @MBeanDescription("get the latest state information from the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "org.jppf.management.JPPFNodeState" })
@@ -122,6 +122,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param size the size as an int.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(Integer)
    */
   @MBeanDescription("set the number of processing threads on the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -133,6 +134,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param newPriority the new priority to set.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if an error is raised when invoking the node mbean.
+   * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(Integer)
    */
   @MBeanDescription("set the priority of the processing threads on the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -143,6 +145,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#restart()
    */
   @MBeanDescription("restart the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -154,6 +157,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param interruptIfRunning whether to restart immediately or wait until each node is idle.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#restart(Boolean)
    */
   @MBeanDescription("restart the selected nodes, specifying whther to wait until they are no longer executing jobs")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -164,6 +168,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#shutdown()
    */
   @MBeanDescription("shutdown the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -175,6 +180,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param interruptIfRunning whether to shutdown immediately or wait until each node is idle.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#shutdown(Boolean)
    */
   @MBeanDescription("shutdown the selected nodes, specifying whther to wait until they are no longer executing jobs")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -185,6 +191,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#resetTaskCounter()
    */
   @MBeanDescription("reset the executed tasks count on the selected nodes to zero")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -196,6 +203,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param n the number to set the task counter to.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#setTaskCounter(Integer)
    */
   @MBeanDescription("set the executed tasks count on the selected nodes to a specified value")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -210,6 +218,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * This parameter only applies when the {@code restart} parameter is {@code true}.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(Map, Boolean, Boolean)
    */
   @MBeanDescription("update the configuration properties of the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -223,6 +232,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param restart specifies whether the node should be restarted after updating the properties.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(Map, Boolean)
    */
   @MBeanDescription("update the configuration properties of the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -236,6 +246,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param requeue true if the job should be requeued on the server side, false otherwise.
    * @return a mapping of node uuids to an eventual exception resulting invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(String, Boolean)
    */
   @MBeanDescription("cancel the job with the specified uuid in the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -248,6 +259,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * Each result may be either a {@link DelegationModel} enum value, or an exception if the invocation failed for the corresponding node.
    * @throws Exception if any error occurs.
    * @see org.jppf.classloader.AbstractJPPFClassLoader#getDelegationModel()
+   * @see org.jppf.management.JPPFNodeAdminMBean#getDelegationModel()
    */
   @MBeanDescription("get the current class loader delegation model for the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "org.jppf.classloader.DelegationModel" })
@@ -261,6 +273,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
    * @see org.jppf.classloader.AbstractJPPFClassLoader#setDelegationModel(org.jppf.classloader.DelegationModel)
+   * @see org.jppf.management.JPPFNodeAdminMBean#setDelegationModel(DelegationModel)
    */
   @MBeanDescription("set the class loader delegation model onr the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -271,6 +284,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#systemInformation()
    */
   @MBeanDescription("get the system information for the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "org.jppf.management.JPPFSystemInformation" })
@@ -281,6 +295,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.diagnostics.DiagnosticsMBean#healthSnapshot()
    */
   @MBeanDescription("get a JVM health snapshot for the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "org.jppf.management.diagnostics.HealthSnapshot" })
@@ -291,6 +306,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.diagnostics.DiagnosticsMBean#gc()
    */
   @MBeanDescription("invoke System.gc(} on the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -301,6 +317,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to a string holding the path to the heap dump in each node's file system.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.diagnostics.DiagnosticsMBean#heapDump()
    */
   @MBeanDescription("trigger a heap dump on the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.String" })
@@ -311,6 +328,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.management.diagnostics.DiagnosticsMBean#threadDump()
    */
   @MBeanDescription("get a thread dump for the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "org.jppf.management.diagnostics.ThreadDump" })
@@ -322,6 +340,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @return a mapping of node uuids to either an {@code int} corresponding to the number of slaves provisioned by the node,
    * or an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.node.provisioning.JPPFNodeProvisioningMBean#getNbSlaves()
    */
   @MBeanDescription("get the number of provisioned slave nodes for the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Integer" })
@@ -334,6 +353,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param nbNodes the number of slave nodes to reach.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.node.provisioning.JPPFNodeProvisioningMBean#provisionSlaveNodes(int)
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -346,6 +366,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.node.provisioning.JPPFNodeProvisioningMBean#provisionSlaveNodes(int, boolean)
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes, specifying whether to wait for slave nodes to be idle before stopping them")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -360,6 +381,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param configOverrides the configuration overrides to apply.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.node.provisioning.JPPFNodeProvisioningMBean#provisionSlaveNodes(int, TypedProperties)
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes, specifying configuration overrides")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
@@ -375,6 +397,7 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
    * @param configOverrides the configuration overrides to apply.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * @throws Exception if any error occurs.
+   * @see org.jppf.node.provisioning.JPPFNodeProvisioningMBean#provisionSlaveNodes(int, boolean, TypedProperties)
    */
   @MBeanDescription("make a slave node provisioning request to the selected nodes, specifying configuration overrides")
   @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })

@@ -264,7 +264,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   /**
-   * Register a notification listener which will receive notifications from from the specified MBean on the selected nodes.
+   * Register a notification listener which will receive notifications from the specified MBean on the selected nodes.
    * @param selector determines which nodes will be selected.
    * @param mBeanName the name of the MBean from which to receive notificaztions from the selected nodes.
    * @param listener the listener to register.
@@ -290,7 +290,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   /**
-   * Unregister a previously registered forwarding notification listener.
+   * Unregister a previously registered forwarding notification listeners.
    * @param listenerID the id of a listener previously registered with {@link #registerForwardingNotificationListener(NodeSelector,String,NotificationListener,NotificationFilter,Object)}.
    * @throws Exception if the listener with this id was not found or if any other error occurss.
    */
@@ -409,7 +409,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
     return getProxy(NodeForwardingMBean.MBEAN_NAME, NodeForwardingMBean.class);
   }
 
-
   /**
    * This convenience method creates a proxy to the driver's mbean which forwards requests to its nodes.
    * It is equivalent to calling the more cumbersome {@code getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class)}.
@@ -472,15 +471,16 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   /**
-   * 
+   * Create a forwarding proxy for the specified node MBean.
    * @param <E> the type of mbean interface.
-   * @param inf the MBean nterface.
+   * @param mbeanInterface the class of the node MBean nterface.
    * @return a forwarding proxy to the specified MBean.
    * @throws Exception if any error occurs.
    * @since 6.2
    */
-  public <E> AbstractNodeForwardingProxy getForwardingProxy(final Class<E> inf) throws Exception {
-    final String proxyClassName = "org.jppf.management.forwarding.generated." + inf.getSimpleName() + "Forwarder";
+  @SuppressWarnings("unchecked")
+  public <E extends AbstractMBeanForwarder> E getMBeanForwarder(final Class<?> mbeanInterface) throws Exception {
+    final String proxyClassName = "org.jppf.management.forwarding.generated." + mbeanInterface.getSimpleName() + "Forwarder";
     Class<?> clazz = null;
     try {
       clazz = Class.forName(proxyClassName);
@@ -488,6 +488,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
       throw new ClassNotFoundException("could not find a class named " + proxyClassName, e);
     }
     final Constructor<?> c = clazz.getConstructor(getClass());
-    return (AbstractNodeForwardingProxy) c.newInstance(this);
+    return (E) c.newInstance(this);
   }
 }

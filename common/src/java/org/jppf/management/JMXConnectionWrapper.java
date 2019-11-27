@@ -21,6 +21,8 @@ package org.jppf.management;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.management.*;
 import javax.management.remote.*;
@@ -28,7 +30,7 @@ import javax.management.remote.*;
 import org.jppf.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -48,6 +50,10 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    * Determines whether debug log statements are enabled.
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * The list of listeners to this connection wrapper.
+   */
+  final List<JMXConnectionWrapperListener> listeners = new CopyOnWriteArrayList<>();
 
   /**
    * Initialize a local connection (same JVM) to the MBean server.
@@ -144,24 +150,24 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
 
   /**
    * Invoke a method on the specified MBean.
-   * @param name the name of the MBean.
+   * @param mbeanName the name of the MBean.
    * @param methodName the name of the method to invoke.
    * @param params the method parameter values.
    * @param signature the types of the method parameters.
    * @return an object or null.
    * @throws Exception if the invocation failed.
    */
-  public Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
+  public Object invoke(final String mbeanName, final String methodName, final Object[] params, final String[] signature) throws Exception {
     if (!isConnected()) {
-      log.warn("invoking mbean '{}' method '{}({})' while not connected", name, methodName, (signature == null ? "" : StringUtils.arrayToString(signature)));
+      log.warn("invoking mbean '{}' method '{}({})' while not connected", mbeanName, methodName, (signature == null ? "" : StringUtils.arrayToString(signature)));
       return null;
     }
     Object result = null;
     try {
-      final ObjectName mbeanName = ObjectNameCache.getObjectName(name);
-      result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
+      final ObjectName objectName = ObjectNameCache.getObjectName(mbeanName);
+      result = getMbeanConnection().invoke(objectName, methodName, params, signature);
     } catch(final IOException e) {
-      final String msg = String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", name, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e));
+      final String msg = String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", mbeanName, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e));
       if (debugEnabled) log.debug(msg);
       reset();
     }
@@ -172,31 +178,31 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    * Invoke a method on the specified MBean.
    * This is a convenience method to be used when invoking a remote MBean method with no parameters.<br/>
    * This is equivalent to calling <code>invoke(name, methodName, (Object[]) null, (String[]) null)</code>.
-   * @param name the name of the MBean.
+   * @param mbeanName the name of the MBean.
    * @param methodName the name of the method to invoke.
    * @return an object or null.
    * @throws Exception if the invocation failed.
    */
-  public Object invoke(final String name, final String methodName) throws Exception {
-    return invoke(name, methodName, (Object[]) null, (String[]) null);
+  public Object invoke(final String mbeanName, final String methodName) throws Exception {
+    return invoke(mbeanName, methodName, (Object[]) null, (String[]) null);
   }
 
   /**
    * Get the value of an attribute of the specified MBean.
-   * @param name the name of the MBean.
+   * @param mbeanName the name of the MBean.
    * @param attribute the name of the attribute to read.
    * @return an object or null.
    * @throws Exception if the invocation failed.
    */
-  public Object getAttribute(final String name, final String attribute) throws Exception {
+  public Object getAttribute(final String mbeanName, final String attribute) throws Exception {
     if (!isConnected()) {
-      log.warn("getting mbean '{}' attribute '{}' while not connected", name, attribute);
+      log.warn("getting mbean '{}' attribute '{}' while not connected", mbeanName, attribute);
       return null;
     }
     Object result = null;
     try {
-      final ObjectName mbeanName = ObjectNameCache.getObjectName(name);
-      result = getMbeanConnection().getAttribute(mbeanName, attribute);
+      final ObjectName objectName = ObjectNameCache.getObjectName(mbeanName);
+      result = getMbeanConnection().getAttribute(objectName, attribute);
     } catch(final IOException e) {
       if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
       reset();
@@ -207,24 +213,32 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
 
   /**
    * Set the value of an attribute of the specified MBean.
-   * @param name the name of the MBean.
+   * @param mbeanName the name of the MBean.
    * @param attribute the name of the attribute to write.
    * @param value the value to set on the attribute.
    * @throws Exception if the invocation failed.
    */
-  public void setAttribute(final String name, final String attribute, final Object value) throws Exception {
+  public void setAttribute(final String mbeanName, final String attribute, final Object value) throws Exception {
     if (!isConnected()) {
-      log.warn("setting mbean '{}' attribute '{}' while not connected", name, attribute);
+      log.warn("setting mbean '{}' attribute '{}' while not connected", mbeanName, attribute);
       return;
     }
     try {
-      final ObjectName mbeanName = ObjectNameCache.getObjectName(name);
-      getMbeanConnection().setAttribute(mbeanName, new Attribute(attribute, value));
+      final ObjectName objectnName = ObjectNameCache.getObjectName(mbeanName);
+      getMbeanConnection().setAttribute(objectnName, new Attribute(attribute, value));
     } catch(final IOException e) {
       if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
       reset();
       throw e;
     }
+  }
+
+  /**
+   * Get the host the server is running on.
+   * @return the host as a string.
+   */
+  public String getHost() {
+    return host;
   }
 
   /**
@@ -237,7 +251,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
 
   /**
    * Get the service URL of the MBean server.
-   * @return a {@link JMXServiceURL} instance.
+   * @return a {@link JMXServiceURL} instance, or {@code null} if this object represents a local MBean server connection.
    */
   public JMXServiceURL getURL() {
     return url;
@@ -370,5 +384,33 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    */
   public JMXConnector getJmxconnector() {
     return jmxc;
+  }
+
+  /**
+   * Add a listener to this connection wrapper.
+   * @param listener the listener to add.
+   */
+  public void addJMXConnectionWrapperListener(final JMXConnectionWrapperListener listener) {
+    listeners.add(listener);
+  }
+
+  /**
+   * Remove a listener from this connection wrapper.
+   * @param listener the listener to add.
+   */
+  public void removeJMXConnectionWrapperListener(final JMXConnectionWrapperListener listener) {
+    listeners.remove(listener);
+  }
+
+  @Override
+  void fireConnected() {
+    final JMXConnectionWrapperEvent event = new JMXConnectionWrapperEvent(this);
+    for (final JMXConnectionWrapperListener listener: listeners) listener.onConnected(event);
+  }
+
+  @Override
+  void fireTimeout() {
+    final JMXConnectionWrapperEvent event = new JMXConnectionWrapperEvent(this);
+    for (final JMXConnectionWrapperListener listener: listeners) listener.onConnectionTimeout(event);
   }
 }

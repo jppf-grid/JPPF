@@ -63,8 +63,8 @@ public class JPPFNodeForwardingNotification extends Notification {
   }
 
   /**
-   * Get the notification forwarded from the node.
-   * @return an instance of <code>Notification</code>.
+   * Get the actual notification forwarded from the node.
+   * @return an instance of {@link Notification}.
    */
   public Notification getNotification() {
     return notification;
