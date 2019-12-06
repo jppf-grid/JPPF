@@ -25,7 +25,7 @@ public enum ChartType {
   /**
    * Chart type definition for a 3D bar chart.
    */
-  CHART_3DBAR("3D bar chart"),
+  CHART_3DBAR("Bar chart"),
   /**
    * Chart type definition for a plot XY chart.
    */
@@ -35,9 +35,21 @@ public enum ChartType {
    */
   CHART_AREA("Area chart"),
   /**
+   * Chart type definition for a scatter chart.
+   */
+  CHART_SCATTER("Scatter chart"),
+  /**
+   * Chart type definition for a step chart.
+   */
+  CHART_STEP("Step chart"),
+  /**
+   * Chart type definition for a step area chart.
+   */
+  CHART_STEP_AREA("Step area chart"),
+  /**
    * Chart type definition for a plot XY chart.
    */
-  CHART_3DPIE("3D pie chart"),
+  CHART_3DPIE("Pie chart"),
   /**
    * Chart type definition for a plot XY chart.
    */
@@ -45,7 +57,7 @@ public enum ChartType {
   /**
    * Chart type definition for a plot XY chart.
    */
-  CHART_DIFFERENCE("Difference chart"),
+  //CHART_DIFFERENCE("Difference chart"),
   /**
    * Chart type definition for a stacked area chart.
    */
@@ -53,11 +65,11 @@ public enum ChartType {
   /**
    * Chart type definition for a 3D series bar chart.
    */
-  CHART_3DBAR_SERIES("3D series bar chart"),
+  CHART_3DBAR_SERIES("Bar chart 2"),
   /**
    * Chart type definition for a 3D series bar chart.
    */
-  CHART_STACKED_3DBAR_SERIES("Stacked 3D series bar chart"),
+  CHART_STACKED_3DBAR_SERIES("Stacked bar chart"),
   /**
    * Chart type definition for a 3D series bar chart.
    */
@@ -66,7 +78,7 @@ public enum ChartType {
   /**
    * An english-like name for this enum type.
    */
-  private String name = null;
+  private String name;
 
   /**
    * Initialize this enum type with a nice display name.

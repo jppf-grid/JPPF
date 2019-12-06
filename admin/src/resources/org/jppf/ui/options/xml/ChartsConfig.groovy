@@ -47,13 +47,15 @@ ChartConfiguration getPopulatedConfiguration() {
   config.name = option.findFirstWithName("/ChartName").getValue();
   config.unit = option.findFirstWithName("/Unit").getValue();
   if ("".equals(config.unit)) config.unit = null;
-  config.precision = option.findFirstWithName("/Precision").getValue().intValue();
+  def precision = option.findFirstWithName("/Precision").getValue();
+  config.precision = (precision == null) ? 0 : precision.intValue();
   config.type = option.findFirstWithName("/ChartType").getValue();
   def list = option.findFirstWithName("/FieldsList").getValue();
-  def fields = java.lang.reflect.Array.newInstance(Fields, list.size());
+  def fields = java.lang.reflect.Array.newInstance(Fields.class, list.size());
   for (def i=0; i<fields.length; i++) fields[i] = list.get(i);
   config.fields = fields;
   return config;
+  //return GuiUtils.getPopulatedConfiguration(option, chartBuilder)
 }
 
 TabConfiguration getTabConfig() {
@@ -93,6 +95,7 @@ void changePreview(final config) {
     //cfg.chart.setBackgroundPaint(comp.getBackground());
     comp.updateUI();
   }
+  //GuiUtils.changePreview(option, config, chartBuilder)
 }
 
 void resetAllEnabledStates() {
@@ -150,7 +153,7 @@ void doTabNew() {
   pageRoot.setEventsEnabled(false);
   def BASE_NAME = "org/jppf/ui/options/xml/ChartsConfigPage";
   def s = JOptionPane.showInputDialog(option.getUIComponent(), LocalizationUtils.getLocalized(BASE_NAME, "new.tab.name"),
-      LocalizationUtils.getLocalized(BASE_NAME, "new.tab.title"), JOptionPane.PLAIN_MESSAGE, null, null, null);
+    LocalizationUtils.getLocalized(BASE_NAME, "new.tab.title"), JOptionPane.PLAIN_MESSAGE, null, null, null);
   if ((s != null) && !"".equals(s.trim())) {
     def tab = new TabConfiguration(s, -1);
     chartBuilder.addTab(tab);

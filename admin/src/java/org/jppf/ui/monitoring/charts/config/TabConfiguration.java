@@ -25,16 +25,15 @@ import javax.swing.JPanel;
  * This class manages the data related to the charts within a tab.
  * @author Laurent Cohen
  */
-public class TabConfiguration
-{
+public class TabConfiguration {
   /**
    * The name of the tab.
    */
-  String name = null;
+  String name;
   /**
    * The panel that contains the configured charts.
    */
-  public JPanel panel = null;
+  public JPanel panel;
   /**
    * The list of chart configurations contained in this tab.
    */
@@ -47,8 +46,7 @@ public class TabConfiguration
   /**
    * Create a tab configuration with uninitialized parameters.
    */
-  public TabConfiguration()
-  {
+  public TabConfiguration() {
   }
 
   /**
@@ -56,8 +54,7 @@ public class TabConfiguration
    * @param name the name of the tab to create.
    * @param position the position of the tab in the list of tabs.
    */
-  public TabConfiguration(final String name, final int position)
-  {
+  public TabConfiguration(final String name, final int position) {
     this.name = name;
     this.position = position;
   }
@@ -68,8 +65,7 @@ public class TabConfiguration
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return name == null ? "unnamed tab" : name;
   }
 }

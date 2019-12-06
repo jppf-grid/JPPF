@@ -28,58 +28,52 @@ import org.jppf.ui.monitoring.data.Fields;
  * Instances of this class represent the configuration elements used to create and update a chart definition.
  * @author Laurent Cohen
  */
-public class ChartConfiguration
-{
+public class ChartConfiguration {
   /**
    * Name of this configuration. Must be unique.
    */
-  public String name = null;
+  public String name;
   /**
    * Determines the type of the chart, ie bar chart, plot chart, pie, etc.
    */
-  public ChartType type  = null;
+  public ChartType type;
   /**
    * Unit to display on item labels or in the legend or title.
    */
-  public String unit = null;
+  public String unit;
   /**
    * Precision of the number to display in items and tooltip labels.
    */
-  public int precision = 0;
+  public int precision;
   /**
    * The list of fields charted in this chart.
    */
-  public Fields[] fields = null;
+  public Fields[] fields;
   /**
    * The dataset associated with the chart.
    */
-  public Object dataset = null;
-  //public Dataset dataset = null;
+  public Object dataset;
   /**
    * The JFreeChart object.
    */
-  public Object chart = null;
-  //public JFreeChart chart = null;
+  public Object chart;
   /**
    * The chartPanel enclosing the chart.
    */
-  public JPanel chartPanel = null;
-  //public ChartPanel chartPanel = null;
+  public JPanel chartPanel;
   /**
    * Position of the chart in its containing panel.
    */
   public int position = -1;
   /**
    * Holds non persisted parameters for quick access.
-   * @since 5.0
    */
   public final Map<String, Object> params = new HashMap<>();
 
   /**
    * Default constructor.
    */
-  public ChartConfiguration()
-  {
+  public ChartConfiguration() {
   }
 
   /**
@@ -90,8 +84,7 @@ public class ChartConfiguration
    * @param precision the precision of the number to display in items and tooltip labels.
    * @param fields the list of fields charted in this chart.
    */
-  public ChartConfiguration(final String name, final ChartType type, final String unit, final int precision, final Fields[] fields)
-  {
+  public ChartConfiguration(final String name, final ChartType type, final String unit, final int precision, final Fields[] fields) {
     this.name = name;
     this.type = type;
     this.unit = unit;
@@ -103,8 +96,7 @@ public class ChartConfiguration
    * Create a configuration from another configuration (copy constructor).
    * @param cfg the configuration to copy from.
    */
-  public ChartConfiguration(final ChartConfiguration cfg)
-  {
+  public ChartConfiguration(final ChartConfiguration cfg) {
     this.name = cfg.name;
     this.type = cfg.type;
     this.unit = cfg.unit;
@@ -112,14 +104,26 @@ public class ChartConfiguration
     this.fields = cfg.fields;
   }
 
+  @Override
+  public String toString() {
+    return name == null ? "no name" : name;
+  }
+
   /**
    * Get a string representation of this chart configuration.
    * @return a string containing this configuration's name.
    * @see java.lang.Object#toString()
    */
-  @Override
-  public String toString()
-  {
-    return name == null ? "no name" : name;
+  public String toDebugString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("name = ").append(name == null ? "no name" : name)
+      .append(", fields = ").append(Arrays.toString(fields))
+      .append(", dataset = ").append(dataset)
+      .append(", chart = ").append(chart)
+      .append(", chartPanel = ").append(chartPanel)
+      .append(", position = ").append(position)
+      .append(", precision = ").append(precision)
+      .append(", unit = ").append(unit)
+      .append(']').toString();
   }
 }

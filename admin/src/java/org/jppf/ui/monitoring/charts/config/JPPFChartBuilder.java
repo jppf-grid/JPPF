@@ -18,7 +18,6 @@
 package org.jppf.ui.monitoring.charts.config;
 
 import static org.jppf.ui.monitoring.charts.ChartType.*;
-import static org.jppf.utils.ReflectionHelper.*;
 
 import java.awt.Color;
 import java.util.*;
@@ -29,6 +28,11 @@ import org.jppf.ui.monitoring.charts.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.utils.GuiUtils;
+import org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle;
+import org.knowm.xchart.PieSeries.PieSeriesRenderStyle;
+import org.knowm.xchart.XChartPanel;
+import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
+import org.knowm.xchart.internal.chartpart.Chart;
 import org.slf4j.*;
 
 /**
@@ -56,33 +60,43 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
   /**
    * Used to store and retrieve the configuration, to and from the preferences tree.
    */
-  private transient PreferencesStorage storage = null;
+  private transient PreferencesStorage storage;
+  /**
+   * 
+   */
+  private final ChartDataCache cache = ChartDataCache.getInstance();
+  /**
+   * 
+   */
+  private final StatsHandler statsHandler;
 
   /**
    * Initialize this charts builder.
    */
   public JPPFChartBuilder() {
     storage = new PreferencesStorage(this);
+    statsHandler = StatsHandler.getInstance();
     initHandlerMap();
-    //createInitialCharts();
-    StatsHandler.getInstance().addStatsHandlerListener(this);
+    statsHandler.addStatsHandlerListener(this);
   }
 
   /**
    * Initialize the mapping of chart types to the chart handler used to create and update them.
    */
   private void initHandlerMap() {
-    final StatsHandler statsHandler = StatsHandler.getInstance();
-    handlerMap.put(CHART_PLOTXY, new PlotXYChartHandler(statsHandler));
-    handlerMap.put(CHART_3DBAR, new Bar3DChartHandler(statsHandler));
-    handlerMap.put(CHART_AREA, new AreaChartHandler(statsHandler));
-    handlerMap.put(CHART_3DPIE, new Pie3DChartHandler(statsHandler));
-    handlerMap.put(CHART_RING, new RingChartHandler(statsHandler));
-    handlerMap.put(CHART_DIFFERENCE, new DifferenceChartHandler(statsHandler));
-    handlerMap.put(CHART_STACKED_AREA, new StackedAreaChartHandler(statsHandler));
-    handlerMap.put(CHART_3DBAR_SERIES, new BarSeries3DChartHandler(statsHandler));
-    handlerMap.put(CHART_STACKED_3DBAR_SERIES, new StackedBarSeries3DChartHandler(statsHandler));
-    handlerMap.put(CHART_METER, new MeterChartHandler(statsHandler));
+    handlerMap.put(CHART_PLOTXY, new XChartPlotXYHandler(statsHandler, XYSeriesRenderStyle.Line));
+    handlerMap.put(CHART_AREA, new XChartPlotXYHandler(statsHandler, XYSeriesRenderStyle.Area));
+    handlerMap.put(CHART_SCATTER, new XChartPlotXYHandler(statsHandler, XYSeriesRenderStyle.Scatter));
+    handlerMap.put(CHART_STEP, new XChartPlotXYHandler(statsHandler, XYSeriesRenderStyle.Step));
+    handlerMap.put(CHART_STEP_AREA, new XChartPlotXYHandler(statsHandler, XYSeriesRenderStyle.StepArea));
+    handlerMap.put(CHART_3DBAR, new XChartBarHandler(statsHandler, CategorySeriesRenderStyle.Bar, false));
+    handlerMap.put(CHART_3DBAR_SERIES, new XChartBarHandler(statsHandler, CategorySeriesRenderStyle.Bar, false));
+    handlerMap.put(CHART_STACKED_3DBAR_SERIES, new XChartBarHandler(statsHandler, CategorySeriesRenderStyle.Bar, true));
+    handlerMap.put(CHART_3DPIE, new XChartPieHandler(statsHandler, PieSeriesRenderStyle.Pie));
+    handlerMap.put(CHART_RING, new XChartPieHandler(statsHandler, PieSeriesRenderStyle.Donut));
+    handlerMap.put(CHART_METER, new XChartDialHandler(statsHandler));
+    handlerMap.put(CHART_STACKED_AREA, new XChartBarHandler(statsHandler, CategorySeriesRenderStyle.Area, true));
+    //handlerMap.put(CHART_DIFFERENCE, new DifferenceChartHandler(statsHandler));
   }
 
   /**
@@ -94,37 +108,24 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    */
   public ChartConfiguration createChart(final ChartConfiguration config, final boolean preview) {
     final ChartConfiguration cfg = preview ? new ChartConfiguration(config) : config;
+    cache.addFields(cfg.fields, StatsHandler.getInstance());
     final ChartHandler handler = handlerMap.get(cfg.type);
     if (handler == null) return null;
     handler.createChart(cfg);
-    final Class<?> jfChartClass = getClass0("org.jfree.chart.JFreeChart");
-    final Class<?> chartPanelClass = getClass0("org.jfree.chart.ChartPanel");
     if (cfg.chart instanceof Object[]) {
       final JPanel panel = new JPanel();
       panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
       final Object[] charts = (Object[]) cfg.chart;
       for (int i=0; i<charts.length; i++) {
         final Object chart = charts[i];
-        //chartPanel = new ChartPanel(chart, true);
-        final JPanel chartPanel = (JPanel) invokeConstructor(chartPanelClass, new Class[] {jfChartClass, boolean.class}, chart, true);
-        //chartPanel.setMinimumDrawWidth(0);
-        invokeMethod(chartPanelClass, chartPanel, "setMinimumDrawWidth", new Class[] {int.class}, 0);
-        //chartPanel.setMaximumDrawWidth(Integer.MAX_VALUE);
-        invokeMethod(chartPanelClass, chartPanel, "setMaximumDrawWidth", new Class[] {int.class}, Integer.MAX_VALUE);
-        //chartPanel.setMinimumDrawHeight(0);
-        invokeMethod(chartPanelClass, chartPanel, "setMinimumDrawHeight", new Class[] {int.class}, 0);
-        //chartPanel.setMaximumDrawHeight(Integer.MAX_VALUE);
-        invokeMethod(chartPanelClass, chartPanel, "setMaximumDrawHeight", new Class[] {int.class}, Integer.MAX_VALUE);
-        chartPanel.setBackground(Color.WHITE);
+        final JPanel chartPanel = new XChartPanel<>((Chart<?, ?>) chart);
         panel.add(chartPanel);
       }
       cfg.chartPanel = panel;
     } else {
-      //cfg.chartPanel = new ChartPanel(cfg.chart);
-      cfg.chartPanel = (JPanel) invokeConstructor(chartPanelClass, new Class[] {jfChartClass}, cfg.chart);
+      cfg.chartPanel = new XChartPanel<>((Chart<?, ?>) cfg.chart);
     }
     cfg.chartPanel.setBackground(Color.WHITE);
-    //cfg.chartPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY.brighter()));
     cfg.chartPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
     return cfg;
   }
@@ -168,11 +169,9 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
     if (config.position < 0) {
       config.position = tab.configs.size();
       tab.configs.add(config);
-      //if (tab.configs.size() > 1) tab.panel.add(Box.createVerticalStrut(10));
       tab.panel.add(config.chartPanel);
     } else {
       tab.configs.add(config.position, config);
-      //if (config.position > 0) tab.panel.add(Box.createVerticalStrut(10));
       tab.panel.add(config.chartPanel, config.position);
     }
   }
@@ -183,6 +182,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * @param config the configuration to remove.
    */
   public void removeChart(final TabConfiguration tab, final ChartConfiguration config) {
+    cache.removeFields(config.fields);
     tab.configs.remove(config);
     final JPanel panel = tab.panel;
     panel.remove(config.chartPanel);
@@ -195,20 +195,16 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    */
   @Override
   public void dataUpdated(final StatsHandlerEvent event) {
+    cache.update(statsHandler);
     for (TabConfiguration tab: tabMap.values()) {
       for (final ChartConfiguration config: tab.configs) {
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              if (event.getType() == StatsHandlerEvent.Type.UPDATE) {
-                handlerMap.get(config.type).updateDataset(config);
-              } else {
-                handlerMap.get(config.type).populateDataset(config);
-              }
-            } catch (final Exception e) {
-              log.error(e.getMessage(), e);
-            }
+        SwingUtilities.invokeLater(() -> {
+          try {
+            final ChartHandler handler = handlerMap.get(config.type);
+            if (event.getType() == StatsHandlerEvent.Type.UPDATE) handler.updateDataset(config);
+            else handler.populateDataset(config);
+          } catch (final Exception e) {
+            log.error(e.getMessage(), e);
           }
         });
       }
@@ -243,8 +239,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
   /**
    * Create a set of default charts if none is defined.
    */
-  public void createInitialCharts()
-  {
+  public void createInitialCharts() {
     storage.loadChartConfigurations();
     if (tabList.isEmpty()) storage.loadDefaultChartConfigurations();
   }

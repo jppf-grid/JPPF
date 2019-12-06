@@ -34,7 +34,7 @@
   <property name="Groovy.inc"           value="*.jar"/>
   <property name="HikaryCP.inc"         value="*.jar"/>
   <property name="J2EE.inc"             value="*.jar"/>
-  <property name="JFreeChart.inc"       value="*.jar"/>
+  <property name="XChart.inc"           value="*.jar"/>
   <property name="JGoodies.inc"         value="*.jar"/>
   <property name="jmxremote.inc"        value="*.jar"/>
   <property name="JNA.inc"              value="*.jar"/>
@@ -65,8 +65,7 @@
     <get.maven.lib g="org.codehaus.groovy"  a="groovy-all"         v="1.6.5"                dest="${lib}/Groovy"/>
     <get.maven.lib g="com.zaxxer"           a="HikariCP-java7"     v="2.4.11"               dest="${lib}/HikariCP"/>
     <get.maven.lib g="org.apache.geronimo.specs" a="geronimo-j2ee-connector_1.5_spec" v="2.0.0" dest="${lib}/J2EE"/>
-    <get.maven.lib g="jfree"                a="jcommon"            v="1.0.15"               dest="${lib}/JFreeChart"/>
-    <get.maven.lib g="jfree"                a="jfreechart"         v="1.0.12"               dest="${lib}/JFreeChart"/>
+    <get.maven.lib g="org.knowm.xchart"     a="xchart"             v="3.6.0"                dest="${lib}/XChart"/>
     <get.maven.lib g="com.jgoodies"         a="jgoodies-looks"     v="${looks.version}"     dest="${lib}/JGoodies"/>
     <get.maven.lib g="com.jgoodies"         a="jgoodies-common"    v="1.8.1"                dest="${lib}/JGoodies"/>
     <get.maven.lib g="net.java.dev.jna"     a="jna"                v="${jna.version}"       dest="${lib}/JNA"/>

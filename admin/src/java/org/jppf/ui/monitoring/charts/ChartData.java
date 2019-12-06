@@ -16,9 +16,22 @@
  * limitations under the License.
  */
 
+package org.jppf.ui.monitoring.charts;
+
+import java.util.*;
+
+import org.jppf.ui.monitoring.data.Fields;
+
 /**
- * Classes used to download libraries from various URLs.
- * Here idle means no keyboard or mouse activity was detected for a specified time.
- * @exclude
+ * Simple data structure for chart data with multiple time series.
  */
-package org.jppf.libmanagement;
+public class ChartData {
+  /**
+   * The X axis data.
+   */
+  List<Double> x;
+  /**
+   * The time series by field.
+   */
+  Map<Fields, List<Double>> values = new HashMap<>();
+}

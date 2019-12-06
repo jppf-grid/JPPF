@@ -122,7 +122,7 @@
       <module-elements>
         <zipfileset dir="${build}" prefix="${gui.prefix}/lib" includes="jppf-client-${version.number}.jar,jppf-admin-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${gui.prefix}/lib-src" includes="jppf-client-src-${version.number}.jar,jppf-admin-src-${version.number}.jar"/>
-        <zipfileset dir="${lib}/JFreeChart" prefix="${gui.prefix}/lib" includes="${JFreeChart.inc}"/>
+        <zipfileset dir="${lib}/XChart" prefix="${gui.prefix}/lib" includes="${XChart.inc}"/>
         <zipfileset dir="${lib}/JGoodies" prefix="${gui.prefix}/lib" includes="${JGoodies.inc}"/>
         <zipfileset dir="${lib}/Groovy" prefix="${gui.prefix}/lib" includes="${Groovy.inc}"/>
         <zipfileset dir="${lib}/MigLayout" prefix="${gui.prefix}/lib" includes="${MigLayout.inc}"/>

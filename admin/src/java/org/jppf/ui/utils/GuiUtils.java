@@ -371,4 +371,51 @@ public final class GuiUtils {
     scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(thickness, 0));
     scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, thickness));
   }
+
+  /**
+   * 
+   * @param option .
+   * @param chartBuilder .
+   * @return the chart config.
+  public static ChartConfiguration getPopulatedConfiguration(final AbstractOption option, final JPPFChartBuilder chartBuilder) {
+    final ChartConfiguration config = new ChartConfiguration();
+    try {
+      config.name = (String) ((AbstractOption) option.findFirstWithName("/ChartName")).getValue();
+      config.unit = (String) ((AbstractOption) option.findFirstWithName("/Unit")).getValue();
+      if ("".equals(config.unit)) config.unit = null;
+      final Number precision = (Number) ((AbstractOption) option.findFirstWithName("/Precision")).getValue();
+      config.precision = (precision == null) ? 0 : precision.intValue();
+      config.type = (ChartType)  ((AbstractOption) option.findFirstWithName("/ChartType")).getValue();
+      @SuppressWarnings("unchecked")
+      final List<Fields> list = (List<Fields>) ((AbstractOption) option.findFirstWithName("/FieldsList")).getValue();
+      final Fields[] fields = (Fields[]) java.lang.reflect.Array.newInstance(Fields.class, list.size());
+      for (int i=0; i<fields.length; i++) fields[i] = list.get(i);
+      config.fields = fields;
+    } catch (final Exception e) {
+      log.error("option = {} : ", option, e);
+    }
+    return config;
+  }
+   */
+
+  /**
+   * 
+   * @param option .
+   * @param config .
+   * @param chartBuilder .
+  public static void changePreview(final OptionElement option, final ChartConfiguration config, final JPPFChartBuilder chartBuilder) {
+    try {
+      if (config != null) {
+        final ChartConfiguration cfg = chartBuilder.createChart(config, true);
+        final JComponent comp = option.findFirstWithName("/ChartPreview").getUIComponent();
+        comp.removeAll();
+        comp.add(cfg.chartPanel);
+        //cfg.chart.setBackgroundPaint(comp.getBackground());
+        comp.updateUI();
+      }
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
+  }
+   */
 }

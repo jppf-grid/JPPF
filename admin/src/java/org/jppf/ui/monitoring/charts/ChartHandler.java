@@ -25,8 +25,7 @@ import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
  * types of charts.
  * @author Laurent Cohen
  */
-public interface ChartHandler
-{
+public interface ChartHandler {
   /**
    * Create a chart based on a chart configuration.
    * @param config holds the configuration parameters for the chart created, modified by this method.

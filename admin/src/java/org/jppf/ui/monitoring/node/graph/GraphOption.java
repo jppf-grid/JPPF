@@ -29,7 +29,6 @@ import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
-import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.node.MasterSlaveRelationShipsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.AbstractOption;
@@ -165,19 +164,18 @@ public class GraphOption extends AbstractOption implements ActionHolder, MasterS
       graphComponent.getVerticalScrollBar().setPreferredSize(new Dimension(GuiUtils.DEFAULT_SCROLLBAR_THICKNESS, 0));
       graphComponent.getHorizontalScrollBar().setPreferredSize(new Dimension(0, GuiUtils.DEFAULT_SCROLLBAR_THICKNESS));
       actionHandler = new GraphActionHandler(viewer);
-      final EditingModalGraphMouse<AbstractTopologyComponent, Number> graphMouse = new EditingModalGraphMouse<>(viewer.getRenderContext(), null, null);
-      graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
-      final PopupMenuMousePlugin<AbstractTopologyComponent, Number> myPlugin = new PopupMenuMousePlugin<>(actionHandler);
-      graphMouse.remove(graphMouse.getPopupEditingPlugin());
-      graphMouse.add(myPlugin);
-      viewer.setGraphMouse(graphMouse);
+      try {
+        final EditingModalGraphMouse<AbstractTopologyComponent, Number> graphMouse = new EditingModalGraphMouse<>(viewer.getRenderContext(), null, null);
+        graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
+        final PopupMenuMousePlugin<AbstractTopologyComponent, Number> myPlugin = new PopupMenuMousePlugin<>(actionHandler);
+        graphMouse.remove(graphMouse.getPopupEditingPlugin());
+        graphMouse.add(myPlugin);
+        viewer.setGraphMouse(graphMouse);
+      } catch(final Exception e) {
+        log.error(e.getMessage(), e);
+      }
       graphComponent.addComponentListener(new ViewerComponentListener());
-      StatsHandler.getInstance().getShowIPHandler().addShowIPListener(new ShowIPListener() {
-        @Override
-        public void stateChanged(final ShowIPEvent event) {
-          graphComponent.repaint();
-        }
-      });
+      StatsHandler.getInstance().getShowIPHandler().addShowIPListener((event) -> graphComponent.repaint());
     }
   }
 

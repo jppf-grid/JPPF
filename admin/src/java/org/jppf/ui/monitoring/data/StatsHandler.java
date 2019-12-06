@@ -74,7 +74,7 @@ public final class StatsHandler extends BaseStatsHandler {
    * Get the singleton instance of this class.
    * @return a <code>StatsHandler</code> instance.
    */
-  public static StatsHandler getInstance() {
+  public synchronized static StatsHandler getInstance() {
     if (instance == null) instance = new StatsHandler();
     return instance;
   }

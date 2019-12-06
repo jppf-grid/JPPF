@@ -62,4 +62,11 @@ public class StatsHandlerEvent extends EventObject {
   public Type getType() {
     return type;
   }
+
+  /**
+   * @return the source of this event.
+   */
+  public BaseStatsHandler getBaseStatsHandler() {
+    return (BaseStatsHandler) getSource();
+  }
 }

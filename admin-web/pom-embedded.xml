@@ -62,8 +62,8 @@
           <artifactId>jung-graph-impl</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>jfree</groupId>
-          <artifactId>jfreechart</artifactId>
+          <groupId>org.knowm.xchart</groupId>
+          <artifactId>xchart</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.codehaus.groovy</groupId>

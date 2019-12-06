@@ -43,7 +43,8 @@ public class JPPFAdminConsole {
    * Whether the charts library is present in the classpath.
    * @exclude
    */
-  public static final boolean HAS_CHARTS = checkChartsPresent();
+  public static final boolean HAS_CHARTS = true;
+  //public static final boolean HAS_CHARTS = checkChartsPresent();
   /**
    * Path to the UI descriptor file when running with charts.
    * @exclude
@@ -107,7 +108,7 @@ public class JPPFAdminConsole {
    * Determines whether the charts library can be found in the class path.
    * @return true if the charts library is found, false ortherwise.
    */
-  private static boolean checkChartsPresent() {
+  static boolean checkChartsPresent() {
     try {
       Class.forName("org.jfree.chart.JFreeChart", true, ReflectionHelper.getCurrentClassLoader());
       return true;
