@@ -22,6 +22,7 @@ import java.util.concurrent.*;
 
 import javax.management.*;
 
+import org.jppf.node.Node;
 import org.jppf.node.event.*;
 import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
@@ -47,37 +48,43 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * The current count of tasks executed.
    */
-  private int taskCount = 0;
+  private int taskCount;
   /**
    * The current count of tasks executed.
    */
-  private int taskInErrorCount = 0;
+  private int taskInErrorCount;
   /**
    * The current count of tasks executed.
    */
-  private int taskSuccessfulCount = 0;
+  private int taskSuccessfulCount;
   /**
    * The current count of tasks executed.
    */
-  private long totalCpuTime = 0L;
+  private long totalCpuTime;
   /**
    * The current count of tasks executed.
    */
-  private long totalElapsedTime = 0L;
+  private long totalElapsedTime;
   /**
    * The sequence number for notifications.
    */
-  private long sequence = 0L;
+  private long sequence;
   /**
    * 
    */
   private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("NodeTaskMonitor"));
+  /**
+   * The jppf node which hosts this mbean.
+   */
+  final Node node;
 
   /**
    * Default constructor.
+   * @param node the jppf node which hosts this mbean.
    * @param objectName a string representing the MBean object name.
    */
-  public JPPFNodeTaskMonitor(final String objectName) {
+  public JPPFNodeTaskMonitor(final Node node, final String objectName) {
+    this.node = node;
     try {
       OBJECT_NAME = ObjectNameCache.getObjectName(objectName);
     } catch (final Exception e) {
