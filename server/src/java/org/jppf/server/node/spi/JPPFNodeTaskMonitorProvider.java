@@ -45,7 +45,7 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider {
    */
   @Override
   public Object createMBean(final Node node) {
-    final JPPFNodeTaskMonitor monitor = new JPPFNodeTaskMonitor(JPPFNodeTaskMonitorMBean.MBEAN_NAME);
+    final JPPFNodeTaskMonitor monitor = new JPPFNodeTaskMonitor(node, JPPFNodeTaskMonitorMBean.MBEAN_NAME);
     ((JPPFNode) node).getExecutionManager().getTaskNotificationDispatcher().addTaskExecutionListener(monitor);
     return monitor;
   }

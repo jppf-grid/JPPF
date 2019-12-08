@@ -22,6 +22,7 @@ import java.util.concurrent.*;
 
 import javax.management.*;
 
+import org.jppf.node.Node;
 import org.jppf.node.event.*;
 import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
@@ -72,12 +73,18 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    * 
    */
   private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("NodeTaskMonitor"));
+  /**
+   * The jppf node which hosts this mbean.
+   */
+  final Node node;
 
   /**
    * Default constructor.
+   * @param node the jppf node which hosts this mbean.
    * @param objectName a string representing the MBean object name.
    */
-  public JPPFNodeTaskMonitor(final String objectName) {
+  public JPPFNodeTaskMonitor(final Node node, final String objectName) {
+    this.node = node;
     try {
       OBJECT_NAME = ObjectNameCache.getObjectName(objectName);
     } catch (final Exception e) {
