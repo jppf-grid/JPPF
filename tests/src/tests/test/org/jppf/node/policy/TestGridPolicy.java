@@ -96,14 +96,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submit(job);
-    assertNotNull(results);
-    assertEquals(results.size(), nbTasks);
-    for (int i=0; i<nbTasks; i++) {
-      final Task<?> task = results.get(i);
-      assertNotNull(task.getResult());
-      assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
-    }
+    checkResults(job);
   }
 
   /**
@@ -120,14 +113,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submit(job);
-    assertNotNull(results);
-    assertEquals(results.size(), nbTasks);
-    for (int i=0; i<nbTasks; i++) {
-      final Task<?> task = results.get(i);
-      assertNotNull(task.getResult());
-      assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
-    }
+    checkResults(job);
   }
 
   /**
@@ -142,13 +128,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submit(job);
-    assertNotNull(results);
-    assertEquals(results.size(), nbTasks);
-    for (int i=0; i<nbTasks; i++) {
-      final Task<?> task = results.get(i);
-      assertNull(task.getResult());
-    }
+    checkNullResults(job);
   }
 
   /**
@@ -165,14 +145,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submit(job);
-    assertNotNull(results);
-    assertEquals(results.size(), nbTasks);
-    for (int i=0; i<nbTasks; i++) {
-      final Task<?> task = results.get(i);
-      assertNotNull(task.getResult());
-      assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
-    }
+    checkNullResults(job);
   }
 
   /**
@@ -187,13 +160,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    final List<Task<?>> results = client.submit(job);
-    assertNotNull(results);
-    assertEquals(results.size(), nbTasks);
-    for (int i=0; i<nbTasks; i++) {
-      final Task<?> task = results.get(i);
-      assertNull(task.getResult());
-    }
+    checkNullResults(job);
   }
 
   /**
@@ -238,5 +205,30 @@ public class TestGridPolicy extends Setup1D2N1C {
       ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() == 2, 5000L, 250L, true);
       BaseTestHelper.printToAll(client, true, true, true, true, false, "stopped all slave nodes");
     }
+  }
+
+  /**
+   * @param job the job to check.
+   */
+  private static void checkResults(final JPPFJob job) {
+    final List<Task<?>> results = client.submit(job);
+    assertNotNull(results);
+    final int nbTasks = job.getJobTasks().size();
+    assertEquals(nbTasks, results.size());
+    results.forEach(task -> {
+      assertNotNull(task.getResult());
+      assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+    });
+  }
+
+  /**
+   * @param job the job to check.
+   */
+  private static void checkNullResults(final JPPFJob job) {
+    final List<Task<?>> results = client.submit(job);
+    assertNotNull(results);
+    final int nbTasks = job.getJobTasks().size();
+    assertEquals(nbTasks, results.size());
+    results.forEach(task -> assertNull(task.getResult()));
   }
 }
