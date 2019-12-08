@@ -145,7 +145,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
-    checkNullResults(job);
+    checkResults(job);
   }
 
   /**
@@ -225,7 +225,9 @@ public class TestGridPolicy extends Setup1D2N1C {
    * @param job the job to check.
    */
   private static void checkNullResults(final JPPFJob job) {
+    BaseTestHelper.printToAll(client, true, true, true, true, false, "submitting job");
     final List<Task<?>> results = client.submit(job);
+    BaseTestHelper.printToAll(client, true, true, true, true, false, "got job results");
     assertNotNull(results);
     final int nbTasks = job.getJobTasks().size();
     assertEquals(nbTasks, results.size());
