@@ -75,7 +75,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
         final AbstractTopologyComponent info = (AbstractTopologyComponent) defNode.getUserObject();
         final HealthSnapshot health = info.getHealthSnapshot();
         if (health == null) return res;
-        if (column == URL) res = info.toString();
+        if (column == URL) res = info.getDisplayName();
         else {
           final JPPFProperty<?> prop = properties.get(column - 1);
           final String name = prop.getName();

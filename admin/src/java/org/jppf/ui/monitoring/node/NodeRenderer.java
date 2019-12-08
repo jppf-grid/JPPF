@@ -40,31 +40,19 @@ public class NodeRenderer extends AbstractTreeCellRenderer {
     defaultSelectionBackground = getBackgroundSelectionColor();
   }
 
-  /**
-   * Configures the renderer based on the passed in components.
-   * @param tree the tree on which to apply this renderer.
-   * @param value the node to render.
-   * @param sel determines whether the node is selected.
-   * @param expanded determines whether the node is expanded.
-   * @param leaf determines whether the node is a leaf.
-   * @param row the node's row number.
-   * @param hasFocus determines whether the node has the focus.
-   * @return a component used to paint the node.
-   */
   @Override
   public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-    final DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
     if (value instanceof DefaultMutableTreeNode) {
       final DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
+        this.selected = sel;
         final AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
         String path = null;
         Color background = defaultNonSelectionBackground;
-        Color backgroundSelected = defaultSelectionBackground;
+        Color backgroundSelected = getBackgroundSelectionColor();
         Color foreground = sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND;
-        final Font f = renderer.getFont();
+        final Font f = getFont();
         Font font = getPlainFont(f);
-        renderer.setText(TopologyUtils.getDisplayName(data, isShowIP()));
         if (data.isDriver()) {
           final TopologyDriver driver = (TopologyDriver) data;
           if (driver.getConnection().getStatus().isWorkingStatus()) {
@@ -95,14 +83,15 @@ public class NodeRenderer extends AbstractTreeCellRenderer {
         }
         if (font != null) setFont(font);
         final ImageIcon icon = GuiUtils.loadIcon(path);
-        renderer.setIcon(icon);
-        renderer.setBackgroundNonSelectionColor(background);
-        renderer.setBackgroundSelectionColor(backgroundSelected);
-        renderer.setBorderSelectionColor(backgroundSelected);
-        renderer.setBackground(sel ? backgroundSelected : background);
-        renderer.setForeground(foreground);
+        setIcon(icon);
+        setBackgroundNonSelectionColor(background);
+        setBackgroundSelectionColor(backgroundSelected);
+        setBorderSelectionColor(backgroundSelected);
+        setBackground(sel ? backgroundSelected : background);
+        setForeground(foreground);
+        setText(TopologyUtils.getDisplayName(data, isShowIP()));
       }
     }
-    return renderer;
+    return this;
   }
 }

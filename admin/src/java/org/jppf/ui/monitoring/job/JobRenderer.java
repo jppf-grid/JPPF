@@ -48,18 +48,17 @@ public class JobRenderer extends AbstractTreeCellRenderer {
    */
   @Override
   public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-    final DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
     if (value instanceof DefaultMutableTreeNode) {
       final DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
+        this.selected = sel;
         final AbstractJobComponent data = (AbstractJobComponent) node.getUserObject();
-        renderer.setText(data.getDisplayName());
         String path = null;
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = defaultSelectionBackground;
         if (data instanceof JobDriver) {
           final JobDriver driver = (JobDriver) data;
-          renderer.setText(TopologyUtils.getDisplayName(driver.getTopologyDriver(), isShowIP()));
+          setText(TopologyUtils.getDisplayName(driver.getTopologyDriver(), isShowIP()));
           if (((JobDriver) data).getTopologyDriver().getConnection().getStatus().isWorkingStatus()) {
             path = DRIVER_ICON;
             background = ACTIVE_COLOR;
@@ -75,24 +74,25 @@ public class JobRenderer extends AbstractTreeCellRenderer {
             background = SUSPENDED_COLOR;
             backgroundSelected = INACTIVE_SELECTION_COLOR;
           }
+          setText(job.getDisplayName());
         } else if (data instanceof JobDispatch) {
           final JobDispatch dispatch = (JobDispatch) data;
           final TopologyNode nodeData = dispatch.getNode();
           if (nodeData != null) {
             final JPPFManagementInfo nodeInfo = nodeData.getManagementInfo();
             path = nodeData.isPeer() ? DRIVER_ICON : GuiUtils.computeNodeIconKey(nodeData);
-            renderer.setText((StatsHandler.getInstance().getShowIPHandler().isShowIP() ? nodeInfo.getIpAddress() : nodeInfo.getHost()) + ":" + nodeInfo.getPort());
+            setText((StatsHandler.getInstance().getShowIPHandler().isShowIP() ? nodeInfo.getIpAddress() : nodeInfo.getHost()) + ":" + nodeInfo.getPort());
           }
         }
         final ImageIcon icon = GuiUtils.loadIcon(path);
-        renderer.setIcon(icon);
-        renderer.setBackgroundNonSelectionColor(background);
-        renderer.setBackgroundSelectionColor(backgroundSelected);
-        renderer.setBorderSelectionColor(backgroundSelected);
-        renderer.setBackground(sel ? backgroundSelected : background);
-        renderer.setForeground(sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND);
+        setIcon(icon);
+        setBackgroundNonSelectionColor(background);
+        setBackgroundSelectionColor(backgroundSelected);
+        setBorderSelectionColor(backgroundSelected);
+        setBackground(sel ? backgroundSelected : background);
+        setForeground(sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND);
       }
     }
-    return renderer;
+    return this;
   }
 }

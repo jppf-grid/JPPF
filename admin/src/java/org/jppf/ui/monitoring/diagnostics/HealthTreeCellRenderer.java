@@ -40,26 +40,14 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer {
     defaultSelectionBackground = getBackgroundSelectionColor();
   }
 
-  /**
-   * Configures the renderer based on the passed in components.
-   * @param tree the tree on which to apply this renderer.
-   * @param value the node to render.
-   * @param sel determines whether the node is selected.
-   * @param expanded determines whether the node is expanded.
-   * @param leaf determines whether the node is a leaf.
-   * @param row the node's row number.
-   * @param hasFocus determines whether the node has the focus.
-   * @return a component used to paint the node.
-   * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
-   */
   @Override
   public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-    final DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
     if (value instanceof DefaultMutableTreeNode) {
+      this.selected = sel;
       final DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
         final AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
-        renderer.setText(TopologyUtils.getDisplayName(data, isShowIP()));
+        setText(TopologyUtils.getDisplayName(data, isShowIP()));
         String path = null;
         final Color background = defaultNonSelectionBackground;
         final Color backgroundSelected = defaultSelectionBackground;
@@ -69,13 +57,13 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer {
           path = GuiUtils.computeNodeIconKey((TopologyNode) data);
         }
         final ImageIcon icon = GuiUtils.loadIcon(path);
-        renderer.setIcon(icon);
-        renderer.setBackgroundNonSelectionColor(background);
-        renderer.setBackgroundSelectionColor(backgroundSelected);
-        renderer.setBackground(sel ? backgroundSelected : background);
-        renderer.setForeground(sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND);
+        setIcon(icon);
+        setBackgroundNonSelectionColor(background);
+        setBackgroundSelectionColor(backgroundSelected);
+        setBackground(sel ? backgroundSelected : background);
+        setForeground(sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND);
       }
     }
-    return renderer;
+    return this;
   }
 }

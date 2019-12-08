@@ -52,21 +52,10 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer {
     this.panel = panel;
   }
 
-  /**
-   * Returns the default table cell renderer.
-   * @param table the JTable to which this renderer applies.
-   * @param value the value of the rendered cell.
-   * @param isSelected determines whether the cell is selected.
-   * @param hasFocus determines whether the cell has the focus.
-   * @param row the row of the rendered cell.
-   * @param column the column of the rendered cell.
-   * @return the default table cell renderer.
-   */
   @Override
   public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
-    final DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     final int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
-    if ((actualCol < 0) || panel.isColumnHidden(actualCol)) return renderer;
+    if ((actualCol < 0) || panel.isColumnHidden(actualCol)) return this;
     int alignment = SwingConstants.LEFT;
     switch(actualCol) {
       case NodeTreeTableModel.NB_TASKS:
@@ -86,21 +75,22 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer {
       if (o instanceof AbstractTopologyComponent) {
         final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
         if (data.isNode()) {
-          if (((TopologyNode) data).getStatus() == TopologyNodeStatus.DOWN) renderer.setForeground(UNMANAGED_COLOR);
+          if (((TopologyNode) data).getStatus() == TopologyNodeStatus.DOWN) setForeground(UNMANAGED_COLOR);
           else {
             if (!data.getManagementInfo().isActive())
-              renderer.setBackground(isSelected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
-            else renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            renderer.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+              setBackground(isSelected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
+            else setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+            setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
           }
         } else {
-          renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-          renderer.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+          setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+          setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
         }
       }
     }
-    renderer.setHorizontalAlignment(alignment);
-    renderer.setBorder(border);
-    return renderer;
+    setHorizontalAlignment(alignment);
+    setBorder(border);
+    setText(value == null ? "" : value.toString());
+    return this;
   }
 }

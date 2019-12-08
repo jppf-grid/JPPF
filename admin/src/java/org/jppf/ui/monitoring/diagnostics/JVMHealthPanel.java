@@ -27,7 +27,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
-import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.*;
@@ -89,7 +88,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
       for (final AbstractTopologyComponent child: driver.getChildren()) {
         if (child.isPeer()) continue;
         final TopologyNode node = (TopologyNode) child;
-        log.debug("adding node " + node+ " to driver " + driver);
+        if (debugEnabled) log.debug("adding node " + node+ " to driver " + driver);
         nodeAdded(new TopologyEvent(manager, driver, node, TopologyEvent.UpdateType.TOPOLOGY));
       }
     }
@@ -113,12 +112,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
     GuiUtils.adjustScrollbarsThickness(sp);
     setUIComponent(sp);
     treeTable.expandAll();
-    StatsHandler.getInstance().getShowIPHandler().addShowIPListener(new ShowIPListener() {
-      @Override
-      public void stateChanged(final ShowIPEvent event) {
-        treeTable.repaint();
-      }
-    });
+    StatsHandler.getInstance().getShowIPHandler().addShowIPListener((event) -> treeTable.repaint());
   }
 
   /**

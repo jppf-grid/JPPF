@@ -59,7 +59,7 @@ package org.jppf.ui.treetable;
 import java.io.Serializable;
 
 import javax.swing.event.*;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -119,13 +119,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel, Serializ
 
   @Override
   public int getIndexOfChild(final Object parent, final Object child) {
-    // This is not called in the JTree's default mode: use a naive implementation.
-    for (int i = 0; i < getChildCount(parent); i++) {
-      if (getChild(parent, i).equals(child)) {
-        return i;
-      }
-    }
-    return -1;
+    return ((TreeNode) parent).getIndex((TreeNode) child);
   }
 
   @Override

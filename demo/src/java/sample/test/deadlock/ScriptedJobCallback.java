@@ -19,6 +19,7 @@
 package sample.test.deadlock;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.scripting.*;
@@ -30,6 +31,12 @@ public class ScriptedJobCallback extends JobStreamingCallback.Adapter {
   final String jobCreatedScript, jobCompletedScript;
   /** */
   final ScriptDefinition jobCreatedScriptDef, jobCompletedScriptDef;
+  /** */
+  private AtomicBoolean jobSubmitted = new AtomicBoolean(false);
+  /** */
+  private final AtomicInteger submittedCount = new AtomicInteger(0);
+  /** */
+  private final AtomicInteger completedCount = new AtomicInteger(0);
 
   /** */
   public ScriptedJobCallback() {
@@ -42,14 +49,22 @@ public class ScriptedJobCallback extends JobStreamingCallback.Adapter {
 
   @Override
   public void jobCreated(final JPPFJob job) {
-    //if (jobCreatedScript != null) runScript(job, "deadlock.script.created", jobCreatedScript);
+    jobSubmitted.compareAndSet(false, true);
+    submittedCount.incrementAndGet();
     if (jobCreatedScriptDef != null) runScript(job, jobCreatedScriptDef);
   }
 
   @Override
   public void jobCompleted(final JPPFJob job, final JobStreamImpl jobStream) {
-    //if (jobCompletedScript != null) runScript(job, "deadlock.script.completed", jobCompletedScript);
+    completedCount.incrementAndGet();
     if (jobCompletedScriptDef != null) runScript(job, jobCompletedScriptDef);
+  }
+
+  /**
+   * @throws Exception if any error occurs.
+   */
+  synchronized void awaitFullCompletion() throws Exception {
+    while (!jobSubmitted.get() || (submittedCount.get() != completedCount.get())) wait(10L);
   }
 
   /**

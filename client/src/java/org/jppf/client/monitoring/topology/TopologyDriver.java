@@ -135,7 +135,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
 
   @Override
   public String getDisplayName() {
-    return managementInfo == null ? toString() : managementInfo.toDisplayString();
+    return managementInfo.toDisplayString();
   }
 
   /**

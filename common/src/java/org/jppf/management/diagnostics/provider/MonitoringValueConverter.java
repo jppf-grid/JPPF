@@ -41,7 +41,8 @@ public interface MonitoringValueConverter {
   public interface IntConverter extends MonitoringValueConverter {
     @Override
     default String convert(String value) {
-      return convert(Integer.valueOf(value));
+      
+      return convert(((value == null) || value.isEmpty()) ? 0 : Integer.valueOf(value));
     }
 
     /**
@@ -58,7 +59,7 @@ public interface MonitoringValueConverter {
   public interface LongConverter extends MonitoringValueConverter {
     @Override
     default String convert(String value) {
-      return convert(Long.valueOf(value));
+      return convert(((value == null) || value.isEmpty()) ? 0L : Long.valueOf(value));
     }
 
     /**
@@ -75,7 +76,7 @@ public interface MonitoringValueConverter {
   public interface FloatConverter extends MonitoringValueConverter {
     @Override
     default String convert(String value) {
-      return convert(Float.valueOf(value));
+      return convert(((value == null) || value.isEmpty()) ? 0f : Float.valueOf(value));
     }
 
     /**
@@ -92,7 +93,7 @@ public interface MonitoringValueConverter {
   public interface DoubleConverter extends MonitoringValueConverter {
     @Override
     default String convert(String value) {
-      return convert(Double.valueOf(value));
+      return convert(((value == null) || value.isEmpty()) ? 0d : Double.valueOf(value));
     }
 
     /**
@@ -154,7 +155,7 @@ public interface MonitoringValueConverter {
     
     @Override
     public String convert(final Double value) {
-      if ((range != null) && !range.isValueInRange(value)) return "n/a";
+      if (((range != null) && !range.isValueInRange(value)) || (value == null)) return "n/a";
       final String s = nf.format(value);
       return (suffix == null) ? s : s + suffix;
     }

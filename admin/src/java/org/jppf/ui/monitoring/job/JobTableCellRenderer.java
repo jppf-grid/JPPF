@@ -27,8 +27,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  * Table cell renderer used to render the alignment of cell values in the table.
  * @author Laurent Cohen
  */
-public class JobTableCellRenderer extends DefaultTableCellRenderer
-{
+public class JobTableCellRenderer extends DefaultTableCellRenderer {
   /**
    * The panel which holds the tree table.
    */
@@ -42,22 +41,10 @@ public class JobTableCellRenderer extends DefaultTableCellRenderer
     this.panel = panel;
   }
 
-  /**
-   * Returns the default table cell renderer.
-   * @param table the JTable to which this renderer applies.
-   * @param value the value of the rendered cell.
-   * @param isSelected determines whether the cell is selected.
-   * @param hasFocus  determines whether the cell has the focus.
-   * @param row the row of the rendered cell.
-   * @param column the column of the rendered cell.
-   * @return the default table cell renderer.
-   * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
-   */
   @Override
   public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
-    final DefaultTableCellRenderer renderer =  (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     final int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
-    if ((actualCol < 0) || panel.isColumnHidden(actualCol)) return renderer;
+    if ((actualCol < 0) || panel.isColumnHidden(actualCol)) return this;
       int alignment = SwingConstants.LEFT;
     switch(actualCol) {
       case JobTreeTableModel.INITIAL_TASK_COUNT:
@@ -69,7 +56,8 @@ public class JobTableCellRenderer extends DefaultTableCellRenderer
         alignment = "\u221E".equals(value) ? SwingConstants.CENTER : SwingConstants.RIGHT;
         break;
     }
-    renderer.setHorizontalAlignment(alignment);
-    return renderer;
+    setHorizontalAlignment(alignment);
+    setText(value == null ? "" : value.toString());
+    return this;
   }
 }

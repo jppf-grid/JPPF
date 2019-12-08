@@ -111,7 +111,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
         if (state == null) return res;
         switch (column) {
           case NODE_URL:
-            res = info.toString() + (isNode ? "" : "(peer driver)");
+            res = info.getDisplayName() + (isNode ? "" : "(peer driver)");
             break;
           case NODE_THREADS:
             if (isNode) {
