@@ -63,17 +63,16 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer {
 
   @Override
   public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean selected, final boolean hasFocus, final int row, final int column) {
-    final DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, selected, hasFocus, row, column);
     try {
       final int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
-      if ((actualCol < 0) || healthPanel.isColumnHidden(actualCol)) return renderer;
+      if ((actualCol < 0) || healthPanel.isColumnHidden(actualCol)) return this;
       final int alignment = (actualCol == 0) ? SwingConstants.LEFT : SwingConstants.RIGHT;
       final JPPFTreeTable treeTable = (JPPFTreeTable) table;
       final TreePath path = treeTable.getPathForRow(row);
       String iconPath = null;
       if (path != null) {
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-        renderer.setForeground(selected ? table.getSelectionForeground() : table.getForeground());
+        setForeground(selected ? table.getSelectionForeground() : table.getForeground());
         final Object o = node.getUserObject();
         if (o instanceof AbstractTopologyComponent) {
           final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
@@ -84,44 +83,45 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer {
             case MonitoringConstants.LIVE_THREADS_COUNT:
             case MonitoringConstants.DEADLOCKED:
               if (health.getBoolean(MonitoringConstants.DEADLOCKED)) {
-                renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
+                setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
                 iconPath = CRITICAL_ICON;
-                renderer.setIconTextGap(5);
+                setIconTextGap(5);
               } else {
-                renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
+                setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
               }
               break;
             case MonitoringConstants.HEAP_USAGE_MB:
             case MonitoringConstants.HEAP_USAGE_RATIO:
-              computeColor(renderer, table, health.getDouble(MonitoringConstants.HEAP_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+              computeColor(this, table, health.getDouble(MonitoringConstants.HEAP_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
             case MonitoringConstants.NON_HEAP_USAGE_MB:
             case MonitoringConstants.NON_HEAP_USAGE_RATIO:
-              computeColor(renderer, table, health.getDouble(MonitoringConstants.NON_HEAP_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+              computeColor(this, table, health.getDouble(MonitoringConstants.NON_HEAP_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
             case MonitoringConstants.RAM_USAGE_MB:
             case MonitoringConstants.RAM_USAGE_RATIO:
-              computeColor(renderer, table, health.getDouble(MonitoringConstants.RAM_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+              computeColor(this, table, health.getDouble(MonitoringConstants.RAM_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
             case MonitoringConstants.PROCESS_CPU_LOAD:
-              computeColor(renderer, table, health.getDouble(MonitoringConstants.PROCESS_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+              computeColor(this, table, health.getDouble(MonitoringConstants.PROCESS_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
               break;
             case MonitoringConstants.SYSTEM_CPU_LOAD:
-              computeColor(renderer, table, health.getDouble(MonitoringConstants.SYSTEM_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+              computeColor(this, table, health.getDouble(MonitoringConstants.SYSTEM_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
               break;
             default:
-              renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
+              setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
               break;
           }
         }
       }
-      renderer.setIcon((iconPath != null) ? GuiUtils.loadIcon(iconPath) : null);
-      renderer.setHorizontalAlignment(alignment);
-      renderer.setBorder(border);
+      setIcon((iconPath != null) ? GuiUtils.loadIcon(iconPath) : null);
+      setHorizontalAlignment(alignment);
+      setBorder(border);
+      setText(value == null ? "" : value.toString());
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-    return renderer;
+    return this;
   }
 
   /**

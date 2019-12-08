@@ -20,20 +20,16 @@ package sample.test.deadlock;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.management.*;
 
 import org.jppf.client.*;
 import org.jppf.client.utils.AbstractJPPFJobStream;
-import org.jppf.job.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.IsMasterNode;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -70,13 +66,9 @@ public class DeadlockRunner {
       ro.concurrencyLimit, ro.streamDuration, ro.nbJobs, ro.tasksPerJob, ro.taskOptions.taskDuration);
     ProvisioningThread pt = null;
     final JMXDriverConnectionWrapper jmx;
-    final MyJmxListener jmxListener = new MyJmxListener();
     try (final JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
       jmx = getJmxConnection(client);
-      jmx.getJobManager().addNotificationListener(jmxListener, null, null);
       ro.callback = new ScriptedJobCallback();
-      //ro.callback = new SystemExitCallback();
-      //ro.callback = new JobPersistenceCallback();
       ensureSufficientConnections(client, ro.clientConnections);
       if (ro.slaves >= 0) updateSlaveNodes(client, ro.slaves);
       if (ro.simulateNodeCrashes) pt = new ProvisioningThread(client, ro.waitTime);
@@ -98,12 +90,11 @@ public class DeadlockRunner {
         if (ro.simulateNodeCrashes) pt.setStopped(true);
         jobProvider.awaitEndOfStream();
         print("reached end of job stream");
-        ConcurrentUtils.awaitCondition(() -> jmxListener.getMapSize() <= 0, 5000L, 100L, false);
+        ((ScriptedJobCallback) ro.callback).awaitFullCompletion();
+        
         marker.stop();
-        printJobStats(jmxListener);
         printStats(jmx, jobProvider, marker);
       } finally {
-        jmx.getJobManager().removeNotificationListener(jmxListener);
         if (ro.simulateNodeCrashes) pt.setStopped(true);
       }
     } catch (final Exception e) {
@@ -258,14 +249,6 @@ public class DeadlockRunner {
   }
 
   /**
-   * @param listener .
-   */
-  private static void printJobStats(final MyJmxListener listener) {
-    print("jobs stats: start entries=%d (%s), longest job=%s, missed startCount=%d, jobCount=%,d",
-      listener.getMapSize(), listener.getMap(), listener.longestJobInfo, listener.missedStartCount.get(), listener.jobCount.get());
-  }
-
-  /**
    * Write a csv line where string elements are quoted.
    * @param writer the writer which writes to the file.
    * @param params the elements to write into the file.
@@ -294,65 +277,6 @@ public class DeadlockRunner {
     final String msg = String.format(format, params);
     System.out.println(msg);
     log.info(msg);
-  }
-
-  /** */
-  public static class MyJmxListener implements NotificationListener {
-    /** */
-    final AtomicInteger jobCount = new AtomicInteger(0);
-    /** */
-    final AtomicInteger missedStartCount = new AtomicInteger(0);
-    /**
-     * Mapping of job uuids to their start time.
-     */
-    final Map<String, Long> map = new HashMap<>();
-    /** */
-    final JobInfo longestJobInfo = new JobInfo();
-
-    @Override
-    public void handleNotification(final Notification notification, final Object handback) {
-      final JobNotification notif = (JobNotification) notification;
-      if (notif.getEventType() == JobEventType.JOB_QUEUED) {
-        final long time = System.nanoTime();
-        jobCount.incrementAndGet();
-        synchronized(this) {
-          map.put(notif.getJobInformation().getJobUuid(), time);
-        }
-      } else if (notif.getEventType() == JobEventType.JOB_ENDED) {
-        final long time = System.nanoTime();
-        final JobInformation ji = notif.getJobInformation();
-        final Long startTime;
-        synchronized(this) {
-          startTime = map.remove(ji.getJobUuid());
-          if (startTime != null) {
-            final long elapsed = time - startTime;
-            if (elapsed > longestJobInfo.duration) {
-              longestJobInfo.duration = elapsed;
-              longestJobInfo.jobUuid = ji.getJobUuid();
-              longestJobInfo.jobName = ji.getJobName();
-            }
-          }
-        }
-        if (startTime == null) {
-          missedStartCount.incrementAndGet();
-          log.info("couldn't find start entry for {}", ji);
-        }
-      }
-    }
-
-    /**
-     * @return the number of remaining entries in the map.
-     */
-    synchronized int getMapSize() {
-      return map.size();
-    }
-
-    /**
-     * @return the number of remaining entries in the map.
-     */
-    synchronized Map<String, Long> getMap() {
-      return new HashMap<>(map);
-    }
   }
 
   /** */

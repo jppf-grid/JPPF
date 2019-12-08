@@ -129,13 +129,12 @@ public class TopologyDriver extends AbstractTopologyComponent {
     sb.append(", managementInfo=").append(managementInfo);
     sb.append(", uuid=").append(uuid);
     sb.append(']');
-    //return (jmx == null) ? (managementInfo == null ? "?" : managementInfo.toDisplayString()) : jmx.getDisplayName();
     return sb.toString();
   }
 
   @Override
   public String getDisplayName() {
-    return managementInfo == null ? toString() : managementInfo.toDisplayString();
+    return managementInfo.toDisplayString();
   }
 
   /**
