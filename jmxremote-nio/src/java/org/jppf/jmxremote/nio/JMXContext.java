@@ -21,13 +21,14 @@ package org.jppf.jmxremote.nio;
 import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 
 import java.nio.channels.*;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.io.IOHelper;
+import org.jppf.jmx.*;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
+import org.jppf.utils.concurrent.QueueHandler;
 import org.slf4j.*;
 
 /**
@@ -50,7 +51,7 @@ public class JMXContext extends AbstractNioContext {
   /**
    * The queue of pending messages to send.
    */
-  private final Queue<MessageWrapper> pendingJmxMessages;
+  private final QueueHandler<MessageWrapper> pendingJmxMessages;
   /**
    * The JMX nio server to use.
    */
@@ -64,7 +65,7 @@ public class JMXContext extends AbstractNioContext {
    */
   private SelectionKey selectionKey;
   /**
-   * 
+   * Sequence number for each instance of this class.
    */
   private static final AtomicInteger idSequence = new AtomicInteger(0);
   /**
@@ -77,10 +78,17 @@ public class JMXContext extends AbstractNioContext {
    * @param server the JMX nio server to use.
    * @param socketChannel the associated socket channel.
    * @param reading whether the associated channel performs read operations ({@code true}) or write operations ({@code false}).
+   * @param env the jmx environment parameters.
    */
-  public JMXContext(final JMXNioServer server, final boolean reading, final SocketChannel socketChannel) {
+  public JMXContext(final JMXNioServer server, final boolean reading, final SocketChannel socketChannel, final Map<String, ?> env) {
     this.server = server;
-    pendingJmxMessages = reading ? null : new LinkedBlockingQueue<>();
+    if (reading) {
+      pendingJmxMessages = null;
+    } else {
+      int size = JMXEnvHelper.getInt(JPPFJMXProperties.NOTIF_QUEUE_SIZE, env, null);
+      if (size <= 0) size = JPPFJMXProperties.NOTIF_QUEUE_SIZE.getDefaultValue();
+      pendingJmxMessages = new QueueHandler<MessageWrapper>(null, size).setPeakSizeUpdateCallback(server::updatePeakPendingMessages);
+    }
     this.peer = false;
     this.socketChannel = socketChannel;
   }
@@ -119,7 +127,7 @@ public class JMXContext extends AbstractNioContext {
   public void offerJmxMessage(final JMXMessage jmxMessage) throws Exception {
     final SimpleNioMessage msg = new SimpleNioMessage(this);
     msg.setCurrentDataLocation(IOHelper.serializeData(jmxMessage));
-    pendingJmxMessages.offer(new MessageWrapper(jmxMessage, msg));
+    pendingJmxMessages.put(new MessageWrapper(jmxMessage, msg));
   }
 
   /**
@@ -127,7 +135,8 @@ public class JMXContext extends AbstractNioContext {
    * @return a {@link JMXMessage} instance.
    */
   public MessageWrapper pollJmxMessage() {
-    return pendingJmxMessages.poll();
+    final MessageWrapper msg = pendingJmxMessages.poll();
+    return msg;
   }
 
   /**

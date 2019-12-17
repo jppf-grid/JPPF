@@ -18,8 +18,10 @@
 
 package org.jppf.jmxremote.nio;
 
+import org.jppf.io.IOHelper;
 import org.jppf.jmx.*;
 import org.jppf.jmxremote.message.JMXRequest;
+import org.jppf.nio.SimpleNioMessage;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.Logger;
 
@@ -64,6 +66,8 @@ public class JMXMessageWriter {
       if (context.getCurrentMessageWrapper() == null) {
         final MessageWrapper msg = context.pollJmxMessage();
         if (msg == null) return false;
+        final SimpleNioMessage nioMessage =  (SimpleNioMessage) msg.nioMessage;
+        if (nioMessage.getCurrentDataLocation() == null) nioMessage.setCurrentDataLocation(IOHelper.serializeData(msg.jmxMessage));
         if (debugEnabled) log.debug("about to send message {} from context {}", msg, context);
         context.setCurrentMessageWrapper(msg);
         context.setReadMessage(msg.nioMessage);

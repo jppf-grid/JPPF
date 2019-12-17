@@ -41,6 +41,10 @@ public class JMXHelper {
    */
   public static final String LOCAL_PROTOCOL = "local";
   /**
+   * The maximum number of notifications in a JMX connection queue.
+   */
+  public static final int DEFAULT_MAX_NOTIFICATIONS_QUEUE_SIZE = 20_000;
+  /**
    * Identifier for the initial handshake of a connection.
    */
   public static final byte CONNECT = 1;

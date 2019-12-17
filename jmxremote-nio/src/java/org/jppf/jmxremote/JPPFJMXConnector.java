@@ -269,8 +269,9 @@ public class JPPFJMXConnector implements JMXConnector {
    */
   void addNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
     final int listenerID = (Integer) messageHandler.sendRequestWithResponse(ADD_NOTIFICATION_LISTENER, name, filter);
+    final ClientListenerInfo info = new ClientListenerInfo(listenerID, name, listener, filter, handback);
     synchronized(notificationListenerMap) {
-      notificationListenerMap.put(listenerID, new ClientListenerInfo(listenerID, name, listener, filter, handback));
+      notificationListenerMap.put(listenerID, info);
     }
   }
 
@@ -282,17 +283,21 @@ public class JPPFJMXConnector implements JMXConnector {
    */
   void removeNotificationListener(final ObjectName name, final NotificationListener listener) throws Exception {
     final List<ClientListenerInfo> toRemove = new ArrayList<>();
+    int[] ids = null;
     synchronized(notificationListenerMap) {
       for (final Map.Entry<Integer, ClientListenerInfo> entry: notificationListenerMap.entrySet()) {
         final ClientListenerInfo info = entry.getValue();
         if (info.getMbeanName().equals(name) && (info.getListener() == listener)) toRemove.add(info);
       }
       if (toRemove.isEmpty()) throw new ListenerNotFoundException("no matching listener");
-      final int[] ids = new int[toRemove.size()];
-      for (int i=0; i<ids.length; i++) ids[i] = toRemove.get(i).getListenerID();
-      messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER, name, ids);
-      for (final int id: ids) notificationListenerMap.remove(id);
+      ids = new int[toRemove.size()];
+      for (int i=0; i<ids.length; i++) {
+        final int id = toRemove.get(i).getListenerID();
+        ids[i] = id;
+        notificationListenerMap.remove(id);
+      }
     }
+    messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER, name, ids);
   }
 
   /**
@@ -314,9 +319,9 @@ public class JPPFJMXConnector implements JMXConnector {
         }
       }
       if (toRemove == null) throw new ListenerNotFoundException("no matching listener");
-      messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, name, toRemove.getListenerID());
       notificationListenerMap.remove(toRemove.getListenerID());
     }
+    messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, name, toRemove.getListenerID());
   }
 
   /**

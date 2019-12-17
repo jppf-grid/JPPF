@@ -450,6 +450,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String> JOB_SLA_DEFAULT_POLICY = new StringProperty("jppf.job.sla.default.policy", null);
   /** A default client-side execution policy to associate with submitted jobs when they don't have one. */
   public static final JPPFProperty<String> JOB_CLIENT_SLA_DEFAULT_POLICY = new StringProperty("jppf.job.client.sla.default.policy", null);
+  /** Maximum size of pending notifications queue. */
+  public static final JPPFProperty<Integer> JMX_NOTIF_QUEUE_SIZE = new IntProperty("jppf.jmx.notifications.queue.size", JMXHelper.DEFAULT_MAX_NOTIFICATIONS_QUEUE_SIZE);
   /** The list of all predefined properties. */
   private static List<JPPFProperty<?>> properties;
 

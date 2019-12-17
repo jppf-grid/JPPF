@@ -35,4 +35,10 @@ public interface JMXNioServerMBean extends Serializable {
    * @return a map of statistics entries.
    */
   String stats();
+
+  /**
+   * Get the maximum number of pending notifications in the queue of a JMX connection.
+   * @return the peak queue size as an int.
+   */
+  int getPeakPendingMessages();
 }

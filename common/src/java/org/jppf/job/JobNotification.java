@@ -90,7 +90,7 @@ public class JobNotification extends Notification {
 
   /**
    * Get the type of this job event.
-   * @return a <code>JobManagerEventType</code> enum value.
+   * @return a {@code>JobManagerEventType} enum value.
    */
   public JobEventType getEventType() {
     return eventType;

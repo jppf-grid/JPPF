@@ -34,7 +34,7 @@ public class JPPFThreadFactory implements ThreadFactory {
   /**
    * The name used as prefix for the constructed threads name.
    */
-  private String name = null;
+  private String name;
   /**
    * Count of created threads.
    */
@@ -46,7 +46,7 @@ public class JPPFThreadFactory implements ThreadFactory {
   /**
    * List of monitored thread IDs.
    */
-  private List<Long> threadIDs = null;
+  private List<Long> threadIDs;
   /**
    * Whether created threads are daemon threads.
    */
@@ -54,7 +54,7 @@ public class JPPFThreadFactory implements ThreadFactory {
   /**
    * The thread group that contains the threads of this factory.
    */
-  ThreadGroup threadGroup = null;
+  ThreadGroup threadGroup;
   /**
    * Priority assigned to the threads created by this factory.
    */
@@ -130,7 +130,9 @@ public class JPPFThreadFactory implements ThreadFactory {
   @Override
   public synchronized Thread newThread(final Runnable r) {
     final Thread thread;
-    final String threadName = String.format("%s-%04d", name, count.incrementAndGet());
+    final int n = count.incrementAndGet();
+    if (n == 3000) System.out.println("reach 3000 threads, callstack:\n" + ExceptionUtils.getCallStack());
+    final String threadName = String.format("%s-%04d", name, n);
     if (doPrivileged) {
       thread = AccessController.doPrivileged(new PrivilegedAction<Thread>() {
         @Override

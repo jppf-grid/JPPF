@@ -31,7 +31,8 @@ import org.jppf.jmx.JMXHelper;
 import org.jppf.jmxremote.JMXAuthorizationChecker;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
+import org.jppf.utils.concurrent.QueueHandler;
 import org.slf4j.*;
 
 /**
@@ -48,6 +49,11 @@ class JMXMessageReader {
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Handles the JMX notifications in a separate thread.
+   */
+  private static QueueHandler<Pair<JMXContext, JMXMessage>> queueHandler =
+    new QueueHandler<Pair<JMXContext, JMXMessage>>("JMXNotificationsHandler", (pair) -> handleMessage(pair.first(), pair.second())).startDequeuer();
 
   /**
    * Read from the channel until no more data is available (i.e. socket receive buffer is empty).
@@ -79,10 +85,12 @@ class JMXMessageReader {
         else throw e;
       }
       if (b) {
-        final SimpleNioMessage message = (SimpleNioMessage) context.getReadMessage();
+        final SimpleNioMessage nioMessage = (SimpleNioMessage) context.getReadMessage();
         if (debugEnabled) log.debug("read message from {}", context);
         context.setReadMessage(null);
-        executor.execute(new HandlingTask(context, message));
+        final JMXMessage msg = context.deserializeMessage(nioMessage);
+        if (msg instanceof JMXNotification) queueHandler.put(new Pair<>(context, msg));
+        else executor.execute(() -> handleMessage(context, msg));
       } else if (context.readByteCount <= 0L) break;
     }
   }
@@ -90,15 +98,25 @@ class JMXMessageReader {
   /**
    * Deserialize the specified message and route it to the specialized handling method.
    * @param context the context associated with the channel.
-   * @param message the message to handle.
-   * @throws Exception if any error occurs.
+   * @param msg the message to handle.
    */
-  private static void handleMessage(final JMXContext context, final SimpleNioMessage message) throws Exception {
-    final JMXMessage msg = context.deserializeMessage(message);
-    if (debugEnabled) log.debug("read message = {} from context = {}", msg, context);
-    if (msg instanceof JMXRequest) handleRequest(context, (JMXRequest) msg);
-    else if (msg instanceof JMXResponse) handleResponse(context, (JMXResponse) msg);
-    else if (msg instanceof JMXNotification) handleNotification(context, (JMXNotification) msg);
+  static void handleMessage(final JMXContext context, final JMXMessage msg) {
+    try {
+      if (debugEnabled) log.debug("read message = {} from context = {}", msg, context);
+      if (msg instanceof JMXRequest) handleRequest(context, (JMXRequest) msg);
+      else if (msg instanceof JMXResponse) handleResponse(context, (JMXResponse) msg);
+      else if (msg instanceof JMXNotification) handleNotification(context, (JMXNotification) msg);
+    } catch(final Exception|Error e) {
+      try {
+        if (debugEnabled) log.debug("error on channel {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+        else log.warn("error on channel {} : {}", context, ExceptionUtils.getMessage(e));
+      } catch (final Exception e2) {
+        if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e2));
+        else log.warn("error on channel: {}", ExceptionUtils.getMessage(e2));
+      }
+      if (e instanceof Exception) context.handleException((Exception) e);
+      else throw (Error) e;
+    }
   }
 
   /**
@@ -308,47 +326,6 @@ class JMXMessageReader {
     } else {
       final JMXResponse response = new JMXResponse(request, result, isException);
       context.getMessageHandler().sendMessage(response);
-    }
-  }
-
-  /**
-   * Instances of this task deserialize and porcess a NioMessage that was read from the network channel.
-   */
-  private final static class HandlingTask implements Runnable {
-    /**
-     * The context associated with the channel.
-     */
-    private final JMXContext context;
-    /**
-     * The message to handle.
-     */
-    private final SimpleNioMessage message;
-
-    /**
-     * Initialize with the specified context and message.
-     * @param context the context associated with the channel.
-     * @param message the message to handle.
-     */
-    private HandlingTask(final JMXContext context, final SimpleNioMessage message) {
-      this.context = context;
-      this.message = message;
-    }
-
-    @Override
-    public void run() {
-      try {
-        JMXMessageReader.handleMessage(context, message);
-      } catch(final Exception|Error e) {
-        try {
-          if (debugEnabled) log.debug("error on channel {} :\n{}", context, ExceptionUtils.getStackTrace(e));
-          else log.warn("error on channel {} : {}", context, ExceptionUtils.getMessage(e));
-        } catch (final Exception e2) {
-          if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e2));
-          else log.warn("error on channel: {}", ExceptionUtils.getMessage(e2));
-        }
-        if (e instanceof Exception) context.handleException((Exception) e);
-        else throw (Error) e;
-      }
     }
   }
 }

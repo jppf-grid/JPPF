@@ -39,6 +39,7 @@ import org.jppf.nio.acceptor.AcceptorNioServer;
 import org.jppf.ssl.*;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
+import org.jppf.utils.concurrent.SynchronizedInteger;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
@@ -91,6 +92,10 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
    * The statsistics to update, if any.
    */
   private final JPPFStatistics stats;
+  /**
+   * The maximum number of notifications waiiting to be sent in a JMX connection.
+   */
+  private final SynchronizedInteger peakPeakPendingMessages = new SynchronizedInteger(0);
 
   /**
    * @throws Exception if any error occurs.
@@ -215,7 +220,7 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
    */
   private JMXContext createContext(final Map<String, ?> env, final SocketChannel channel, final boolean ssl, final boolean reading, final SSLHandler sslHandler, final boolean client)
     throws Exception {
-    final JMXContext context = createNioContext(reading, channel);
+    final JMXContext context = createNioContext(reading, channel, env);
     if (debugEnabled) log.debug("creating channel wrapper for ssl={}, reading={}, sslHandler={}, context={}, env={}", ssl, reading, sslHandler, context, env);
     context.setSsl(ssl);
     if (ssl) {
@@ -252,9 +257,10 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
     context.setSSLHandler(sslHandler);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public JMXContext createNioContext(final Object...params) {
-    return new JMXContext(this, (Boolean) params[0], (SocketChannel) params[1]);
+    return new JMXContext(this, (Boolean) params[0], (SocketChannel) params[1], (Map<String, ?>) params[2]);
   }
 
   /**
@@ -421,5 +427,18 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
   protected void initNioHandlers() {
     super.initNioHandlers();
     acceptHandler = null;
+  }
+
+  @Override
+  public int getPeakPendingMessages() {
+    return peakPeakPendingMessages.get();
+  }
+
+  /**
+   * Update the peak notifications count.
+   * @param value the value to update with.
+   */
+  void updatePeakPendingMessages(final int value) {
+    peakPeakPendingMessages.compareAndSet(Operator.LESS_THAN, value);
   }
 }

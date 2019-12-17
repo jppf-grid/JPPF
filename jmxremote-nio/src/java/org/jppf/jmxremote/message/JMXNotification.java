@@ -18,10 +18,12 @@
 
 package org.jppf.jmxremote.message;
 
+import java.io.*;
+import java.util.Arrays;
+
 import javax.management.Notification;
 
 import org.jppf.jmx.JMXHelper;
-import org.jppf.utils.StringUtils;
 
 /**
  * A specialized message that represents a JMX notification to dispatch on the client side.
@@ -33,13 +35,17 @@ public class JMXNotification extends AbstractJMXMessage {
    */
   private static final long serialVersionUID = 1L;
   /**
+   * Constant for an empty set of listeners.
+   */
+  private static final Integer[] NO_LISTENER = new Integer[0];
+  /**
    * The notification to dispatch.
    */
-  private final Notification notification;
+  private Notification notification;
   /**
    * The ids of the listeners to dispatch to.
    */
-  private final Integer[] listenerIDs;
+  private Integer[] listenerIDs;
 
   /**
    * Initialize this request with the specified ID, request type and parameters.
@@ -50,7 +56,7 @@ public class JMXNotification extends AbstractJMXMessage {
   public JMXNotification(final long messageID, final Notification notification, final Integer[] listenerIDs) {
     super(messageID, JMXHelper.NOTIFICATION);
     this.notification = notification;
-    this.listenerIDs = listenerIDs;
+    this.listenerIDs = (listenerIDs == null) ? NO_LISTENER : listenerIDs;
   }
 
   /**
@@ -72,8 +78,35 @@ public class JMXNotification extends AbstractJMXMessage {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("messageID=").append(getMessageID())
       .append(", messageType=").append(JMXHelper.name(getMessageType()))
-      .append(", listenerIDs=").append(StringUtils.arrayToString(", ", "[", "]", listenerIDs))
+      .append(", listenerIDs=").append(Arrays.toString(listenerIDs))
       .append(", notification=").append(notification)
       .append(']').toString();
+  }
+
+  /**
+   * Save the state of the {@code AbstractJPPFJob} instance to a stream (i.e.,serialize it).
+   * @param out the output stream to which to write the job. 
+   * @throws IOException if any I/O error occurs.
+   */
+  private void writeObject(final ObjectOutputStream out) throws IOException {
+    out.writeObject(notification);
+    out.writeInt(listenerIDs.length);
+    for (final int id: listenerIDs) out.writeInt(id);
+  }
+
+  /**
+   * Reconstitute the {@code AbstractJPPFJob} instance from a stream (i.e., deserialize it).
+   * @param in the input stream from which to read the job. 
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if the class of an object in the object graph can not be found.
+   */
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+    notification = (Notification) in.readObject();
+    final int n = in.readInt();
+    if (n == 0) listenerIDs = NO_LISTENER;
+    else {
+      listenerIDs = new Integer[n];
+      for (int i=0; i<n; i++) listenerIDs[i] = in.readInt();
+    }
   }
 }
