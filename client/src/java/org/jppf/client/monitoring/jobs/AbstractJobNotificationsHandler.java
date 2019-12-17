@@ -19,7 +19,6 @@
 package org.jppf.client.monitoring.jobs;
 
 import java.util.*;
-import java.util.concurrent.*;
 
 import javax.management.*;
 
@@ -51,7 +50,7 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
   /**
    * Used to queue the JMX notifications in the same order they are received with a minimum of interruption.
    */
-  final ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobNotificationsHandler"));
+  final QueueHandler<JobNotification> notificationsQueue;
   /**
    * 
    */
@@ -69,12 +68,21 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
     if (debugEnabled) log.debug("initializing {} with {}", getClass().getSimpleName(), monitor);
     this.monitor = monitor;
     monitor.getTopologyManager().addTopologyListener(driverListener = new DriverListener());
+    final int capacity = 5_000;
+    notificationsQueue = new QueueHandler<>("JobNotificationsHandler", capacity, this::handleNotificationAsync)
+      .setPeakSizeUpdateCallback((n) -> {
+        if ((n >= capacity) && debugEnabled) log.debug("maximum peak job notifications: {}", n);
+      }).startDequeuer();
   }
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
     if (log.isTraceEnabled()) log.trace("got jmx notification: {}", notification);
-    executor.execute(new NotificationHandlingTask((JobNotification) notification));
+    try {
+      notificationsQueue.put((JobNotification) notification);
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
   }
 
   /**
@@ -86,32 +94,9 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
   @Override
   public void close() {
     monitor.getTopologyManager().removeTopologyListener(driverListener);
-    executor.shutdownNow();
+    notificationsQueue.close();
     synchronized(initializerMap) {
       initializerMap.clear();
-    }
-  }
-
-  /**
-   * Instances of this task handle raw JMX notifications handed to the executor queue.
-   */
-  private class NotificationHandlingTask implements Runnable {
-    /**
-     * The notification to handle.
-     */
-    final JobNotification notif;
-
-    /**
-     * Create this initializer witht he specified driver.
-     * @param notif the notification to handle.
-     */
-    NotificationHandlingTask(final JobNotification notif) {
-      this.notif = notif;
-    }
-
-    @Override
-    public void run() {
-      handleNotificationAsync(notif);
     }
   }
 

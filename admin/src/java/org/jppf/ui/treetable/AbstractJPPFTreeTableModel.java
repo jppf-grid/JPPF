@@ -131,8 +131,10 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @param pos the position at which to insert the node.
    */
   public void insertNodeInto(final DefaultMutableTreeNode child, final DefaultMutableTreeNode parent, final int pos) {
-    parent.insert(child, pos);
-    fireTreeNodesInserted(parent, parent.getPath(), new int[] { pos }, new Object[] { child } );
+    final int size = parent.getChildCount();
+    final int n = (pos > size) ? size : pos;
+    parent.insert(child, n);
+    fireTreeNodesInserted(parent, parent.getPath(), new int[] { n }, new Object[] { child } );
   }
 
   /**
@@ -141,9 +143,11 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    */
   public void removeNodeFromParent(final DefaultMutableTreeNode node) {
     final DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
-    final int pos = parent.getIndex(node);
-    parent.remove(node);
-    fireTreeNodesRemoved(parent, parent.getPath(), new int[] { pos }, new Object[] { node } );
+    if (parent != null) {
+      final int pos = parent.getIndex(node);
+      parent.remove(node);
+      fireTreeNodesRemoved(parent, parent.getPath(), new int[] { pos }, new Object[] { node } );
+    }
   }
 
   /**

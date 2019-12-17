@@ -17,12 +17,14 @@
  */
 package org.jppf.ui.utils;
 
+import java.util.Enumeration;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.monitoring.AbstractComponent;
-import org.jppf.management.*;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 
@@ -39,34 +41,38 @@ public final class TreeTableUtils {
    * Determines whether debug log statements are enabled.
    */
   static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+
   /**
-   * Find the position at which to insert a driver, using the sorted lexical order of driver names.
-   * @param parent the parent tree node for the driver to insert.
-   * @param comp the driver to insert.
-   * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
+   * Find the position at which to insert a a child tree node, using the sorted lexical order of the children names.
+   * @param parent the parent tree node for the tree node to insert.
+   * @param comp the tree node to insert.
+   * @return the index at which to insert the driver, or -1 if the child is already in the tree.
    */
   public static int insertIndex(final DefaultMutableTreeNode parent, final AbstractComponent<?> comp) {
-    final int n = parent.getChildCount();
-    for (int i=0; i<n; i++) {
-      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
+    final Enumeration<?> children = parent.children();
+    int count = 0;
+    while (children.hasMoreElements()) {
+      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
       final AbstractComponent<?> childData = (AbstractComponent<?>) child.getUserObject();
       if (childData == null) return -1;
       if (childData.getUuid().equals(comp.getUuid())) return -1;
-      else if (comp.getDisplayName().compareTo(childData.getDisplayName()) < 0) return i;
+      else if (comp.getDisplayName().compareTo(childData.getDisplayName()) < 0) return count;
+      count++;
     }
-    return n;
+    return parent.getChildCount();
   }
 
   /**
    * Find the tree node with the specified component uuid in the children of the specified parent.
    * @param parent the parent tree node for the component to find.
    * @param uuid uuid of the component to find.
-   * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
+   * @return a {@code DefaultMutableTreeNode} or null if the child could not be found.
    */
   public static DefaultMutableTreeNode findComponent(final DefaultMutableTreeNode parent, final String uuid) {
     if (uuid == null) return null;
-    for (int i=0; i<parent.getChildCount(); i++) {
-      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
+    final Enumeration<?> children = parent.children();
+    while (children.hasMoreElements()) {
+      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
       final AbstractComponent<?> data = (AbstractComponent<?>) child.getUserObject();
       if (data == null) continue;
       if (data.getUuid().equals(uuid)) return child;
@@ -89,7 +95,7 @@ public final class TreeTableUtils {
    * @param root the parent tree node for the component to find.
    * @param uuid uuid of the component to find.
    * @param filter a filter that may reject a certain type of nodes, may be {@code null}.
-   * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
+   * @return a {@code DefaultMutableTreeNode} or null if the driver could not be found.
    */
   public static DefaultMutableTreeNode findTreeNode(final DefaultMutableTreeNode root, final String uuid, final TreeNodeFilter filter) {
     if (uuid == null) return null;

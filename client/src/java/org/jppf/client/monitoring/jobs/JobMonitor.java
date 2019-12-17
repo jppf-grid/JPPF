@@ -25,7 +25,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.job.JobInformation;
-import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -339,7 +338,7 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
           break;
       }
     } catch(final Exception e) {
-      log.error("error dispatching event of type {}, event={}, exception: {}", type, event, ExceptionUtils.getStackTrace(e));
+      log.error("error dispatching event of type {}, event={}", type, event, e);
     }
   }
 

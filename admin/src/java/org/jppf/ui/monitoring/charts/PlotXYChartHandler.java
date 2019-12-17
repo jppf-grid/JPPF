@@ -138,6 +138,7 @@ public class PlotXYChartHandler implements ChartHandler {
   public ChartConfiguration updateDataset(final ChartConfiguration config) {
     //XYSeriesCollection ds = (XYSeriesCollection) config.dataset;
     final Object ds = config.dataset;
+    if (ds == null) return config;
     final Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     //for (int i=0; i<ds.getSeriesCount(); i++)
     for (int i = 0; i < (Integer) invokeMethod(ds.getClass(), ds, "getSeriesCount"); i++) {

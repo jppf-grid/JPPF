@@ -46,9 +46,9 @@ public class JobsUtils {
   public static DefaultMutableTreeNode addDriver(final AbstractJPPFTreeTableModel model, final JobDriver driver) {
     final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
     final int index = TreeTableUtils.insertIndex(treeTableRoot, driver);
+    if (debugEnabled) log.debug("adding driver: {} at index {}", driver.getDisplayName(), index);
     if (index < 0) return null;
     final DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driver);
-    if (debugEnabled) log.debug("adding driver: " + driver.getDisplayName() + " at index " + index);
     model.insertNodeInto(driverNode, treeTableRoot, index);
     return driverNode;
   }
@@ -59,9 +59,9 @@ public class JobsUtils {
    * @param driver the name of the driver to remove.
    */
   public static void removeDriver(final AbstractJPPFTreeTableModel model, final JobDriver driver) {
+    if (debugEnabled) log.debug("removing driver: " + driver.getDisplayName());
     final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
     final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driver.getUuid());
-    if (debugEnabled) log.debug("removing driver: " + driver.getDisplayName());
     if (driverNode == null) return;
     model.removeNodeFromParent(driverNode);
   }
@@ -76,11 +76,14 @@ public class JobsUtils {
   public static DefaultMutableTreeNode addJob(final AbstractJPPFTreeTableModel model, final JobDriver driver, final Job job) {
     final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
     final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driver.getUuid());
-    if (driverNode == null) return null;
+    if (driverNode == null) {
+      if (debugEnabled) log.debug("driverNode null for {}", driver);
+      return null;
+    }
     final int index = TreeTableUtils.insertIndex(driverNode, job);
+    if (debugEnabled) log.debug("adding job: " + job.getDisplayName() + " to driver " + driver.getDisplayName() + " at index " + index);
     if (index < 0) return null;
     final DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(job);
-    if (debugEnabled) log.debug("adding job: " + job.getDisplayName() + " to driver " + driver.getDisplayName() + " at index " + index);
     model.insertNodeInto(jobNode, driverNode, index);
     return driverNode;
   }
@@ -94,9 +97,15 @@ public class JobsUtils {
   public static void removeJob(final AbstractJPPFTreeTableModel model, final JobDriver driver, final Job job) {
     final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
     final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driver.getUuid());
-    if (driverNode == null) return;
+    if (driverNode == null) {
+      if (debugEnabled) log.debug("driverNode null for {}", driver);
+      return;
+    }
     final DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
-    if (jobNode == null) return;
+    if (jobNode == null) {
+      if (debugEnabled) log.debug("jobNode null for {}", job);
+      return;
+    }
     if (debugEnabled) log.debug("removing job: " + job.getDisplayName() + " from driver " + driver.getDisplayName());
     model.removeNodeFromParent(jobNode);
   }
@@ -112,9 +121,14 @@ public class JobsUtils {
     if (driverNode == null) return;
     final DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
     if (jobNode == null) return;
-    if (debugEnabled) log.debug("updating job: " + job.getDisplayName() + " from driver " + job.getJobDriver().getDisplayName());
+    //if (debugEnabled) log.debug("updating job: {} from driver {}", job.getDisplayName(), job.getJobDriver().getDisplayName());
     model.changeNode(jobNode);
   }
+
+  /**
+   * 
+   */
+  private static boolean logDispatch = false;
 
   /**
    * Called to notify that a sub-job was dispatched to a node.
@@ -126,13 +140,19 @@ public class JobsUtils {
   public static DefaultMutableTreeNode addJobDispatch(final AbstractJPPFTreeTableModel model, final Job job, final JobDispatch dispatch) {
     final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
     final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, job.getJobDriver().getUuid());
-    if (driverNode == null) return null;
+    if (driverNode == null) {
+      if (debugEnabled && logDispatch) log.debug("driverNode null for {}", job.getJobDriver());
+      return null;
+    }
     final DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
-    if (jobNode == null) return null;
+    if (jobNode == null) {
+      if (debugEnabled && logDispatch) log.debug("jobNode null for {}", job);
+      return null;
+    }
     final int index = TreeTableUtils.insertIndex(jobNode, dispatch);
+    if (debugEnabled && logDispatch) log.debug("sub-job: {} dispatched to node {} at index {}", job.getDisplayName(), dispatch.getDisplayName(), index);
     if (index < 0) return null;
     final DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(dispatch);
-    if (debugEnabled) log.debug("sub-job: {} dispatched to node {} (index {})", new Object[] { job.getDisplayName(), dispatch.getDisplayName(), index});
     model.insertNodeInto(subJobNode, jobNode, index);
     return jobNode;
   }
@@ -147,12 +167,21 @@ public class JobsUtils {
     if (dispatch == null) return;
     final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
     final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, job.getJobDriver().getUuid());
-    if (driverNode == null) return;
+    if (driverNode == null) {
+      if (debugEnabled && logDispatch) log.debug("driverNode null for {}", job.getJobDriver());
+      return;
+    }
     final DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
-    if (jobNode == null) return;
+    if (jobNode == null) {
+      if (debugEnabled && logDispatch) log.debug("jobNode null for {}", job);
+      return;
+    }
     final DefaultMutableTreeNode subJobNode = TreeTableUtils.findComponent(jobNode, dispatch.getUuid());
-    if (subJobNode == null) return;
-    if (debugEnabled) log.debug("removing dispatch: " + job.getDisplayName() + " from node " + dispatch.getDisplayName());
+    if (subJobNode == null) {
+      if (debugEnabled && logDispatch) log.debug("dispatch node null for for {}, job = {}", dispatch, job);
+      return;
+    }
+    if (debugEnabled && logDispatch) log.debug("removing dispatch: " + job.getDisplayName() + " from node " + dispatch.getDisplayName());
     model.removeNodeFromParent(subJobNode);
   }
 }

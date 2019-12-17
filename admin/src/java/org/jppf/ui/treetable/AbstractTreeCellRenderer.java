@@ -120,31 +120,31 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer {
   /**
    * Default non-selection background.
    */
-  protected Color defaultNonSelectionBackground = null;
+  protected Color defaultNonSelectionBackground;
   /**
    * Default selection background.
    */
-  protected Color defaultSelectionBackground = null;
+  protected Color defaultSelectionBackground;
   /**
    * Default selection background.
    */
-  protected Color defaultSelectionForeground = null;
+  protected Color defaultSelectionForeground;
   /**
    * The default plain font.
    */
-  protected static Font plainFont = null;
+  protected static Font plainFont;
   /**
    * The default italic font.
    */
-  protected static Font italicFont = null;
+  protected static Font italicFont;
   /**
    * The default bold font.
    */
-  protected static Font boldFont = null;
+  protected static Font boldFont;
   /**
    * The default bold and italic font.
    */
-  protected static Font boldItalicFont = null;
+  protected static Font boldItalicFont;
 
   /**
    * Default constructor.

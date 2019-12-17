@@ -145,7 +145,8 @@ public class Bar3DChartHandler implements ChartHandler {
     if (valueMap != null) {
       for (Fields key: config.fields) {
         //ds.setValue(valueMap.get(key), "0", key);
-        invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), "0", key);
+        final Double value = valueMap.get(key);
+        invokeMethod(ds.getClass(), ds, "setValue", (value == null) ? 0d : value, "0", key);
       }
     }
     return config;

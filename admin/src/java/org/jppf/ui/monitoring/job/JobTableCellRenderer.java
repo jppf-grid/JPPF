@@ -58,6 +58,8 @@ public class JobTableCellRenderer extends DefaultTableCellRenderer {
     }
     setHorizontalAlignment(alignment);
     setText(value == null ? "" : value.toString());
+    setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+    setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
     return this;
   }
 }

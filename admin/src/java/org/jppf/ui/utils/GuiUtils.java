@@ -370,4 +370,13 @@ public final class GuiUtils {
     scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(thickness, 0));
     scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, thickness));
   }
+
+  /**
+   * Perform the specified action on the AWT event dispatch thread.
+   * @param action the action to perform.
+   */
+  public static void invokeOnAWTThread(final Runnable action) {
+    /*if (EventQueue.isDispatchThread()) action.run();
+    else*/ EventQueue.invokeLater(action);
+  }
 }

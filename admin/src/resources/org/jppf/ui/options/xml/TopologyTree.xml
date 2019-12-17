@@ -134,9 +134,9 @@
 			<property name="value" value=""/>
 			<initializer type="script">
 				<script language="groovy">
+          option.init();
 					option.setupTableColumns();
 					option.setupActions();
-          option.init();
 				</script>
 			</initializer>
 			<finalizer type="script">
