@@ -26,7 +26,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
-import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.*;
@@ -100,12 +99,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
     GuiUtils.adjustScrollbarsThickness(sp);
     setUIComponent(sp);
     treeTable.expandAll();
-    StatsHandler.getInstance().getShowIPHandler().addShowIPListener(new ShowIPListener() {
-      @Override
-      public void stateChanged(final ShowIPEvent event) {
-        treeTable.repaint();
-      }
-    });
+    StatsHandler.getInstance().getShowIPHandler().addShowIPListener((event) -> treeTable.repaint());
   }
 
   /**
@@ -152,16 +146,18 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
     if (!firstDriverAdded) {
       firstDriverAdded = true;
       if (debugEnabled) log.debug("adding first driver: {}", driver.getDisplayName());
-      final Runnable r =  new Runnable() {
-        @Override public synchronized void run() {
-          try {
-            JPPFTreeTable treeTable = null;
-            while ((treeTable = getTreeTable()) == null) wait(10L);
-            treeTable.expand(getTreeTableRoot());
-            treeTable.expand(driverNode);
-          } catch (final Exception e) {
-            log.debug(e.getMessage(), e);
+      final Runnable r =  () -> {
+        try {
+          JPPFTreeTable treeTable = null;
+          while ((treeTable = getTreeTable()) == null) {
+            synchronized(this) {
+              wait(10L);
+            }
           }
+          treeTable.expand(getTreeTableRoot());
+          treeTable.expand(driverNode);
+        } catch (final Exception e) {
+          log.debug(e.getMessage(), e);
         }
       };
       ThreadUtils.startThread(r, "Job tree expansion");

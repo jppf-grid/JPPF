@@ -121,8 +121,25 @@ public final class ChartDataCache {
    */
   public synchronized Map<Fields, List<Double>> getData(final Fields[] fields) {
     final Map<Fields, List<Double>> result = new HashMap<>(fields.length);
+    int maxLength = 0;
     for (final Fields field: fields) {
       final List<Double> values = (List<Double>) map.getValues(field);
+      final int n = (values == null) ? 0 : values.size();
+      if (n > maxLength) maxLength = n;
+    }
+    if (maxLength <= 0) maxLength = 1;
+    for (final Fields field: fields) {
+      List<Double> values = (List<Double>) map.getValues(field);
+      if (values == null) {
+        values = new LinkedList<>();
+        for (int i=0; i<maxLength; i++) values.add(0d);
+        map.addValues(field, values);
+      } else {
+        final int n = values.size();
+        if (n < maxLength) {
+          for (int i=0; i<maxLength - n; i++) values.add(0d);
+        }
+      }
       result.put(field, new LinkedList<>(values));
     }
     return result;

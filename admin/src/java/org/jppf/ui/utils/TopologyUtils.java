@@ -65,6 +65,8 @@ public class TopologyUtils {
         driverNode = new DefaultMutableTreeNode(driver);
         if (TreeTableUtils.debugEnabled) TreeTableUtils.log.debug("adding driver: " + driver + " at index " + index);
         model.insertNodeInto(driverNode, treeTableRoot, index);
+      } else {
+        if (debugEnabled) log.debug("insertion index = {} for driver {}", index, driver);
       }
     }
     return driverNode;

@@ -52,6 +52,7 @@ package org.jppf.ui.treetable;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -296,11 +297,11 @@ public class JTreeTable extends JTable {
     /**
      * Set to true when we are updating the ListSelectionModel.
      */
-    protected boolean updatingListSelectionModel;
+    protected final AtomicBoolean updatingListSelectionModel = new AtomicBoolean(false);
     /**
      *
      */
-    protected boolean updatingTreeSelectionModel;
+    protected final AtomicBoolean updatingTreeSelectionModel = new AtomicBoolean(false);
 
     /**
      * Initialize this selection model.
@@ -326,12 +327,11 @@ public class JTreeTable extends JTable {
      */
     @Override
     public void resetRowSelection() {
-      if (!updatingListSelectionModel) {
-        updatingListSelectionModel = true;
+      if (updatingListSelectionModel.compareAndSet(false, true)) {
         try {
-          super.resetRowSelection();
+          if (selection != null) super.resetRowSelection();
         } finally {
-          updatingListSelectionModel = false;
+          updatingListSelectionModel.set(false);
         }
       }
       // Notice how we don't message super if updatingListSelectionModel is true. If updatingListSelectionModel is true,
@@ -350,8 +350,7 @@ public class JTreeTable extends JTable {
      * If <code>updatingListSelectionModel</code> is false, this will reset the selected paths from the selected rows in the list selection model.
      */
     protected void updateSelectedPathsFromSelectedRows() {
-      if (!updatingListSelectionModel && !updatingTreeSelectionModel) {
-        updatingListSelectionModel = true;
+      if (updatingListSelectionModel.compareAndSet(false, true)) {
         try {
           // This is way expensive, ListSelectionModel needs an enumerator for iterating.
           final int min = listSelectionModel.getMinSelectionIndex();
@@ -366,7 +365,7 @@ public class JTreeTable extends JTable {
             }
           }
         } finally {
-          updatingListSelectionModel = false;
+          updatingListSelectionModel.set(false);
         }
       }
     }
@@ -376,9 +375,7 @@ public class JTreeTable extends JTable {
      * the list selection model.
      */
     protected void updateSelectedTableRows() {
-      if (!updatingListSelectionModel && !updatingTreeSelectionModel) {
-        System.out.println("in updateSelectedTableRows()");
-        updatingTreeSelectionModel = true;
+      if (!updatingListSelectionModel.get() && updatingTreeSelectionModel.compareAndSet(false, true)) {
         try {
           final TreeSelectionModel treeSelectionModel = getTree().getSelectionModel();
           final int[] rows = treeSelectionModel.getSelectionRows();
@@ -396,7 +393,7 @@ public class JTreeTable extends JTable {
             }
           }
         } finally {
-          updatingTreeSelectionModel = false;
+          updatingTreeSelectionModel.set(false);
         }
       }
     }

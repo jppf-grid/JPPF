@@ -17,12 +17,14 @@
  */
 package org.jppf.ui.utils;
 
+import java.util.Enumeration;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.monitoring.AbstractComponent;
-import org.jppf.management.*;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 
@@ -39,6 +41,7 @@ public final class TreeTableUtils {
    * Determines whether debug log statements are enabled.
    */
   static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+
   /**
    * Find the position at which to insert a driver, using the sorted lexical order of driver names.
    * @param parent the parent tree node for the driver to insert.
@@ -46,15 +49,17 @@ public final class TreeTableUtils {
    * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
    */
   public static int insertIndex(final DefaultMutableTreeNode parent, final AbstractComponent<?> comp) {
-    final int n = parent.getChildCount();
-    for (int i=0; i<n; i++) {
-      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
+    final Enumeration<?> children = parent.children();
+    int count = 0;
+    while (children.hasMoreElements()) {
+      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
       final AbstractComponent<?> childData = (AbstractComponent<?>) child.getUserObject();
       if (childData == null) return -1;
       if (childData.getUuid().equals(comp.getUuid())) return -1;
-      else if (comp.getDisplayName().compareTo(childData.getDisplayName()) < 0) return i;
+      else if (comp.getDisplayName().compareTo(childData.getDisplayName()) < 0) return count;
+      count++;
     }
-    return n;
+    return parent.getChildCount();
   }
 
   /**
@@ -65,8 +70,9 @@ public final class TreeTableUtils {
    */
   public static DefaultMutableTreeNode findComponent(final DefaultMutableTreeNode parent, final String uuid) {
     if (uuid == null) return null;
-    for (int i=0; i<parent.getChildCount(); i++) {
-      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
+    final Enumeration<?> children = parent.children();
+    while (children.hasMoreElements()) {
+      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
       final AbstractComponent<?> data = (AbstractComponent<?>) child.getUserObject();
       if (data == null) continue;
       if (data.getUuid().equals(uuid)) return child;

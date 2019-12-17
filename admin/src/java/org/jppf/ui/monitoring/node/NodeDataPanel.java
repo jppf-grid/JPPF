@@ -24,7 +24,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
-import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.*;
@@ -122,12 +121,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     GuiUtils.adjustScrollbarsThickness(sp);
     setUIComponent(sp);
     treeTable.expandAll();
-    StatsHandler.getInstance().getShowIPHandler().addShowIPListener(new ShowIPListener() {
-      @Override
-      public void stateChanged(final ShowIPEvent event) {
-        treeTable.repaint();
-      }
-    });
+    StatsHandler.getInstance().getShowIPHandler().addShowIPListener((event) -> treeTable.repaint());
   }
 
   /**
@@ -170,7 +164,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
         treeTable.expand(driverNode);
       }
     } catch(final RuntimeException | Error e) {
-      log.debug(e.getMessage(), e);
+      log.error(e.getMessage(), e);
     }
     TopologyUtils.addDriver(model, driver);
   }

@@ -96,9 +96,9 @@ public class XChartPlotXYHandler extends AbstractXChartHandler {
   @Override
   public ChartConfiguration populateDataset(final ChartConfiguration config) {
     try {
-      final ChartData data = getSeriesData(config);
       final XYChart chart = (XYChart) config.chart;
       if (chart == null) return config;
+      final ChartData data = getSeriesData(config);
       for (final Fields field: config.fields) {
         final String name = field.getLocalizedName();
         try {

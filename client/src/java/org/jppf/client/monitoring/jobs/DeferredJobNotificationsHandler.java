@@ -72,26 +72,30 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
 
   @Override
   void handleNotificationAsync(final JobNotification notif) {
-    final JobInformation jobInfo = notif.getJobInformation();
-    final JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
-    final DriverNotif driverNotif = getDriverNotif(driver);
-    final JPPFManagementInfo nodeInfo = notif.getNodeInfo();
-    switch (notif.getEventType()) {
-      case JOB_QUEUED:
-        handleJobNotif(jobInfo, driverNotif, ADD);
-        break;
-      case JOB_ENDED:
-        handleJobNotif(jobInfo, driverNotif, REMOVE);
-        break;
-      case JOB_UPDATED:
-        handleJobNotif(jobInfo, driverNotif, UPDATE);
-        break;
-      case JOB_DISPATCHED:
-        handleJobDispatchNotif(jobInfo, nodeInfo, driverNotif, ADD);
-        break;
-      case JOB_RETURNED:
-        handleJobDispatchNotif(jobInfo, nodeInfo, driverNotif, REMOVE);
-        break;
+    try {
+      final JobInformation jobInfo = notif.getJobInformation();
+      final JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
+      final DriverNotif driverNotif = getDriverNotif(driver);
+      final JPPFManagementInfo nodeInfo = notif.getNodeInfo();
+      switch (notif.getEventType()) {
+        case JOB_QUEUED:
+          handleJobNotif(jobInfo, driverNotif, ADD);
+          break;
+        case JOB_ENDED:
+          handleJobNotif(jobInfo, driverNotif, REMOVE);
+          break;
+        case JOB_UPDATED:
+          handleJobNotif(jobInfo, driverNotif, UPDATE);
+          break;
+        case JOB_DISPATCHED:
+          handleJobDispatchNotif(jobInfo, nodeInfo, driverNotif, ADD);
+          break;
+        case JOB_RETURNED:
+          handleJobDispatchNotif(jobInfo, nodeInfo, driverNotif, REMOVE);
+          break;
+      }
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
     }
   }
 

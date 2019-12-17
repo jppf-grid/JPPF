@@ -49,36 +49,40 @@ class ImmediateJobNotificationsHandler extends AbstractJobNotificationsHandler {
 
   @Override
   void handleNotificationAsync(final JobNotification notif) {
-    if (traceEnabled) log.trace("handling {} notification: {}", notif.getEventType(), notif);
-    final JobInformation jobInfo = notif.getJobInformation();
-    final JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
-    if (driver == null) return;
-    final Job job = driver.getJob(jobInfo.getJobUuid());
-    final JPPFManagementInfo nodeInfo = notif.getNodeInfo();
-    final TopologyNode node = (nodeInfo == null) ? null : (TopologyNode) driver.getTopologyDriver().getChild(nodeInfo.getUuid());
-    switch (notif.getEventType()) {
-      case JOB_QUEUED:
-        monitor.jobAdded(driver, new Job(jobInfo));
-        break;
-
-      case JOB_ENDED:
-        monitor.jobRemoved(driver, job);
-        break;
-
-      case JOB_UPDATED:
-        if ((job != null) && monitor.isJobUpdated(job.getJobInformation(), jobInfo)) {
-          job.setJobInformation(jobInfo);
-          monitor.jobUpdated(driver, job);
-        }
-        break;
-
-      case JOB_DISPATCHED:
-        if (node != null) monitor.dispatchAdded(driver, job, new JobDispatch(jobInfo, node));
-        break;
-
-      case JOB_RETURNED:
-        if ((node != null) && (job != null)) monitor.dispatchRemoved(driver, job, job.getJobDispatch(node.getUuid()));
-        break;
+    try {
+      if (traceEnabled) log.trace("handling {} notification: {}", notif.getEventType(), notif);
+      final JobInformation jobInfo = notif.getJobInformation();
+      final JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
+      if (driver == null) return;
+      final Job job = driver.getJob(jobInfo.getJobUuid());
+      final JPPFManagementInfo nodeInfo = notif.getNodeInfo();
+      final TopologyNode node = (nodeInfo == null) ? null : (TopologyNode) driver.getTopologyDriver().getChild(nodeInfo.getUuid());
+      switch (notif.getEventType()) {
+        case JOB_QUEUED:
+          monitor.jobAdded(driver, new Job(jobInfo));
+          break;
+  
+        case JOB_ENDED:
+          monitor.jobRemoved(driver, job);
+          break;
+  
+        case JOB_UPDATED:
+          if ((job != null) && monitor.isJobUpdated(job.getJobInformation(), jobInfo)) {
+            job.setJobInformation(jobInfo);
+            monitor.jobUpdated(driver, job);
+          }
+          break;
+  
+        case JOB_DISPATCHED:
+          if (node != null) monitor.dispatchAdded(driver, job, new JobDispatch(jobInfo, node));
+          break;
+  
+        case JOB_RETURNED:
+          if ((node != null) && (job != null)) monitor.dispatchRemoved(driver, job, job.getJobDispatch(node.getUuid()));
+          break;
+      }
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
     }
   }
 }

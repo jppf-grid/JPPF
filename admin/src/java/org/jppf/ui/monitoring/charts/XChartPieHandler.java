@@ -76,6 +76,7 @@ public class XChartPieHandler extends AbstractXChartHandler {
   @Override
   public ChartConfiguration updateDataset(final ChartConfiguration config) {
     final PieChart chart = (PieChart) config.chart;
+    if (chart == null) return config;
     final Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     if (valueMap != null) {
       for (final Fields key: config.fields) chart.updatePieSeries(key.getLocalizedName(), valueMap.get(key));

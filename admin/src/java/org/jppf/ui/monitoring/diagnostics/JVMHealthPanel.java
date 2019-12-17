@@ -92,7 +92,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
         nodeAdded(new TopologyEvent(manager, driver, node, TopologyEvent.UpdateType.TOPOLOGY));
       }
     }
-    treeTable.expandAll();
+    if (treeTable != null) treeTable.expandAll();
     repaintTreeTable();
   }
 
@@ -119,13 +119,10 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
    * Repaint the tree table area.
    */
   void repaintTreeTable() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        if (treeTable != null) {
-          treeTable.invalidate();
-          treeTable.repaint();
-        }
+    SwingUtilities.invokeLater(() -> {
+      if (treeTable != null) {
+        treeTable.invalidate();
+        treeTable.repaint();
       }
     });
   }
