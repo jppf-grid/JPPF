@@ -92,7 +92,7 @@ public class JMXEnvHelper {
     if (value == null) value = prop.getDefaultValue();
     else if (prop instanceof IntProperty) {
       final IntProperty p = (IntProperty) prop;
-      if (p.hasMinAndMax() && (value < p.getMinValue()) || (value > p.getMaxValue())) value = prop.getDefaultValue();
+      if (p.hasMinAndMax() && ((value < p.getMinValue()) || (value > p.getMaxValue()))) value = prop.getDefaultValue();
     }
     return value;
   }

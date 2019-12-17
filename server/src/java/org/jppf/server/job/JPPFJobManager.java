@@ -19,19 +19,19 @@
 package org.jppf.server.job;
 
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.job.*;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.management.JPPFManagementInfo;
+import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.NodeReservationHandler;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
-import org.jppf.utils.concurrent.JPPFThreadFactory;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
@@ -54,10 +54,6 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   private final CollectionMap<String, ChannelJobPair> jobMap = new ArrayListHashMap<>();
   /**
-   * Processes the event queue asynchronously.
-   */
-  private final ExecutorService executor;
-  /**
    * The list of registered job life manager listeners.
    */
   private final List<JobManagerListener> jobManagerListeners = new CopyOnWriteArrayList<>();
@@ -66,21 +62,13 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   private final List<JobTasksListener> taskReturnListeners = new CopyOnWriteArrayList<>();
   /**
-   * Count of notifications in the executor's quueue.
-   */
-  private final AtomicInteger notifCount = new AtomicInteger(0);
-  /**
-   * Peak count of notifications in the executor's quueue.
-   */
-  private final AtomicInteger notifMax = new AtomicInteger(0);
-  /**
    * Reference to the JPPF driver.
    */
   private final JPPFDriver driver;
   /**
-   * 
+   * Queue of job notifications waiting to be sent.
    */
-  private final boolean jppfDebug;
+  private final QueueHandler<JobNotification> eventQueue;
 
   /**
    * Default constructor.
@@ -88,13 +76,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   public JPPFJobManager(final JPPFDriver driver) {
     this.driver = driver;
-    jppfDebug = driver.getConfiguration().get(JPPFProperties.DEBUG_ENABLED);
-    executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("JobManager")) {
-      @Override
-      protected void afterExecute(final Runnable r, final Throwable t) {
-        if (jppfDebug) notifCount.decrementAndGet();
-      }
-    };
+    final TypedProperties config = driver.getConfiguration();
+    int size = config.get(JPPFProperties.JMX_NOTIF_QUEUE_SIZE);
+    if (size <= 0) size = Integer.MAX_VALUE;
+    eventQueue = new QueueHandler<>("JobNotifications", size, this::fireJobEvent).startDequeuer();
   }
 
   /**
@@ -224,8 +209,11 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param channel the id of the job source of the event.
    */
   private void submitEvent(final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel<?> channel) {
-    executor.execute(new JobEventTask(this, eventType, bundle, null, channel));
-    if (jppfDebug) incNotifCount();
+    try {
+      eventQueue.put(newJobNotification(this, eventType, bundle, null, channel));
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
   }
 
   /**
@@ -235,15 +223,43 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param channel the id of the job source of the event.
    */
   private void submitEvent(final JobEventType eventType, final ServerJob job, final ExecutorChannel<?> channel) {
-    executor.execute(new JobEventTask(this, eventType, null, job, channel));
-    if (jppfDebug) incNotifCount();
+    try {
+      eventQueue.put(newJobNotification(this, eventType, null, job, channel));
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Create a job notification with the specified parameters.
+   * @param jobManager the job manager that submits the events.
+   * @param eventType the type of event to generate.
+   * @param bundle the task bundle data.
+   * @param job the job data.
+   * @param channel the id of the job source of the event.
+   * @return a {@link JobNotification} instance.
+   */
+  private static JobNotification newJobNotification(final JobNotificationEmitter jobManager, final JobEventType eventType, final TaskBundle bundle, final ServerJob job, final ExecutorChannel<?> channel) {
+    final JobSLA sla;
+    final JobInformation jobInfo;
+    if (job != null) {
+      sla = job.getSLA();
+      jobInfo = new JobInformation(job.getUuid(), job.getName(), job.getTaskCount(), job.getInitialTaskCount(), sla.getPriority(), job.isSuspended(), job.isPending());
+    } else {
+      sla = bundle.getSLA();
+      jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getCurrentTaskCount(), bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(),
+        bundle.getParameter(BundleParameter.JOB_PENDING, false));
+    }
+    jobInfo.setMaxNodes(sla.getMaxNodes());
+    final JPPFManagementInfo nodeInfo = (channel == null) ? null : channel.getManagementInfo();
+    return new JobNotification(jobManager.getEmitterUuid(), eventType, jobInfo, nodeInfo, System.currentTimeMillis());
   }
 
   /**
    * Close this job manager and release its resources.
    */
   public synchronized void close() {
-    executor.shutdownNow();
+    eventQueue.close();
     jobMap.clear();
   }
 
@@ -396,7 +412,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @return the ocunt as an int.
    */
   public int getNotifCount() {
-    return notifCount.get();
+    return eventQueue.size();
   }
 
   /**
@@ -404,16 +420,9 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @return the ocunt as an int.
    */
   public int getNotifMax() {
-    return notifMax.get();
+    return eventQueue.getPeakSize();
   }
 
-  /**
-   * Increment the current count of notifications and update the peak value.
-   */
-  private void incNotifCount() {
-    final int n = notifCount.incrementAndGet();
-    if (n > notifMax.get()) notifMax.set(n);
-  }
   /**
    * Determine whether the specified job is the dispatch of a broadcast job to a node.
    * @param job the job to evaluate.

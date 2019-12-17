@@ -72,6 +72,8 @@ public class JPPFJMXProperties {
   public static final JPPFProperty<String> TLS_KEYSTORE_SOURCE = new StringProperty("jmx.remote.x.tls.keystore.source", null);
   /** Key store format, defaults to 'jks'. */
   public static final JPPFProperty<String> TLS_KEYSTORE_TYPE = new StringProperty("jmx.remote.x.tls.keystore.type", "jks");
+  /** Maximum size of pending notifications queue. */
+  public static final JPPFProperty<Integer> NOTIF_QUEUE_SIZE = new IntProperty("jmx.remote.x.notifications.queue.size", JMXHelper.DEFAULT_MAX_NOTIFICATIONS_QUEUE_SIZE);
   /** The list of all predefined properties in this class. */
   private static List<JPPFProperty<?>> properties = allProperties();
 

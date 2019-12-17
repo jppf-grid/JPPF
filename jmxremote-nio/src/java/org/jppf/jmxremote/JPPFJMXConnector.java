@@ -36,7 +36,6 @@ import org.jppf.comm.socket.*;
 import org.jppf.jmx.*;
 import org.jppf.jmxremote.message.*;
 import org.jppf.jmxremote.nio.*;
-import org.jppf.jmxremote.nio.ChannelsPair.CloseCallback;
 import org.jppf.jmxremote.notification.ClientListenerInfo;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -231,17 +230,11 @@ public class JPPFJMXConnector implements JMXConnector {
     if (debugEnabled) log.debug("Reconnected to JMX server {}, secure={}", address, secure);
     final JMXNioServer server = JMXNioServerPool.getServer();
     final ChannelsPair pair = server.createChannelsPair(environment, "", -1, socketClient.getChannel(), secure, true);
-    pair.addCloseCallback(new CloseCallback() {
-      @Override
-      public void onClose(final Exception exception) {
-        fireConnectionNotification(true, exception);
-      }
-    });
+    pair.addCloseCallback((exception) -> fireConnectionNotification(true, exception));
     messageHandler = pair.getMessageHandler();
     if (debugEnabled) log.debug("registering channel");
     server.registerChannel(pair, socketClient.getChannel());
     if (debugEnabled) log.debug("getting connection id");
-    //connectionID = messageHandler.receiveConnectionID(address);
     connectionID = (String) messageHandler.sendRequestWithResponse(JMXHelper.CONNECT, environment.get(JMXConnector.CREDENTIALS));
     pair.setConnectionID(connectionID);
     if (debugEnabled) log.debug("received connectionId = {}", connectionID);
@@ -263,7 +256,13 @@ public class JPPFJMXConnector implements JMXConnector {
         if (info != null) infos.add(info);
       }
     }
-    for  (final ClientListenerInfo info: infos) info.getListener().handleNotification(jmxNotification.getNotification(), info.getHandback());
+    for (final ClientListenerInfo info: infos) {
+      try {
+        info.getListener().handleNotification(jmxNotification.getNotification(), info.getHandback());
+      } catch (final Exception e) {
+        log.error("error dispatching notification {}", jmxNotification.getNotification(), e);
+      }
+    }
   }
 
   /**
@@ -289,17 +288,21 @@ public class JPPFJMXConnector implements JMXConnector {
    */
   void removeNotificationListener(final ObjectName name, final NotificationListener listener) throws Exception {
     final List<ClientListenerInfo> toRemove = new ArrayList<>();
+    int[] ids = null;
     synchronized(notificationListenerMap) {
       for (final Map.Entry<Integer, ClientListenerInfo> entry: notificationListenerMap.entrySet()) {
         final ClientListenerInfo info = entry.getValue();
         if (info.getMbeanName().equals(name) && (info.getListener() == listener)) toRemove.add(info);
       }
       if (toRemove.isEmpty()) throw new ListenerNotFoundException("no matching listener");
-      final int[] ids = new int[toRemove.size()];
-      for (int i=0; i<ids.length; i++) ids[i] = toRemove.get(i).getListenerID();
-      messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER, name, ids);
-      for (final int id: ids) notificationListenerMap.remove(id);
+      ids = new int[toRemove.size()];
+      for (int i=0; i<ids.length; i++) {
+        final int id = toRemove.get(i).getListenerID();
+        ids[i] = id;
+        notificationListenerMap.remove(id);
+      }
     }
+    messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER, name, ids);
   }
 
   /**
@@ -321,9 +324,9 @@ public class JPPFJMXConnector implements JMXConnector {
         }
       }
       if (toRemove == null) throw new ListenerNotFoundException("no matching listener");
-      messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, name, toRemove.getListenerID());
       notificationListenerMap.remove(toRemove.getListenerID());
     }
+    messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, name, toRemove.getListenerID());
   }
 
   /**

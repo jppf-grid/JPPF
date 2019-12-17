@@ -21,7 +21,7 @@ package org.jppf.management;
 import java.lang.management.ManagementFactory;
 import java.util.*;
 
-import org.jppf.jmx.JMXHelper;
+import org.jppf.jmx.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.*;
@@ -80,6 +80,9 @@ public class JPPFJMXServer extends AbstractJMXServer {
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       if (ssl) SSLHelper.configureJMXProperties(JMXHelper.JPPF_JMX_PROTOCOL, env);
+      int queueSize = config.get(JPPFProperties.JMX_NOTIF_QUEUE_SIZE);
+      if (queueSize <= 0) queueSize = JPPFProperties.JMX_NOTIF_QUEUE_SIZE.getDefaultValue();
+      env.put(JPPFJMXProperties.NOTIF_QUEUE_SIZE.getName(), queueSize);
       startConnectorServer(JMXHelper.JPPF_JMX_PROTOCOL, env);
     } finally {
       lock.unlock();
