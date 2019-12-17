@@ -90,12 +90,20 @@ public class AsyncNodeMessageHandler {
    * @throws Exception if any error occurs.
    */
   void bundleSent(final AsyncNodeContext context, final ServerTaskBundleNode nodeBundle)  throws Exception {
-    final JPPFSchedule schedule = nodeBundle.getJob().getSLA().getDispatchExpirationSchedule();
-    final AsyncNodeNioServer server = context.getServer();
-    if (schedule != null) {
-      final NodeDispatchTimeoutAction action = new NodeDispatchTimeoutAction(server.getOfflineNodeHandler(), nodeBundle, context.isOffline() ? null : context);
-      server.getDispatchExpirationHandler().scheduleAction(ServerTaskBundleNode.makeKey(nodeBundle), schedule, action);
-    }
+    if (nodeBundle != null) {
+      final TaskBundle job = nodeBundle.getJob();
+      if (job != null) {
+        final JobSLA sla = job.getSLA();
+        if (sla != null) {
+          final JPPFSchedule schedule = sla.getDispatchExpirationSchedule();
+          final AsyncNodeNioServer server = context.getServer();
+          if (schedule != null) {
+            final NodeDispatchTimeoutAction action = new NodeDispatchTimeoutAction(server.getOfflineNodeHandler(), nodeBundle, context.isOffline() ? null : context);
+            server.getDispatchExpirationHandler().scheduleAction(ServerTaskBundleNode.makeKey(nodeBundle), schedule, action);
+          }
+        } else log.warn("null sla for {} of {} with {}", job, nodeBundle, context);
+      } else log.warn("null job for {} with {}", nodeBundle, context);
+    } else log.warn("null bundle for {}", context);
     context.setWriteMessage(null);
     if (context.isOffline()) processOfflineRequest(context, nodeBundle);
   }
