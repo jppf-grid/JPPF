@@ -61,7 +61,7 @@ public class JPPFSchedule implements Serializable {
 
   /**
    * Initialize this schedule configuration with the specified duration.
-   * @param duration the duration in milliseconds.
+   * @param duration the duration in milliseconds. If the value is zero or less, then this schedule will expire immediately.
    */
   public JPPFSchedule(final long duration) {
     this(duration, null, null, null, null);
@@ -69,7 +69,7 @@ public class JPPFSchedule implements Serializable {
 
   /**
    * Initialize this schedule configuration with the specified fixed date annd date format.
-   * @param date the schedule date provided as a string.
+   * @param date the schedule date provided as a string. If the date is equal to or before the creation time of this schedule, then this schedule will expire immediately.
    * @param format the format in which the date is expressed (including locale and time zone information),
    * as specified in the description of {@link SimpleDateFormat}.
    */
@@ -79,7 +79,7 @@ public class JPPFSchedule implements Serializable {
 
   /**
    * Initialize this schedule configuration with the specified date.
-   * @param zonedDateTime the schedule date.
+   * @param zonedDateTime the schedule date. If the date is equal to or before the creation time of this schedule, then this schedule will expire immediately.
    */
   public JPPFSchedule(final ZonedDateTime zonedDateTime) {
     this(0L, null, null, zonedDateTime, null);
@@ -87,7 +87,7 @@ public class JPPFSchedule implements Serializable {
 
   /**
    * Initialize this schedule configuration with the specified duration.
-   * @param duration the duration before this schedule expires or times out.
+   * @param duration the duration before this schedule expires or times out. If duaration resolves to a value of zero or less, then this schedule will expire immediately.
    */
   public JPPFSchedule(final Duration duration) {
     this(0L, null, null, null, duration);
