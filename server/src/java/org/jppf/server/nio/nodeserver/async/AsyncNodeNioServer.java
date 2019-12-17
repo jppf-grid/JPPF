@@ -180,7 +180,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
       else log.warn("error [{}] on {}", e.toString(), context);
       context.handleException(e);
     } else {
-      log.error("error on [{}] on {}", e.toString(), context);
+      log.error("error on {}", context, e);
       if (context != null) context.handleException(e);
     }
   }

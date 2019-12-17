@@ -117,6 +117,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
       if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
       final AsyncClientContext context = createContext(channel, ssl);
       registerChannel(context, channel);
+      if (debugEnabled) log.debug("registered channel = {}, for context = {}", channel, context);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
