@@ -53,7 +53,7 @@ class JMXMessageReader {
    * Handles the JMX notifications in a separate thread.
    */
   private static QueueHandler<Pair<JMXContext, JMXMessage>> queueHandler =
-    new QueueHandler<Pair<JMXContext, JMXMessage>>("JMXNotificationsHandler", (pair) -> handleMessage(pair.first(), pair.second())).startDequeuer();
+    new QueueHandler<Pair<JMXContext, JMXMessage>>("JMXNotificationsHandler", pair -> handleMessage(pair.first(), pair.second())).startDequeuer();
 
   /**
    * Read from the channel until no more data is available (i.e. socket receive buffer is empty).

@@ -43,7 +43,7 @@ public class JMXHelper {
   /**
    * The maximum number of notifications in a JMX connection queue.
    */
-  public static final int DEFAULT_MAX_NOTIFICATIONS_QUEUE_SIZE = 20_000;
+  public static final int DEFAULT_MAX_NOTIFICATIONS_QUEUE_SIZE = 2_000;
   /**
    * Identifier for the initial handshake of a connection.
    */

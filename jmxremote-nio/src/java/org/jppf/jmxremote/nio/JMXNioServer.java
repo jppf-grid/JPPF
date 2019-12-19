@@ -119,10 +119,9 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
 
   @Override
   protected void handleWrite(final SelectionKey key) throws Exception {
-    final ChannelsPair pair = (ChannelsPair) key.attachment();
     updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, false);
-    final JMXTransitionTask task = pair.getNonSelectingWritingTask();
-    if (!task.incrementCountIfNeeded()) task.run();
+    final ChannelsPair pair = (ChannelsPair) key.attachment();
+    if (JMXMessageWriter.write(pair.writingContext())) updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, true);
   }
 
   @Override
