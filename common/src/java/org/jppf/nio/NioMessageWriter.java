@@ -65,6 +65,7 @@ public abstract class NioMessageWriter<C extends AbstractNioContext> {
         data = context.nextMessageToSend();
         if (data == null) return false;
         context.setWriteMessage(data);
+        preWrite(context, data);
       }
       if (context.writeMessage()) {
         context.setWriteMessage(null);
@@ -74,7 +75,16 @@ public abstract class NioMessageWriter<C extends AbstractNioContext> {
   }
 
   /**
-   * 
+   * Method called just before a message is sent to the remote peer.
+   * @param context the context that sent the message.
+   * @param data the message sent.
+   * @throws Exception if any error occurs.
+   */
+  protected void preWrite(final C context, final NioMessage data) throws Exception {
+  }
+
+  /**
+   * Method called after a message is sent to the remote peer.
    * @param context the context that sent the message.
    * @param data the message sent.
    * @throws Exception if any error occurs.

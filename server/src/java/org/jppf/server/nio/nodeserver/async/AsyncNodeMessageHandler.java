@@ -84,27 +84,30 @@ public class AsyncNodeMessageHandler {
   }
 
   /**
+   * Called before a job is sent to a node.
+   * @param context the channel that sent theb bundle.
+   * @param nodeBundle the task bundle to send.
+   * @throws Exception if any error occurs.
+   */
+  void beforeSendingBundle(final AsyncNodeContext context, final ServerTaskBundleNode nodeBundle)  throws Exception {
+    if (nodeBundle != null) {
+      final JobSLA sla = nodeBundle.getJob().getSLA();
+      final JPPFSchedule schedule = sla.getDispatchExpirationSchedule();
+      if (schedule != null) {
+        final AsyncNodeNioServer server = context.getServer();
+        final NodeDispatchTimeoutAction action = new NodeDispatchTimeoutAction(server.getOfflineNodeHandler(), nodeBundle, context.isOffline() ? null : context);
+        server.getDispatchExpirationHandler().scheduleAction(ServerTaskBundleNode.makeKey(nodeBundle), schedule, action);
+      }
+    } else log.warn("null node bundle, a dispatch timeout chedule may be lost for context = {}", context);
+  }
+
+  /**
    * Called when a job was sent to a node.
    * @param context the channel that sent theb bundle.
    * @param nodeBundle the task bundle to send.
    * @throws Exception if any error occurs.
    */
   void bundleSent(final AsyncNodeContext context, final ServerTaskBundleNode nodeBundle)  throws Exception {
-    if (nodeBundle != null) {
-      final TaskBundle job = nodeBundle.getJob();
-      if (job != null) {
-        final JobSLA sla = job.getSLA();
-        if (sla != null) {
-          final JPPFSchedule schedule = sla.getDispatchExpirationSchedule();
-          final AsyncNodeNioServer server = context.getServer();
-          if (schedule != null) {
-            final NodeDispatchTimeoutAction action = new NodeDispatchTimeoutAction(server.getOfflineNodeHandler(), nodeBundle, context.isOffline() ? null : context);
-            server.getDispatchExpirationHandler().scheduleAction(ServerTaskBundleNode.makeKey(nodeBundle), schedule, action);
-          }
-        } else log.warn("null sla for {} of {} with {}", job, nodeBundle, context);
-      } else log.warn("null job for {} with {}", nodeBundle, context);
-    } else log.warn("null bundle for {}", context);
-    context.setWriteMessage(null);
     if (context.isOffline()) processOfflineRequest(context, nodeBundle);
   }
 

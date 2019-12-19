@@ -47,6 +47,17 @@ public class AsyncNodeMessageWriter extends NioMessageWriter<AsyncNodeContext> {
   }
 
   @Override
+  protected void preWrite(final AsyncNodeContext context, final NioMessage data) throws Exception {
+    final TaskBundle header = ((AbstractTaskBundleMessage) data).getBundle();
+    if (debugEnabled) log.debug("before sending message {} for job [uuid={}, name={}, handshake={}] from context {}", data, header.getUuid(), header.getName(), header.isHandshake(), context);
+    if (!header.isHandshake()) {
+      final ServerTaskBundleNode nodeBundle = context.getJobEntry(header.getUuid(), header.getBundleId());
+      if (nodeBundle == null) log.warn("null nodeBundle for header = {}, context = {}, data = {}", header, context, data);
+      context.getServer().getMessageHandler().beforeSendingBundle(context, nodeBundle);
+    }
+  }
+
+  @Override
   protected void postWrite(final AsyncNodeContext context, final NioMessage data) throws Exception {
     final AbstractTaskBundleMessage msg = (AbstractTaskBundleMessage) data;
     final TaskBundle header = msg.getBundle();
