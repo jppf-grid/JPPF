@@ -157,8 +157,13 @@ abstract class AbstractAsyncJobScheduler extends ThreadSynchronization implement
     }
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) { 
       final String message  = "channel is not active: " + channel;
-      log.error(message);
-      throw new IllegalStateException(message);
+      if (channel.getExecutionStatus() != ExecutorStatus.EXECUTING) {
+        log.error(message);
+        throw new IllegalStateException(message);
+      } else {
+        log.warn("attempting to add EXECUTING channel as idle: {}", channel);
+        return;
+      }
     }
     channelsExecutor.execute(() -> {
       if (debugEnabled) log.debug("adding idle channel {}", channel);
