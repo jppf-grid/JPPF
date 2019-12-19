@@ -71,7 +71,7 @@ public abstract class NioMessageReader<C extends StatelessNioContext> {
       final boolean b = context.readMessage();
       if (b) {
         final NioMessage message = context.getMessage();
-        if (debugEnabled) log.debug("read message {} from {}", message, context);
+        if (log.isTraceEnabled()) log.trace("read message {} from {}", message, context);
         context.setMessage(null);
         NioHelper.getGlobalexecutor().execute(new HandlingTask<>(context, message, createMessageHandler()));
       } else if (context.byteCount <= 0L) break;
@@ -134,7 +134,7 @@ public abstract class NioMessageReader<C extends StatelessNioContext> {
         messageHandler.execute(context, message);
       } catch(final Exception|Error e) {
         try {
-          if (debugEnabled) log.debug("error on channel {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+          if (debugEnabled) log.debug("error on channel {} :\n", context, e);
           else log.warn("error on channel {} : {}", context, ExceptionUtils.getMessage(e));
         } catch (final Exception e2) {
           if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e2));
