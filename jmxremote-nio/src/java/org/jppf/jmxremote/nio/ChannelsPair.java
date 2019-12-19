@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.management.*;
+import javax.management.JMException;
 import javax.management.remote.*;
 import javax.security.auth.Subject;
 
@@ -75,14 +75,6 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> implements NioCha
    */
   private int serverPort = -1;
   /**
-   * The tasks that perform the state transitions for the reading and writing channels.
-   */
-  private final JMXTransitionTask writingTask;
-  /**
-   * The tasks that perform the state transitions for the reading and writing channels.
-   */
-  private final JMXTransitionTask nonSelectingWritingTask;
-  /**
    * The socket channel's interest ops.
    */
   private int interestOps;
@@ -120,8 +112,6 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> implements NioCha
   public ChannelsPair(final JMXContext first, final JMXContext second, final JMXNioServer server, final JMXAuthenticator authenticator) {
     super(first, second);
     this.authenticator = authenticator;
-    writingTask = new JMXTransitionTask(second, server, true);
-    nonSelectingWritingTask = new JMXTransitionTask(second, server, false);
   }
 
   /**
@@ -267,20 +257,6 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> implements NioCha
       .append(", serverSide=").append(serverSide)
       .append(", socketChannel=").append(selectionKey == null ? "null" : selectionKey.channel())
       .append(']').toString();
-  }
-
-  /**
-   * @return the writing task.
-   */
-  public JMXTransitionTask getWritingTask() {
-    return writingTask;
-  }
-
-  /**
-   * @return the writing task while the selector is not selecting.
-   */
-  public JMXTransitionTask getNonSelectingWritingTask() {
-    return nonSelectingWritingTask;
   }
 
   @Override

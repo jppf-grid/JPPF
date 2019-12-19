@@ -19,13 +19,13 @@
 package org.jppf.jmxremote.message;
 
 import java.io.IOException;
+import java.nio.channels.SelectionKey;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
 import org.jppf.JPPFTimeoutException;
 import org.jppf.jmx.*;
 import org.jppf.jmxremote.nio.*;
-import org.jppf.nio.StateTransitionManager;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.Logger;
@@ -67,14 +67,6 @@ public class JMXMessageHandler {
    * Whether this handler was closed.
    */
   private final AtomicBoolean closed = new AtomicBoolean(false);
-  /**
-   * The transition manager.
-   */
-  private final JMXNioServer server;
-  /**
-   * The transition manager.
-   */
-  private final StateTransitionManager<EmptyEnum, EmptyEnum> mgr;
 
   /**
    * Initialize with the specified pair of reading and writing channels.
@@ -84,8 +76,6 @@ public class JMXMessageHandler {
   public JMXMessageHandler(final ChannelsPair channels, final Map<String, ?> env) {
     this.channels = channels;
     channels.setMessageHandler(this);
-    this.server = channels.readingContext().getServer();
-    this.mgr = this.server.getTransitionManager();
     this.requestTimeout = JMXEnvHelper.getLong(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT, env, JPPFConfiguration.getProperties());
   }
 
@@ -194,9 +184,9 @@ public class JMXMessageHandler {
   public void sendMessage(final JMXMessage message) throws Exception {
     if (closed.get()) return;
     if (debugEnabled) log.debug("sending message {}", message);
-    channels.writingContext().offerJmxMessage(message);
-    final JMXTransitionTask task = channels.getWritingTask();
-    if (!task.incrementCountIfNeeded()) mgr.execute(task);
+    final JMXContext context = channels.writingContext();
+    context.offerJmxMessage(message);
+    context.getServer().updateInterestOps(context.getSelectionKey(), SelectionKey.OP_WRITE, true);
   }
 
   /**
