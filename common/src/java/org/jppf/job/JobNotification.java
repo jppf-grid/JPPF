@@ -82,7 +82,7 @@ public class JobNotification extends Notification {
 
   /**
    * Get the information about the node.
-   * @return a {@link NodeManagementInfo} instance.
+   * @return a {@link JPPFManagementInfo} instance.
    */
   public JPPFManagementInfo getNodeInfo() {
     return nodeInfo;
@@ -90,7 +90,7 @@ public class JobNotification extends Notification {
 
   /**
    * Get the type of this job event.
-   * @return a {@link JobManagerEventType} enum value.
+   * @return a {@link JobEventType} enum value.
    */
   public JobEventType getEventType() {
     return eventType;
