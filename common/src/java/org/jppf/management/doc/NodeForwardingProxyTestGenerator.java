@@ -129,7 +129,7 @@ public class NodeForwardingProxyTestGenerator extends AbstractForwardingCodeGene
       println("  public void test%s%s() throws Exception {", prefix, capitalizeFirstChar(attribute.getName()));
       //println("  public ResultsMap<String, %s> %s%s(final NodeSelector selector) throws Exception {", info.wrappedType, prefix, attribute.getName());
       println("    final ResultsMap<String, %s> results = proxy.%s%s(NodeSelector.ALL_NODES);", info.wrappedType, prefix, attribute.getName());
-      println("    checkResults(results, %s.class);", info.type);
+      println("    checkResults(results, %s.class);", formatGenericType(info.type));
       println("  }");
     }
     if (info.writable) {
@@ -143,7 +143,7 @@ public class NodeForwardingProxyTestGenerator extends AbstractForwardingCodeGene
       //println("  public ResultsMap<String, Void> set%s(final NodeSelector selector, final %s value) throws Exception {", attribute.getName(), info.type);
       println("    // nothing yet");
       println("    final ResultsMap<String, Void> results = proxy.set%s(NodeSelector.ALL_NODES, %s);", attribute.getName(), defaultValueExpression(info.type));
-      println("    checkResults(results, %s.class);", info.type);
+      println("    checkResults(results, %s.class);", formatGenericType(info.type));
       println("  }");
     }
   }
@@ -167,7 +167,7 @@ public class NodeForwardingProxyTestGenerator extends AbstractForwardingCodeGene
     print("    final ResultsMap<String, %s> results = proxy.%s(NodeSelector.ALL_NODES", info.wrappedReturnType, operation.getName());
     for (int i=0; i<info.params.length; i++) print(", %s", defaultValueExpression(info.genericTypes[i]));
     println(");");
-    println("    checkResults(results, %s.class);", info.returnType);
+    println("    checkResults(results, %s.class);", formatGenericType(info.returnType));
     println("  }");
   }
 

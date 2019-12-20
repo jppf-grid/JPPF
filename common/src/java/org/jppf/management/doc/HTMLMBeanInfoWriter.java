@@ -162,10 +162,11 @@ public class HTMLMBeanInfoWriter extends AbstractMBeanInfoWriter<HTMLMBeanInfoWr
   @Override
   String formatObjectType(final String type) {
     final String name = type.startsWith("L") ? type.substring(1, type.length() - 1) : type;
+    final String ref = formatGenericType(name);
     final String url = (name.startsWith("org.jppf."))
-      ? "https://www.jppf.org/javadoc/6.2/index.html?" + name.replace(".", "/") + ".html"
-      : "https://docs.oracle.com/javase/8/docs/api/index.html?" + name.replace(".", "/") + ".html";
-    final String label = name.substring(name.lastIndexOf('.') + 1);
+      ? "https://www.jppf.org/javadoc/6.2/index.html?" + ref.replace(".", "/") + ".html"
+      : "https://docs.oracle.com/javase/8/docs/api/index.html?" + ref.replace(".", "/") + ".html";
+    final String label = name.substring(name.lastIndexOf('.') + 1).replace("<", "&lt;").replace(">", "&gt;");
     return "<a href='" + url + "'>" + label + "</a>";
   }
 

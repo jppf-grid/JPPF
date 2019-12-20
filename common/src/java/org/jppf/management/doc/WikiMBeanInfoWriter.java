@@ -47,6 +47,8 @@ public class WikiMBeanInfoWriter extends AbstractMBeanInfoWriter<WikiMBeanInfoWr
    */
   public WikiMBeanInfoWriter(final Writer writer) {
     super(writer);
+    lt = "&lt;";
+    gt = "&gt;";
   }
 
   @Override
@@ -164,11 +166,12 @@ public class WikiMBeanInfoWriter extends AbstractMBeanInfoWriter<WikiMBeanInfoWr
   @Override
   String formatObjectType(final String type) {
     final String name = type.startsWith("L") ? type.substring(1, type.length() - 1) : type;
+    final String ref = formatGenericType(name);
     final String url = (name.startsWith("org.jppf."))
-      ? "[{{SERVER}}/javadoc/6.2/index.html?" + name.replace(".", "/") + ".html"
-      : "https://docs.oracle.com/javase/8/docs/api/index.html?" + name.replace(".", "/") + ".html";
+      ? "{{SERVER}}/javadoc/6.2/index.html?" + ref.replace(".", "/") + ".html"
+      : "https://docs.oracle.com/javase/8/docs/api/index.html?" + ref.replace(".", "/") + ".html";
     final String label = name.substring(name.lastIndexOf('.') + 1);
-    return "[" + url + " " + label + "]";
+    return ("[" + url + " " + label + "]").replace("<", "&lt;").replace(">", "&gt;");
   }
 
   /**

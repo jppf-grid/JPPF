@@ -55,7 +55,7 @@ public final class MonitoringDataProviderHandler {
   /**
    * Whether the providers have already been initalized.
    */
-  private static boolean initalized;
+  private static boolean initialized;
   /**
    * Whether the properties of the providers have already been defined.
    */
@@ -71,8 +71,8 @@ public final class MonitoringDataProviderHandler {
    * Initialize the providers found via SPI.
    */
   static synchronized void initProviders() {
-    if (!initalized) {
-      initalized = true;
+    if (!initialized) {
+      initialized = true;
       for (final MonitoringDataProvider provider: getProviders()) {
         try {
           provider.init();

@@ -195,7 +195,7 @@ public abstract class AbstractForwardingCodeGenerator<E> extends AbstractMBeanIn
   @Override
   String formatObjectType(final String type) {
     final String name = type.startsWith("L") ? type.substring(1, type.length() - 1) : type;
-    importedTypes.add(name);
+    importedTypes.add(formatGenericType(name));
     return name.substring(name.lastIndexOf('.') + 1);
   }
 

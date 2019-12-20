@@ -92,7 +92,8 @@ public class NodeForwardingProxyGenerator extends AbstractForwardingCodeGenerato
       if (info.desc != null) print(" (%s)", info.desc);
       println(".");
       println("   * @param selector a {@link NodeSelector} instance.");
-      println("   * @return a mapping of node uuids to {@link %s} instances.", info.wrappedType);
+      final String tag = (info.wrappedType.contains("&lt;") || info.wrappedType.contains("<")) ? "code" : "link";
+      println("   * @return a mapping of node uuids to {@%s %s} instances.", tag, info.wrappedType);
       println("   * @throws Exception if any error occurs.");
       println("   */");
       final String prefix = attribute.isIs() ? "is" : "get";
@@ -133,7 +134,13 @@ public class NodeForwardingProxyGenerator extends AbstractForwardingCodeGenerato
       if (wrappedType.equals(type)) println("{@link %s} instance.", wrappedType);
       else println("{@code %s}.", wrappedType);
     }
-    println("   * @return a mapping of node uuids to objects that wrap either %s or an exeption.", ("Void".equals(info.wrappedReturnType)) ? "{@code null}" : "a {@link " + info.wrappedReturnType + "}");
+    
+    if ("Void".equals(info.wrappedReturnType))
+      println("   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.");
+    else {
+      final String tag = (info.wrappedReturnType.contains("&lt;") || info.wrappedReturnType.contains("<")) ? "code" : "link";
+      println("   * @return a mapping of node uuids to objects that wrap either a [@%s %s} or an exeption.", tag, info.wrappedReturnType);
+    }
     println("   * @throws Exception if any error occurs.");
     println("   */");
 

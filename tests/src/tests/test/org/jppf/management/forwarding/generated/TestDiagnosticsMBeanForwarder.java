@@ -18,6 +18,7 @@
 
 package test.org.jppf.management.forwarding.generated;
 
+import java.util.List;
 import org.jppf.management.NodeSelector;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.diagnostics.HealthSnapshot;
@@ -25,6 +26,7 @@ import org.jppf.management.diagnostics.MemoryInformation;
 import org.jppf.management.diagnostics.ThreadDump;
 import org.jppf.management.forwarding.generated.DiagnosticsMBeanForwarder;
 import org.jppf.utils.ResultsMap;
+import org.jppf.utils.configuration.JPPFProperty;
 import org.junit.Before;
 import org.junit.Test;
 import test.org.jppf.management.forwarding.AbstractTestForwarderProxy;
@@ -50,6 +52,16 @@ public class TestDiagnosticsMBeanForwarder extends AbstractTestForwarderProxy {
   }
 
   /**
+   * Test getting the value of the {@code MonitoringDataProperties} attribute for all selected nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testgetMonitoringDataProperties() throws Exception {
+    final ResultsMap<String, List<JPPFProperty<?>>> results = proxy.getMonitoringDataProperties(NodeSelector.ALL_NODES);
+    checkResults(results, List.class);
+  }
+
+  /**
    * Test invoking the {@code gc} operation for all selected nodes.
    * @throws Exception if any error occurs.
    */
@@ -57,26 +69,6 @@ public class TestDiagnosticsMBeanForwarder extends AbstractTestForwarderProxy {
   public void testGc() throws Exception {
     final ResultsMap<String, Void> results = proxy.gc(NodeSelector.ALL_NODES);
     checkResults(results, void.class);
-  }
-
-  /**
-   * Test invoking the {@code healthSnapshotAsString} operation for all selected nodes.
-   * @throws Exception if any error occurs.
-   */
-  @Test
-  public void testHealthSnapshotAsString() throws Exception {
-    final ResultsMap<String, String> results = proxy.healthSnapshotAsString(NodeSelector.ALL_NODES);
-    checkResults(results, String.class);
-  }
-
-  /**
-   * Test invoking the {@code memoryInformation} operation for all selected nodes.
-   * @throws Exception if any error occurs.
-   */
-  @Test
-  public void testMemoryInformation() throws Exception {
-    final ResultsMap<String, MemoryInformation> results = proxy.memoryInformation(NodeSelector.ALL_NODES);
-    checkResults(results, MemoryInformation.class);
   }
 
   /**
@@ -127,5 +119,25 @@ public class TestDiagnosticsMBeanForwarder extends AbstractTestForwarderProxy {
   public void testCpuLoad() throws Exception {
     final ResultsMap<String, Double> results = proxy.cpuLoad(NodeSelector.ALL_NODES);
     checkResults(results, Double.class);
+  }
+
+  /**
+   * Test invoking the {@code healthSnapshotAsString} operation for all selected nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testHealthSnapshotAsString() throws Exception {
+    final ResultsMap<String, String> results = proxy.healthSnapshotAsString(NodeSelector.ALL_NODES);
+    checkResults(results, String.class);
+  }
+
+  /**
+   * Test invoking the {@code memoryInformation} operation for all selected nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testMemoryInformation() throws Exception {
+    final ResultsMap<String, MemoryInformation> results = proxy.memoryInformation(NodeSelector.ALL_NODES);
+    checkResults(results, MemoryInformation.class);
   }
 }

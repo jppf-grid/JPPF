@@ -47,6 +47,16 @@ public class TestJPPFNodeTaskMonitorMBeanForwarder extends AbstractTestForwarder
   }
 
   /**
+   * Test getting the value of the {@code TotalTasksSucessfull} attribute for all selected nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testgetTotalTasksSucessfull() throws Exception {
+    final ResultsMap<String, Integer> results = proxy.getTotalTasksSucessfull(NodeSelector.ALL_NODES);
+    checkResults(results, Integer.class);
+  }
+
+  /**
    * Test getting the value of the {@code TotalTaskCpuTime} attribute for all selected nodes.
    * @throws Exception if any error occurs.
    */
@@ -63,16 +73,6 @@ public class TestJPPFNodeTaskMonitorMBeanForwarder extends AbstractTestForwarder
   @Test
   public void testgetTotalTasksExecuted() throws Exception {
     final ResultsMap<String, Integer> results = proxy.getTotalTasksExecuted(NodeSelector.ALL_NODES);
-    checkResults(results, Integer.class);
-  }
-
-  /**
-   * Test getting the value of the {@code TotalTasksSucessfull} attribute for all selected nodes.
-   * @throws Exception if any error occurs.
-   */
-  @Test
-  public void testgetTotalTasksSucessfull() throws Exception {
-    final ResultsMap<String, Integer> results = proxy.getTotalTasksSucessfull(NodeSelector.ALL_NODES);
     checkResults(results, Integer.class);
   }
 

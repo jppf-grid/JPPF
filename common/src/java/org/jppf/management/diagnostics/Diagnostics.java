@@ -20,11 +20,13 @@ package org.jppf.management.diagnostics;
 
 import java.io.*;
 import java.lang.management.*;
+import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.management.diagnostics.provider.MonitoringConstants;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
+import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
 
 /**
@@ -155,5 +157,10 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
 
   @Override
   public void close() throws IOException {
+  }
+
+  @Override
+  public List<JPPFProperty<?>> getMonitoringDataProperties() {
+    return MonitoringDataProviderHandler.getAllProperties();
   }
 }

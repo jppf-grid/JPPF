@@ -100,11 +100,22 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
   /**
    * Invoke the {@code state} operation for all selected nodes (get the latest state information from the node).
    * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to objects that wrap either a {@link JPPFNodeState} or an exeption.
+   * @return a mapping of node uuids to objects that wrap either a [@link JPPFNodeState} or an exeption.
    * @throws Exception if any error occurs.
    */
   public ResultsMap<String, JPPFNodeState> state(final NodeSelector selector) throws Exception {
     return invoke(selector, "state");
+  }
+
+  /**
+   * Invoke the {@code updateThreadsPriority} operation for all selected nodes (update the priority of all processing threads).
+   * @param selector a {@link NodeSelector} instance.
+   * @param newPriority a {@link Integer} instance.
+   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
+   * @throws Exception if any error occurs.
+   */
+  public ResultsMap<String, Void> updateThreadsPriority(final NodeSelector selector, final Integer newPriority) throws Exception {
+    return invoke(selector, "updateThreadsPriority", new Object[] { newPriority }, new String[] { Integer.class.getName() });
   }
 
   /**
@@ -126,17 +137,6 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
    */
   public ResultsMap<String, Void> restart(final NodeSelector selector, final Boolean interruptIfRunning) throws Exception {
     return invoke(selector, "restart", new Object[] { interruptIfRunning }, new String[] { Boolean.class.getName() });
-  }
-
-  /**
-   * Invoke the {@code updateThreadsPriority} operation for all selected nodes (update the priority of all processing threads).
-   * @param selector a {@link NodeSelector} instance.
-   * @param newPriority a {@link Integer} instance.
-   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
-   * @throws Exception if any error occurs.
-   */
-  public ResultsMap<String, Void> updateThreadsPriority(final NodeSelector selector, final Integer newPriority) throws Exception {
-    return invoke(selector, "updateThreadsPriority", new Object[] { newPriority }, new String[] { Integer.class.getName() });
   }
 
   /**
@@ -190,21 +190,11 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
   /**
    * Invoke the {@code cancelPendingAction} operation for all selected nodes (cancel a previous deferred shutdown or restart request, if any).
    * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to objects that wrap either a {@link Boolean} or an exeption.
+   * @return a mapping of node uuids to objects that wrap either a [@link Boolean} or an exeption.
    * @throws Exception if any error occurs.
    */
   public ResultsMap<String, Boolean> cancelPendingAction(final NodeSelector selector) throws Exception {
     return invoke(selector, "cancelPendingAction");
-  }
-
-  /**
-   * Invoke the {@code pendingAction} operation for all selected nodes (determine wether a deffered shutdwon or restartd was requested and not yet performed for the node).
-   * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to objects that wrap either a {@link NodePendingAction} or an exeption.
-   * @throws Exception if any error occurs.
-   */
-  public ResultsMap<String, NodePendingAction> pendingAction(final NodeSelector selector) throws Exception {
-    return invoke(selector, "pendingAction");
   }
 
   /**
@@ -218,9 +208,19 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
   }
 
   /**
+   * Invoke the {@code pendingAction} operation for all selected nodes (determine wether a deffered shutdwon or restartd was requested and not yet performed for the node).
+   * @param selector a {@link NodeSelector} instance.
+   * @return a mapping of node uuids to objects that wrap either a [@link NodePendingAction} or an exeption.
+   * @throws Exception if any error occurs.
+   */
+  public ResultsMap<String, NodePendingAction> pendingAction(final NodeSelector selector) throws Exception {
+    return invoke(selector, "pendingAction");
+  }
+
+  /**
    * Invoke the {@code systemInformation} operation for all selected nodes (get detailed information on the system where the JPPF server or node is runnning: environement variables, JVM system properties, JPPF configuration, runtime information, storage details, network interfaces, statistics).
    * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to objects that wrap either a {@link JPPFSystemInformation} or an exeption.
+   * @return a mapping of node uuids to objects that wrap either a [@link JPPFSystemInformation} or an exeption.
    * @throws Exception if any error occurs.
    */
   public ResultsMap<String, JPPFSystemInformation> systemInformation(final NodeSelector selector) throws Exception {

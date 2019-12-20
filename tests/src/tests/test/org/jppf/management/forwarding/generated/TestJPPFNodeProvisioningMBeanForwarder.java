@@ -63,16 +63,6 @@ public class TestJPPFNodeProvisioningMBeanForwarder extends AbstractTestForwarde
    */
   @Test
   public void testProvisionSlaveNodes() throws Exception {
-    final ResultsMap<String, Void> results = proxy.provisionSlaveNodes(NodeSelector.ALL_NODES, 0, false, (TypedProperties) null);
-    checkResults(results, void.class);
-  }
-
-  /**
-   * Test invoking the {@code provisionSlaveNodes} operation for all selected nodes.
-   * @throws Exception if any error occurs.
-   */
-  @Test
-  public void testProvisionSlaveNodes2() throws Exception {
     final ResultsMap<String, Void> results = proxy.provisionSlaveNodes(NodeSelector.ALL_NODES, 0, (TypedProperties) null);
     checkResults(results, void.class);
   }
@@ -82,8 +72,18 @@ public class TestJPPFNodeProvisioningMBeanForwarder extends AbstractTestForwarde
    * @throws Exception if any error occurs.
    */
   @Test
+  public void testProvisionSlaveNodes2() throws Exception {
+    final ResultsMap<String, Void> results = proxy.provisionSlaveNodes(NodeSelector.ALL_NODES, 0, false, (TypedProperties) null);
+    checkResults(results, void.class);
+  }
+
+  /**
+   * Test invoking the {@code provisionSlaveNodes} operation for all selected nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test
   public void testProvisionSlaveNodes3() throws Exception {
-    final ResultsMap<String, Void> results = proxy.provisionSlaveNodes(NodeSelector.ALL_NODES, 0, false);
+    final ResultsMap<String, Void> results = proxy.provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
     checkResults(results, void.class);
   }
 
@@ -93,7 +93,7 @@ public class TestJPPFNodeProvisioningMBeanForwarder extends AbstractTestForwarde
    */
   @Test
   public void testProvisionSlaveNodes4() throws Exception {
-    final ResultsMap<String, Void> results = proxy.provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
+    final ResultsMap<String, Void> results = proxy.provisionSlaveNodes(NodeSelector.ALL_NODES, 0, false);
     checkResults(results, void.class);
   }
 }

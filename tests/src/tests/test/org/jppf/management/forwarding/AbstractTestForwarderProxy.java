@@ -74,7 +74,7 @@ public class AbstractTestForwarderProxy extends Setup1D2N1C {
         fail("node " + uuid + " got " + ExceptionUtils.getMessage(result.exception()));
       }
       final Object res = result.result();
-      assertTrue((res == null) || (res.getClass() == wrapperType(expectedType)));
+      if (res != null) assertTrue(wrapperType(expectedType).isAssignableFrom(res.getClass()));
     });
   }
 

@@ -18,7 +18,10 @@
 
 package org.jppf.management.diagnostics;
 
-import org.jppf.management.doc.MBeanDescription;
+import java.util.List;
+
+import org.jppf.management.doc.*;
+import org.jppf.utils.configuration.JPPFProperty;
 
 /**
  * Interface for the diagnostics MBean.
@@ -113,4 +116,12 @@ public interface DiagnosticsMBean {
    */
   @MBeanDescription("get an approximation of the current CPU load")
   Double cpuLoad();
+
+  /**
+   * Get the list of properties available as monitoring data.
+   * @return a list of the properties described as instances of {@link JPPFProperty}.
+   */
+  @MBeanDescription("The list of monitoring data properties available in the snapshots")
+  @MBeanElementType(type = List.class, parameters = { "org.jppf.utils.configuration.JPPFProperty<?>" })
+  List<JPPFProperty<?>> getMonitoringDataProperties();
 }

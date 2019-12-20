@@ -41,6 +41,10 @@ abstract class AbstractMBeanInfoWriter<E extends AbstractMBeanInfoWriter<E>> ext
    * 
    */
   String arraySuffix;
+  /**
+   * 
+   */
+  String lt, gt;
 
   /**
    * Initialize this visitor witht he specified {@link Writer}.
@@ -50,6 +54,8 @@ abstract class AbstractMBeanInfoWriter<E extends AbstractMBeanInfoWriter<E>> ext
     if (writer == null) throw new NullPointerException("writer cannot be null");
     this.writer = writer;
     this.arraySuffix = "&#91;&#93;";
+    lt = "<";
+    gt = ">";
   }
 
   /**
@@ -119,12 +125,12 @@ abstract class AbstractMBeanInfoWriter<E extends AbstractMBeanInfoWriter<E>> ext
     final StringBuilder sb = new StringBuilder(formatType(rawType));
     final String[] typeParams = (String[]) descriptor.getFieldValue(MBeanInfoExplorer.RAW_TYPE_PARAMS_FIELD);
     if ((typeParams != null) && (typeParams.length > 0)) {
-      sb.append('<');
+      sb.append(lt);
       for (int i=0; i<typeParams.length; i++) {
         if (i > 0) sb.append(", ");
         sb.append(formatType(typeParams[i]));
       }
-      sb.append('>');
+      sb.append(gt);
     }
     return sb.toString();
   }
@@ -139,6 +145,7 @@ abstract class AbstractMBeanInfoWriter<E extends AbstractMBeanInfoWriter<E>> ext
     if (result != null) return result;
     if (type.startsWith("[")) result = formatArrayType(type);
     else if (type.startsWith("L") || type.contains(".")) result = formatObjectType(type);
+    //else if (type.contains("<")) result = formatGenericType(type);
     else result = type;
     typeCache.put(type, result);
     return result;
@@ -164,6 +171,16 @@ abstract class AbstractMBeanInfoWriter<E extends AbstractMBeanInfoWriter<E>> ext
     final StringBuilder sb = new StringBuilder();
     for (int i=0; i<count; i++) sb.append(arraySuffix);
     return compName + sb.toString();
+  }
+
+  /**
+   * Convert the specified string into a java-like syntax representing a generic type.
+   * @param type the type to convert.
+   * @return the converted type.
+   */
+  String formatGenericType(final String type) {
+    final int idx = type.indexOf("<");
+    return (idx < 0) ? type : type.substring(0, idx);
   }
 
   /**
