@@ -241,10 +241,10 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @return a pair of objects representing the executed tasks results, and the index of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
    */
-  public Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ObjectSerializer ser, final ClassLoader cl) throws Exception {
+  public BundleWithTasks receiveBundleAndResults(final ObjectSerializer ser, final ClassLoader cl) throws Exception {
     final TaskBundle bundle = receiveHeader(ser, cl);
     final List<Task<?>> tasks = receiveTasks(bundle, ser, cl);
-    return new Pair<>(bundle, tasks);
+    return new BundleWithTasks(bundle, tasks);
   }
 
   /**

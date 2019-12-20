@@ -21,7 +21,6 @@ package org.jppf.server.node;
 import java.util.List;
 
 import org.jppf.node.protocol.*;
-import org.jppf.utils.Pair;
 
 /**
  * This interface defines how a node receives a job and sends its execution results.
@@ -34,7 +33,7 @@ public interface NodeIO {
    * @return a pair of {@link JPPFTaskBundle} and a {@link List} of {@link Task} instances.
    * @throws Exception if an error is raised while reading the task data.
    */
-  Pair<TaskBundle, List<Task<?>>> readJob() throws Exception;
+  BundleWithTasks readJob() throws Exception;
 
   /**
    * Write the execution results to the socket stream.

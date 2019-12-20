@@ -71,7 +71,7 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
     }
     final DataLocation location = currentMessage.getLocations().get(0);
     final TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(location, node.getHelper().getSerializer());
-    node.getExecutionManager().addPendignJobEntry(bundle);
+    node.getExecutionManager().addPendingJobEntry(bundle);
     if (debugEnabled) log.debug("got bundle " + bundle);
     result = deserializeObjects(bundle, currentMessage);
     if (debugEnabled) log.debug("got all data");

@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.node.protocol.*;
 import org.jppf.node.protocol.NotificationBundle.NotificationType;
 import org.jppf.server.node.JPPFNode;
-import org.jppf.utils.ServiceProviderHandler;
+import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -153,7 +153,7 @@ public class NodeThrottlingHandler extends ServiceProviderHandler<JPPFNodeThrott
           final NotificationBundle notif = new NotificationBundle(NotificationType.THROTTLING);
           notif.setParameter(BundleParameter.NODE_ACCEPTS_NEW_JOBS, newAccepts);
           try {
-            node.getJobWriter().putJob(notif, null);
+            node.getJobWriter().put(new BundleWithTasks(notif, null));
           } catch (final Exception e) {
             log.error("error adding notification bundle to the send queue", e);
           }

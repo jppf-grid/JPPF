@@ -59,7 +59,7 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
   }
 
   @Override
-  public Pair<TaskBundle, List<Task<?>>> readJob() throws Exception {
+  public BundleWithTasks readJob() throws Exception {
     try {
       final Object[] result = readObjects();
       final TaskBundle currentBundle = (TaskBundle) result[0];
@@ -72,7 +72,7 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
           taskList.add(task);
         }
       }
-      return new Pair<>(currentBundle, taskList);
+      return new BundleWithTasks(currentBundle, taskList);
     } catch (final Exception|Error e) {
       if (debugEnabled) log.debug("error in readJob():", e);
       throw e;

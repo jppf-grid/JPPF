@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import org.jppf.node.protocol.*;
-import org.jppf.utils.Pair;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 
 /**
@@ -37,7 +36,7 @@ public class JobWriter extends ThreadSynchronization implements Runnable {
   /**
    * The queue of received jobs.
    */
-  private BlockingQueue<Pair<TaskBundle, List<Task<?>>>> queue = new LinkedBlockingQueue<>();
+  private BlockingQueue<BundleWithTasks> queue = new LinkedBlockingQueue<>();
   /**
    * Captures the last exception caught suring an I/O operation.
    */
@@ -55,8 +54,8 @@ public class JobWriter extends ThreadSynchronization implements Runnable {
   public void run() {
     while (!isStopped() && !node.isStopped()) {
       try {
-        final Pair<TaskBundle, List<Task<?>>> pair = queue.take();
-        node.processResults(pair.first(), pair.second());
+        final BundleWithTasks pair = queue.take();
+        node.processResults(pair);
       } catch (final Exception e) {
         lastException = e;
         setStopped(true);
@@ -77,7 +76,7 @@ public class JobWriter extends ThreadSynchronization implements Runnable {
       lastException = null;
       throw e;
     }
-    queue.offer(new Pair<>(bundle, taskList));
+    queue.offer(new BundleWithTasks(bundle, taskList));
   }
 
   /**

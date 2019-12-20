@@ -55,7 +55,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * The bundle currently processed in offline mode.
    */
-  private Pair<TaskBundle, List<Task<?>>> currentBundle;
+  private BundleWithTasks currentBundle;
   /**
    * The slave node manager.
    */
@@ -71,7 +71,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Asynchronously sends job results and notification bundles.
    */
-  private JobWriter jobWriter;
+  //private JobWriter jobWriter;
+  private QueueHandler<BundleWithTasks> jobWriter;
   /**
    * Whether the execution of the current is complete (offline node only).
    */
@@ -181,26 +182,25 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void processNextJob() throws Exception {
-    final Pair<TaskBundle, List<Task<?>>> pair = nodeIO.readJob();
+    BundleWithTasks pair = nodeIO.readJob();
     if (debugEnabled) log.debug("received bundle");
-    TaskBundle bundle = pair.first();
-    List<Task<?>> taskList = pair.second();
-    if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + taskList.size()  + " tasks" : "received a handshake bundle");
+    final TaskBundle bundle = pair.getBundle();
+    if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + pair.getTasks().size()  + " tasks" : "received a handshake bundle");
     if (!bundle.isHandshake()) {
       currentBundle = pair;
       executionComplete = false;
-      executionManager.execute(bundle, taskList);
+      executionManager.execute(pair);
       while (!isStopped() && !executionComplete) offlineLock.goToSleep();
       initDataChannel();
       processNextJob(); // new handshake
     } else {
       if (currentBundle != null) {
-        bundle = currentBundle.first();
-        taskList = currentBundle.second();
+        log.info("non null currentBundle: {}", currentBundle);
+        pair = currentBundle;
       }
       checkInitialBundle(bundle);
       currentBundle = null;
-      processResults(bundle, taskList);
+      processResults(pair);
     }
   }
 
@@ -209,16 +209,15 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void processNextJobAsync() throws Exception {
-    final Pair<TaskBundle, List<Task<?>>> pair = jobReader.nextJob();
+    final BundleWithTasks pair = jobReader.nextJob();
     if (debugEnabled) log.debug("received bundle");
-    final TaskBundle bundle = pair.first();
-    final List<Task<?>> taskList = pair.second();
-    if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + taskList.size()  + " tasks" : "received a handshake bundle");
+    final TaskBundle bundle = pair.getBundle();
+    if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + pair.getTasks().size()  + " tasks" : "received a handshake bundle");
     if (!bundle.isHandshake()) {
-      executionManager.execute(bundle, taskList);
+      executionManager.execute(pair);
     } else {
       checkInitialBundle(bundle);
-      getJobWriter().putJob(bundle, taskList);
+      getJobWriter().put(pair);
       if (isMasterNode()) slaveManager.handleStartup();
     }
   }
@@ -259,13 +258,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   /**
    * Send the results back to the server and perform final checks for the current execution.
-   * @param bundle the bundle that contains the tasks and header information.
-   * @param taskList the tasks results.
+   * @param bundleWithTasks contains the task bundle witht he associated list of task results.
    * @throws Exception if any error occurs.
    */
-  void processResults(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
+  void processResults(final BundleWithTasks bundleWithTasks) throws Exception {
     checkStopped();
     currentBundle = null;
+    final TaskBundle bundle = bundleWithTasks.getBundle();
+    final List<Task<?>> taskList = bundleWithTasks.getTasks();
     if (debugEnabled) log.debug("processing " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
     if (executionManager.checkConfigChanged() || bundle.isHandshake() || isOffline()) {
       if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server, config=\n{}", configuration);
@@ -324,7 +324,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     lifeCycleEventHandler.fireNodeStarting();
     if (!isOffline()) {
       ThreadUtils.startDaemonThread(jobReader = new JobReader(this), "JobReader");
-      ThreadUtils.startDaemonThread(jobWriter = new JobWriter(this), "JobWriter");
+      //ThreadUtils.startDaemonThread(jobWriter = new JobWriter(this), "JobWriter");
+      jobWriter = new QueueHandler<BundleWithTasks>("JobWriter", pair -> processResults(pair)).startDequeuer();
     }
     throttlingHandler = new NodeThrottlingHandler(this);
     if (debugEnabled) log.debug("end node initialization");
@@ -391,7 +392,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         executionComplete = true;
         offlineLock.wakeUp();
       } else {
-        getJobWriter().putJob(bundle, tasks);
+        getJobWriter().put(new BundleWithTasks(bundle, tasks));
       }
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
@@ -405,7 +406,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public synchronized void stopNode() {
     if (debugEnabled) log.debug("stopping node");
     if (jobReader != null) jobReader.close();
-    if (getJobWriter() != null) getJobWriter().close();
+    if (jobWriter != null) jobWriter.close();
     throttlingHandler.stop();
     super.stopNode();
     slaveManager.stopAllSlaves();
@@ -415,7 +416,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @return the object which asynchronously sends job results and notification bundles.
    * @exclude
    */
-  public JobWriter getJobWriter() {
+  public QueueHandler<BundleWithTasks> getJobWriter() {
     return jobWriter;
   }
 

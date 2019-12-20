@@ -18,7 +18,6 @@
 
 package org.jppf.execute.async;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.jppf.execute.*;
@@ -32,11 +31,10 @@ import org.jppf.node.protocol.*;
 public interface AsyncExecutionManager {
   /**
    * Execute the specified tasks of the specified tasks bundle.
-   * @param bundle the bundle to which the tasks are associated.
-   * @param taskList the list of tasks to execute.
+   * @param bundleWithTakss the bundle to execute with its associated tasks.
    * @throws Exception if the execution failed.
    */
-  void execute(TaskBundle bundle, List<Task<?>> taskList) throws Exception;
+  void execute(BundleWithTasks bundleWithTakss) throws Exception;
 
   /**
    * Cancel all executing or pending tasks.
@@ -140,5 +138,5 @@ public interface AsyncExecutionManager {
    * Called when a task bundle s being received by the node, and before it is submitted to this execution manager.
    * @param bundle the bundle to process.
    */
-  void addPendignJobEntry(TaskBundle bundle);
+  void addPendingJobEntry(TaskBundle bundle);
 }

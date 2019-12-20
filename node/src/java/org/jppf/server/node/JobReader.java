@@ -18,11 +18,9 @@
 
 package org.jppf.server.node;
 
-import java.util.List;
 import java.util.concurrent.*;
 
-import org.jppf.node.protocol.*;
-import org.jppf.utils.Pair;
+import org.jppf.node.protocol.BundleWithTasks;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 
 /**
@@ -33,7 +31,7 @@ class JobReader extends ThreadSynchronization implements Runnable {
   /**
    * Bundle set in the JobReader or JobWriter queue when an exception occurs.
    */
-  private static final Pair<TaskBundle, List<Task<?>>> EXCEPTIONAL_BUNDLE = new Pair<>(null, null);
+  private static final BundleWithTasks EXCEPTIONAL_BUNDLE = new BundleWithTasks(null, null);
   /**
    * The node which receives the messages.
    */
@@ -41,7 +39,7 @@ class JobReader extends ThreadSynchronization implements Runnable {
   /**
    * The queue of received jobs.
    */
-  private BlockingQueue<Pair<TaskBundle, List<Task<?>>>> queue = new LinkedBlockingQueue<>();
+  private BlockingQueue<BundleWithTasks> queue = new LinkedBlockingQueue<>();
   /**
    * Captures the last exception caught suring an I/O operation.
    */
@@ -75,8 +73,8 @@ class JobReader extends ThreadSynchronization implements Runnable {
    * @return a pairing of a job header and its tasks.
    * @throws Exception if any error occurs.
    */
-  Pair<TaskBundle, List<Task<?>>> nextJob() throws Exception {
-    Pair<TaskBundle, List<Task<?>>> result = null;
+  BundleWithTasks nextJob() throws Exception {
+    BundleWithTasks result = null;
     if (lastException == null) result = queue.take();
     if (lastException != null) {
       queue.clear();

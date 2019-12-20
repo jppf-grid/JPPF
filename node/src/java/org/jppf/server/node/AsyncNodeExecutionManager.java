@@ -61,7 +61,9 @@ public class AsyncNodeExecutionManager extends AbstractAsyncExecutionManager {
   }
 
   @Override
-  protected JobProcessingEntry setup(final TaskBundle bundle, final List<Task<?>> taskList) {
+  protected JobProcessingEntry setup(final BundleWithTasks bundleWithTasks) {
+    final List<Task<?>> taskList = bundleWithTasks.getTasks();
+    final TaskBundle bundle = bundleWithTasks.getBundle();
     if (debugEnabled) log.debug("setting up bundle {}", bundle);
     final JobProcessingEntry jobEntry = new JobProcessingEntry();
     jobEntry.bundle = bundle;

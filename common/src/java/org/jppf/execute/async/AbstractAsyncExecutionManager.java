@@ -103,10 +103,12 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
   }
 
   @Override
-  public void execute(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
+  public void execute(final BundleWithTasks bundleWithTasks) throws Exception {
+    final List<Task<?>> taskList = bundleWithTasks.getTasks();
+    final TaskBundle bundle = bundleWithTasks.getBundle();
     if ((taskList == null) || taskList.isEmpty()) return;
     if (debugEnabled) log.debug("executing {} tasks of bundle {}", taskList.size(), bundle);
-    final JobProcessingEntry jobEntry = setup(bundle, taskList);
+    final JobProcessingEntry jobEntry = setup(bundleWithTasks);
     jobEntry.executionManager = this;
     final String bundleKey = bundle.getUuid() + bundle.getBundleId();
     synchronized(jobEntries) {
@@ -219,11 +221,10 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
 
   /**
    * Prepare this execution manager for executing the tasks of a bundle.
-   * @param bundle the bundle whose tasks are to be executed.
-   * @param taskList the list of tasks to execute.
+   * @param bundleWithTasks the bundle and associated tasks.
    * @return an instance of {@link JobProcessingEntry}.
    */
-  protected abstract JobProcessingEntry setup(final TaskBundle bundle, final List<Task<?>> taskList);
+  protected abstract JobProcessingEntry setup(final BundleWithTasks bundleWithTasks);
 
   /**
    * Cleanup method invoked when all tasks for the current bundle have completed.
@@ -374,7 +375,7 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
   }
 
   @Override
-  public void addPendignJobEntry(final TaskBundle bundle) {
+  public void addPendingJobEntry(final TaskBundle bundle) {
     if (debugEnabled) log.debug("adding pending entry for {}", bundle);
     synchronized(jobEntries) {
       final JobPendingEntry entry = new JobPendingEntry();
