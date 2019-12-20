@@ -184,9 +184,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   private void processNextJob() throws Exception {
     BundleWithTasks pair = nodeIO.readJob();
     if (debugEnabled) log.debug("received bundle");
-    final TaskBundle bundle = pair.getBundle();
-    if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + pair.getTasks().size()  + " tasks" : "received a handshake bundle");
-    if (!bundle.isHandshake()) {
+    //final TaskBundle bundle = pair.getBundle();
+    if (debugEnabled) log.debug(!pair.getBundle().isHandshake() ? "received a bundle with " + pair.getTasks().size()  + " tasks" : "received a handshake bundle");
+    if (!pair.getBundle().isHandshake()) {
       currentBundle = pair;
       executionComplete = false;
       executionManager.execute(pair);
@@ -198,7 +198,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         log.info("non null currentBundle: {}", currentBundle);
         pair = currentBundle;
       }
-      checkInitialBundle(bundle);
+      checkInitialBundle(pair.getBundle());
       currentBundle = null;
       processResults(pair);
     }
@@ -241,6 +241,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         bundle.setBundleId(currentBundle.first().getBundleId());
         bundle.setParameter(BundleParameter.JOB_UUID, currentBundle.first().getUuid());
       }
+      if (debugEnabled) log.debug("done setting up offline node, params = {}, bundle = {}", bundle.getAll(), bundle);
     } else {
       if (!throttlingHandler.check()) bundle.setParameter(BundleParameter.NODE_ACCEPTS_NEW_JOBS, false);
       final String ip = getManagementAddress();
