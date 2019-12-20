@@ -260,8 +260,9 @@ public class QueueHandler<E> {
     /**
      * Handle an element.
      * @param element the object to handle.
+     * @throws Exception if any error occurs.
      */
-    void handle(E element);
+    void handle(E element) throws Exception;
   }
 
   /**
