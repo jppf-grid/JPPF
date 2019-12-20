@@ -44,6 +44,10 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * The default maximum number of pending JMX notifications.
+   */
+  private static final int DEFAULT_MAX_NOTIFICATIONS = 5_000;
+  /**
    * the associated job monitor.
    */
   final JobMonitor monitor;
@@ -52,11 +56,11 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
    */
   final QueueHandler<JobNotification> notificationsQueue;
   /**
-   * 
+   * Mapping of driver uuids to takss initializing and regstering a driver job management notifications listener.
    */
   final Map<String, JmxInitializer> initializerMap = new HashMap<>();
   /**
-   * 
+   * Listens for drivers joining or leaving the grid.
    */
   final DriverListener driverListener;
 
@@ -68,10 +72,11 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
     if (debugEnabled) log.debug("initializing {} with {}", getClass().getSimpleName(), monitor);
     this.monitor = monitor;
     monitor.getTopologyManager().addTopologyListener(driverListener = new DriverListener());
-    final int capacity = 5_000;
+    final int capacity = monitor.getTopologyManager().getJPPFClient().getConfig().getInt("jppf.job.monitor.max.notifications", DEFAULT_MAX_NOTIFICATIONS);
+    final int cap = (capacity <= 0) ? DEFAULT_MAX_NOTIFICATIONS : capacity;
     notificationsQueue = new QueueHandler<>("JobNotificationsHandler", capacity, this::handleNotificationAsync)
-      .setPeakSizeUpdateCallback((n) -> {
-        if ((n >= capacity) && debugEnabled) log.debug("maximum peak job notifications: {}", n);
+      .setPeakSizeUpdateCallback(n -> {
+        if ((n >= cap) && debugEnabled) log.debug("maximum peak job notifications: {}", n);
       }).startDequeuer();
   }
 
