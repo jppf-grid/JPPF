@@ -18,6 +18,8 @@
 
 package org.jppf.nio;
 
+import java.util.concurrent.ExecutorService;
+
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -39,6 +41,10 @@ public abstract class NioMessageReader<C extends AbstractNioContext> {
    * The server handling the connections.d
    */
   protected final StatelessNioServer<C> server;
+  /**
+   * 
+   */
+  protected final MessageHandler<C> messageHandler;
 
   /**
    * Initialize this message reader.
@@ -46,6 +52,7 @@ public abstract class NioMessageReader<C extends AbstractNioContext> {
    */
   public NioMessageReader(final StatelessNioServer<C> server) {
     this.server = server;
+    this.messageHandler = createMessageHandler();
   }
 
   /**
@@ -73,9 +80,16 @@ public abstract class NioMessageReader<C extends AbstractNioContext> {
         final NioMessage message = context.getReadMessage();
         if (debugEnabled) log.debug("read message {} from {}", message, context);
         context.setReadMessage(null);
-        NioHelper.getGlobalexecutor().execute(new HandlingTask<>(context, message, createMessageHandler()));
+        getExecutor().execute(new HandlingTask<>(context, message, messageHandler));
       } else if (context.readByteCount <= 0L) break;
     }
+  }
+
+  /**
+   * @return the exeuctor to use to handle messages.
+   */
+  protected ExecutorService getExecutor() {
+    return NioHelper.getGlobalexecutor();
   }
 
   /**
