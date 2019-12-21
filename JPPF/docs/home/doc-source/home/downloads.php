@@ -24,8 +24,8 @@ $template{name="about-page-header" title="Downloads"}$
   <div class="column_left" style="text-align: justify; padding: 0px; font-size: 11pt">
     <div class="blockWithHighlightedTitle">
       <?php
-        $tag1 = "v_6_1_3";
-        $ver1 = "6.1.3";
+        $tag1 = "v_6_1_4";
+        $ver1 = "6.1.4";
         $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
