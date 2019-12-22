@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 
 /**
  * Custom thread factory used mostly to specify the names of created threads.
@@ -131,17 +131,9 @@ public class JPPFThreadFactory implements ThreadFactory {
   public synchronized Thread newThread(final Runnable r) {
     final Thread thread;
     final int n = count.incrementAndGet();
-    if (n == 3000) System.out.println("reach 3000 threads, callstack:\n" + ExceptionUtils.getCallStack());
     final String threadName = String.format("%s-%04d", name, n);
-    if (doPrivileged) {
-      thread = AccessController.doPrivileged(new PrivilegedAction<Thread>() {
-        @Override
-        public Thread run() {
-          return new DebuggableThread(threadGroup, r, threadName);
-        }
-      });
-    } else thread = new DebuggableThread(threadGroup, r, threadName);
-    //System.out.printf("created thread = %s for thred group = %s%n", thread, threadGroup);
+    if (doPrivileged) thread = AccessController.doPrivileged((PrivilegedAction<Thread>) () -> new DebuggableThread(threadGroup, r, threadName));
+    else thread = new DebuggableThread(threadGroup, r, threadName);
     if (monitoringEnabled) {
       threadIDs.add(thread.getId());
       computeThreadIDs();
