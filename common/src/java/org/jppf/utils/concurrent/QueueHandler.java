@@ -26,7 +26,7 @@ import org.slf4j.*;
 
 /**
  * Instances of this class handle an optionally bounded queue of elements.
- * It may, upon request, spawn a dequeuing thread that will process elements according to a processing function supplied by the consumer.
+ * It may, upon request, spawn one or more dequeuing threads that will process elements according to a processing function supplied by the consumer.
  * @param <E> the type of the elements in the queue.
  * @author Laurent Cohen
  */
@@ -77,23 +77,23 @@ public class QueueHandler<E> {
   private final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
-   * Initialize this queue handler.
+   * Initialize this queue handler with an unbounded queue.
    */
   public QueueHandler() {
     this(null, Integer.MAX_VALUE, null);
   }
 
   /**
-   * Initialize this queue handler.
-   * @param name the name of the dequeuer thread.
+   * Initialize this queue handler with an unbounded queue.
+   * @param name the prefix for the names of the dequeuer threads.
    */
   public QueueHandler(final String name) {
     this(name, Integer.MAX_VALUE, null);
   }
 
   /**
-   * Initialize this queue handler.
-   * @param name the name of the dequeuer thread.
+   * Initialize this queue handler with an unbounded queue.
+   * @param name the prefix for the names of the dequeuer threads.
    * @param handler the hanler for dequeued elements.
    */
   public QueueHandler(final String name, final Handler<E> handler) {
@@ -102,7 +102,7 @@ public class QueueHandler<E> {
 
   /**
    * Initialize this queue handler.
-   * @param name the name of the dequeuer thread.
+   * @param name the prefix for the names of the dequeuer threads.
    * @param capacity the capacity of the queue.
    */
   public QueueHandler(final String name, final int capacity) {
@@ -225,7 +225,7 @@ public class QueueHandler<E> {
   }
 
   /**
-   * Start the dequeuer thread. It the thread was already started, this method has no effect.
+   * Start a single dequeuer thread. It the thread was already started, this method has no effect.
    * @return this queue handler, for method call chaining.
    */
   public QueueHandler<E> startDequeuer() {
@@ -233,8 +233,8 @@ public class QueueHandler<E> {
   }
 
   /**
-   * Start the dequeuer thread. It the thread was already started, this method has no effect.
-   * @param nbThreads the number of threads to start.
+   * Start the specified number of dequeuer threads. It the dequeuing was already started, this method has no effect.
+   * @param nbThreads the number of dequeuer threads to start.
    * @return this queue handler, for method call chaining.
    */
   public QueueHandler<E> startDequeuer(final int nbThreads) {
@@ -251,7 +251,7 @@ public class QueueHandler<E> {
   }
 
   /**
-   * CLose this queue handler.
+   * Close this queue handler.
    */
   @SuppressWarnings("unchecked")
   public void close() {
