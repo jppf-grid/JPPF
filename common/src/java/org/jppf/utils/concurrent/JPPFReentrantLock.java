@@ -27,6 +27,7 @@ import org.jppf.utils.SystemUtils;
 /**
  * A non-fair lock implementation that allows assigning a readable and identifiable name and {@code toString()}.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFReentrantLock implements Lock, Serializable {
   /**
@@ -96,6 +97,7 @@ public class JPPFReentrantLock implements Lock, Serializable {
 
   /**
    * Object to which locking and synchronization operations are delegated.
+   * @exclude
    */
   static class Synchronizer extends AbstractQueuedSynchronizer {
     /**

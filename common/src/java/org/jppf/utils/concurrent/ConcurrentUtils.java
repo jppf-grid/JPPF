@@ -26,6 +26,7 @@ import org.jppf.JPPFTimeoutException;
  * A set of utility methods to facilitate concurrent and multithreaded programming.
  * @author Laurent Cohen
  * @since 5.0
+ * @exclude
  */
 public final class ConcurrentUtils {
   /**
@@ -113,6 +114,7 @@ public final class ConcurrentUtils {
 
   /**
    * This interface represents a condition to evaluate to either {@code true} or {@code false}.
+   * @exclude
    */
   @FunctionalInterface
   public static interface Condition {
@@ -125,6 +127,7 @@ public final class ConcurrentUtils {
 
   /**
    * This interface handles exceptions raised by its {@code evaluate()} method and returns {@code false} when it happens.
+   * @exclude
    */
   @FunctionalInterface
   public static interface ConditionFalseOnException extends Condition {

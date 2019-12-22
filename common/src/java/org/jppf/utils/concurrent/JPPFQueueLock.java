@@ -25,6 +25,7 @@ import org.slf4j.*;
 /**
  * This class is for logging and debugging purposes. It allows distinguishing the lock on the JPPF queue (driver and client) from any other lock in the same JVM.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFQueueLock extends ReentrantLock {
   /**
