@@ -326,7 +326,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (!isOffline()) {
       ThreadUtils.startDaemonThread(jobReader = new JobReader(this), "JobReader");
       //ThreadUtils.startDaemonThread(jobWriter = new JobWriter(this), "JobWriter");
-      jobWriter = new QueueHandler<BundleWithTasks>("JobWriter", pair -> processResults(pair)).startDequeuer();
+      jobWriter = new QueueHandler<>("JobWriter", this::processResults).startDequeuer();
     }
     throttlingHandler = new NodeThrottlingHandler(this);
     if (debugEnabled) log.debug("end node initialization");
