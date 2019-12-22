@@ -153,7 +153,7 @@ public class NodeThrottlingHandler extends ServiceProviderHandler<JPPFNodeThrott
           final NotificationBundle notif = new NotificationBundle(NotificationType.THROTTLING);
           notif.setParameter(BundleParameter.NODE_ACCEPTS_NEW_JOBS, newAccepts);
           try {
-            node.getJobWriter().put(new BundleWithTasks(notif, null));
+            node.getJobWriter().putToHead(new BundleWithTasks(notif, null));
           } catch (final Exception e) {
             log.error("error adding notification bundle to the send queue", e);
           }
