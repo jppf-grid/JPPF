@@ -20,9 +20,12 @@ package org.jppf.server.nio.nodeserver.async;
 
 import static org.jppf.node.protocol.BundleParameter.NODE_OFFLINE_OPEN_REQUEST;
 
+import java.util.concurrent.*;
+
 import org.jppf.nio.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**
@@ -39,6 +42,10 @@ public class AsyncNodeMessageReader extends NioMessageReader<AsyncNodeContext> {
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * 
+   */
+  private final ExecutorService executor;
 
   /**
    * Initialize this message reader.
@@ -46,6 +53,8 @@ public class AsyncNodeMessageReader extends NioMessageReader<AsyncNodeContext> {
    */
   public AsyncNodeMessageReader(final AsyncNodeNioServer server) {
     super(server);
+    final int n = server.getConfiguration().getInt("jppf.node.reader.max.threads", Runtime.getRuntime().availableProcessors());
+    this.executor = (n > 0) ? Executors.newFixedThreadPool(n, new JPPFThreadFactory("NodeReader")) : NioHelper.getGlobalexecutor();
   }
 
   @Override
@@ -72,5 +81,10 @@ public class AsyncNodeMessageReader extends NioMessageReader<AsyncNodeContext> {
     } else {
       handler.resultsReceived(context, msg);
     }
+  }
+
+  @Override
+  protected ExecutorService getExecutor() {
+    return executor;
   }
 }

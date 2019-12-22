@@ -130,7 +130,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
    */
   @SuppressWarnings("unchecked")
   public AsyncNodeNioServer(final JPPFDriver driver, final int identifier, final boolean useSSL) throws Exception {
-    super(identifier, useSSL);
+    super(identifier, useSSL, driver.getConfiguration());
     this.driver = driver;
     selectTimeout = 1000L;
     messageHandler = new AsyncNodeMessageHandler(driver);

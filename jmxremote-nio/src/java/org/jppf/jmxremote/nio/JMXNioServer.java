@@ -101,7 +101,7 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
    * @throws Exception if any error occurs.
    */
   JMXNioServer() throws Exception {
-    super(JPPFIdentifiers.serverName(JPPFIdentifiers.JMX_REMOTE_CHANNEL) + "-" + instanceCount.incrementAndGet(), JPPFIdentifiers.JMX_REMOTE_CHANNEL, false);
+    super(JPPFIdentifiers.serverName(JPPFIdentifiers.JMX_REMOTE_CHANNEL) + "-" + instanceCount.incrementAndGet(), JPPFIdentifiers.JMX_REMOTE_CHANNEL, false, null);
     serverNotificationHandler = new ServerNotificationHandler(this);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     registerMBean();

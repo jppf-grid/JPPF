@@ -103,16 +103,21 @@ public abstract class NioServer extends Thread {
    * An arbitrary object attached to this server.
    */
   protected final Object attachment;
+  /**
+   * The configuration to use.
+   */
+  protected TypedProperties configuration;
 
   /**
    * Initialize this server with a specified identifier and name.
    * @param identifier the channel identifier for channels handled by this server.
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @param attachment an arbitrary object attached to this server.
+   * @param configuration the JPPF configuration to use.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  protected NioServer(final int identifier, final boolean useSSL, final Object attachment) throws Exception {
-    this(JPPFIdentifiers.serverName(identifier), identifier, useSSL, attachment);
+  protected NioServer(final int identifier, final boolean useSSL, final Object attachment, final TypedProperties configuration) throws Exception {
+    this(JPPFIdentifiers.serverName(identifier), identifier, useSSL, attachment, configuration);
   }
 
   /**
@@ -121,9 +126,10 @@ public abstract class NioServer extends Thread {
    * @param identifier the channel identifier for channels handled by this server.
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @param attachment an arbitrary object attached to this server.
+   * @param configuration the JPPF configuration to use.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  protected NioServer(final String name, final int identifier, final boolean useSSL, final Object attachment) throws Exception {
+  protected NioServer(final String name, final int identifier, final boolean useSSL, final Object attachment, final TypedProperties configuration) throws Exception {
     super(name);
     setDaemon(true);
     if (debugEnabled) log.debug("starting {} with identifier={} and useSSL={}", getClass().getSimpleName(), JPPFIdentifiers.serverName(identifier), useSSL);
@@ -132,6 +138,7 @@ public abstract class NioServer extends Thread {
     this.attachment = attachment;
     selector = Selector.open();
     sync = new SelectorSynchronizerLock(selector);
+    this.configuration = configuration;
     if (useSSL) createSSLContext();
     init();
   }
@@ -141,13 +148,15 @@ public abstract class NioServer extends Thread {
    * @param ports the list of ports this server accepts connections from.
    * @param sslPorts the list of SSL ports this server accepts connections from.
    * @param identifier the channel identifier for channels handled by this server.
+   * @param configuration the JPPF configuration to use.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NioServer(final int[] ports, final int[] sslPorts, final int identifier) throws Exception {
-    this(identifier, false, null);
+  public NioServer(final int[] ports, final int[] sslPorts, final int identifier, final TypedProperties configuration) throws Exception {
+    this(identifier, false, null, configuration);
     if (debugEnabled) log.debug("starting {} with ports={} and sslPorts={}", getClass().getSimpleName(), Arrays.toString(ports), Arrays.toString(sslPorts));
     this.ports = ports;
     this.sslPorts = sslPorts;
+    this.configuration = configuration;
     init();
   }
 
@@ -367,5 +376,20 @@ public abstract class NioServer extends Thread {
    */
   public boolean wakeUpSelectorIfNeeded() {
     return selecting.compareAndRun(true, wakeUpAction);
+  }
+
+  /**
+   * @return the configuration to use.
+   */
+  public TypedProperties getConfiguration() {
+    return configuration;
+  }
+
+  /**
+   * Set the configuration to use.
+   * @param configuration the configuration to use.
+   */
+  public void setConfiguration(final TypedProperties configuration) {
+    this.configuration = configuration;
   }
 }

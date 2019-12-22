@@ -66,7 +66,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
    * @throws Exception if any error occurs.
    */
   public AsyncClientNioServer(final JPPFDriver driver, final int identifier, final boolean useSSL) throws Exception {
-    super(identifier, useSSL);
+    super(identifier, useSSL, driver.getConfiguration());
     this.driver = driver;
     selectTimeout = 1000L;
     messageHandler = new AsyncClientMessageHandler(driver);

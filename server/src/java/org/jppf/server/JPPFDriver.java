@@ -100,7 +100,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
     NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, asyncNodeClassServer = startServer(new AsyncNodeClassNioServer(this, JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, asyncClientNioServer = startServer(new AsyncClientNioServer(this, JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, asyncNodeNioServer = startServer(new AsyncNodeNioServer(this, JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, useSSL)));
-    NioHelper.putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptorServer = new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts, statistics));
+    NioHelper.putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptorServer = new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts, statistics, configuration));
     jobManager.loadTaskReturnListeners();
     if (isManagementEnabled(configuration)) initializer.registerProviderMBeans();
     initializer.initJmxServer();

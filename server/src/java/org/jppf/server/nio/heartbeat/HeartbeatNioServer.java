@@ -59,7 +59,7 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
    * @throws Exception if any error occurs.
    */
   public HeartbeatNioServer(final JPPFDriver driver, final int identifier, final boolean useSSL) throws Exception {
-    super(identifier, useSSL);
+    super(identifier, useSSL, driver.getConfiguration());
     this.driver = driver;
     messageHandler = new HeartbeatMessageHandler(this);
   }

@@ -106,7 +106,7 @@ public class NioHelper {
       NioServer acceptor = identifiedServers.get(JPPFIdentifiers.ACCEPTOR_CHANNEL);
       if (acceptor == null) {
         if (debugEnabled) log.debug("starting acceptor");
-        acceptor = new AcceptorNioServer(null, null);
+        acceptor = new AcceptorNioServer(null, null, null);
         putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptor);
         acceptor.start();
         if (debugEnabled) log.debug("acceptor started");

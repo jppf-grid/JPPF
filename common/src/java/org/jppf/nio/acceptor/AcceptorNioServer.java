@@ -56,10 +56,11 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
    * Initialize this server with the specified port numbers.
    * @param ports the ports this socket server is listening to.
    * @param sslPorts the SSL ports this socket server is listening to.
+   * @param configuration the JPPF configuration to use.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public AcceptorNioServer(final int[] ports, final int[] sslPorts) throws Exception {
-    this(ports, sslPorts, null);
+  public AcceptorNioServer(final int[] ports, final int[] sslPorts, final TypedProperties configuration) throws Exception {
+    this(ports, sslPorts, null, configuration);
     if (debugEnabled) log.debug("{} initialized", getClass().getSimpleName());
   }
 
@@ -68,10 +69,11 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
    * @param ports the ports this socket server is listening to.
    * @param sslPorts the SSL ports this socket server is listening to.
    * @param stats the statsistics to update, if any.
+   * @param configuration the JPPF configuration to use.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public AcceptorNioServer(final int[] ports, final int[] sslPorts, final JPPFStatistics stats) throws Exception {
-    super(ports, sslPorts, JPPFIdentifiers.ACCEPTOR_CHANNEL);
+  public AcceptorNioServer(final int[] ports, final int[] sslPorts, final JPPFStatistics stats, final TypedProperties configuration) throws Exception {
+    super(ports, sslPorts, JPPFIdentifiers.ACCEPTOR_CHANNEL, configuration);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     this.stats = stats;
     if (debugEnabled) log.debug("{} initialized", getClass().getSimpleName());

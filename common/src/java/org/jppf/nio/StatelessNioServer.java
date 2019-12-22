@@ -55,10 +55,11 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
   /**
    * @param identifier the channel identifier for channels handled by this server.
    * @param useSSL determines whether an SSLContext should be created for this server.
+   * @param configuration the JPPF configuration to use.
    * @throws Exception if any error occurs.
    */
-  public StatelessNioServer(final int identifier, final boolean useSSL) throws Exception {
-    super(identifier, useSSL, null);
+  public StatelessNioServer(final int identifier, final boolean useSSL, final TypedProperties configuration) throws Exception {
+    super(identifier, useSSL, null, configuration);
   }
 
   /**
@@ -66,10 +67,11 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
    * @param name the name of this thread.
    * @param identifier the channel identifier for channels handled by this server.
    * @param useSSL determines whether an SSLContext should be created for this server.
+   * @param configuration the JPPF configuration to use.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  protected StatelessNioServer(final String name, final int identifier, final boolean useSSL) throws Exception {
-    super(name, identifier, useSSL, null);
+  protected StatelessNioServer(final String name, final int identifier, final boolean useSSL, final TypedProperties configuration) throws Exception {
+    super(name, identifier, useSSL, null, configuration);
   }
 
   /**
@@ -77,10 +79,11 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
    * @param ports the list of ports this server accepts connections from.
    * @param sslPorts the list of SSL ports this server accepts connections from.
    * @param identifier the channel identifier for channels handled by this server.
+   * @param configuration the JPPF configuration to use.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public StatelessNioServer(final int[] ports, final int[] sslPorts, final int identifier) throws Exception {
-    super(ports, sslPorts, identifier);
+  public StatelessNioServer(final int[] ports, final int[] sslPorts, final int identifier, final TypedProperties configuration) throws Exception {
+    super(ports, sslPorts, identifier, configuration);
   }
 
   @Override
