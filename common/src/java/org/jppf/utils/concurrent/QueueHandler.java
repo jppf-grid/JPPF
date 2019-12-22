@@ -42,7 +42,7 @@ public class QueueHandler<E> {
   /**
    * The queue to handle.
    */
-  private final BlockingQueue<E> queue;
+  private final BlockingDeque<E> queue;
   /**
    * The peak queue size, maintained by this queue handler.
    */
@@ -54,11 +54,15 @@ public class QueueHandler<E> {
   /**
    * The thread that reads job notifications fromm the queue and sends them.
    */
-  private DequeuerThread dequeuerThread;
+  private Thread[] dequeuerThreads;
   /**
    * The name assigned tot he dequeuer thread.
    */
   private final String name;
+  /**
+   * The number of dequeing threads.
+   */
+  private int nbThreads;
   /**
    * An optional callback invoked when a new peak queue size is reached.
    */
@@ -113,12 +117,12 @@ public class QueueHandler<E> {
    */
   public QueueHandler(final String name, final int capacity, final Handler<E> handler) {
     this.name = (name == null) ? getClass().getSimpleName() + "-" + instanceCount.incrementAndGet() : name;
-    queue = new LinkedBlockingQueue<>(capacity);
+    queue = new LinkedBlockingDeque<>(capacity);
     this.handler = handler;
   }
 
   /**
-   * Add the specified element to the tail of the queue.
+   * Add the specified element to the <i>tail</i> of the queue.
    * @param element the element to add.
    * @return {@code true} if the element was successfully added, {@code false} otherwise.
    */
@@ -129,12 +133,33 @@ public class QueueHandler<E> {
   }
 
   /**
-   * Add the specified element to the tail of the queue, waiting if necessary for available space in the queue.
+   * Add the specified element to the <i>head</i> of the queue.
+   * @param element the element to add.
+   * @return {@code true} if the element was successfully added, {@code false} otherwise.
+   */
+  public boolean offerToHead(final E element) {
+    final boolean success = queue.offerFirst(element);
+    checkQueueSize();
+    return success;
+  }
+
+  /**
+   * Add the specified element to the <i>tail</i> of the queue, waiting if necessary for available space in the queue.
    * @param element the element to add.
    * @throws Exception if any error occurs.
    */
   public void put(final E element) throws Exception {
     queue.put(element);
+    checkQueueSize();
+  }
+
+  /**
+   * Add the specified element to the <i>head</i> of the queue, waiting if necessary for available space in the queue.
+   * @param element the element to add.
+   * @throws Exception if any error occurs.
+   */
+  public void putToHead(final E element) throws Exception {
+    queue.putFirst(element);
     checkQueueSize();
   }
 
@@ -204,16 +229,36 @@ public class QueueHandler<E> {
    * @return this queue handler, for method call chaining.
    */
   public QueueHandler<E> startDequeuer() {
-    if (started.compareAndSet(false, true)) (dequeuerThread = new DequeuerThread(name)).start();
+    return startDequeuer(1);
+  }
+
+  /**
+   * Start the dequeuer thread. It the thread was already started, this method has no effect.
+   * @param nbThreads the number of threads to start.
+   * @return this queue handler, for method call chaining.
+   */
+  public QueueHandler<E> startDequeuer(final int nbThreads) {
+    if (started.compareAndSet(false, true)) {
+      this.nbThreads = nbThreads;
+      dequeuerThreads = new Thread[nbThreads];
+      for (int i=0; i<nbThreads; i++) {
+        String threadName = name;
+        if (nbThreads > 1) threadName += "-" + (i + 1);
+        (dequeuerThreads[i] = new DequeuerThread(threadName)).start();
+      }
+    }
     return this;
   }
 
   /**
    * CLose this queue handler.
    */
+  @SuppressWarnings("unchecked")
   public void close() {
     if (closed.compareAndSet(false, true)) {
-      if (dequeuerThread != null) dequeuerThread.stopped.set(true);
+      if (dequeuerThreads != null) {
+        for (int i=0; i<nbThreads; i++) ((DequeuerThread) dequeuerThreads[i]).stopped.set(true);
+      }
       queue.clear();
     }
   }
