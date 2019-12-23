@@ -27,6 +27,7 @@ import javax.net.ssl.X509TrustManager;
  * Instances of this class allow an SSLSocketFactory or an SSLEngine to perform checks against multiple trust managers from multiple trusstores.
  * @author Laurent Cohen
  * @since 6.0
+ * @exclude
  */
 public class CompositeX509TrustManager implements X509TrustManager {
   /**
