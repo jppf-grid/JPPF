@@ -37,20 +37,6 @@ class RemoteResourceRequest extends AbstractResourceRequest {
   private final SocketWrapper socketClient;
 
   /**
-   * Initialize with the specified request.
-   * @param request the request to send.
-   * @param serializer used to serialize the requets and deserialze the response.
-   * @param socketClient the socket client used to get response for request.
-   * @throws Exception if any error occurs.
-   */
-  public RemoteResourceRequest(final JPPFResourceWrapper request, final ObjectSerializer serializer, final SocketWrapper socketClient) throws Exception {
-    super(request);
-    if (socketClient == null) throw new IllegalArgumentException("socketClient is null");
-    this.serializer = serializer;
-    this.socketClient = socketClient;
-  }
-
-  /**
    * Initialize with the specified serializer.
    * @param serializer used to serialize the requets and deserialze the response.
    * @param socketClient the socket client used to get response for request.

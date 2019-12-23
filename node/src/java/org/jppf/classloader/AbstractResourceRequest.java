@@ -42,14 +42,6 @@ abstract class AbstractResourceRequest implements ResourceRequestRunner {
   public AbstractResourceRequest() {
   }
 
-  /**
-   * Initialize with the specified request.
-   * @param request the request to send.
-   */
-  public AbstractResourceRequest(final JPPFResourceWrapper request) {
-    this.request = request;
-  }
-
   @Override
   public Throwable getThrowable() {
     return throwable;

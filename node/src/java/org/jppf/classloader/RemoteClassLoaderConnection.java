@@ -52,11 +52,11 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
   /**
    * Determines whether SSL is enabled.
    */
-  private boolean sslEnabled = false;
+  private boolean sslEnabled;
   /**
    * The object used to serialize and deserialize resources.
    */
-  private ObjectSerializer serializer = null;
+  private ObjectSerializer serializer;
   /**
    * The server conenction information.
    */
