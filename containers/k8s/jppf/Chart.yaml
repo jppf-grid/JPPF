@@ -3,8 +3,8 @@ apiVersion: v1
 name: jppf
 home: https://www.jppf.org
 
-version: 6.2-alpha-2
-appVersion: "6.2-alpha-2"
+version: 6.2-beta
+appVersion: "6.2-beta"
 
 description: The open-source grid computing solution. JPPF enables applications with
   large processing power requirements to be run on any number of computers, in order
