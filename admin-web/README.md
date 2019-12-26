@@ -4,14 +4,28 @@ A web-based administration and monitoring console for JPPF grids. It is function
 
 ## How to get it
 
-**Direct download**: from the [nightly build](https://sourceforge.net/projects/jppf-project/files/jppf-project/nightly/), look for JPPF-&lt;version&gt;-admin-web.zip
+**Direct download**: from the [latest release](https://github.com/jppf-grid/JPPF/releases/tag/v_6_2_beta), look for JPPF-6.2-beta-admin-web.zip
 
-**Maven**: currently in the Sonatype snapshots repository at https://oss.sonatype.org/content/repositories/snapshots:
+### War file
+
+**Maven Central**: 
 
 ~~~xml
 <dependency>
   <groupId>org.jppf</groupId>
   <artifactId>jppf-admin-web</artifactId>
-  <version>6.0-alpha-4-SNAPSHOT</version>
+  <version>6.2-beta</version>
+</dependency>
+~~~
+
+### Jar for enterprise applications to embed the web admin console:
+
+**Maven Central**: 
+
+~~~xml
+<dependency>
+  <groupId>org.jppf</groupId>
+  <artifactId>jppf-admin-web-embedded</artifactId>
+  <version>6.2-beta</version>
 </dependency>
 ~~~

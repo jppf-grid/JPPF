@@ -48,10 +48,6 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    */
   private final Map<String, TopologyDriver> driverMap = new Hashtable<>();
   /**
-   * Synchronization lock.
-   */
-  private final Object driversLock = new Object();
-  /**
    * Mapping of peer driver uuids to the corresponding {@link TopologyPeer} objects.
    */
   private final Map<String, TopologyPeer> peerMap = new Hashtable<>();
@@ -175,7 +171,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @return a list of {@link TopologyDriver} instances.
    */
   public List<TopologyDriver> getDrivers() {
-    synchronized(driversLock) {
+    synchronized(driverMap) {
       return new ArrayList<>(driverMap.values());
     }
   }
@@ -186,7 +182,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @return a {@link TopologyDriver} instance.
    */
   public TopologyDriver getDriver(final String uuid) {
-    synchronized(driversLock) {
+    synchronized(driverMap) {
       return driverMap.get(uuid);
     }
   }
@@ -258,7 +254,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @return the number of drivers.
    */
   public int getDriverCount() {
-    synchronized(driversLock) {
+    synchronized(driverMap) {
       return driverMap.size();
     }
   }
@@ -352,7 +348,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   void driverAdded(final TopologyDriver driver) {
     if (debugEnabled) log.debug("adding driver {}, uuid={}", driver, driver.getUuid());
     TopologyDriver other = null;
-    synchronized(driversLock) {
+    synchronized(driverMap) {
       other = driverMap.get(driver.getUuid());
       if (debugEnabled && (other != null)) log.debug("driver already exists with same uuid: {}", other);
       if (other == null) {
@@ -363,7 +359,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
     if (other != null) {
       driverRemoved(other);
     }
-    synchronized(driversLock) {
+    synchronized(driverMap) {
       driverMap.put(driver.getUuid(), driver);
     }
     final TopologyEvent event = new TopologyEvent(this, driver, null, TopologyEvent.UpdateType.TOPOLOGY);
@@ -380,7 +376,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
     final ClientConnectionStatusListener listener = statusListenerMap.remove(c);
     if (listener != null) c.removeClientConnectionStatusListener(listener);
     for (final AbstractTopologyComponent child: driver.getChildren()) nodeRemoved(driver, (TopologyNode) child);
-    synchronized(driversLock) {
+    synchronized(driverMap) {
       driverMap.remove(driver.getUuid());
     }
     final TopologyEvent event = new TopologyEvent(this, driver, null, TopologyEvent.UpdateType.TOPOLOGY);
@@ -460,23 +456,21 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @param type the type of event.
    */
   private void dispatchEvent(final TopologyEvent event, final TopologyEvent.Type type) {
-    final Runnable dispatchTask = new Runnable() {
-      @Override public void run() {
-        if (log.isTraceEnabled()) log.trace("dispatching event type={} : {}", type, event);
-        switch (type) {
-          case DRIVER_ADDED: for (TopologyListener listener: listeners) listener.driverAdded(event);
-          break;
-          case DRIVER_REMOVED: for (TopologyListener listener: listeners) listener.driverRemoved(event);
-          break;
-          case DRIVER_UPDATED: for (TopologyListener listener: listeners) listener.driverUpdated(event);
-          break;
-          case NODE_ADDED: for (TopologyListener listener: listeners) listener.nodeAdded(event);
-          break;
-          case NODE_REMOVED: for (TopologyListener listener: listeners) listener.nodeRemoved(event);
-          break;
-          case NODE_UPDATED: for (TopologyListener listener: listeners) listener.nodeUpdated(event);
-          break;
-        }
+    final Runnable dispatchTask = () -> {
+      if (log.isTraceEnabled()) log.trace("dispatching event type={} : {}", type, event);
+      switch (type) {
+        case DRIVER_ADDED: for (final TopologyListener listener: listeners) listener.driverAdded(event);
+        break;
+        case DRIVER_REMOVED: for (final TopologyListener listener: listeners) listener.driverRemoved(event);
+        break;
+        case DRIVER_UPDATED: for (final TopologyListener listener: listeners) listener.driverUpdated(event);
+        break;
+        case NODE_ADDED: for (final TopologyListener listener: listeners) listener.nodeAdded(event);
+        break;
+        case NODE_REMOVED: for (final TopologyListener listener: listeners) listener.nodeRemoved(event);
+        break;
+        case NODE_UPDATED: for (final TopologyListener listener: listeners) listener.nodeUpdated(event);
+        break;
       }
     };
     executor.execute(dispatchTask);

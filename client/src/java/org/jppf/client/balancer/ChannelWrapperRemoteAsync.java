@@ -62,7 +62,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
    */
   private final List<Future<?>> futures = new ArrayList<>();
   /**
-   * Used to synchronize on the connection status.
+   * For synchronization.
    */
   private final Object statusLock = new Object();
   /**
