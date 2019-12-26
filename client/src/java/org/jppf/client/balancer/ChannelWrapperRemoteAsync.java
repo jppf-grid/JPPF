@@ -68,7 +68,11 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
   /**
    * Notifies waiting threads that the connection status has changed.
    */
-  private final StatusListener listener = new StatusListener();
+  private final ClientConnectionStatusListener listener = event -> {
+    synchronized(statusLock) {
+      statusLock.notifyAll();
+    }
+  };
 
   /**
    * Default initializer for remote channel wrapper.
@@ -376,8 +380,8 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
   public void close() {
     if (debugEnabled) log.debug("closing {}, resetting={}", this, resetting);
     channel.removeClientConnectionStatusListener(listener);
-    synchronized(statusLock) {
-      statusLock.notifyAll();
+    synchronized(listener) {
+      listener.notifyAll();
     }
     super.close();
     futures.forEach(future -> future.cancel(true));
@@ -395,18 +399,6 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
         final JPPFClientConnectionStatus status = getStatus();
         if (status.isWorkingStatus() || status.isTerminatedStatus()) break;
         statusLock.wait();
-      }
-    }
-  }
-
-  /**
-   * Notifies waiting threads that the connection status has changed.
-   */
-  private class StatusListener implements ClientConnectionStatusListener {
-    @Override
-    public void statusChanged(final ClientConnectionStatusEvent event) {
-      synchronized(statusLock) {
-        statusLock.notifyAll();
       }
     }
   }

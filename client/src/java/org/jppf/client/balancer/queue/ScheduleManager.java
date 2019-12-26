@@ -62,12 +62,7 @@ class ScheduleManager {
       try {
         final long dt = clientJob.getJobReceivedTime();
         jobStartHandler.scheduleAction(uuid, schedule, new JobScheduleAction(clientJob), dt);
-        clientJob.addOnDone(new Runnable() {
-          @Override
-          public void run() {
-            jobStartHandler.cancelAction(uuid);
-          }
-        });
+        clientJob.addOnDone(() -> jobStartHandler.cancelAction(uuid));
       } catch (final ParseException e) {
         clientJob.setPending(false);
         log.error("Unparseable start date for job '{}' : date = {}, date format = {}\n{}", name , schedule.getDate(), schedule.getFormat(), ExceptionUtils.getStackTrace(e));
@@ -91,12 +86,7 @@ class ScheduleManager {
       final long dt = clientJob.getJobReceivedTime();
       try {
         jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(clientJob), dt);
-        clientJob.addOnDone(new Runnable() {
-          @Override
-          public void run() {
-            jobExpirationHandler.cancelAction(uuid);
-          }
-        });
+        clientJob.addOnDone(() -> jobExpirationHandler.cancelAction(uuid));
       } catch (final ParseException e) {
         log.error("Unparseable expiration date for job '{}' : date = {}, date format = {}\n{}", name , schedule.getDate(), schedule.getFormat(), ExceptionUtils.getStackTrace(e));
       }
