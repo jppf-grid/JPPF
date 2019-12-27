@@ -71,10 +71,10 @@ $template{name="about-page-header" title="Downloads"}$
     <br>
 
     <div class="blockWithHighlightedTitle">
-      $template{name="highlighted-title-with-icon" img="images/icons/download.png" title="JPPF 6.2 alpha 2 preview" heading="h2" style="margin: 10px 0px; font-weight: bold"}$
+      $template{name="highlighted-title-with-icon" img="images/icons/download.png" title="JPPF 6.2 beta preview" heading="h2" style="margin: 10px 0px; font-weight: bold"}$
       <div style="height: 5px"></div>
       <ul class="list_nomargin">
-        <li><a href="release_notes.php?version=6.2-alpha-2">Release notes</a></li>
+        <li><a href="release_notes.php?version=6.2-beta">Release notes</a></li>
         <li><a href="downloads-unstable.php">Download</a></li>
       </ul>
     </div>
