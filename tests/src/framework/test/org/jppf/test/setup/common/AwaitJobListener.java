@@ -40,12 +40,10 @@ public class AwaitJobListener extends ThreadSynchronization implements JobListen
 
   /**
    * Initialize this listener.
-   * @param job the job to which this listener is registered.
    * @param eventType the type of event to wait for.
    */
-  public AwaitJobListener(final JPPFJob job, final JobEvent.Type eventType) {
+  AwaitJobListener(final JobEvent.Type eventType) {
     this.expectedEventType = eventType;
-    job.addJobListener(this);
   }
 
   @Override
@@ -66,6 +64,18 @@ public class AwaitJobListener extends ThreadSynchronization implements JobListen
   @Override
   public void jobReturned(final JobEvent event) {
     checkEventType(event.getJob(), JOB_RETURN);
+  }
+
+  /**
+   * Create a new listener.
+   * @param job the job to which this listener is registered.
+   * @param eventType the type of event to wait for.
+   * @return the new listener.
+   */
+  public static AwaitJobListener of(final JPPFJob job, final JobEvent.Type eventType) {
+    final AwaitJobListener listener = new AwaitJobListener(eventType);
+    job.addJobListener(listener);
+    return listener;
   }
 
   /**

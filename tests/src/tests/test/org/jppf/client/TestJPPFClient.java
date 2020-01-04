@@ -35,6 +35,7 @@ import org.jppf.execute.AbstractThreadManager;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.junit.*;
 
 import test.org.jppf.test.setup.Setup1D1N;
@@ -375,6 +376,49 @@ public class TestJPPFClient extends Setup1D1N {
   }
 
   /**
+   * Test that the client recovers from disconnecting from the driver and finishes jobs to completion.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=15_000)
+  public void testClientClose() throws Exception {
+    final TypedProperties config = new TypedProperties(JPPFConfiguration.getProperties())
+      .set(LOAD_BALANCING_ALGORITHM, "manual")
+      .set(LOAD_BALANCING_PROFILE, "test")
+      .setInt(LOAD_BALANCING_PROFILE.getName() + ".test.size", 1);
+    try (final MyClient client = new MyClient(config))  {
+      final int nbJobs = 5;
+      final int nbTasks = 3;
+      for (int i = 1; i<=nbJobs; i++) {
+        final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-" + i, false, nbTasks, LifeCycleTask.class, 0L);
+        print(false, false, "----- iteration #%03d -----", i);
+        int count = 0;
+        for (final Task<?> task: job.getJobTasks()) task.setId("" + count++);
+        final AwaitJobListener listener = AwaitJobListener.of(job, JobEvent.Type.JOB_RETURN);
+        print(false, false, "submitting job");
+        client.submitAsync(job);
+        print(false, false, "awaiting first result");
+        listener.await();
+        print(false, false, "resetting client");
+        final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+        pool.close();
+        print(false, false, "client queue: %s", client.getQueuedJobs());
+        ThreadUtils.startDaemonThread(() -> client.initPools(config), "InitPools");
+        print(false, false, "awaiting job results");
+        final List<Task<?>> results = job.awaitResults();
+        print(false, false, "got job results");
+        assertNotNull(results);
+        assertEquals(nbTasks, results.size());
+        final String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
+        for (final Task<?> task: results) {
+          final Throwable t = task.getThrowable();
+          assertNull("task " + task.getId() + " has an exception " + t, t);
+          assertEquals("result of task " + task.getId() + " should be " + msg + " but is " + task.getResult(), msg, task.getResult());
+        }
+      }
+    }
+  }
+
+  /**
    * A task that checks the current thread context class loader during its execution.
    */
   public static class ThreadContextClassLoaderTask extends AbstractTask<String> {
@@ -406,6 +450,24 @@ public class TestJPPFClient extends Setup1D1N {
     public void jobDispatched(final JobEvent event) {
       final int n = dispatchCount.incrementAndGet();
       tasksPerDispatch.put(n, event.getJobTasks().size());
+    }
+  }
+
+  /**
+   * Subclass to make the {@code initPools()} method public.
+   */
+  public static class MyClient extends JPPFClient {
+    /**
+     * @param config .
+     * @param listeners .
+     */
+    public MyClient(final TypedProperties config, final ConnectionPoolListener... listeners) {
+      super(config, listeners);
+    }
+
+    @Override
+    public void initPools(final TypedProperties config) {
+      super.initPools(config);
     }
   }
 }

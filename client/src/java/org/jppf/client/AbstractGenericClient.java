@@ -184,7 +184,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   }
 
   @Override
-  void initPools(final TypedProperties config) {
+  protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
     if (config.get(JPPFProperties.LOCAL_EXECUTION_ENABLED)) {
       System.out.println("local execution enabled");

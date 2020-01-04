@@ -341,7 +341,6 @@ public class ClientJob extends AbstractClientJob {
     synchronized (bundleMap) {
       final ChannelWrapper channel = bundleMap.remove(bundle);
       if (debugEnabled) log.debug("removed channel {} from bundleMap of {}", channel, this);
-      if ((bundle != null) && (channel == null)) throw new IllegalStateException("future already removed");
     }
     boolean requeue = false;
     if (getSLA().isBroadcastJob()) {

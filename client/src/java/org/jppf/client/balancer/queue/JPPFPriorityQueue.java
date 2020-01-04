@@ -107,7 +107,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   protected void requeue(final ClientJob job) {
     lock.lock();
     try {
-      if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
+      if (!jobMap.containsKey(job.getUuid())) log.warn("Job not managed: {}", job);
       if (debugEnabled) log.debug("requeueing job {}", job);
       priorityMap.putValue(job.getSLA().getPriority(), job);
       incrementSizeCount(getSize(job));
@@ -182,12 +182,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     }
   }
 
-  /**
-   * Process the specified broadcast job.
-   * This consists in creating one job per node, each containing the same tasks,
-   * and with an execution policy that enforces its execution ont he designated node only.
-   * @param clientJob the broadcast job to process.
-   */
   /**
    * Process the specified broadcast job.
    * This consists in creating one job per node, each containing the same tasks and with an execution policy that enforces its execution ont he designated node only.

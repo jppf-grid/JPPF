@@ -49,7 +49,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     BaseTestHelper.printToAll(client, true, true, true, false, "submitting job");
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, duration);
-    final AwaitJobListener listener = new AwaitJobListener(job, JobEvent.Type.JOB_DISPATCH);
+    final AwaitJobListener listener = AwaitJobListener.of(job, JobEvent.Type.JOB_DISPATCH);
     client.submitAsync(job);
     BaseTestHelper.printToAll(client, true, true, true, false, "waiting for JOB_DISPATCH notification");
     listener.await();
