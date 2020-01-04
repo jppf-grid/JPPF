@@ -107,7 +107,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   protected void requeue(final ClientJob job) {
     lock.lock();
     try {
-      if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
+      if (!jobMap.containsKey(job.getUuid())) log.warn("Job not managed: {}", job);
       if (debugEnabled) log.debug("requeueing job {}", job);
       priorityMap.putValue(job.getSLA().getPriority(), job);
       incrementSizeCount(getSize(job));

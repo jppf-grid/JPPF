@@ -69,6 +69,10 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
    * Notifies waiting threads that the connection status has changed.
    */
   private final StatusListener listener = new StatusListener();
+  /**
+   * Used to synchronize on the jobs resubmission.
+   */
+  private final Object resubmitLock = new Object();
 
   /**
    * Default initializer for remote channel wrapper.
@@ -92,12 +96,15 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
 
   @Override
   public Future<?> submit(final ClientTaskBundle bundle) {
+    if (debugEnabled) log.debug("submitting {} to {}", bundle, this);
     if (!channel.isClosed()) {
       jobCount.incrementAndGet();
-      if (debugEnabled) log.debug("submitting {} to {}", bundle, this);
       if (getCurrentNbJobs() >= getMaxJobs()) setStatus(JPPFClientConnectionStatus.EXECUTING);
       bundleQueue.offer(bundle);
       if (debugEnabled) log.debug("submitted {} to {}", bundle, this);
+    } else {
+      if (debugEnabled) log.debug("resubmitting {}", bundle);
+      resubmitBundle(bundle, null);
     }
     return null;
   }
@@ -294,7 +301,6 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
     if (debugEnabled) log.debug("handling throwable from {} for {}:\nchannel = {}", fromSender ? "sender" : "receiver", clientBundle, this, t);
     final boolean channelClosed = channel.isClosed();
     if (debugEnabled) log.debug("channelClosed={}, resetting={}", channelClosed, resetting);
-    if (channelClosed && !resetting) return null;
     if (!channelClosed) {
       final String jobMsg = (clientBundle == null) ? "" : " while handling job " + clientBundle;
       log.warn("Throwable was raised{} on channel {}\n{}", jobMsg, this, ExceptionUtils.getStackTrace(t));
@@ -309,24 +315,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           if (debugEnabled) log.debug("resubmitting {}", clientBundle);
           resubmitBundle(clientBundle, null);
         }
-        if (debugEnabled) log.debug("{} resubmitting all queued jobs", this);
-        final Set<ClientTaskBundle> resubmitted = new HashSet<>(jobCount.get());
-        final Set<Long> resubmittedIds = new HashSet<>(jobCount.get());
-        bundleQueue.drainTo(resubmitted);
-        resubmitted.forEach(bundle -> {
-          resubmittedIds.add(bundle.getBundleId());
-          if (debugEnabled) log.debug("resubmitting {}", bundle);
-          resubmitBundle(bundle, null);
-        });
-        jobCount.set(0);
-        final Map<Long, RemoteResponse> map = new ConcurrentHashMap<>(responseMap);
-        responseMap.clear();
-        map.forEach((id, response) -> {
-          if (!resubmittedIds.contains(id)) {
-            if (debugEnabled) log.debug("resubmitting {}", response.clientBundle);
-            resubmitBundle(response.clientBundle, null);
-          }
-        });
+        resubmitQueueBundles();
       }
     } finally {
       if ((clientBundle != null)) {
@@ -335,6 +324,32 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
       }
     }
     return exception;
+  }
+
+  /**
+   * Resubmit all queued bundles along with those awaiting a response.
+   */
+  private void resubmitQueueBundles() {
+    synchronized(resubmitLock) {
+      if (debugEnabled) log.debug("resubmitting all queued jobs of {}", this);
+      final Set<ClientTaskBundle> resubmitted = new HashSet<>(jobCount.get());
+      final Set<Long> resubmittedIds = new HashSet<>(jobCount.get());
+      bundleQueue.drainTo(resubmitted);
+      final Map<Long, RemoteResponse> map = new ConcurrentHashMap<>(responseMap);
+      responseMap.clear();
+      resubmitted.forEach(bundle -> {
+        resubmittedIds.add(bundle.getBundleId());
+        if (debugEnabled) log.debug("resubmitting {}", bundle);
+        resubmitBundle(bundle, null);
+      });
+      jobCount.set(0);
+      map.forEach((id, response) -> {
+        if (!resubmittedIds.contains(id)) {
+          if (debugEnabled) log.debug("resubmitting {}", response.clientBundle);
+          resubmitBundle(response.clientBundle, null);
+        }
+      });
+    }
   }
 
   /**
@@ -373,6 +388,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
   @Override
   public void close() {
     if (debugEnabled) log.debug("closing {}, resetting={}", this, resetting);
+    resubmitQueueBundles();
     channel.removeClientConnectionStatusListener(listener);
     synchronized(statusLock) {
       statusLock.notifyAll();

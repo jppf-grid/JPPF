@@ -83,6 +83,10 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    */
   AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(NEW);
   /**
+   * Synchronize on status changes.
+   */
+  final Object statusChangeLock = new Object();
+  /**
    * The connection pool this connection belongs to.
    */
   final JPPFConnectionPool pool;

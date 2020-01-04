@@ -103,12 +103,14 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
 
   @Override
   public void setStatus(final JPPFClientConnectionStatus status) {
-    final JPPFClientConnectionStatus oldStatus = getStatus();
-    if (debugEnabled) log.debug("connection '" + name + "' attempting to change status to " + status);
-    if (status != oldStatus) {
-      if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + status);
-      this.status.set(status);
-      fireStatusChanged(oldStatus);
+    synchronized(statusChangeLock) {
+      final JPPFClientConnectionStatus oldStatus = getStatus();
+      if (debugEnabled) log.debug("connection '" + name + "' attempting to change status to " + status);
+      if (status != oldStatus) {
+        if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + status);
+        this.status.set(status);
+        fireStatusChanged(oldStatus);
+      }
     }
   }
 

@@ -318,22 +318,20 @@ public class JobScheduler extends ThreadSynchronization implements Runnable {
    */
   private boolean dispatchJobToChannel(final ChannelWrapper channel, final ClientJob job)  throws Exception {
     if (debugEnabled) log.debug("dispatching jobUuid={} to channel {}, connectionUuid=", new Object[] {job.getJob().getUuid(), channel, channel.getConnectionUuid()});
-    synchronized (channel.getMonitor()) {
-      int size = 1;
-      if (job.isCancellingOrCancelled()) return false;
-      try {
-        updateBundler(job.getJob(), channel);
-        size = channel.getBundler().getBundleSize();
-        if (job.getClientSLA().getMaxDispatchSize() < size) size = job.getClientSLA().getMaxDispatchSize();
-      } catch (final Exception e) {
-        log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1: {}", ExceptionUtils.getStackTrace(e));
-        size = bundlerFactory.getFallbackBundler().getBundleSize();
-      }
-      if (job.isCancellingOrCancelled()) return false;
-      final ClientTaskBundle jobDispatch = queue.nextBundle(job, size);
-      job.addChannel(channel);
-      channel.submit(jobDispatch);
+    int size = 1;
+    if (job.isCancellingOrCancelled()) return false;
+    try {
+      updateBundler(job.getJob(), channel);
+      size = channel.getBundler().getBundleSize();
+      if (job.getClientSLA().getMaxDispatchSize() < size) size = job.getClientSLA().getMaxDispatchSize();
+    } catch (final Exception e) {
+      log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1: {}", ExceptionUtils.getStackTrace(e));
+      size = bundlerFactory.getFallbackBundler().getBundleSize();
     }
+    if (job.isCancellingOrCancelled()) return false;
+    final ClientTaskBundle jobDispatch = queue.nextBundle(job, size);
+    job.addChannel(channel);
+    channel.submit(jobDispatch);
     return true;
   }
 
