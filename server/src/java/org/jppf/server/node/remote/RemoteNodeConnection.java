@@ -84,7 +84,7 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper> 
       if (!InterceptorHandler.invokeOnConnect(channel)) throw new JPPFNodeReconnectionNotification("connection denied by interceptor", null, ConnectionReason.JOB_CHANNEL_INIT_ERROR);
       //if (!NodeRunner.isOffline())
       System.out.println("Reconnected to the node server");
-      if (debugEnabled) log.debug("sending channel identifier");
+      if (debugEnabled) log.debug("sending channel identifier {}", JPPFIdentifiers.asString(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL));
       channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
       if (connectionInfo.isSecure()) channel = SSLHelper.createSSLClientConnection(channel);
       if (debugEnabled) log.debug("end socket initializer");

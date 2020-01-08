@@ -168,7 +168,7 @@ public class AsyncClientMessageHandler {
     final TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(driver.getUuid());
     header.setUuidPath(uuidPath);
-    if (debugEnabled) log.debug("sending handshake job, uuidPath={}", uuidPath);
+    if (debugEnabled) log.debug("sending handshake job, uuidPath={}, to peer {}", uuidPath, context);
     header.setUuid(JPPFUuid.normalUUID());
     header.setName("handshake job");
     header.setHandshake(true);
