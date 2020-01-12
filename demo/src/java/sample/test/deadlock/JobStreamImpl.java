@@ -55,6 +55,10 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
    * An optional data provider set onto each job.
    */
   final DataProvider dp;
+  /**
+   * 
+   */
+  final Object completionLock = new Object();
 
   /**
    * Initialize this job provider.
@@ -135,6 +139,24 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
     if ((options.closeClientAfter > 0) && (getExecutedJobCount() >= options.closeClientAfter)) {
       DeadlockRunner.print("terminating after %d jobs", options.closeClientAfter);
       System.exit(0);
+    }
+    synchronized(completionLock) {
+      completionLock.notifyAll();
+    }
+  }
+
+  /**
+   * 
+   */
+  public void awaitStreamCompletion() {
+    try {
+      synchronized(completionLock) {
+        while (getExecutedJobCount() < options.nbJobs) completionLock.wait();
+      }
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }

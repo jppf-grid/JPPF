@@ -90,7 +90,7 @@ public class DeadlockRunner {
         if (ro.simulateNodeCrashes) pt.setStopped(true);
         jobProvider.awaitEndOfStream();
         print("reached end of job stream");
-        ((ScriptedJobCallback) ro.callback).awaitFullCompletion();
+        jobProvider.awaitStreamCompletion();
         marker.stop();
         printStats(jmx, jobProvider, marker);
       } finally {
