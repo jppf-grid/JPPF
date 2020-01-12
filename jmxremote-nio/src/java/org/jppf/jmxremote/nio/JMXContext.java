@@ -87,7 +87,10 @@ public class JMXContext extends AbstractNioContext {
     } else {
       int size = JMXEnvHelper.getInt(JPPFJMXProperties.NOTIF_QUEUE_SIZE, env, null);
       if (size <= 0) size = JPPFJMXProperties.NOTIF_QUEUE_SIZE.getDefaultValue();
-      pendingJmxMessages = new QueueHandler<MessageWrapper>(null, size).setPeakSizeUpdateCallback(server::updatePeakPendingMessages);
+      pendingJmxMessages = QueueHandler.<MessageWrapper>builder()
+        .withCapacity(size)
+        .handlingPeakSizeAs(server::updatePeakPendingMessages)
+        .build();
     }
     this.peer = false;
     this.socketChannel = socketChannel;

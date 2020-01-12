@@ -74,10 +74,15 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
     monitor.getTopologyManager().addTopologyListener(driverListener = new DriverListener());
     final int capacity = monitor.getTopologyManager().getJPPFClient().getConfig().getInt("jppf.job.monitor.max.notifications", DEFAULT_MAX_NOTIFICATIONS);
     final int cap = (capacity <= 0) ? DEFAULT_MAX_NOTIFICATIONS : capacity;
-    notificationsQueue = new QueueHandler<>("JobNotificationsHandler", capacity, this::handleNotificationAsync)
-      .setPeakSizeUpdateCallback(n -> {
-        if ((n >= cap) && debugEnabled) log.debug("maximum peak job notifications: {}", n);
-      }).startDequeuer();
+    notificationsQueue = QueueHandler.<JobNotification>builder()
+      .named("JobNotificationsHandler")
+      .withCapacity(cap)
+      .handlingElementsAs(this::handleNotificationAsync)
+      .handlingPeakSizeAs(n -> {
+        if (debugEnabled && (n >= cap)) log.debug("maximum peak job notifications: {}", n);
+      })
+      .usingSingleDequuerThread()
+      .build(); 
   }
 
   @Override

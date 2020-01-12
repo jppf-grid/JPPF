@@ -31,7 +31,7 @@ import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
-import org.jppf.utils.concurrent.QueueHandler;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
@@ -79,7 +79,12 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     final TypedProperties config = driver.getConfiguration();
     int size = config.get(JPPFProperties.JMX_NOTIF_QUEUE_SIZE);
     if (size <= 0) size = Integer.MAX_VALUE;
-    eventQueue = new QueueHandler<>("JobNotifications", size, this::fireJobEvent).startDequeuer();
+    eventQueue = QueueHandler.<JobNotification>builder()
+      .named("JobNotifications")
+      .withCapacity(size)
+      .handlingElementsAs(this::fireJobEvent)
+      .usingSingleDequuerThread()
+      .build();
   }
 
   /**

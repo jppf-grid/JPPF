@@ -18,283 +18,90 @@
 
 package org.jppf.utils.concurrent;
 
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
-
-import org.jppf.utils.Operator;
-import org.slf4j.*;
-
 /**
  * Instances of this class handle an optionally bounded queue of elements.
- * It may, upon request, spawn one or more dequeuing threads that will process elements according to a processing function supplied by the consumer.
+ * <p>It may, upon request, spawn one or more dequeuing threads that will process elements according to a processing function supplied by the consumer.
+ * <p>It also maintains basic statistics about the queue size, peak size, number of queued and rejected elements.
  * @param <E> the type of the elements in the queue.
  * @author Laurent Cohen
  */
-public class QueueHandler<E> {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(QueueHandler.class);
-  /**
-   * COunt of instanes of this class.
-   */
-  private static final AtomicLong instanceCount = new AtomicLong(0L);
-  /**
-   * The queue to handle.
-   */
-  private final BlockingDeque<E> queue;
-  /**
-   * The peak queue size, maintained by this queue handler.
-   */
-  private final SynchronizedInteger peakSize = new SynchronizedInteger(0);
-  /**
-   * AN optional operation to perform on the elements taken from the queue.
-   */
-  private final Handler<E> handler;
-  /**
-   * The thread that reads job notifications fromm the queue and sends them.
-   */
-  private Thread[] dequeuerThreads;
-  /**
-   * The name assigned tot he dequeuer thread.
-   */
-  private final String name;
-  /**
-   * The number of dequeing threads.
-   */
-  private int nbThreads;
-  /**
-   * An optional callback invoked when a new peak queue size is reached.
-   */
-  private PeakSizeUpdateCallback peakSizeUpdateCallback;
-  /**
-   * Whether thie dequeuing thread was started.
-   */
-  private final AtomicBoolean started = new AtomicBoolean(false);
-  /**
-   * Whether this queue handler is closed.
-   */
-  private final AtomicBoolean closed = new AtomicBoolean(false);
-
-  /**
-   * Initialize this queue handler with an unbounded queue.
-   */
-  public QueueHandler() {
-    this(null, Integer.MAX_VALUE, null);
-  }
-
-  /**
-   * Initialize this queue handler with an unbounded queue.
-   * @param name the prefix for the names of the dequeuer threads.
-   */
-  public QueueHandler(final String name) {
-    this(name, Integer.MAX_VALUE, null);
-  }
-
-  /**
-   * Initialize this queue handler with an unbounded queue.
-   * @param name the prefix for the names of the dequeuer threads.
-   * @param handler the hanler for dequeued elements.
-   */
-  public QueueHandler(final String name, final Handler<E> handler) {
-    this(name, Integer.MAX_VALUE, handler);
-  }
-
-  /**
-   * Initialize this queue handler.
-   * @param name the prefix for the names of the dequeuer threads.
-   * @param capacity the capacity of the queue.
-   */
-  public QueueHandler(final String name, final int capacity) {
-    this(name, capacity, null);
-  }
-
-  /**
-   * Initialize this queue handler.
-   * @param name the name of the dequeuer thread.
-   * @param capacity the capacity of the queue.
-   * @param handler the hanler for dequeued elements.
-   */
-  public QueueHandler(final String name, final int capacity, final Handler<E> handler) {
-    this.name = (name == null) ? getClass().getSimpleName() + "-" + instanceCount.incrementAndGet() : name;
-    queue = new LinkedBlockingDeque<>(capacity);
-    this.handler = handler;
-  }
+public interface QueueHandler<E> {
 
   /**
    * Add the specified element to the <i>tail</i> of the queue.
    * @param element the element to add.
    * @return {@code true} if the element was successfully added, {@code false} otherwise.
    */
-  public boolean offer(final E element) {
-    final boolean success = queue.offer(element);
-    checkQueueSize();
-    return success;
-  }
+  boolean offer(E element);
 
   /**
    * Add the specified element to the <i>head</i> of the queue.
    * @param element the element to add.
    * @return {@code true} if the element was successfully added, {@code false} otherwise.
    */
-  public boolean offerToHead(final E element) {
-    final boolean success = queue.offerFirst(element);
-    checkQueueSize();
-    return success;
-  }
+  boolean offerToHead(E element);
 
   /**
    * Add the specified element to the <i>tail</i> of the queue, waiting if necessary for available space in the queue.
    * @param element the element to add.
    * @throws Exception if any error occurs.
    */
-  public void put(final E element) throws Exception {
-    queue.put(element);
-    checkQueueSize();
-  }
+  void put(E element) throws Exception;
 
   /**
    * Add the specified element to the <i>head</i> of the queue, waiting if necessary for available space in the queue.
    * @param element the element to add.
    * @throws Exception if any error occurs.
    */
-  public void putToHead(final E element) throws Exception {
-    queue.putFirst(element);
-    checkQueueSize();
-  }
-
-  /**
-   * Check the queue size and performs and update of the peak size if appropriate.
-   */
-  private void checkQueueSize() {
-    final int n = queue.size();
-    if (peakSize.compareAndSet(Operator.LESS_THAN, n) && (peakSizeUpdateCallback != null)) {
-      peakSizeUpdateCallback.newPeakSize(n);
-    }
-  }
+  void putToHead(E element) throws Exception;
 
   /**
    * Get the head element from the queue.
    * @return the head element, or {@code null} if the queue is empty.
    */
-  public E poll() {
-    return queue.poll();
-  }
+  E poll();
 
   /**
    * Get the head element from the queue, waiting if necessary for an element to becomes available.
    * @return the head element.
    * @throws Exception if any error occurs.
    */
-  public E take() throws Exception {
-    return queue.take();
-  }
+  E take() throws Exception;
 
   /**
    * Determine whether the queue is empty.
    * @return {@code true} if the queue is empty, {@code false} otherwise.
    */
-  public boolean isEmpty() {
-    return queue.isEmpty();
-  }
+  boolean isEmpty();
 
   /**
    * Get the size of the queue.
    * @return the queue size as an {@code int}.
    */
-  public int size() {
-    return queue.size();
-  }
+  int size();
 
   /**
    * Get the peak queue size.
    * @return the peak queue size as an int.
    */
-  public int getPeakSize() {
-    return this.peakSize.get();
-  }
+  int getPeakSize();
 
   /**
-   * Set the peak queue size callback.
-   * @param peakSizeUpdateCallback the callback to set.
-   * @return this queue handler, for method call chaining.
+   * Get the count elements that were sucessfully queued.
+   * @return the count as a {@code long} value.
    */
-  public QueueHandler<E> setPeakSizeUpdateCallback(final PeakSizeUpdateCallback peakSizeUpdateCallback) {
-    this.peakSizeUpdateCallback = peakSizeUpdateCallback;
-    return this;
-  }
+  long getQueuedElements();
 
   /**
-   * Start a single dequeuer thread. It the thread was already started, this method has no effect.
-   * @return this queue handler, for method call chaining.
+   * Get the count elements that were rejected.
+   * @return the count as a {@code long} value.
    */
-  public QueueHandler<E> startDequeuer() {
-    return startDequeuer(1);
-  }
-
-  /**
-   * Start the specified number of dequeuer threads. It the dequeuing was already started, this method has no effect.
-   * @param nbThreads the number of dequeuer threads to start.
-   * @return this queue handler, for method call chaining.
-   */
-  public QueueHandler<E> startDequeuer(final int nbThreads) {
-    if (started.compareAndSet(false, true)) {
-      this.nbThreads = nbThreads;
-      dequeuerThreads = new Thread[nbThreads];
-      for (int i=0; i<nbThreads; i++) {
-        String threadName = name;
-        if (nbThreads > 1) threadName += "-" + (i + 1);
-        (dequeuerThreads[i] = new DequeuerThread(threadName)).start();
-      }
-    }
-    return this;
-  }
+  long getRejectedElements();
 
   /**
    * Close this queue handler.
    */
-  @SuppressWarnings("unchecked")
-  public void close() {
-    if (closed.compareAndSet(false, true)) {
-      if (dequeuerThreads != null) {
-        for (int i=0; i<nbThreads; i++) ((DequeuerThread) dequeuerThreads[i]).stopped.set(true);
-      }
-      queue.clear();
-    }
-  }
-
-  /**
-   * A thread that reads objects fromm the queue and sends them.
-   */
-  private final class DequeuerThread extends DebuggableThread {
-    /**
-     * Whether this thread should stop.
-     */
-    private final AtomicBoolean stopped = new AtomicBoolean(false);
-
-    /**
-     * COnstruct this thread.
-     * @param name the name of this thread.
-     */
-    private DequeuerThread(final String name) {
-      super(name);
-      setDaemon(true);
-    }
-
-    @Override
-    public void run() {
-      try {
-        while (!stopped.get()) {
-          final E element = queue.take();
-          if (handler != null) handler.handle(element);
-        }
-      } catch (final InterruptedException e) {
-        if (!stopped.get()) log.error(e.getMessage(), e);
-      } catch (final Exception e) {
-        log.error(e.getMessage(), e);
-      }
-    }
-  }
+  void close();
 
   /**
    * An operation applied to each element taken from the queue by the dequeuer thread.
@@ -320,5 +127,119 @@ public class QueueHandler<E> {
      * @param n the new peak size.
      */
     void newPeakSize(int n);
+  }
+
+  /**
+   * 
+   * @return A build object ot construct and configure a {@code QueueHandler}.
+   * @param <E> the type of elements in the queue.
+   */
+  public static <E> Builder<E> builder() {
+    return new Builder<>();
+  }
+
+  /**
+   * 
+   * @param <E> the type of the elements in the queue.
+   */
+  public static class Builder<E> {
+    /**
+     * AN optional operation to perform on the elements taken from the queue.
+     */
+    private Handler<E> handler;
+    /**
+     * The name assigned to the dequeuer thread.
+     */
+    private String name;
+    /**
+     * The number of dequeing threads.
+     */
+    private int nbThreads;
+    /**
+     * The queue capacity.
+     */
+    private int capacity;
+    /**
+     * An optional callback invoked when a new peak queue size is reached.
+     */
+    private PeakSizeUpdateCallback peakSizeUpdateCallback;
+
+    /**
+     * Default constructor.
+     */
+    private Builder() {
+    }
+
+    /**
+     * Set the name of the dequeuer threads, or the name prefix if there are more than one thread.
+     * @param name the name to set.
+     * @return this builder, for method call chaining.
+     */
+    public Builder<E> named(final String name) {
+      this.name = name;
+      return this;
+    }
+    
+    /**
+     * Set the number of dequeuer threads to 1.
+     * @return this builder, for method call chaining.
+     */
+    public Builder<E> usingSingleDequuerThread() {
+      this.nbThreads = 1;
+      return this;
+    }
+    
+    /**
+     * Set the number of dequeuer threads. If <= 0, then no dequeuing occurs.
+     * @param nbThreads the number of dequeueing threads.
+     * @return this builder, for method call chaining.
+     */
+    public Builder<E> usingDequuerThreads(final int nbThreads) {
+      this.nbThreads = nbThreads;
+      return this;
+    }
+    
+    /**
+     * Set the capacity (maximum size) of the queue. If <= 0, then the queue is unbounded.
+     * @param capacity the number of dequeueing threads.
+     * @return this builder, for method call chaining.
+     */
+    public Builder<E> withCapacity(final int capacity) {
+      this.capacity = capacity;
+      return this;
+    }
+    
+    /**
+     * Set the handler used by the dequeuer threads, if any.
+     * @param handler the handler to set.
+     * @return this builder, for method call chaining.
+     */
+    public Builder<E> handlingElementsAs(final Handler<E> handler) {
+      this.handler = handler;
+      return this;
+    }
+    
+    /**
+     * Set the function invoked whenever a new peak queue size is reached.
+     * @param peakSizeUpdateCallback the function to set.
+     * @return this builder, for method call chaining.
+     */
+    public Builder<E> handlingPeakSizeAs(final PeakSizeUpdateCallback peakSizeUpdateCallback) {
+      this.peakSizeUpdateCallback = peakSizeUpdateCallback;
+      return this;
+    }
+
+    /**
+     * 
+     * @return a new {@code QUeueuHandler} instance.
+     */
+    public QueueHandler<E> build() {
+      final QueueHandlerImpl<E> queueHandler;
+      if (capacity <= 0) queueHandler = new QueueHandlerImpl<>(name, handler);
+      else queueHandler = new QueueHandlerImpl<>(name, capacity, handler);
+      queueHandler.setPeakSizeUpdateCallback(peakSizeUpdateCallback);
+      if (nbThreads > 0) queueHandler.startDequeuer(nbThreads);
+      return queueHandler;
+    }
   }
 }

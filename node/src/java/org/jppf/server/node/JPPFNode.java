@@ -325,8 +325,11 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     lifeCycleEventHandler.fireNodeStarting();
     if (!isOffline()) {
       ThreadUtils.startDaemonThread(jobReader = new JobReader(this), "JobReader");
-      //ThreadUtils.startDaemonThread(jobWriter = new JobWriter(this), "JobWriter");
-      jobWriter = new QueueHandler<>("JobWriter", this::processResults).startDequeuer();
+      jobWriter = QueueHandler.<BundleWithTasks>builder()
+        .named("JobWriter")
+        .handlingElementsAs(this::processResults)
+        .usingSingleDequuerThread()
+        .build();
     }
     throttlingHandler = new NodeThrottlingHandler(this);
     if (debugEnabled) log.debug("end node initialization");

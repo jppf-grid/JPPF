@@ -32,7 +32,7 @@ import org.jppf.jmxremote.JMXAuthorizationChecker;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.QueueHandler;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**
@@ -52,8 +52,11 @@ class JMXMessageReader {
   /**
    * Handles the JMX notifications in a separate thread.
    */
-  private static QueueHandler<Pair<JMXContext, JMXMessage>> queueHandler =
-    new QueueHandler<Pair<JMXContext, JMXMessage>>("JMXNotificationsHandler", pair -> handleMessage(pair.first(), pair.second())).startDequeuer();
+  private static QueueHandler<Pair<JMXContext, JMXMessage>> queueHandler = QueueHandler.<Pair<JMXContext, JMXMessage>>builder()
+    .named("JMXNotificationsHandler")
+    .handlingElementsAs(pair -> handleMessage(pair.first(), pair.second()))
+    .usingSingleDequuerThread()
+    .build();
 
   /**
    * Read from the channel until no more data is available (i.e. socket receive buffer is empty).
