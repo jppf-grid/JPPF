@@ -238,18 +238,17 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
       if (traceEnabled) log.trace("task ended: {}", taskWrapper);
       final long elapsedTime = taskWrapper.getElapsedTime();
       final TaskBundle bundle;
-      final int n, submittedCount;
-      final JobProcessingEntry jobEntry = taskWrapper.getJobEntry();
-      // so we can call jobEnded() from outside the synchronized block
       boolean endJob = false;
+      final JobProcessingEntry jobEntry = taskWrapper.getJobEntry();
+      final ExecutionInfo info = taskWrapper.getExecutionInfo();
+      final long cpuTime = (info == null) ? 0L : (info.cpuTime / 1_000_000L);
+      final Task<?> task = taskWrapper.getTask();
+
+      jobEntry.accumulatedElapsed.addAndGet(elapsedTime);
+      final int n = jobEntry.resultCount.incrementAndGet();
       synchronized(jobEntry) {
         bundle = jobEntry.bundle;
-        jobEntry.accumulatedElapsed.addAndGet(elapsedTime);
-        n = jobEntry.resultCount.incrementAndGet();
-        submittedCount = jobEntry.submittedCount;
-        final ExecutionInfo info = taskWrapper.getExecutionInfo();
-        final long cpuTime = (info == null) ? 0L : (info.cpuTime / 1_000_000L);
-        final Task<?> task = taskWrapper.getTask();
+        final int submittedCount = jobEntry.submittedCount;
         if (traceEnabled) log.trace("sending task ended notification for {}, bundle={}", taskWrapper, bundle);
         taskNotificationDispatcher.fireTaskEnded(task, bundle.getUuid(), bundle.getName(), cpuTime, elapsedTime / 1_000_000L, task.getThrowable() != null);
         if (traceEnabled) log.trace("resultCount={} for {}", n, taskWrapper);

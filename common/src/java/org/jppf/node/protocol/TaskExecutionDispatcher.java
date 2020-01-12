@@ -108,9 +108,10 @@ public class TaskExecutionDispatcher {
    */
   private void fireEvent(final TaskExecutionEvent event) {
     if (traceEnabled) log.trace("firing task notification: {}", event);
-    for (final TaskExecutionListener listener : taskExecutionListeners) {
-      if (event.isTaskCompletion()) listener.taskExecuted(event);
-      else listener.taskNotification(event);
+    if (event.isTaskCompletion()) {
+      for (final TaskExecutionListener listener : taskExecutionListeners) listener.taskExecuted(event);
+    } else {
+      for (final TaskExecutionListener listener : taskExecutionListeners) listener.taskNotification(event);
     }
   }
 

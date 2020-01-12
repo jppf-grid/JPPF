@@ -18,13 +18,13 @@
 
 package org.jppf.management;
 
-import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
 
 import org.jppf.node.Node;
 import org.jppf.node.event.*;
-import org.jppf.utils.concurrent.JPPFThreadFactory;
+import org.jppf.utils.concurrent.QueueHandler;
 import org.slf4j.*;
 
 /**
@@ -48,35 +48,36 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * The current count of tasks executed.
    */
-  private int taskCount = 0;
+  private int taskCount;
   /**
    * The current count of tasks executed.
    */
-  private int taskInErrorCount = 0;
+  private int taskInErrorCount;
   /**
    * The current count of tasks executed.
    */
-  private int taskSuccessfulCount = 0;
+  private int taskSuccessfulCount;
   /**
    * The current count of tasks executed.
    */
-  private long totalCpuTime = 0L;
+  private long totalCpuTime;
   /**
    * The current count of tasks executed.
    */
-  private long totalElapsedTime = 0L;
+  private long totalElapsedTime;
   /**
    * The sequence number for notifications.
    */
-  private long sequence = 0L;
-  /**
-   * 
-   */
-  private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("NodeTaskMonitor"));
+  private final AtomicLong sequence = new AtomicLong(0L);
   /**
    * The jppf node which hosts this mbean.
    */
   final Node node;
+  /**
+   * 
+   */
+  final QueueHandler<NotificationSender> notificationHandler;
+  
 
   /**
    * Default constructor.
@@ -90,22 +91,29 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
+    this.notificationHandler = QueueHandler.<NotificationSender>builder()
+      .named("NodeTaskMonitor")
+      .handlingElementsAs(sender -> sender.run())
+      .usingSingleDequuerThread()
+      .build();
   }
 
   @Override
-  public synchronized void taskExecuted(final TaskExecutionEvent event) {
+  public void taskExecuted(final TaskExecutionEvent event) {
     final TaskInformation info = event.getTaskInformation();
-    taskCount++;
-    if (info.hasError()) taskInErrorCount++;
-    else taskSuccessfulCount++;
-    totalCpuTime += info.getCpuTime();
-    totalElapsedTime += info.getElapsedTime();
-    executor.execute(new NotificationSender(info, null, false));
+    synchronized(this) {
+      taskCount++;
+      if (info.hasError()) taskInErrorCount++;
+      else taskSuccessfulCount++;
+      totalCpuTime += info.getCpuTime();
+      totalElapsedTime += info.getElapsedTime();
+    }
+    notificationHandler.offer(new NotificationSender(info, null, false));
   }
 
   @Override
   public void taskNotification(final TaskExecutionEvent event) {
-    if (event.isSendViaJmx()) executor.execute(new NotificationSender(event.getTaskInformation(), event.getUserObject(), true));
+    if (event.isSendViaJmx()) notificationHandler.offer(new NotificationSender(event.getTaskInformation(), event.getUserObject(), true));
   }
 
   /**
@@ -194,7 +202,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     @Override
     public void run() {
       if (debugEnabled) log.debug("sending task notification with userObject={}, info={}", userObject, info);
-      sendNotification(new TaskExecutionNotification(OBJECT_NAME, ++sequence, info, userObject, userNotification));
+      sendNotification(new TaskExecutionNotification(OBJECT_NAME, sequence.incrementAndGet(), info, userObject, userNotification));
     }
   }
 }
