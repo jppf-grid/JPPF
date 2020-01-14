@@ -115,18 +115,13 @@ public class NodeTaskWrapper implements Runnable {
     this.taskClassLoader = taskClassLoader;
     this.timeoutHandler = timeoutHandler;
     this.jobEntry = jobEntry;
-    final Thread thread = Thread.currentThread();
-    final ClassLoader cl = thread.getContextClassLoader();
-    try {
-      TaskThreadLocals.setRequestUuid(task.getJob().getUuid());
-      if (traceEnabled) {
+    if (traceEnabled) {
+      log.trace("initialized {}", this);
+      try {
         log.trace("in constructor: contextClassLoader={}, taskClassLoader={}", Thread.currentThread().getContextClassLoader(), taskClassLoader);
-        log.trace("initialized {}", this);
+      } catch(final Throwable e) {
+        log.error("error in constructor, contextClassLoader={}, taskClassLoader={}", Thread.currentThread().getContextClassLoader(), taskClassLoader, e);
       }
-    } catch(final Throwable e) {
-      log.error("error in constructor, contextClassLoader={}, taskClassLoader={}", Thread.currentThread().getContextClassLoader(), taskClassLoader, e);
-    } finally {
-      thread.setContextClassLoader(cl);
     }
   }
 
@@ -145,7 +140,7 @@ public class NodeTaskWrapper implements Runnable {
         ((CancellationHandler) task).doCancelAction();
       } catch (final Throwable t) {
         if (task.getThrowable() == null) task.setThrowable(t);
-        if (traceEnabled) log.trace("throwable raised in doCancelAction()", t);
+        if (traceEnabled) log.trace("throwable raised in cancel()", t);
       }
     }
   }
