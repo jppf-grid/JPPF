@@ -98,7 +98,7 @@ public abstract class AbstractTestStandaloneConnector extends BaseTest {
   }
 
   /**
-   * Register the LBeans used in the tests.
+   * Register the MBeans used in the tests.
    * @throws Exception if any error occurs.
    */
   static void registerMBeans() throws Exception {
