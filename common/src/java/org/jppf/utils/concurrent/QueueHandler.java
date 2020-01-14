@@ -104,11 +104,11 @@ public interface QueueHandler<E> {
   void close();
 
   /**
-   * An operation applied to each element taken from the queue by the dequeuer thread.
+   * An operation applied to each element taken from the queue by the dequeuer thread(s).
    * @param <E> the type of elements to handle.
    */
   @FunctionalInterface
-  public interface Handler<E> {
+  public interface ElementHandler<E> {
     /**
      * Handle an element.
      * @param element the object to handle.
@@ -130,7 +130,7 @@ public interface QueueHandler<E> {
   }
 
   /**
-   * 
+   * Create a builder to construct and configure a {@code QueueHandler}.
    * @return A build object ot construct and configure a {@code QueueHandler}.
    * @param <E> the type of elements in the queue.
    */
@@ -139,14 +139,15 @@ public interface QueueHandler<E> {
   }
 
   /**
-   * 
+   * Builder class for {@link QueueHandler} instances.
    * @param <E> the type of the elements in the queue.
+   * @see QueueHandler#builder()
    */
   public static class Builder<E> {
     /**
      * AN optional operation to perform on the elements taken from the queue.
      */
-    private Handler<E> handler;
+    private ElementHandler<E> handler;
     /**
      * The name assigned to the dequeuer thread.
      */
@@ -210,11 +211,11 @@ public interface QueueHandler<E> {
     }
     
     /**
-     * Set the handler used by the dequeuer threads, if any.
+     * Set the element handler used by the dequeuer threads, if any.
      * @param handler the handler to set.
      * @return this builder, for method call chaining.
      */
-    public Builder<E> handlingElementsAs(final Handler<E> handler) {
+    public Builder<E> handlingElementsAs(final ElementHandler<E> handler) {
       this.handler = handler;
       return this;
     }
@@ -230,7 +231,7 @@ public interface QueueHandler<E> {
     }
 
     /**
-     * 
+     * COnstruct and configure a {@link QueueHandler} instance using previously set configuration pproperties.
      * @return a new {@code QUeueuHandler} instance.
      */
     public QueueHandler<E> build() {

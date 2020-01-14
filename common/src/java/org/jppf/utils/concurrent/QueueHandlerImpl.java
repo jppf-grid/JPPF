@@ -31,7 +31,7 @@ import org.slf4j.*;
  * @param <E> the type of the elements in the queue.
  * @author Laurent Cohen
  */
-public class QueueHandlerImpl<E> implements QueueHandler<E> {
+class QueueHandlerImpl<E> implements QueueHandler<E> {
   /**
    * Logger for this class.
    */
@@ -51,7 +51,7 @@ public class QueueHandlerImpl<E> implements QueueHandler<E> {
   /**
    * AN optional operation to perform on the elements taken from the queue.
    */
-  private final Handler<E> handler;
+  private final ElementHandler<E> handler;
   /**
    * The thread that reads job notifications fromm the queue and sends them.
    */
@@ -90,7 +90,7 @@ public class QueueHandlerImpl<E> implements QueueHandler<E> {
    * @param name the prefix for the names of the dequeuer threads.
    * @param handler the hanler for dequeued elements.
    */
-  QueueHandlerImpl(final String name, final Handler<E> handler) {
+  QueueHandlerImpl(final String name, final ElementHandler<E> handler) {
     this(name, Integer.MAX_VALUE, handler);
   }
 
@@ -100,7 +100,7 @@ public class QueueHandlerImpl<E> implements QueueHandler<E> {
    * @param capacity the capacity of the queue.
    * @param handler the hanler for dequeued elements.
    */
-  QueueHandlerImpl(final String name, final int capacity, final Handler<E> handler) {
+  QueueHandlerImpl(final String name, final int capacity, final ElementHandler<E> handler) {
     this.name = (name == null) ? getClass().getSimpleName() + "-" + instanceCount.incrementAndGet() : name;
     queue = new LinkedBlockingDeque<>(capacity);
     this.handler = handler;
