@@ -115,6 +115,7 @@ public class NodeTaskWrapper implements Runnable {
     this.taskClassLoader = taskClassLoader;
     this.timeoutHandler = timeoutHandler;
     this.jobEntry = jobEntry;
+    TaskThreadLocals.setRequestUuid(task.getJob().getUuid());
     if (traceEnabled) {
       log.trace("initialized {}", this);
       try {
