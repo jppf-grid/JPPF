@@ -153,8 +153,8 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
     synchronized(jobEntries) {
       uuids.addAll(pendingBundleIds.keySet());
       uuids.addAll(jobBundleIds.keySet());
-      for (final String uuid: uuids) cancelJob(uuid, callOnCancel, requeue);
     }
+    for (final String uuid: uuids) cancelJob(uuid, callOnCancel, requeue);
   }
 
   @Override
