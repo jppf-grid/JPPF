@@ -57,6 +57,18 @@ public class TestLocation extends BaseTest {
   }
 
   /**
+   * Test a maven central location.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10_000)
+  public void testMavenCentralLocation() throws Exception {
+    final File dest = new File("test1.jar");
+    new MavenCentralLocation("org.jppf:jppf-node:6.1.1").copyTo(new FileLocation(dest));
+    assertTrue(dest.exists());
+    assertTrue(dest.delete());
+  }
+
+  /**
    * Check the copy of the source location to all possible kinds of locations.
    * @param source the source location to copy.
    * @param size the size of the source.

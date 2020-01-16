@@ -181,6 +181,7 @@
     <java fork="true" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="tests.classpath" failonerror="true">
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>
+      <jvmarg value="-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2"/>
       <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
       <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
       <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
@@ -202,6 +203,7 @@
       <classpath refid="tests.classpath"/>
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>
+      <jvmarg value="-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2"/>
       <jvmarg value="-Duser.dir=${basedir}"/>
       <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
       <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
@@ -235,6 +237,7 @@
       <classpath refid="tests.classpath"/>
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>
+      <jvmarg value="-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2"/>
       <jvmarg value="-Duser.dir=${basedir}"/>
       <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
       <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
@@ -259,6 +262,7 @@
       <classpath refid="tests.classpath"/>
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>
+      <jvmarg value="-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2"/>
       <jvmarg value="-Duser.dir=${basedir}"/>
       <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
       <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>

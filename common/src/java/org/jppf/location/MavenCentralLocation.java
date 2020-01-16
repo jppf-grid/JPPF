@@ -118,7 +118,9 @@ public class MavenCentralLocation extends URLLocation {
     final String[] tokens = gav.split(":");
     if ((tokens == null) || (tokens.length != 3)) throw new IllegalArgumentException("malformed gav '" + gav + "'");
     final String path = tokens[0].replace(".", "/");
-    return new URL(String.format("http://repo.maven.apache.org/maven2/%s/%s/%s/%s-%s.%s", path, tokens[1], tokens[2], tokens[1], tokens[2], packaging));
+    //
+    return new URL(String.format("https://repo1.maven.org/maven2/%s/%s/%s/%s-%s.%s", path, tokens[1], tokens[2], tokens[1], tokens[2], packaging));
+    //return new URL(String.format("http://repo.maven.apache.org/maven2/%s/%s/%s/%s-%s.%s", path, tokens[1], tokens[2], tokens[1], tokens[2], packaging));
   }
 
   /**
