@@ -36,7 +36,7 @@ public class MavenCentralLocation extends MavenLocation {
   /**
    * The URL for the Maven Central repository.
    */
-  public static final String MAVEN_CENTRAL_URL = "http://repo.maven.apache.org/maven2";
+  public static final String MAVEN_CENTRAL_URL = "https://repo1.maven.org/maven2";
 
   /**
    * Create this maven central location with the specified GAV string and packaging.

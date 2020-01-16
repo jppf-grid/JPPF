@@ -148,7 +148,7 @@
           project.setProperty("path", project.getProperty("group").replaceAll("\\.", "/"));
         </script>
         <local name="url"/>
-        <property name="url" value="http://repo.maven.apache.org/maven2/${path}/@{a}/@{v}/@{a}-@{v}.@{p}"/>
+        <property name="url" value="https://repo1.maven.org/maven2/${path}/@{a}/@{v}/@{a}-@{v}.@{p}"/>
         <get src="${url}" dest="@{dest}" ignoreerrors="true"/>
       </sequential>
     </sequential>
