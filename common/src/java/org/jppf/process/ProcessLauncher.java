@@ -163,17 +163,12 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
     for (final Map.Entry<Object, Object> entry: System.getProperties().entrySet()) {
       final Object key = entry.getKey();
       if ((key instanceof String) && (entry.getValue() instanceof String)) {
-        if (((String) key).startsWith("jppf.")) command.add(String.format("-D%s=%s", entry.getKey(), entry.getValue()));
+        if (((String) key).startsWith("jppf.")) command.add(String.format("-D%s=%s", key, entry.getValue()));
       }
     }
     for (String opt: jvmOptions) command.add(opt);
-    /*
-    s = System.getProperty(JPPFConfiguration.CONFIG_PROPERTY);
-    if (s != null) command.add("-D" + JPPFConfiguration.CONFIG_PROPERTY + '=' + s);
-    s = System.getProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY);
-    if (s != null) command.add("-D" + JPPFConfiguration.CONFIG_PLUGIN_PROPERTY + '=' + s);
-    */
-    command.add("-Dlog4j.configuration=" + System.getProperty("log4j.configuration"));
+    final String log4j = System.getProperty("log4j.configuration");
+    if (log4j != null) command.add("-Dlog4j.configuration=" + log4j);
     command.add(mainClass);
     command.add(Integer.toString(processPort));
     if (debugEnabled) log.debug("process command:\n" + command);
