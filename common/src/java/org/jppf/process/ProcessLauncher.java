@@ -165,7 +165,8 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
     if (s != null) command.add("-D" + JPPFConfiguration.CONFIG_PROPERTY + '=' + s);
     s = System.getProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY);
     if (s != null) command.add("-D" + JPPFConfiguration.CONFIG_PLUGIN_PROPERTY + '=' + s);
-    command.add("-Dlog4j.configuration=" + System.getProperty("log4j.configuration"));
+    s = System.getProperty("log4j.configuration");
+    if (s != null) command.add("-Dlog4j.configuration=" + s);
     command.add(mainClass);
     command.add(Integer.toString(processPort));
     if (debugEnabled) log.debug("process command:\n" + command);
