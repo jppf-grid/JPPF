@@ -21,13 +21,11 @@ package org.jppf.utils;
 import static org.jppf.utils.PropertyType.*;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.security.*;
 import java.util.*;
 
 import org.slf4j.*;
-//import java.lang.management.*;
 
 /**
  * Collection of utility methods used as a convenience for retrieving
@@ -489,21 +487,6 @@ public final class SystemUtils {
   }
 
   /**
-   * Determine whether the current JVM is a JPPF driver.
-   * @return {@code true} if the current JVM is a JPPF driver, {@code false} otherwise.
-   */
-  public static boolean isJPPFDriver() {
-    try {
-      final Class<?> c = Class.forName("org.jppf.server.JPPFDriver");
-      final Method m = c.getMethod("getInstance");
-      final Object o = m.invoke(null);
-      return o != null;
-    } catch (@SuppressWarnings("unused") final Exception e) {
-      return false;
-    }
-  }
-
-  /**
    * Get a name for an object in the form simple_class_name@hex_identity_hashcode.
    * @param o the object for which to get a name.
    * @return the object's identity name.
@@ -519,5 +502,17 @@ public final class SystemUtils {
    */
   public static String getSystemIdentity(final Object o) {
     return o.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(o));
+  }
+
+  /**
+   * Determine whether 2 objects are equal.
+   * @param o1 the first object.
+   * @param o2 the second object.
+   * @return {@code true} if the 2 objects are equal, {@code false} otherwise.
+   */
+  public static boolean areEqual(final Object o1, final Object o2) {
+    if (o1 == o2) return true;
+    if ((o1 == null) || (o2 == null)) return false;
+    return o1.equals(o2);
   }
 }

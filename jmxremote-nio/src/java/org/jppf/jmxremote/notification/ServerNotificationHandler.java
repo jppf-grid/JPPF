@@ -24,12 +24,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.management.*;
 
 import org.jppf.jmxremote.nio.JMXNioServer;
+import org.slf4j.*;
 
 /**
  * Server-side interface for registering and unregistering notifications listeners, as well as dispatching local notifications to remote listeners.
  * @author Laurent Cohen
  */
 public class ServerNotificationHandler {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ServerNotificationHandler.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Sequence number used to generate listener IDs.
    */
@@ -54,9 +63,9 @@ public class ServerNotificationHandler {
   /**
    * Add a notification listener.
    * @param mbeanServer the mbeanServer on which to to register the listener.
+   * @param connectionID the id of the connection to which notifications will be forwarded.
    * @param mbeanName the name of the MBean for which to subscribe to notifications.
    * @param filter the filter associated to the listener, may be null.
-   * @param connectionID the id of the connection to which notifications will be forwarded.
    * @return a unique integer uniquely identifying the new listener.
    * @throws Exception if any error occurs.
    */
@@ -65,11 +74,13 @@ public class ServerNotificationHandler {
     synchronized(mbeanServerMap) {
       dispatcher = mbeanServerMap.get(mbeanServer);
       if (dispatcher == null) {
+        if (debugEnabled) log.debug("creating notification dispatcher");
         dispatcher = new MBeanServerNotificationDispatcher(mbeanServer, server);
         mbeanServerMap.put(mbeanServer, dispatcher);
       }
     }
     final int listenerID = listenerSequence.incrementAndGet();
+    if (debugEnabled) log.debug("creating listener with listenerID = {}", listenerID);
     dispatcher.addNotificationListener(mbeanName, filter, listenerID, connectionID);
     return listenerID;
   }
@@ -87,6 +98,7 @@ public class ServerNotificationHandler {
       dispatcher = mbeanServerMap.get(mbeanServer);
     }
     if (dispatcher == null) throw new ListenerNotFoundException("found no listener for " + mbeanName);
+    if (debugEnabled) log.debug("removing listeners with listenerIDs = {}", Arrays.toString(listenerIDs));
     dispatcher.removeNotificationListeners(mbeanName, listenerIDs);
   }
 }

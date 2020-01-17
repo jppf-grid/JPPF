@@ -268,6 +268,7 @@ public class JPPFJMXConnector implements JMXConnector {
    * @throws Exception if any error occurs.
    */
   void addNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
+    if (debugEnabled) log.debug("adding notification listener for mbean = {}; listener = {}, filter = {}, handback = {}", name, listener, filter, handback);
     final int listenerID = (Integer) messageHandler.sendRequestWithResponse(ADD_NOTIFICATION_LISTENER, name, filter);
     final ClientListenerInfo info = new ClientListenerInfo(listenerID, name, listener, filter, handback);
     synchronized(notificationListenerMap) {
@@ -282,6 +283,7 @@ public class JPPFJMXConnector implements JMXConnector {
    * @throws Exception if any error occurs.
    */
   void removeNotificationListener(final ObjectName name, final NotificationListener listener) throws Exception {
+    if (debugEnabled) log.debug("removing notification listeners for mbean = {}, listener = {}", name, listener);
     final List<ClientListenerInfo> toRemove = new ArrayList<>();
     int[] ids = null;
     synchronized(notificationListenerMap) {
@@ -297,6 +299,7 @@ public class JPPFJMXConnector implements JMXConnector {
         notificationListenerMap.remove(id);
       }
     }
+    if (debugEnabled) log.debug("removing notification listeners for mbean = {}, ids = {}", name, Arrays.toString(ids));
     messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER, name, ids);
   }
 
@@ -309,11 +312,12 @@ public class JPPFJMXConnector implements JMXConnector {
    * @throws Exception if any error occurs.
    */
   void removeNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
+    if (debugEnabled) log.debug("removing notification listener for mbean = {}, listener = {}, filter = {}, handback = {}", name, listener, filter, handback);
     ClientListenerInfo toRemove = null;
     synchronized(notificationListenerMap) {
       for (Map.Entry<Integer, ClientListenerInfo> entry: notificationListenerMap.entrySet()) {
         final ClientListenerInfo info = entry.getValue();
-        if (info.getMbeanName().equals(name) && (info.getListener() == listener) && (info.getFilter() == filter) && (info.getHandback() == handback)) {
+        if (info.getMbeanName().equals(name) && (info.getListener() == listener) && (info.getFilter() == filter) && SystemUtils.areEqual(info.getHandback(), handback)) {
           toRemove = info;
           break;
         }
@@ -321,6 +325,7 @@ public class JPPFJMXConnector implements JMXConnector {
       if (toRemove == null) throw new ListenerNotFoundException("no matching listener");
       notificationListenerMap.remove(toRemove.getListenerID());
     }
+    if (debugEnabled) log.debug("removing notification listener for mbean = {}, id = {}", name, toRemove.getListenerID());
     messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, name, toRemove.getListenerID());
   }
 

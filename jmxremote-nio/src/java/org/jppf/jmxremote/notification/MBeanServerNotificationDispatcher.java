@@ -32,7 +32,7 @@ import org.slf4j.*;
  * and dispatch local notifications to the registered remote notification listeners.
  * @author Laurent Cohen
  */
-public class MBeanServerNotificationDispatcher implements NotificationListener {
+class MBeanServerNotificationDispatcher implements NotificationListener {
   /**
    * Logger for this class.
    */
@@ -59,7 +59,7 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
    * @param mbeanServer the MBean server whose notifications to dispatch.
    * @param server the nio server.
    */
-  public MBeanServerNotificationDispatcher(final MBeanServer mbeanServer, final JMXNioServer server) {
+  MBeanServerNotificationDispatcher(final MBeanServer mbeanServer, final JMXNioServer server) {
     if (mbeanServer == null) throw new IllegalArgumentException("MBeanServer cannot be null");
     this.mbeanServer = mbeanServer;
     this.server = server;
@@ -73,12 +73,13 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
    * @param connectionID the id of the connection tot he client.
    * @throws Exception if any error occurs.
    */
-  public void addNotificationListener(final ObjectName mbeanName, final NotificationFilter filter, final int listenerID, final String connectionID) throws Exception {
+  void addNotificationListener(final ObjectName mbeanName, final NotificationFilter filter, final int listenerID, final String connectionID) throws Exception {
     final ServerListenerInfo info = new ServerListenerInfo(listenerID, filter, connectionID);
-    if (debugEnabled) log.debug("adding {} to {}", info, mbeanServer);
+    if (debugEnabled) log.debug("adding listenerID = {}, {} to {}", listenerID, info, mbeanServer);
     synchronized(listenerMap) {
       if (!listenerMap.containsKey(mbeanName)) mbeanServer.addNotificationListener(mbeanName, this, null, mbeanName);
       listenerMap.putValue(mbeanName, info);
+      if (debugEnabled) log.debug("added listenerID = {}, nbListeners = {}", listenerID, listenerMap.size());
     }
   }
 
@@ -88,7 +89,8 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
    * @param listenerIDs the ids of the listeners to remove.
    * @throws Exception if any error occurs.
    */
-  public void removeNotificationListeners(final ObjectName mbeanName, final int[] listenerIDs) throws Exception {
+  void removeNotificationListeners(final ObjectName mbeanName, final int[] listenerIDs) throws Exception {
+    if (debugEnabled) log.debug("removing listenerIDs = {} from {}", Arrays.toString(listenerIDs), mbeanName);
     final Set<Integer> idSet = new HashSet<>();
     for (final int n: listenerIDs) idSet.add(n);
     final List<ServerListenerInfo> toRemove = new ArrayList<>();
@@ -99,7 +101,7 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
         }
       }
       if (toRemove.isEmpty()) throw new ListenerNotFoundException("found no listener for " + mbeanName);
-      for (ServerListenerInfo info: toRemove) listenerMap.removeValue(mbeanName, info);
+      for (final ServerListenerInfo info: toRemove) listenerMap.removeValue(mbeanName, info);
       if (!listenerMap.containsKey(mbeanName)) mbeanServer.removeNotificationListener(mbeanName, this);
     }
   }

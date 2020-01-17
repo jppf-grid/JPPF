@@ -22,7 +22,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
 
+import org.jppf.utils.*;
 import org.slf4j.*;
+
+import test.org.jppf.test.setup.BaseTest;
 
 /**
  * Simple MBean implementation for testing.
@@ -89,5 +92,33 @@ public class ConnectorTest extends NotificationBroadcasterSupport implements Con
       notif.setUserData(msg);
       sendNotification(notif);
     }
+  }
+
+  @Override
+  public void sendNotification(final Notification notification) {
+    final String name = ReflectionUtils.getCurrentClassAndMethod();
+    BaseTest.print(false, false, "[%s] sending notification %s", name, notification);
+    super.sendNotification(notification);
+  }
+
+  @Override
+  public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
+    final String name = ReflectionUtils.getCurrentClassAndMethod();
+    BaseTest.print(false, false, "[%s] adding notification listener %s, filter = %s, handback = %s, call stack:\n%s", name, listener, filter, handback, ExceptionUtils.getCallStack());
+    super.addNotificationListener(listener, filter, handback);
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener) throws ListenerNotFoundException {
+    final String name = ReflectionUtils.getCurrentClassAndMethod();
+    BaseTest.print(false, false, "[%s] removing notification listeners %s", name, listener);
+    super.removeNotificationListener(listener);
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) throws ListenerNotFoundException {
+    final String name = ReflectionUtils.getCurrentClassAndMethod();
+    BaseTest.print(false, false, "[%s] removing notification listener %s, filter = %s, handback = %s", name, listener, filter, handback);
+    super.removeNotificationListener(listener, filter, handback);
   }
 }
