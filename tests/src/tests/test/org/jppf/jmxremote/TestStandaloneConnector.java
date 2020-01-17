@@ -26,7 +26,8 @@ import java.util.*;
 import javax.management.*;
 import javax.management.remote.*;
 
-import org.jppf.jmxremote.*;
+import org.jppf.jmxremote.JPPFMBeanServerConnection;
+import org.jppf.management.*;
 import org.jppf.nio.NioHelper;
 import org.jppf.utils.StringUtils;
 import org.jppf.utils.collections.*;
@@ -43,11 +44,11 @@ public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
    */
   @Before
   public void beforeInstance() throws Exception {
+    registerMBeans();
     print(false, false, "***** starting connector server *****");
     server = createConnectorServer();
     print(false, false, "***** starting connector client *****");
     clientConnector = createConnectorClient();
-    registerMBeans();
   }
 
   /**
@@ -214,6 +215,27 @@ public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
   }
 
   /**
+   * Test connector client connection status notifications.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10_000)
+  public void testWithJMXConnectionWrapper() throws Exception {
+    for (int i=1; i<=10; i++) {
+      print(false, false, ">>> creating connector client #%d", i);
+      try (final JMXConnectionWrapper jmx = new JMXConnectionWrapper("localhost", 12001, false)) {
+        final MyJMXWrapperListener listener = new MyJMXWrapperListener();
+        jmx.addJMXWrapperListener(listener);
+        jmx.connect();
+        listener.await();
+        assertTrue(jmx.isConnected());
+        assertNull(listener.throwable);
+        jmx.removeJMXWrapperListener(listener);
+        listener.removeNotificationListener(jmx);
+      }
+    }
+  }
+
+  /**
    * @param sleepTime how long to sleep in millis before counting.
    * @return the count of live threads whose names starts with "JPPF-".
    * @throws Exception if any error occurs.
@@ -281,6 +303,49 @@ public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
     public boolean isNotificationEnabled(final Notification notification) {
       final String msg = (String) notification.getUserData();
       return msg.startsWith(start);
+    }
+  }
+
+  /** */
+  public static class MyJMXWrapperListener implements JMXWrapperListener {
+    /** */
+    Throwable throwable;
+    /** */
+    boolean done;
+    /** */
+    final NotificationListener listener = (notif, handback) -> {};
+
+    @Override
+    public synchronized void jmxWrapperConnected(final JMXWrapperEvent event) {
+      try {
+        final JMXConnectionWrapper jmx = (JMXConnectionWrapper) event.getJMXConnectionWrapper();
+        print(false, false, "jmx connection established for " + jmx);
+        jmx.getMbeanConnection().addNotificationListener(connectorTestName, listener, null, null);
+      } catch (final Throwable e) {
+        throwable = e;
+      }
+      done = true;
+      notifyAll();
+    }
+
+    @Override
+    public void jmxWrapperTimeout(final JMXWrapperEvent event) {
+    }
+
+    /**
+     * . 
+     * @throws Exception if any error occurs.
+     */
+    public synchronized void await() throws Exception {
+      while (!done) wait();
+    }
+
+    /**
+     * @param jmx .
+     * @throws Exception if any error occurs.
+     */
+    public void removeNotificationListener(final JMXConnectionWrapper jmx) throws Exception {
+      jmx.getMbeanConnection().removeNotificationListener(connectorTestName, listener, null, null);
     }
   }
 }
