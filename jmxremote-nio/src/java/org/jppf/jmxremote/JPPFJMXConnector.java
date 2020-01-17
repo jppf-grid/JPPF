@@ -230,8 +230,8 @@ public class JPPFJMXConnector implements JMXConnector {
     if (debugEnabled) log.debug("Reconnected to JMX server {}, secure={}", address, secure);
     final JMXNioServer server = JMXNioServerPool.getServer();
     final ChannelsPair pair = server.createChannelsPair(environment, "", -1, socketClient.getChannel(), secure, true);
-    pair.addCloseCallback((exception) -> fireConnectionNotification(true, exception));
     messageHandler = pair.getMessageHandler();
+    pair.addCloseCallback((exception) -> fireConnectionNotification(true, exception));
     if (debugEnabled) log.debug("registering channel");
     server.registerChannel(pair, socketClient.getChannel());
     if (debugEnabled) log.debug("getting connection id");

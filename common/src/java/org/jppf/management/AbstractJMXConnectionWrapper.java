@@ -291,11 +291,8 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    */
   protected void fireConnected() {
     final JMXWrapperEvent event = new JMXWrapperEvent(this);
-    final Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        for (JMXWrapperListener listener: listeners) listener.jmxWrapperConnected(event);
-      }
+    final Runnable r = () -> {
+      for (final JMXWrapperListener listener: listeners) listener.jmxWrapperConnected(event);
     };
     //new Thread(r, getDisplayName() + " connection notifier").start();
     r.run();
