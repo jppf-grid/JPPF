@@ -191,6 +191,8 @@ public class AsyncClientMessageHandler {
     final ServerTaskBundleClient bundle = new ServerTaskBundleClient(header, dataProvider, Collections.<DataLocation>emptyList(), true);
     final ClientMessage request = context.serializeBundle(bundle);
     context.offerMessageToSend(bundle, request);
+    final String uuid = header.getParameter(BundleParameter.NODE_UUID_PARAM);
+    if (debugEnabled) log.debug("sending handshake with uuid = {}", uuid);
   }
 
   /**

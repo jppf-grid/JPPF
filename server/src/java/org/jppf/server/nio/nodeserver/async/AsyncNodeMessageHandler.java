@@ -138,6 +138,9 @@ public class AsyncNodeMessageHandler {
     context.setNodeIdentifier(getNodeIdentifier(context.getServer().getBundlerFactory(), context, systemInfo));
     if (debugEnabled) log.debug("nodeID = {} for node = {}", context.getNodeIdentifier(), context);
     final boolean isPeer = bundle.getParameter(IS_PEER, false);
+    if (uuid == null) {
+      if (debugEnabled) log.debug("received handshake for {}\ntaskBundle data = {}", context, bundle.getAll());
+    }
     context.setPeer(isPeer);
     if (systemInfo != null) {
       systemInfo.getJppf().setBoolean("jppf.peer.driver", isPeer);
