@@ -19,7 +19,6 @@ package org.jppf.server.peer;
 
 import java.nio.channels.*;
 
-import org.jppf.JPPFRuntimeException;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.nio.client.*;
 import org.jppf.utils.*;
@@ -85,7 +84,7 @@ class AsyncPeerNode extends AbstractPeerConnectionHandler {
       socketClient = null;
     } catch (final Exception e) {
       log.error(e.getMessage());
-      throw new JPPFRuntimeException(e);
+      throw e;
     }
   }
 
