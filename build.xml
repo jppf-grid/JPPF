@@ -48,6 +48,12 @@
     <ant dir="JPPF/bin" target="deploy" useNativeBasedir="true"/>
   </target>
 
+  <target name="build.base" description="build JPPF without javadoc nor installer">
+    <echo message="Building JPPF (without javadoc/installer)"/>
+    <ant dir="jmxremote" target="compile" useNativeBasedir="true"/>
+    <ant dir="JPPF/bin" target="deploy.base" useNativeBasedir="true"/>
+  </target>
+
   <!-- to publish to staging repository, use the cmd "ant -Dstaging=true maven" -->
   <target name="maven" description="publish all maven artifacts">
     <echo message="Publishing JPPF maven artifacts"/>
