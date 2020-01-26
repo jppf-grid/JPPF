@@ -86,7 +86,7 @@ public class AsyncClientMessageHandler {
       clientBundle.bundleEnded();
     } else {
       context.addEntry(clientBundle);
-      context.driver.getQueue().addBundle(clientBundle);
+      driver.getQueue().addBundle(clientBundle);
     }
   }
 
@@ -115,15 +115,19 @@ public class AsyncClientMessageHandler {
   void jobResultsSent(final AsyncClientContext context, final ServerTaskBundleClient bundle) throws Exception {
     final long bundleId = bundle.getOriginalBundleId();
     if (debugEnabled) log.debug("job results sent bundleId={}, bundle={} for {}", bundleId, bundle, context);
-    final JobEntry entry = context.getJobEntry(bundle.getUuid() + bundleId);
+    final JobEntry entry = context.getJobEntry(bundle.getUuid(), bundleId);
     if (entry != null) {
-      entry.nbTasksToSend -= bundle.getTaskCount();
-      if (debugEnabled) log.debug("job entry = {}", entry);
-      if (entry.nbTasksToSend <= 0) {
-        if (debugEnabled) log.debug("*** client bundle ended {}", entry.getBundle());
-        entry.jobEnded();
-        context.removeJobEntry(bundle.getUuid(), bundleId);
+      boolean jobEnded = false;
+      synchronized(entry) {
+        entry.nbTasksToSend -= bundle.getTaskCount();
+        if (debugEnabled) log.debug("job entry = {}", entry);
+        if (entry.nbTasksToSend <= 0) {
+          if (debugEnabled) log.debug("*** client bundle ended {}", entry.getBundle());
+          jobEnded = true;
+          context.removeJobEntry(bundle.getUuid(), bundleId);
+        }
       }
+      if (jobEnded) entry.jobEnded();
     } else {
       if (log.isTraceEnabled()) log.trace("job entry not found for uuid={}, bundleId={}, call stack:\n{}", bundle.getUuid(), bundleId, ExceptionUtils.getCallStack());
       else if (debugEnabled) log.debug("job entry not found for uuid={}, bundleId={}", bundle.getUuid(), bundleId);

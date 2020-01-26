@@ -81,6 +81,7 @@ class JobEntry {
       .append(", jobName=").append(clientBundle.getJob().getName())
       .append(", nbTasksToSend=").append(nbTasksToSend)
       .append(", bundleId=").append(clientBundle.getId())
+      .append(", bundle=").append(clientBundle)
       .append(']').toString();
   }
 }

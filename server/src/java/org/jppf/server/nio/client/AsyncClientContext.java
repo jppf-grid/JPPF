@@ -181,11 +181,12 @@ public class AsyncClientContext extends StatelessNioContext {
 
   /**
    * Retrieve the job entry with the specified id.
-   * @param id the id of the job entry to retrieve.
+   * @param jobUuid the uuid of the job whose entry to retrieve.
+   * @param bundleId the id of the client job bundle for the entry.
    * @return a {@link JobEntry} instance, or {@code null} if there is no entry with the specified id.
    */
-  public JobEntry getJobEntry(final String id) {
-    return entryMap.get(id);
+  public JobEntry getJobEntry(final String jobUuid, final long bundleId) {
+    return entryMap.get(jobUuid + bundleId);
   }
 
   /**
