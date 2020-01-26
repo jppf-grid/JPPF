@@ -43,6 +43,12 @@
     <ant dir="JPPF/bin" target="deploy.noinstaller" useNativeBasedir="true"/>
   </target>
 
+  <target name="build.base" description="build JPPF without javadoc nor installer">
+    <echo message="Building JPPF (without javadoc/installer)"/>
+    <ant dir="jmxremote" target="compile" useNativeBasedir="true"/>
+    <ant dir="JPPF/bin" target="deploy.base" useNativeBasedir="true"/>
+  </target>
+
   <target name="build.with.installer" description="build JPPF with installer">
     <echo message="Building JPPF with installer"/>
     <ant dir="JPPF/bin" target="deploy" useNativeBasedir="true"/>
