@@ -316,19 +316,16 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @param type the type of event: created, removd, update.
    */
   private void fireEvent(final JPPFSnapshot snapshot, final EventType type) {
-    executor.execute(new Runnable() {
-      @Override
-      public void run() {
-        final JPPFStatisticsEvent event = new JPPFStatisticsEvent(JPPFStatistics.this, snapshot);
-        final List<ListenerInfo> accepted = new ArrayList<>(listeners.size());
-        for (final ListenerInfo info: listeners) {
-          if (info.filter.accept(snapshot)) accepted.add(info);
-        }
-        switch(type) {
-          case ADDED:   for (ListenerInfo info: accepted) info.listener.snapshotAdded(event); break;
-          case REMOVED: for (ListenerInfo info: accepted) info.listener.snapshotRemoved(event); break;
-          case UPDATED: for (ListenerInfo info: accepted) info.listener.snapshotUpdated(event); break;
-        }
+    executor.execute(() -> {
+      final JPPFStatisticsEvent event = new JPPFStatisticsEvent(JPPFStatistics.this, snapshot);
+      final List<ListenerInfo> accepted = new ArrayList<>(listeners.size());
+      for (final ListenerInfo info: listeners) {
+        if (info.filter.accept(snapshot)) accepted.add(info);
+      }
+      switch(type) {
+        case ADDED:   for (ListenerInfo info: accepted) info.listener.snapshotAdded(event); break;
+        case REMOVED: for (ListenerInfo info: accepted) info.listener.snapshotRemoved(event); break;
+        case UPDATED: for (ListenerInfo info: accepted) info.listener.snapshotUpdated(event); break;
       }
     });
   }

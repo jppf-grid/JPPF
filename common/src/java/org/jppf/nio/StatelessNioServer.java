@@ -356,6 +356,7 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
    * Interface for context filtering.
    * @param <C> the type of connection context.
    */
+  @FunctionalInterface
   public interface ContextFilter<C extends AbstractNioContext> {
     /**
      * @param context the context to check.
@@ -368,6 +369,7 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
    * An action ot execute on a context.
    * @param <C> the type of connection context.
    */
+  @FunctionalInterface
   public interface ContextAction<C extends AbstractNioContext> {
     /**
      * @param context the context on which to execute the action.
