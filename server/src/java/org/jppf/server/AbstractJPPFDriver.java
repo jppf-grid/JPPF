@@ -140,6 +140,10 @@ abstract class AbstractJPPFDriver {
    * MBean handling changes in number of nodes/processing threads.
    */
   PeerDriver peerDriver;
+  /**
+   * Whether JPPF debug mode is enabled.
+   */
+  final boolean jppfDebugEnabled;
 
   /**
    * Initialize this JPPFDriver.
@@ -157,6 +161,7 @@ abstract class AbstractJPPFDriver {
     statistics = createServerStatistics();
     systemInformation = new JPPFSystemInformation(configuration, uuid, false, true, statistics);
     statistics.addListener(new StatsSystemInformationUpdater(systemInformation));
+    jppfDebugEnabled = configuration.get(JPPFProperties.DEBUG_ENABLED);
   }
 
   /**
@@ -319,5 +324,12 @@ abstract class AbstractJPPFDriver {
    */
   public void setPeerDriver(final PeerDriver peerDriver) {
     this.peerDriver = peerDriver;
+  }
+
+  /**
+   * @return whether JPPF debug mode is enabled.
+   */
+  public boolean isJppfDebugEnabled() {
+    return jppfDebugEnabled;
   }
 }

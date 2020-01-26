@@ -25,6 +25,7 @@ import org.jppf.JPPFRuntimeException;
 import org.jppf.nio.*;
 import org.jppf.scripting.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.client.*;
 import org.jppf.server.nio.nodeserver.BaseNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
@@ -302,5 +303,28 @@ public class ServerDebug implements ServerDebugMBean {
    */
   public JPPFDriver getDriver() {
     return driver;
+  }
+
+  @Override
+  public String getClientJobEntryStats() {
+    return AsyncClientContext.getEntrystats().toString();
+  }
+
+  @Override
+  public List<String> allClientJobEntries() {
+    final AsyncClientNioServer server = driver.getAsyncClientNioServer();
+    final Map<String, AsyncClientContext> map = server.performContextAction(context -> context.getEntryMap().size() > 0, null);
+    final List<String> result = new ArrayList<>(map.size());
+    int nbEntries = 0;
+    for (final Map.Entry<String, AsyncClientContext> entry: map.entrySet()) {
+      final AsyncClientContext context = entry.getValue();
+      final Map<String, JobEntry> jobEntries = context.getEntryMap();
+      nbEntries += jobEntries.size();
+      final StringBuilder sb = new StringBuilder().append(jobEntries.size()).append(" job entries in ").append(context);
+      jobEntries.forEach((id, jobEntry) -> sb.append("\n- ").append(jobEntry));
+      result.add(sb.toString());
+    }
+    result.add("total: " + nbEntries + " entries");
+    return result;
   }
 }

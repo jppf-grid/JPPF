@@ -159,4 +159,14 @@ public interface ServerDebugMBean extends Serializable {
    * Trigger method for the profiler to stop profiling.
    */
   void endProfiling();
+
+  /**
+   * @return some statistics on the job entries in the client connections.
+   */
+  String getClientJobEntryStats();
+
+  /**
+   * @return information on all client job entries currently in the driver.
+   */
+  List<String> allClientJobEntries();
 }

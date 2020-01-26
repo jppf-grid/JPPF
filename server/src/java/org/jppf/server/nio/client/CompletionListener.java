@@ -57,7 +57,8 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
   public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
     if (bundle == null) throw new IllegalStateException("bundler is null");
     if (!isChannelValid()) {
-      if (debugEnabled) log.debug("channel is invalid: {}", context);
+      //if (debugEnabled) log.debug("channel is invalid: {}", context);
+      log.warn("attempt to send bundle to invalid channel {}\nbundle = {}", context, bundle);
       try {
         context.server.getMessageHandler().jobResultsSent(context, bundle);
       } catch (final Exception e) {

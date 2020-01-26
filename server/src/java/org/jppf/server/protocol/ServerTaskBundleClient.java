@@ -438,6 +438,7 @@ public class ServerTaskBundleClient {
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("id=").append(id);
     sb.append(", pendingTasks=").append(pendingTasksCount);
+    sb.append(", taskList.size()=").append(taskList.size());
     sb.append(", cancelled=").append(cancelled);
     sb.append(", done=").append(done);
     sb.append(", job=").append(job);

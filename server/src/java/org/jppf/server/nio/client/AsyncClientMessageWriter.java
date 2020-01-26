@@ -57,6 +57,8 @@ public class AsyncClientMessageWriter extends NioMessageWriter<AsyncClientContex
           ((AsyncClientNioServer) server).getMessageHandler().jobResultsSent(context, clientBundle);
         } catch (final Exception e) {
           context.handleException(e);
+        } catch(final Throwable t) {
+          log.error(t.getMessage(), t);
         }
       });
     }

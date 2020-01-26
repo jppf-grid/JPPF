@@ -23,14 +23,15 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.io.*;
 import org.jppf.nio.AbstractNioContext;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
+import org.jppf.utils.concurrent.SynchronizedLong;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -54,6 +55,10 @@ public class AsyncClientContext extends AbstractNioContext {
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
+   * 
+   */
+  private static final JobEntryDebugStats entryStats = new JobEntryDebugStats();
+  /**
    * Reference to the driver.
    */
   final JPPFDriver driver;
@@ -69,6 +74,8 @@ public class AsyncClientContext extends AbstractNioContext {
    * This queue contains all the result bundles to send back to the client.
    */
   private final BlockingQueue<ClientMessage> sendQueue = new LinkedBlockingQueue<>();
+  /** */
+  private final boolean jppfDebugEnabled;
 
   /**
    * @param server the server that handles this context.
@@ -78,6 +85,7 @@ public class AsyncClientContext extends AbstractNioContext {
     this.server = server;
     this.driver = server.getDriver();
     this.socketChannel = socketChannel;
+    jppfDebugEnabled = driver.isJppfDebugEnabled();
   }
 
   @Override
@@ -170,6 +178,16 @@ public class AsyncClientContext extends AbstractNioContext {
   }
 
   /**
+   * Retrieve the job entry with the specified id.
+   * @param jobUuid the uuid of the job whose entry to retrieve.
+   * @param bundleId the id of the client job bundle for the entry.
+   * @return a {@link JobEntry} instance, or {@code null} if there is no entry with the specified id.
+   */
+  public JobEntry getJobEntry(final String jobUuid, final long bundleId) {
+    return entryMap.get(jobUuid + bundleId);
+  }
+
+  /**
    * Add a new job to the job map.
    * @param bundle the job to add.
    */
@@ -177,15 +195,7 @@ public class AsyncClientContext extends AbstractNioContext {
     final String id = bundle.getUuid() + bundle.getId();
     if (debugEnabled) log.debug("adding job entry [jobUuid={}, bundleId={}]", bundle.getUuid(), bundle.getId());
     entryMap.put(id, new JobEntry(bundle));
-  }
-
-  /**
-   * Retrieve the job entry with the specified id.
-   * @param id the id of the job entry to retrieve.
-   * @return a {@link JobEntry} instance, or {@code null} if there is no entry with the specified id.
-   */
-  public JobEntry getJobEntry(final String id) {
-    return entryMap.get(id);
+    if (jppfDebugEnabled) entryStats.add();
   }
 
   /**
@@ -197,7 +207,15 @@ public class AsyncClientContext extends AbstractNioContext {
   public JobEntry removeJobEntry(final String jobUuid, final long bundleId) {
     if (traceEnabled) log.trace("removing job entry with jobUuid={}, bundleId={}, call stack:\n{}", jobUuid, bundleId, ExceptionUtils.getCallStack());
     else if (debugEnabled) log.debug("removing job entry with jobUuid={}, bundleId={}", jobUuid, bundleId);
-    return entryMap.remove(jobUuid + bundleId);
+    final JobEntry entry = entryMap.remove(jobUuid + bundleId);
+    if (jppfDebugEnabled) {
+      if (entry == null) {
+        entryStats.notFound();
+        log.warn("job entry not found [jobUuid={}, bundleId={}] in {}\ncall stack:\n{}", jobUuid, bundleId, this, ExceptionUtils.getCallStack());
+      }
+      entryStats.remove();
+    }
+    return entry;
   }
 
   /**
@@ -239,7 +257,7 @@ public class AsyncClientContext extends AbstractNioContext {
           }
           final int tasksToSend2 = jobEntry.nbTasksToSend;
           final int n = tasksToSend - tasksToSend2 - taskCount;
-          if (debugEnabled) log.debug("tasksToSend={}, tasksToSend2={}, n={}, taskCount={}, serverJob={}", new Object[] {tasksToSend, tasksToSend2, n, taskCount, job});
+          if (debugEnabled) log.debug("tasksToSend={}, tasksToSend2={}, n={}, taskCount={}, serverJob={}", tasksToSend, tasksToSend2, n, taskCount, job);
           final JPPFStatistics stats = driver.getStatistics();
           stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -taskCount);
           if (job != null) driver.getQueue().removeBundle(job);
@@ -308,5 +326,64 @@ public class AsyncClientContext extends AbstractNioContext {
     sb.append(", interestOps=").append(getInterestOps());
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * 
+   */
+  public static class JobEntryDebugStats {
+    /** */
+    final AtomicLong totalCurrent = new AtomicLong(0L);
+    /** */
+    final AtomicLong totalAdded = new AtomicLong(0L);
+    /** */
+    final AtomicLong totalRemoved = new AtomicLong(0L);
+    /** */
+    final SynchronizedLong peak = new SynchronizedLong(0L);
+    /** */
+    final AtomicLong totalNotFound = new AtomicLong(0L);
+
+    /** */
+    public void add() {
+      final long n = totalCurrent.incrementAndGet();
+      peak.compareAndSet(Operator.LESS_THAN, n);
+      totalAdded.incrementAndGet();
+    }
+
+    /** */
+    public void remove() {
+      totalCurrent.decrementAndGet();
+      totalRemoved.incrementAndGet();
+    }
+
+    /** */
+    public void notFound() {
+      totalNotFound.incrementAndGet();
+    }
+
+    @Override
+    public String toString() {
+      return new StringBuilder(getClass().getSimpleName()).append('[')
+        .append("current: ").append(totalCurrent.get())
+        .append(", peak: ").append(peak.get())
+        .append(", added: ").append(totalAdded.get())
+        .append(", removed: ").append(totalRemoved.get())
+        .append(", notFound: ").append(totalNotFound.get())
+        .append(']').toString();
+    }
+  }
+
+  /**
+   * @return the job entry stats.
+   */
+  public static JobEntryDebugStats getEntrystats() {
+    return entryStats;
+  }
+
+  /**
+   * @return a map of the client bundles sent over this connection.
+   */
+  public Map<String, JobEntry> getEntryMap() {
+    return entryMap;
   }
 }

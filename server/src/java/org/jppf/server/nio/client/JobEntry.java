@@ -21,10 +21,10 @@ package org.jppf.server.nio.client;
 import org.jppf.server.protocol.ServerTaskBundleClient;
 
 /**
- * 
+ * Instances of tyhis class represent the state of a task bundle sent over a client conenction.
  * @author Laurent Cohen
  */
-class JobEntry {
+public class JobEntry {
   /**
    * The task bundle to send or receive.
    */
@@ -81,6 +81,7 @@ class JobEntry {
       .append(", jobName=").append(clientBundle.getJob().getName())
       .append(", nbTasksToSend=").append(nbTasksToSend)
       .append(", bundleId=").append(clientBundle.getId())
+      .append(", bundle=").append(clientBundle)
       .append(']').toString();
   }
 }
