@@ -29,7 +29,9 @@ import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.policy.IsMasterNode;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ThreadUtils;
+import org.jppf.utils.concurrent.*;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -96,6 +98,8 @@ public class DeadlockRunner {
       } finally {
         if (ro.simulateNodeCrashes) pt.setStopped(true);
       }
+      printDebugInfo(client);
+      StreamUtils.waitKeyPressed("press [Enter] to exit");
     } catch (final Exception e) {
       print("error in job stremaing: %s", ExceptionUtils.getStackTrace(e));
     }
@@ -245,7 +249,7 @@ public class DeadlockRunner {
         writer, nbNodes, jobProvider.getJobCount(), marker.getLastElapsed() / 1_000_000L, meanDev, lbi.getAlgorithm(), new TreeMap<>(props).toString(), Boolean.toString(computed));
       writer.write("\n");
     }
-    print("client classpath cahche stats: %s", ClasspathCache.getInstance());
+    print("client classpath cache stats: %s", ClasspathCache.getInstance());
   }
 
   /**
@@ -277,5 +281,36 @@ public class DeadlockRunner {
     final String msg = String.format(format, params);
     System.out.println(msg);
     log.info(msg);
+  }
+
+  /**
+   * 
+   * @param client the JPPFClient.
+   * @throws Exception if any error occurs.
+   */
+  static void printDebugInfo(final JPPFClient client) throws Exception {
+    printDebugInfo(client.awaitWorkingConnectionPool().awaitWorkingJMXConnection());
+  }
+
+  /**
+   * 
+   * @param jmx .
+   * @throws Exception if any error occurs.
+   */
+  static void printDebugInfo(final JMXDriverConnectionWrapper jmx) throws Exception {
+    ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> {
+      @SuppressWarnings("unchecked")
+      final List<String> entries = (List<String>) jmx.invoke("org.jppf:name=debug,type=driver", "allClientJobEntries");
+      if ((entries ==null) || entries.isEmpty()) return false;
+      final String s = entries.get(entries.size() - 1);
+      print(s);
+      return "total: 0 entries".equals(s);
+    }, 10_000L, 1000L, false);
+    @SuppressWarnings("unchecked")
+    final List<String> entries = (List<String>) jmx.invoke("org.jppf:name=debug,type=driver", "allClientJobEntries");
+    final String jobEntryStats = (String) jmx.getAttribute("org.jppf:name=debug,type=driver", "ClientJobEntryStats");
+    print("Remaining client job entries");
+    entries.forEach(DeadlockRunner::print);
+    print("client job entries stats: %s", jobEntryStats);
   }
 }
