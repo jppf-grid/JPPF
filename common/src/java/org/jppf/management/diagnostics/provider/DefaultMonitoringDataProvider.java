@@ -101,8 +101,6 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     setLongProperty(STARTED_THREADS_COUNT, -1L);
     setDoubleProperty(PROCESS_CPU_LOAD, -1d).setConverter(PROCESS_CPU_LOAD, PCT_CONVERTER);
     setDoubleProperty(SYSTEM_CPU_LOAD, -1d).setConverter(SYSTEM_CPU_LOAD, PCT_CONVERTER);
-    setDoubleProperty(PROCESS_RESIDENT_SET_SIZE, -1d).setConverter(PROCESS_RESIDENT_SET_SIZE, FRACTION_2_CONVERTER);
-    setDoubleProperty(PROCESS_VIRTUAL_SIZE, -1d).setConverter(PROCESS_VIRTUAL_SIZE, FRACTION_2_CONVERTER);
     setDoubleProperty(RAM_USAGE_RATIO, -1d).setConverter(RAM_USAGE_RATIO, PCT_CONVERTER);
     setDoubleProperty(RAM_USAGE_MB, -1d).setConverter(RAM_USAGE_MB, FRACTION_2_CONVERTER);
     setDoubleProperty(SWAP_USAGE_RATIO, -1d).setConverter(SWAP_USAGE_RATIO, PCT_CONVERTER);
@@ -111,6 +109,7 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     setStringProperty(OS_NAME, "n/a");
     setDoubleProperty(PROCESS_RESIDENT_SET_SIZE, -1d).setConverter(PROCESS_RESIDENT_SET_SIZE, FRACTION_2_CONVERTER);
     setDoubleProperty(PROCESS_VIRTUAL_SIZE, -1d).setConverter(PROCESS_VIRTUAL_SIZE, FRACTION_2_CONVERTER);
+
     setLongProperty(JVM_UPTIME, -1L).setConverter(JVM_UPTIME, (LongConverter) StringUtils::toStringDuration);
   }
 
