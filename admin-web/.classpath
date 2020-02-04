@@ -76,7 +76,7 @@
 	<classpathentry kind="lib" path="lib/wicket-request-8.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-util-8.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-velocity-8.5.0.jar"/>
-	<classpathentry kind="lib" path="lib/wicket-webjars-0.5.5.jar"/>
 	<classpathentry kind="lib" path="lib/wicketstuff-servlet3-auth-8.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-webjars-2.0.15.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

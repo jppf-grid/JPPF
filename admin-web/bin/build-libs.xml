@@ -71,7 +71,7 @@
     <get.maven.lib g="commons-io"                             a="commons-io"                      v="2.6"                       dest="${lib.dir}"/>
     <get.maven.lib g="commons-lang"                           a="commons-lang"                    v="2.4"                       dest="${lib.dir}"/>
     <get.maven.lib g="commons-logging"                        a="commons-logging"                 v="1.1.1"                     dest="${lib.dir}"/>
-    <get.maven.lib g="de.agilecoders.wicket.webjars"          a="wicket-webjars"                  v="0.5.5"                     dest="${lib.dir}"/>
+    <get.maven.lib g="de.agilecoders.wicket.webjars"          a="wicket-webjars"                  v="2.0.15"                    dest="${lib.dir}"/>
     <get.maven.lib g="edu.emory.mathcs.util"                  a="emory-util-classloader"          v="2.1"                       dest="${lib.dir}"/>
     <get.maven.lib g="edu.emory.mathcs.util"                  a="emory-util-io"                   v="2.1"                       dest="${lib.dir}"/>
     <get.maven.lib g="edu.emory.mathcs.util"                  a="emory-util-security"             v="2.1"                       dest="${lib.dir}"/>
