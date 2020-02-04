@@ -124,7 +124,7 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
     if (target.getPage() instanceof RefreshTimerHolder) {
       final AjaxSelfUpdatingTimerBehavior timer = ((RefreshTimerHolder) target.getPage()).getRefreshTimer();
       //if (debugEnabled) log.debug("stopping timer {} for page {}", timer, target.getPage());
-      if (timer != null) timer.stop(null);
+      if (timer != null) timer.stop(target);
     }
   }
 
@@ -137,7 +137,7 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
     if (target.getPage() instanceof RefreshTimerHolder) {
       final AjaxSelfUpdatingTimerBehavior timer = ((RefreshTimerHolder) target.getPage()).getRefreshTimer();
       //if (debugEnabled) log.debug("restarting timer {} for page {}", timer, target.getPage());
-      if (timer != null) timer.restart(null);
+      if (timer != null) timer.restart(target);
     }
   }
 

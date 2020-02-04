@@ -72,20 +72,15 @@ public abstract class AbstractModalLink<F extends AbstractModalForm> extends Abs
   protected void onInitialize() {
     super.onInitialize();
     modalForm = createForm();
+    modal.setPageCreator(new ModalPageCreator<>(modalForm, pageClass));
   }
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
-    if (debugEnabled) log.debug("clicked on {}", getDefaultModelObject());
-    modal.setPageCreator(new ModalPageCreator<>(modalForm, pageClass));
-    stopRefreshTimer(target);
+    if (debugEnabled) log.debug("clicked on {}, target page = {}, target = {}", getDefaultModelObject(), target.getPage(), target.getComponents());
     addTableTreeToTarget(target);
-    modal.setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
-      @Override
-      public void onClose(final AjaxRequestTarget target) {
-        restartRefreshTimer(target);
-      }
-    });
+    stopRefreshTimer(target);
+    modal.setWindowClosedCallback(tg -> restartRefreshTimer(tg));
     modal.show(target);
   }
 
