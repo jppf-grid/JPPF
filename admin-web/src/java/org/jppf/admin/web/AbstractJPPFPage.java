@@ -101,6 +101,9 @@ public class AbstractJPPFPage extends WebPage {
   protected void onConfigure() {
     super.onConfigure();
     if (debugEnabled) log.debug("in onConfigure() for page {} ==> '{}'", getClass().getSimpleName(), RequestCycle.get().urlFor(getClass(), null));
-    if (!JPPFWebSession.get().isSignedIn()) JPPFWebConsoleApplication.get().restartResponseAtSignInPage();
+    if (!JPPFWebSession.get().isSignedIn()) {
+      if (debugEnabled) log.debug("not signed in: {]", this);
+      JPPFWebConsoleApplication.get().restartResponseAtSignInPage();
+    }
   }
 }
