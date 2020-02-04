@@ -59,7 +59,7 @@ public class NodeThreadsLink extends AbstractModalLink<NodeThreadsForm> {
 
   @Override
   protected NodeThreadsForm createForm() {
-    return new NodeThreadsForm(modal, new Runnable() { @Override public void run() { doOK(); } });
+    return new NodeThreadsForm(modal, () -> doOK());
   }
   
   /**

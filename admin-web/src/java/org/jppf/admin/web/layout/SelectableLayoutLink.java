@@ -55,7 +55,7 @@ public class SelectableLayoutLink extends AbstractModalLink<SelectableLayoutForm
 
   @Override
   protected SelectableLayoutForm createForm() {
-    return new SelectableLayoutForm(layout, modal, new Runnable() { @Override public void run() { doOK(); } });
+    return new SelectableLayoutForm(layout, modal, () -> doOK());
   }
   
   /**

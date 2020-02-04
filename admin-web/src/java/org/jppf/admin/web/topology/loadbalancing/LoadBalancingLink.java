@@ -54,7 +54,7 @@ public class LoadBalancingLink extends AbstractModalLink<LoadBalancingForm> {
 
   @Override
   protected LoadBalancingForm createForm() {
-    return new LoadBalancingForm(modal, new Runnable() { @Override public void run() { doOK(); } });
+    return new LoadBalancingForm(modal, () -> doOK());
   }
 
   /**

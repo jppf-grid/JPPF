@@ -60,7 +60,7 @@ public class ProvisioningLink extends AbstractModalLink<ProvisioningForm> {
 
   @Override
   protected ProvisioningForm createForm() {
-    return new ProvisioningForm(modal, new Runnable() { @Override public void run() { doOK(); } });
+    return new ProvisioningForm(modal, () -> doOK());
   }
 
   /**

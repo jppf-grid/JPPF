@@ -57,7 +57,7 @@ public class DriverStopRestartLink extends AbstractModalLink<DriverStopRestartFo
 
   @Override
   protected DriverStopRestartForm createForm() {
-    return new DriverStopRestartForm(modal, new Runnable() { @Override public void run() { doOK(); } });
+    return new DriverStopRestartForm(modal, () -> doOK());
   }
 
   /**

@@ -51,7 +51,7 @@ public class ThresholdsLink extends AbstractModalLink<ThresholdsForm> {
 
   @Override
   protected ThresholdsForm createForm() {
-    return new ThresholdsForm(modal, new Runnable() { @Override public void run() { doOK(); } });
+    return new ThresholdsForm(modal, () -> doOK());
   }
   
   /**

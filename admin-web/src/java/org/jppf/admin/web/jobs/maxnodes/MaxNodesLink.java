@@ -60,7 +60,7 @@ public class MaxNodesLink extends AbstractModalLink<MaxNodesForm> {
 
   @Override
   protected MaxNodesForm createForm() {
-    return new MaxNodesForm(modal, new Runnable() { @Override public void run() { doOK(); } });
+    return new MaxNodesForm(modal, () -> doOK());
   }
   
   /**

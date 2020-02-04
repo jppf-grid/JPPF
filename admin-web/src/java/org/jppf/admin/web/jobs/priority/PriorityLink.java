@@ -60,7 +60,7 @@ public class PriorityLink extends AbstractModalLink<PriorityForm> {
 
   @Override
   protected PriorityForm createForm() {
-    return new PriorityForm(modal, new Runnable() { @Override public void run() { doOK(); } });
+    return new PriorityForm(modal, () -> doOK());
   }
   
   /**

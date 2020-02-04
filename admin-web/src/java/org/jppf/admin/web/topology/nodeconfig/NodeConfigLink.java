@@ -58,7 +58,7 @@ public class NodeConfigLink extends AbstractModalLink<NodeConfigForm> {
 
   @Override
   protected NodeConfigForm createForm() {
-    return new NodeConfigForm(modal, new Runnable() { @Override public void run() { doOK(); } });
+    return new NodeConfigForm(modal, () -> doOK());
   }
 
   /**
