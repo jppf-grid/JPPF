@@ -99,7 +99,7 @@
 
   <target name="compile" depends="init">
     <echo message="compiling the JPPFWebAdmin classes ..." />
-    <checkstyle config="${basedir}/bin/CheckStyle_JPPF_config.xml">
+    <checkstyle config="${basedir}/bin/CheckStyle_JPPF_config.xml" if:true="run.checkstyle">
       <fileset dir="${src.dir}" includes="**/*.java" />
     </checkstyle>
     <javac srcdir="" destdir="${classes.dir}" source="1.8" target="1.8" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
