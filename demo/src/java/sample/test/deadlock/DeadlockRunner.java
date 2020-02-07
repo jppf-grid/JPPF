@@ -31,7 +31,6 @@ import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
 import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -99,7 +98,6 @@ public class DeadlockRunner {
         if (ro.simulateNodeCrashes) pt.setStopped(true);
       }
       printDebugInfo(client);
-      StreamUtils.waitKeyPressed("press [Enter] to exit");
     } catch (final Exception e) {
       print("error in job stremaing: %s", ExceptionUtils.getStackTrace(e));
     }
