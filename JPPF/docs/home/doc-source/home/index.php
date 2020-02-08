@@ -32,7 +32,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
   <script>anim_main2();</script>
   <div align="center">
     <br/>
-    <h2><i>New</i>: JPPF 6.1 is here, <a href='/release_notes.php?version=6.1'>check it out!</a></h2>
+    <h2><i>New</i>: JPPF 6.2 is here, <a href='/release_notes.php?version=6.2'>check it out!</a></h2>
   </div>
   <br><div class="blockWithHighlightedTitle" style="padding-left: 25px">
     <p style="font-size: 12pt">JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.

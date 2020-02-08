@@ -11,11 +11,8 @@ $template{name="about-page-header" title="Downloads"}$
       <h4 style="display: inline">All JPPF releases:</h4>
       <ul class="inline">
         $template{name="download-link" label="Maven Central" link="https://search.maven.org/#search|ga|1|g:org.jppf"}$
-        $template{name="download-link" label="Releases on Github" link="https://github.com/jppf-grid/JPPF/tags"}$
+        $template{name="download-link" label="Releases on Github" link="https://github.com/jppf-grid/JPPF/releases"}$
         $template{name="download-link" label="Older releases on SF.net" link="https://sourceforge.net/projects/jppf-project/files/jppf-project"}$
-        <!--
-        $template{name="download-link" label="JPPF 6.2 alpha preview" link="downloads-unstable.php"}$
-        -->
       </ul>
     </div>
   </div>
@@ -24,14 +21,14 @@ $template{name="about-page-header" title="Downloads"}$
   <div class="column_left" style="text-align: justify; padding: 0px; font-size: 11pt">
     <div class="blockWithHighlightedTitle">
       <?php
-        $tag1 = "v_6_1_4";
-        $ver1 = "6.1.4";
+        $tag1 = "v_6_2";
+        $ver1 = "6.2";
         $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
       $template{name="highlighted-title-with-icon" img="images/icons/download.png" title="JPPF <?php echo $ver1 ?>" heading="h1" style="margin: 10px 0px"}$
 
-      $template{name="highlighted-title-with-icon" img="images/icons/warning.png" title="Please note:<div style='padding-left: 10px; font-size: 14pt; margin-top: 10px'>JPPF <?php echo $ver1 ?> now requires Java 8 or later to run</div>" heading="h2"}$
+      $template{name="highlighted-title-with-icon" img="images/icons/warning.png" title="Requires Java 8 or later" heading="h2"}$
 
       <h3>Web Installer</h3>
       <a href="<?php echo '/download/' . $ver1 . '/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
@@ -70,6 +67,7 @@ $template{name="about-page-header" title="Downloads"}$
     </div>
     <br>
 
+    <!--
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/download.png" title="JPPF 6.2 beta preview" heading="h2" style="margin: 10px 0px; font-weight: bold"}$
       <div style="height: 5px"></div>
@@ -78,18 +76,22 @@ $template{name="about-page-header" title="Downloads"}$
         <li><a href="downloads-unstable.php">Download</a></li>
       </ul>
     </div>
+    -->
     <div style="height: 5px"></div>
   </div>
 
   <div class="column_right" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $tag1 = "v_6_0_4";
-        $ver1 = "6.0.4";
+        $tag1 = "v_6_1_4";
+        $ver1 = "6.1.4";
         $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
       $template{name="highlighted-title-with-icon" img="images/icons/download.png" title="JPPF <?php echo $ver1 ?>" heading="h1" style="margin: 10px 0px"}$
+
+      $template{name="highlighted-title-with-icon" img="images/icons/warning.png" title="Requires Java 8 or later" heading="h2"}$
+
       <h3>Web Installer</h3>
       <a href="<?php echo '/download/' . $ver1 . '/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
       <ul class="list_nomargin">
@@ -106,34 +108,11 @@ $template{name="about-page-header" title="Downloads"}$
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-web.zip'; ?>">Web administration and monitoring console</a></li>
       </ul>
 
-      <h3>Deployable .Net binaries</h3>
-      <ul class="list_nomargin">
-        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-dotnet.zip'; ?>">.Net demo application</a></li>
-        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-dotnet.zip'; ?>">.Net-enabled node distribution</a></li>
-      </ul>
-
-      <h3>Android Node</h3>
-      <ul class="list_nomargin">
-        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-redist.zip'; ?>">Android node app binaries and dependencies</a></li>
-        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-src.zip'; ?>">Full source as a Gradle/Android Studio project</a></li>
-        <li><table cellpadding="3"><tr>
-          <td valign="middle">
-            <a href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk'; ?>">You may also download the<br>APK directly to a device:</a>
-          </td>
-          <td>&nbsp;</td>
-          <td valign="middle" style="white-space: nowrap">
-            <a class="yhd2" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk'; ?>">
-              <span style="vertical-align: top">Node APK</span>
-            </a><br>
-          </td>
-        </tr></table></li>
-      </ul>
-
       <h3>Source code and documentation</h3>
       <ul class="list_nomargin">
         <li><a href="<?php echo 'https://github.com/jppf-grid/JPPF/archive/' . $tag1 . '.zip'; ?>">Full source code distribution</a></li>
-        <li>User Guide: <a href="/doc/6.0">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip'; ?>">download the PDF</a></li>
-        <li>API documentation: <a href="/javadoc/6.0">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip'; ?>">download</a></li>
+        <li>User Guide: <a href="/doc/6.1">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip'; ?>">download the PDF</a></li>
+        <li>API documentation: <a href="/javadoc/6.1">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip'; ?>">download</a></li>
       </ul>
 
       <h3>Connectors and add-ons</h3>
@@ -145,10 +124,22 @@ $template{name="about-page-header" title="Downloads"}$
       <h3>Samples and tutorials</h3>
       <ul class="list_nomargin">
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-samples-pack.zip'; ?>">JPPF samples pack</a></li>
-        <li>Make sure to get started with our <a href="/doc/6.0/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/></li>
+        <li>Make sure to get started with our <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/></li>
       </ul>
     </div>
     <br>
+
+    <!--
+    <div class="blockWithHighlightedTitle">
+      $template{name="highlighted-title-with-icon" img="images/icons/download.png" title="JPPF 6.2 beta preview" heading="h2" style="margin: 10px 0px; font-weight: bold"}$
+      <div style="height: 5px"></div>
+      <ul class="list_nomargin">
+        <li><a href="release_notes.php?version=6.2-beta">Release notes</a></li>
+        <li><a href="downloads-unstable.php">Download</a></li>
+      </ul>
+    </div>
+    -->
+    <div style="height: 5px"></div>
   </div>
   <br>
 

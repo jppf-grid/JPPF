@@ -79,12 +79,12 @@
         <?php if ($currentPage == "On Github") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="https://github.com/jppf-grid/JPPF" class="<?php echo $itemClass; ?>">&raquo; On Github</a><br></div>
         <hr/>
                 <?php if ($currentPage == "All docs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc" class="<?php echo $itemClass; ?>">&raquo; All docs</a><br></div>
-        <?php if (($currentPage == "v6.2 (beta)") || ($currentPage == "v6.2-beta")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.2" class="<?php echo $itemClass; ?>">v6.2 (beta)</a><br></div>
+        <?php if (($currentPage == "v6.2") || ($currentPage == "v6.2")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.2" class="<?php echo $itemClass; ?>">v6.2</a><br></div>
         <?php if (($currentPage == "v6.1") || ($currentPage == "v6.1")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.1" class="<?php echo $itemClass; ?>">v6.1</a><br></div>
         <?php if (($currentPage == "v6.0") || ($currentPage == "v6.0")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php if (($currentPage == "v5.2") || ($currentPage == "v5.2")) $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php if ($currentPage == "All Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/#javadoc" class="<?php echo $itemClass; ?>">&raquo; All Javadoc</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.2" class="<?php echo $itemClass; ?>">v6.2 (beta)</a><br></div>
+        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.2" class="<?php echo $itemClass; ?>">v6.2</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.1" class="<?php echo $itemClass; ?>">v6.1</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
@@ -121,11 +121,8 @@
       <h4 style="display: inline">All JPPF releases:</h4>
       <ul class="inline">
         <li>&#8226; <a href="https://search.maven.org/#search|ga|1|g:org.jppf"><b>Maven Central</b></a></li>
-        <li>&#8226; <a href="https://github.com/jppf-grid/JPPF/tags"><b>Releases on Github</b></a></li>
+        <li>&#8226; <a href="https://github.com/jppf-grid/JPPF/releases"><b>Releases on Github</b></a></li>
         <li>&#8226; <a href="https://sourceforge.net/projects/jppf-project/files/jppf-project"><b>Older releases on SF.net</b></a></li>
-        <!--
-        <li>&#8226; <a href="downloads-unstable.php"><b>JPPF 6.2 alpha preview</b></a></li>
-        -->
       </ul>
     </div>
   </div>
@@ -133,8 +130,8 @@
   <div class="column_left" style="text-align: justify; padding: 0px; font-size: 11pt">
     <div class="blockWithHighlightedTitle">
       <?php
-        $tag1 = "v_6_1_4";
-        $ver1 = "6.1.4";
+        $tag1 = "v_6_2";
+        $ver1 = "6.2";
         $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
@@ -142,7 +139,7 @@
   <h1 style="margin: 10px 0px">&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h1>
 </div>
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
-  <h2 style="${style}">&nbsp;<img src="images/icons/warning.png" class="titleWithIcon"/>Please note:<div style='padding-left: 10px; font-size: 14pt; margin-top: 10px'>JPPF <?php echo $ver1 ?> now requires Java 8 or later to run</div></h2>
+  <h2 style="${style}">&nbsp;<img src="images/icons/warning.png" class="titleWithIcon"/>Requires Java 8 or later</h2>
 </div>
       <h3>Web Installer</h3>
       <a href="<?php echo '/download/' . $ver1 . '/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
@@ -176,6 +173,7 @@
       </ul>
     </div>
     <br>
+    <!--
     <div class="blockWithHighlightedTitle">
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h2 style="margin: 10px 0px; font-weight: bold">&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF 6.2 beta preview</h2>
@@ -186,18 +184,22 @@
         <li><a href="downloads-unstable.php">Download</a></li>
       </ul>
     </div>
+    -->
     <div style="height: 5px"></div>
   </div>
   <div class="column_right" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $tag1 = "v_6_0_4";
-        $ver1 = "6.0.4";
+        $tag1 = "v_6_1_4";
+        $ver1 = "6.1.4";
         $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h1 style="margin: 10px 0px">&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h1>
+</div>
+      <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h2 style="${style}">&nbsp;<img src="images/icons/warning.png" class="titleWithIcon"/>Requires Java 8 or later</h2>
 </div>
       <h3>Web Installer</h3>
       <a href="<?php echo '/download/' . $ver1 . '/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
@@ -213,32 +215,11 @@
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-ui.zip'; ?>">Desktop administration and monitoring console</a></li>
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-web.zip'; ?>">Web administration and monitoring console</a></li>
       </ul>
-      <h3>Deployable .Net binaries</h3>
-      <ul class="list_nomargin">
-        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-dotnet.zip'; ?>">.Net demo application</a></li>
-        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-dotnet.zip'; ?>">.Net-enabled node distribution</a></li>
-      </ul>
-      <h3>Android Node</h3>
-      <ul class="list_nomargin">
-        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-redist.zip'; ?>">Android node app binaries and dependencies</a></li>
-        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-src.zip'; ?>">Full source as a Gradle/Android Studio project</a></li>
-        <li><table cellpadding="3"><tr>
-          <td valign="middle">
-            <a href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk'; ?>">You may also download the<br>APK directly to a device:</a>
-          </td>
-          <td>&nbsp;</td>
-          <td valign="middle" style="white-space: nowrap">
-            <a class="yhd2" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk'; ?>">
-              <span style="vertical-align: top">Node APK</span>
-            </a><br>
-          </td>
-        </tr></table></li>
-      </ul>
       <h3>Source code and documentation</h3>
       <ul class="list_nomargin">
         <li><a href="<?php echo 'https://github.com/jppf-grid/JPPF/archive/' . $tag1 . '.zip'; ?>">Full source code distribution</a></li>
-        <li>User Guide: <a href="/doc/6.0">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip'; ?>">download the PDF</a></li>
-        <li>API documentation: <a href="/javadoc/6.0">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip'; ?>">download</a></li>
+        <li>User Guide: <a href="/doc/6.1">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip'; ?>">download the PDF</a></li>
+        <li>API documentation: <a href="/javadoc/6.1">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip'; ?>">download</a></li>
       </ul>
       <h3>Connectors and add-ons</h3>
       <ul class="list_nomargin">
@@ -248,10 +229,23 @@
       <h3>Samples and tutorials</h3>
       <ul class="list_nomargin">
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-samples-pack.zip'; ?>">JPPF samples pack</a></li>
-        <li>Make sure to get started with our <a href="/doc/6.0/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/></li>
+        <li>Make sure to get started with our <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/></li>
       </ul>
     </div>
     <br>
+    <!--
+    <div class="blockWithHighlightedTitle">
+      <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h2 style="margin: 10px 0px; font-weight: bold">&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF 6.2 beta preview</h2>
+</div>
+      <div style="height: 5px"></div>
+      <ul class="list_nomargin">
+        <li><a href="release_notes.php?version=6.2-beta">Release notes</a></li>
+        <li><a href="downloads-unstable.php">Download</a></li>
+      </ul>
+    </div>
+    -->
+    <div style="height: 5px"></div>
   </div>
   <br>
 </div>
@@ -265,7 +259,7 @@
         <td align="left" style="font-size: 9pt; color: #6D78B6">
           <a href="/"><img src="/images/jppf_group_large.gif" border="0" alt="JPPF"/></a>
         </td>
-        <td align="middle" valign="middle" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2019 JPPF.org</td>
+        <td align="middle" valign="middle" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2020 JPPF.org</td>
         <td align="right">
           <a href="https://sourceforge.net/projects/jppf-project">
             <img src="https://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
