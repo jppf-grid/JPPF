@@ -17,8 +17,8 @@
  */
 
 /**
- * Support for the <a href="https://www.jppf.org/doc/6.1/index.php?title=The_JPPFClient_API">clients</a> connecting to the JPPF driver,
- * <a href="https://www.jppf.org/doc/6.1/index.php?title=Connection_pools">connection pooling</a>, and <a href="https://www.jppf.org/doc/6.1/index.php?title=Dealing_with_jobs">JPPF jobs</a>.
+ * Support for the <a href="https://www.jppf.org/doc/@version@/index.php?title=The_JPPFClient_API">clients</a> connecting to the JPPF driver,
+ * <a href="https://www.jppf.org/doc/@version@/index.php?title=Connection_pools">connection pooling</a>, and <a href="https://www.jppf.org/doc/@version@/index.php?title=Dealing_with_jobs">JPPF jobs</a>.
  * <p>Found in: <b>jppf-client.jar</b> 
  */
 package org.jppf.client;

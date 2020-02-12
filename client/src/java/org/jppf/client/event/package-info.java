@@ -17,10 +17,10 @@
  */
 
 /**
- * Support for <a href="https://www.jppf.org/doc/6.1/index.php?title=Connection_pools#Connection_Pool_Events">connection pool events</a>,
- * <a href="https://www.jppf.org/doc/6.1/index.php?title=Connection_pools#Status_notifications_for_existing_connections">connection status notifications</a>,
- * <a href="https://www.jppf.org/doc/6.1/index.php?title=Jobs_runtime_behavior,_recovery_and_failover#Job_lifecycle_notifications:_JobListener">job lifecycle events</a>
- * and <a href="https://www.jppf.org/doc/6.1/index.php?title=Notifications_of_client_job_queue_events">job queue events</a> in the JPPF client.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Connection_pools#Connection_Pool_Events">connection pool events</a>,
+ * <a href="https://www.jppf.org/doc/@version@/index.php?title=Connection_pools#Status_notifications_for_existing_connections">connection status notifications</a>,
+ * <a href="https://www.jppf.org/doc/@version@/index.php?title=Jobs_runtime_behavior,_recovery_and_failover#Job_lifecycle_notifications:_JobListener">job lifecycle events</a>
+ * and <a href="https://www.jppf.org/doc/@version@/index.php?title=Notifications_of_client_job_queue_events">job queue events</a> in the JPPF client.
  * <p>Found in: <b>jppf-client.jar</b> 
  */
 package org.jppf.client.event;
