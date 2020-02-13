@@ -62,20 +62,22 @@ public class BundleCompletionListener implements ServerTaskBundleClient.Completi
       SubmissionStatus newStatus = null;
       serverJob.lock.lock();
       try {
-        bundle.removeCompletionListener(BundleCompletionListener.this);
-        serverJob.clientBundles.remove(bundle);
-        //for (final ServerTask task: bundle.getTaskList()) serverJob.tasks.remove(task.getPosition());
-        if (serverJob.completionBundles != null) serverJob.completionBundles.remove(bundle);
-        if (serverJob.clientBundles.isEmpty() && serverJob.tasks.isEmpty()) newStatus = SubmissionStatus.ENDED;
+        if (serverJob.getSubmissionStatus() != SubmissionStatus.ENDED) {
+          bundle.removeCompletionListener(BundleCompletionListener.this);
+          serverJob.clientBundles.remove(bundle);
+          if (serverJob.completionBundles != null) serverJob.completionBundles.remove(bundle);
+          if (serverJob.clientBundles.isEmpty() && serverJob.tasks.isEmpty()) newStatus = SubmissionStatus.ENDED;
+        }
       } catch(final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
       } finally {
         serverJob.lock.unlock();
       }
-      if (debugEnabled) log.debug("new status = {}", newStatus);
-      if (newStatus != null) serverJob.setSubmissionStatus(newStatus);
+      if (newStatus != null) {
+        if (debugEnabled) log.debug("new status = {}", newStatus);
+        serverJob.setSubmissionStatus(newStatus);
+      }
     };
     r.run();
-    //NioHelper.getGlobalexecutor().execute(r);
   }
 }
