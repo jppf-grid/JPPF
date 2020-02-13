@@ -140,9 +140,9 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
       CollectionMap<String, NotificationListenerWrapper> map = clientMap.get(uuid);
       if (map == null) {
         map = new ArrayListHashMap<>();
-        map.putValue(mbean, wrapper);
+        clientMap.put(uuid, map);
       }
-      clientMap.put(uuid, map);
+      map.putValue(mbean, wrapper);
     }
   }
 

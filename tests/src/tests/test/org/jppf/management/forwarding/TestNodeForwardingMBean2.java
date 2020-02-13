@@ -29,9 +29,11 @@ import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.*;
 import org.jppf.node.policy.Equal;
+import org.jppf.node.protocol.AbstractTask;
 import org.jppf.test.addons.mbeans.*;
 import org.jppf.utils.ReflectionUtils;
 import org.jppf.utils.collections.CollectionUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.common.*;
@@ -122,6 +124,45 @@ public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
   }
 
   /**
+   * Test that multiple notification listeners are registered and each receives expected notifications.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testMultipleNotificationListeners() throws Exception {
+    final Map<String, SimpleNotificationListener> listenerMap = new HashMap<>();
+    final List<String> ids = new ArrayList<>();
+    try {
+      for (int i=1; i<=2; i++) {
+        final SimpleNotificationListener listener = new SimpleNotificationListener();
+        final String listenerID = driverJmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing-" + i);
+        listenerMap.put(listenerID, listener);
+        ids.add(listenerID);
+        print(false, false, "registered listenerID = %s", listenerID);
+      }
+      client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, MyNotifyingTask.class, 100L));
+      print(false, false, "got job results");
+      final ConcurrentUtils.Condition condition = () -> {
+        for (final SimpleNotificationListener lsnr: listenerMap.values()) {
+          if (lsnr.userNotifs.get() < 1) return false;
+        }
+        return true;
+      };
+      assertTrue(ConcurrentUtils.awaitCondition(condition, 5000L, 100L, false));
+      
+      final String id = ids.remove(1);
+      print(false, false, "removing listenerID = %s", id);
+      assertNotNull(listenerMap.remove(id));
+      driverJmx.unregisterForwardingNotificationListener(id);
+      final SimpleNotificationListener listener = listenerMap.get(ids.get(0));
+      client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", false, 1, MyNotifyingTask.class, 100L));
+      assertTrue(ConcurrentUtils.awaitCondition(() -> listener.userNotifs.get() == 2, 5000L, 100L, false));
+    } finally {
+      for (final String id: listenerMap.keySet()) driverJmx.unregisterForwardingNotificationListener(id);
+      listenerMap.clear();
+    }
+  }
+
+  /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
@@ -181,6 +222,49 @@ public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
     }
     for (final Map.Entry<String, AtomicInteger> entry: notifCounts.entrySet()) {
       assertEquals(nbNotifsPerNode, entry.getValue().get());
+    }
+  }
+
+  /**
+   * A simple test class.
+   */
+  public static class MyNotifyingTask extends AbstractTask<String> {
+    /** */
+    private final long duration;
+
+    /**
+     * @param duration .
+     */
+    public MyNotifyingTask(final long duration) {
+      this.duration = duration;
+    }
+
+    @Override
+    public void run() {
+      fireNotification("start of " + getId(), true);
+      try {
+        if (duration > 0L) Thread.sleep(duration);
+      } catch (final Exception e) {
+        setThrowable(e);
+      }
+    }
+  }
+
+  /** */
+  public static class SimpleNotificationListener implements ForwardingNotificationListener {
+    /** */
+    public AtomicInteger userNotifs = new AtomicInteger(0);
+
+    @Override
+    public void handleNotification(final JPPFNodeForwardingNotification notification, final Object handback) {
+      final Notification realNotif = notification.getNotification();
+      if (realNotif instanceof TaskExecutionNotification) {
+        final TaskExecutionNotification notif = (TaskExecutionNotification) realNotif;
+        if (notif.isUserNotification()) {
+          userNotifs.incrementAndGet();
+          print(false, false, "received notif %s, user object = %s", notification, notif.getUserData());
+        }
+      }
     }
   }
 }
