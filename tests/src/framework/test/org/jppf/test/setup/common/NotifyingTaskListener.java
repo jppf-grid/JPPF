@@ -67,6 +67,7 @@ public class NotifyingTaskListener implements NotificationListener {
     try {
       notifs.add(notification);
       if (notification instanceof JPPFNodeForwardingNotification) {
+        BaseTest.print(false, false, "[%s] received notif %s", handback, notification);
         final Notification realNotif = ((JPPFNodeForwardingNotification) notification).getNotification();
         if (realNotif instanceof TaskExecutionNotification) {
           final TaskExecutionNotification notif = (TaskExecutionNotification) realNotif;
@@ -77,7 +78,7 @@ public class NotifyingTaskListener implements NotificationListener {
         } else {
           if ("NodeTest".equals(realNotif.getType())) {
             if (debugEnabled) log.debug("received test notification {}", realNotif);
-            BaseTest.print(true, false, "client-side received notification:  type=%s, sequence=%d, userData=%s", realNotif.getType(), realNotif.getSequenceNumber(), realNotif.getUserData());
+            BaseTest.print(false, false, "client-side received notification:  type=%s, sequence=%d, userData=%s", realNotif.getType(), realNotif.getSequenceNumber(), realNotif.getUserData());
           }
         }
       }

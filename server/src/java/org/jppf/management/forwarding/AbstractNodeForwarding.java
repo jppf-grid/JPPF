@@ -92,7 +92,7 @@ public abstract class AbstractNodeForwarding extends NotificationBroadcasterSupp
    */
   @Override
   public String registerForwardingNotificationListener(final NodeSelector selector, final String mBeanName) throws IllegalArgumentException {
-    if (debugEnabled) log.debug("before registering listener with selector=" + selector + ", mbean=" + mBeanName);
+    if (debugEnabled) log.debug("before registering listener with selector={}, mbean={}", selector, mBeanName);
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (mBeanName == null) throw new IllegalArgumentException("mBeanName cannot be null");
     final String id = StringUtils.build(driver.getUuid(), ':', listenerSequence.incrementAndGet());

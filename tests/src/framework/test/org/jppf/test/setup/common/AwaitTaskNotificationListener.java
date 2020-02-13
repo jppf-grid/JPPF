@@ -74,6 +74,7 @@ public class AwaitTaskNotificationListener implements ForwardingNotificationList
     this.expectedMessage = expectedMessage;
     this.jmx = jmx;
     listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, JPPFNodeTaskMonitorMBean.MBEAN_NAME, this, null, null);
+    if (debugEnabled) log.debug("registered forwarding notification listener with id = {}", listenerId);
   }
 
   @Override
@@ -81,13 +82,13 @@ public class AwaitTaskNotificationListener implements ForwardingNotificationList
     final TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
     final Object data = actualNotif.getUserData();
     if ((expectedMessage == null) || expectedMessage.equals(data)) {
-      if (debugEnabled) log.debug("received expected task notification {}", expectedMessage);
+      if (debugEnabled) log.debug("received task notification - expected: {}", expectedMessage);
       synchronized(this) {
         receivedMessage = true;
         notifyAll();
       }
     } else {
-      if (debugEnabled) log.debug("received task notification: {}", actualNotif);
+      if (debugEnabled) log.debug("received task notification: {}", data);
     }
   }
 
@@ -101,5 +102,23 @@ public class AwaitTaskNotificationListener implements ForwardingNotificationList
       jmx.unregisterForwardingNotificationListener(listenerId);
       listenerId = null;
     }
+  }
+
+  /**
+   * Wait for the epxected message to be received, for a sepcified maximum time.
+   * @param timeout maximum wiat time in millis.
+   * @return  whether the notification was received.
+   * @throws Exception if any error occurs.
+   */
+  public synchronized boolean await(final long timeout) throws Exception {
+    long elapsed = 0L;
+    if (listenerId != null) {
+      final long start = System.currentTimeMillis();
+      while (!receivedMessage && ((elapsed = System.currentTimeMillis() - start) < timeout)) wait(100L);
+      jmx.unregisterForwardingNotificationListener(listenerId);
+      if (debugEnabled) log.debug("unregistered forwarding notification listener with id = {}", listenerId);
+      listenerId = null;
+    }
+    return elapsed < timeout;
   }
 }
