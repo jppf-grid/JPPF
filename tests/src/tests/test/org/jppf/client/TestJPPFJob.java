@@ -153,8 +153,8 @@ public class TestJPPFJob extends Setup1D1N {
    * @throws Exception if any error occurs
    */
   @SuppressWarnings("deprecation")
-  @Ignore
-  @Test(timeout=15000)
+  //@Ignore
+  //@Test(timeout=15000)
   public void testCancelImmediately() throws Exception {
     ///final String name  = ReflectionUtils.getCurrentMethodName();
     final String name  = "tci";
