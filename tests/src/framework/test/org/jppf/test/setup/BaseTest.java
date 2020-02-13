@@ -131,7 +131,7 @@ public class BaseTest {
    * @param params the parameter values.
    */
   public static void print(final boolean systemOutOnly, final boolean decorate, final String format, final Object...params) {
-    final String message = String.format(Locale.US, format, params);
+    final String message = ((params == null) || (params.length <= 0)) ? format : String.format(Locale.US, format, params);
     System.out.println(message);
     if (!systemOutOnly) {
       String s = "";

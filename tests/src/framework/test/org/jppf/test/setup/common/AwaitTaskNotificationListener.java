@@ -102,4 +102,22 @@ public class AwaitTaskNotificationListener implements ForwardingNotificationList
       listenerId = null;
     }
   }
+
+  /**
+   * Wait for the epxected message to be received, for a sepcified maximum time.
+   * @param timeout maximum wiat time in millis.
+   * @return  whether the notification was received.
+   * @throws Exception if any error occurs.
+   */
+  public synchronized boolean await(final long timeout) throws Exception {
+    long elapsed = 0L;
+    if (listenerId != null) {
+      final long start = System.currentTimeMillis();
+      while (!receivedMessage && ((elapsed = System.currentTimeMillis() - start) < timeout)) wait(100L);
+      jmx.unregisterForwardingNotificationListener(listenerId);
+      if (debugEnabled) log.debug("unregistered forwarding notification listener with id = {}", listenerId);
+      listenerId = null;
+    }
+    return elapsed < timeout;
+  }
 }
