@@ -328,7 +328,7 @@ public class TypedProperties extends AbstractTypedProperties {
    * @return this {@code TypedProperties} object.
    * @since 5.2
    */
-  public TypedProperties setStringArray(final String key, final String delimiter, final String[] value) {
+  public TypedProperties setStringArray(final String key, final String delimiter, final String...value) {
     if (value != null) {
       final StringBuilder sb = new StringBuilder();
       for (int i=0; i<value.length; i++) {
