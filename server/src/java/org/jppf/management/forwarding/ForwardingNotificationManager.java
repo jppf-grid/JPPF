@@ -140,9 +140,9 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
       CollectionMap<String, NotificationListenerWrapper> map = clientMap.get(uuid);
       if (map == null) {
         map = new ArrayListHashMap<>();
-        map.putValue(mbean, wrapper);
+        clientMap.put(uuid, map);
       }
-      clientMap.put(uuid, map);
+      map.putValue(mbean, wrapper);
     }
   }
 
@@ -243,8 +243,8 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   @Override
   public synchronized void notificationReceived(final ForwardingNotificationEvent event) {
     final Notification notif = event.getNotification();
-    if (debugEnabled) log.debug("received notification from node={}, mbean={}, notification={} (sequence={}, timestamp={})",
-      event.getNodeUuid(), event.getMBeanName(), notif, notif.getSequenceNumber(), notif.getTimeStamp());
+    if (debugEnabled) log.debug("received notification from node={}, mbean={}, notification={} (sequence={}, timestamp={}), userData = {}",
+      event.getNodeUuid(), event.getMBeanName(), notif, notif.getSequenceNumber(), notif.getTimeStamp(), notif.getUserData());
     forwarder.sendNotification(new JPPFNodeForwardingNotification(notif, event.getNodeUuid(), event.getMBeanName()));
   }
 }
