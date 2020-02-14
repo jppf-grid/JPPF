@@ -67,6 +67,8 @@ public class BundleCompletionListener implements ServerTaskBundleClient.Completi
           serverJob.clientBundles.remove(bundle);
           if (serverJob.completionBundles != null) serverJob.completionBundles.remove(bundle);
           if (serverJob.clientBundles.isEmpty() && serverJob.tasks.isEmpty()) newStatus = SubmissionStatus.ENDED;
+        } else {
+          if (debugEnabled) log.debug("bundle status is ENDED");
         }
       } catch(final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
