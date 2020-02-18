@@ -24,8 +24,8 @@ import java.util.EventListener;
  * Instances of this class listen to status change events on client connections.
  * @author Laurent Cohen
  */
-public interface ClientConnectionStatusListener extends EventListener
-{
+@FunctionalInterface
+public interface ClientConnectionStatusListener extends EventListener {
   /**
    * Invoked to notify of a status change event on a client connection.
    * @param event the event to notify of.

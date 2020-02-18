@@ -490,7 +490,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   private class StatusListener implements ClientConnectionStatusListener {
     @Override
     public void statusChanged(final ClientConnectionStatusEvent event) {
-      final JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
+      final JPPFClientConnection c = event.getClientConnection();
       final JPPFClientConnectionStatus newStatus = c.getStatus();
       final JPPFClientConnectionStatus oldStatus = event.getOldStatus();
       if (newStatus.isWorkingStatus() && !oldStatus.isWorkingStatus()) {

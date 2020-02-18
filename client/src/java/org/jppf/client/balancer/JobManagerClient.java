@@ -406,12 +406,12 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (localExecutionEnabled) {
       wrapperLocal = new ChannelWrapperLocal(client);
       wrapperLocal.addClientConnectionStatusListener(statusListener);
-      addConnection(wrapperLocal);
+      addConnection((ChannelWrapper) wrapperLocal);
     } else if (wrapperLocal != null) {
       try {
         wrapperLocal.close();
       } finally {
-        removeConnection(wrapperLocal);
+        removeConnection((ChannelWrapper) wrapperLocal);
         wrapperLocal = null;
       }
     }

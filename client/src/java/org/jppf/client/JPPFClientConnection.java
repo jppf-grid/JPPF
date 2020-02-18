@@ -91,4 +91,12 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler, Aut
    * @return a {@link JPPFConnectionPool} instance.
    */
   JPPFConnectionPool getConnectionPool();
+
+  /**
+   * Determine whether this connection is local, that is, whether it executes jobs in the local JVM.
+   * @return {@code true} if this connection is local, {@code false} otherwise.
+   */
+  default boolean isLocal() {
+    return false;
+  }
 }

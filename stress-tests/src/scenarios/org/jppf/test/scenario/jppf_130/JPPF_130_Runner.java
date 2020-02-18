@@ -91,7 +91,7 @@ public class JPPF_130_Runner extends AbstractScenarioRunner {
   private class MyConnectionListener implements ClientConnectionStatusListener {
     @Override
     public void statusChanged(final ClientConnectionStatusEvent event) {
-      final JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
+      final JPPFClientConnectionStatus status = event.getClientConnection().getStatus();
       if ((status != JPPFClientConnectionStatus.ACTIVE) && (status != JPPFClientConnectionStatus.EXECUTING)) {
         try {
           getSetup().cleanup();

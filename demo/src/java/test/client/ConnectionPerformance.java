@@ -56,8 +56,8 @@ public class ConnectionPerformance extends ConnectionPoolListenerAdapter impleme
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event) {
     final long time = System.nanoTime();
-    final JPPFClientConnection connection = (JPPFClientConnection) event.getClientConnectionStatusHandler();
-    final JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
+    final JPPFClientConnection connection = event.getClientConnection();
+    final JPPFClientConnectionStatus status = connection.getStatus();
     ConnectionInfo info = map.get(connection.getConnectionUuid());
     if (info == null) {
       info = new ConnectionInfo();

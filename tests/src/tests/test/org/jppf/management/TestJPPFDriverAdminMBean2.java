@@ -130,7 +130,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
   private class MyClientListener implements ClientConnectionStatusListener {
     @Override
     public void statusChanged(final ClientConnectionStatusEvent event) {
-      print(false, false, "connection status changing from %s to %s", event.getOldStatus(), event.getClientConnectionStatusHandler().getStatus());
+      print(false, false, "connection status changing from %s to %s", event.getOldStatus(), event.getClientConnection().getStatus());
     }
   }
 }

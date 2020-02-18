@@ -37,7 +37,7 @@ import org.slf4j.*;
  * Context associated with a local channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnectionStatusHandler {
+public class ChannelWrapperLocal extends ChannelWrapper implements JPPFClientConnection {
   /**
    * Logger for this class.
    */
@@ -70,6 +70,10 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * 
    */
   private boolean closed;
+  /**
+   * The name assigned to this connection.
+   */
+  private final String name;
 
   /**
    * Default initializer for local channel wrapper.
@@ -77,6 +81,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    */
   public ChannelWrapperLocal(final JPPFClient client) {
     this.client = client;
+    this.name = client.getUuid() + "_local_executor";
     executionManager = new ClientExecutionManager(client.getConfig(), JPPFProperties.LOCAL_EXECUTION_THREADS);
     priority = client.getConfig().get(JPPFProperties.LOCAL_EXECUTION_PRIORITY);
     systemInfo = new JPPFSystemInformation(client.getConfig(), getConnectionUuid(), true, false);
@@ -246,9 +251,45 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   /**
    * @return whether this channel is closed.
    */
+  @Override
   public boolean isClosed() {
     synchronized(getMonitor()) {
       return closed;
     }
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public boolean isSSLEnabled() {
+    return false;
+  }
+
+  @Override
+  public String getHost() {
+    return "local";
+  }
+
+  @Override
+  public int getPort() {
+    return -1;
+  }
+
+  @Override
+  public String getDriverUuid() {
+    return null;
+  }
+
+  @Override
+  public JPPFSystemInformation getSystemInfo() {
+    return getSystemInformation();
+  }
+
+  @Override
+  public JPPFConnectionPool getConnectionPool() {
+    return null;
   }
 }
