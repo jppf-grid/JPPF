@@ -184,7 +184,7 @@ public final class AsyncClientClassNioServer extends StatelessNioServer<AsyncCli
     if (removeJobConnection) {
       final String connectionUuid = context.getConnectionUuid();
       final AsyncClientNioServer clientJobServer = getDriver().getAsyncClientNioServer();
-      clientJobServer.performContextAction(ctx -> connectionUuid.equals(ctx.getConnectionUuid()), clientJobServer::closeConnection);
+      clientJobServer.performContextAction(ctx -> (connectionUuid != null) && connectionUuid.equals(ctx.getConnectionUuid()), clientJobServer::closeConnection);
     }
   }
 
