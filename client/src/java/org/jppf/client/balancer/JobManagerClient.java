@@ -84,8 +84,8 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * Listener used for monitoring state changes.
    */
   private final ClientConnectionStatusListener statusListener = event -> {
-    if (event.getSource() instanceof JPPFClientConnection) updateConnectionStatus(((JPPFClientConnection) event.getSource()), event.getOldStatus());
-    else if (event.getSource() instanceof ChannelWrapperLocal) updateConnectionStatus((ChannelWrapper) event.getSource(), event.getOldStatus());
+    if (event.getSource() instanceof ChannelWrapperLocal) updateConnectionStatus((ChannelWrapper) event.getSource(), event.getOldStatus());
+    else if (event.getSource() instanceof JPPFClientConnection) updateConnectionStatus(((JPPFClientConnection) event.getSource()), event.getOldStatus());
   };
   /**
    * Determines whether local execution is enabled on this client.
