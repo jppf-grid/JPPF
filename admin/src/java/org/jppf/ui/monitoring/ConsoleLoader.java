@@ -17,8 +17,6 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.nio.charset.Charset;
-
 import org.slf4j.*;
 
 /**
@@ -38,7 +36,6 @@ public class ConsoleLoader {
    */
   public static void main(final String...args) {
     try {
-      System.out.println("Default charset: " + Charset.defaultCharset());
       start();
       log.info("terminating");
     } catch(final Exception e) {
