@@ -67,6 +67,11 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
     forwarder.provisionSlaveNodes(selector, nbSlaves);
     print(false, false, "waiting for %d slave nodes", nbSlaves);
     while (driver.nbIdleNodes() < nbSlaves + 1) Thread.sleep(10L);
+    print(false, false, "waiting for %d connected notifications", nbSlaves);
+    synchronized(notifList) {
+      while (notifList.size() < nbSlaves) notifList.wait(10L);
+    }
+    print(false, false, "terminating slave nodes");
     forwarder.provisionSlaveNodes(selector, 0);
     print(false, false, "waiting for slave nodes termination");
     while (driver.nbIdleNodes() > 1) Thread.sleep(10L);
@@ -99,6 +104,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
     final JPPFManagementInfo info = (JPPFManagementInfo) notification.getUserData();
+    print(false, false, "received '%s' notification for %s", notification.getType(), info);
     if (info.isMasterNode()) return;
     synchronized(notifList) {
       notifList.add(notification);
