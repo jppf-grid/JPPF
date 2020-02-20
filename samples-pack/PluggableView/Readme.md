@@ -9,7 +9,7 @@ Each log entry is timestamped and the view also has two action buttons to clear 
 
 <h3>How do I run it?</h3>
 Before running this sample, you need to install a JPPF server, at least one node, and the JPPF amdinistration console.<br>
-For information on how to set the JPPF components, please refer to the <a href="https://www.jppf.org/doc/6.2/index.php?title=Introduction">JPPF documentation</a>.<br>
+For information on how to set the JPPF components, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have installed the console, a server and a node, perform the following steps:
 <ol class="samplesList">
   <li>Open a command prompt in JPPF-x.y-samples-pack/PluggableView</li>

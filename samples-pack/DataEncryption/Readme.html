@@ -40,7 +40,7 @@ Once this is done, you can restart the servers, nodes and clients, and any data 
 <h3>What features of JPPF are demonstrated?</h3>
 Custom transformation and encryption of the JPPF network traffic, allowing to work securely with a JPPF grid.
 For a detailed explanation, please refer to the related documentation in the
-<a href="https://www.jppf.org/doc/6.2/index.php?title=Composite_serialization">Composite serialization</a> section.
+<a href="https://www.jppf.org/doc/6.3/index.php?title=Composite_serialization">Composite serialization</a> section.
 
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>DataEncryption/src</b> folder.

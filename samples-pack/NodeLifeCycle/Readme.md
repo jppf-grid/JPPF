@@ -47,7 +47,7 @@ A consequence of this is that we will lose some degree of parallelism, since it 
 
 <h3>How do I run it?</h3>
 Before running this sample application, you need to install a JPPF server and at least one node.<br>
-For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.2/index.php?title=Introduction">JPPF documentation</a>.<br>
+For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
   <li>open a command prompt in JPPF-x.y-samples-pack/NodeLifeCycle</li>
@@ -64,7 +64,7 @@ Once you have installed a server and node, perform the following steps:
 
 <h3>What features of JPPF are demonstrated?</h3>
 <ul class="samplesList">
-  <li><a href="https://www.jppf.org/doc/6.2/index.php?title=Receiving_notifications_of_node_life_cycle_events">Subscribing to node life cycle events</a></li>
+  <li><a href="https://www.jppf.org/doc/6.3/index.php?title=Receiving_notifications_of_node_life_cycle_events">Subscribing to node life cycle events</a></li>
   <li>Integration with a JTA-compliant transaction manager and implementation of node crash recovery</li>
 </ul>
 

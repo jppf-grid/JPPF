@@ -1,8 +1,8 @@
 # Embedded Grid demo
 
 <h3>What does the sample do?</h3>
-This sample demonstrates how to start and use an embedded JPPF <a href="https://www.jppf.org/doc/6.2/index.php?title=Embedded_driver_and_node#Embedded_driver">driver</a> and
-<a href="https://www.jppf.org/doc/6.2/index.php?title=Embedded_driver_and_node#Embedded_node">node</a> programmatically, in the same JVM as the client.
+This sample demonstrates how to start and use an embedded JPPF <a href="https://www.jppf.org/doc/6.3/index.php?title=Embedded_driver_and_node#Embedded_driver">driver</a> and
+<a href="https://www.jppf.org/doc/6.3/index.php?title=Embedded_driver_and_node#Embedded_node">node</a> programmatically, in the same JVM as the client.
 
 <h3>How do I run it?</h3>
 From a command prompt, type the following:
@@ -57,8 +57,8 @@ Hello! from the node
 
 <h3>Documentation references</h3>
 <ul class="samplesList">
-  <li><a href="https://www.jppf.org/doc/6.2/index.php?title=Embedded_driver_and_node">Embedded driver and node</a></li>
-  <li><a href="https://www.jppf.org/doc/6.2/index.php?title=The_JPPF_configuration_API">The JPPF configuration API</a></li>
+  <li><a href="https://www.jppf.org/doc/6.3/index.php?title=Embedded_driver_and_node">Embedded driver and node</a></li>
+  <li><a href="https://www.jppf.org/doc/6.3/index.php?title=The_JPPF_configuration_API">The JPPF configuration API</a></li>
 </ul>
 
 <h3>How can I build the sample?</h3>
