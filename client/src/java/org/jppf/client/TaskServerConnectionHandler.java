@@ -60,8 +60,9 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
     boolean done = false;
     while (!done && !isClosed()) {
       if (socketClient == null) initSocketClient();
+      final boolean sysoutEnabled = owner.getConnectionPool().getClient().isSysoutEnabled();
       String msg = String.format("[client: %s] Attempting connection to the task server at %s:%d", name, host, port);
-      System.out.println(msg);
+      if (sysoutEnabled) System.out.println(msg);
       log.info(msg);
       if (!socketInitializer.initialize(socketClient)) throw new JPPFException(String.format("[%s] Could not reconnect to the JPPF task server", name));
       if (!InterceptorHandler.invokeOnConnect(socketClient)) throw new JPPFException(String.format("[%s] Could not reconnect to the JPPF task server due to interceptor failure", name));
@@ -78,7 +79,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
         */
         owner.getConnectionPool().setJmxPort(owner.getConnectionPool().getDriverPort());
         msg = "[client: " + name + "] Reconnected to the JPPF task server";
-        System.out.println(msg);
+        if (sysoutEnabled) System.out.println(msg);
         log.info(msg);
         done = true;
       } catch (final Exception e) {

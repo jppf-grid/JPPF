@@ -452,6 +452,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String> JOB_CLIENT_SLA_DEFAULT_POLICY = new StringProperty("jppf.job.client.sla.default.policy", null);
   /** Maximum size of pending notifications queue. */
   public static final JPPFProperty<Integer> JMX_NOTIF_QUEUE_SIZE = new IntProperty("jppf.jmx.notifications.queue.size", JMXHelper.DEFAULT_MAX_NOTIFICATIONS_QUEUE_SIZE);
+  /** Whether the client should print connection events to stdout. */
+  public static final JPPFProperty<Boolean> CLIENT_SYSOUT_ENABLED = new BooleanProperty("jppf.client.sysout.enabled", true);
   /** The list of all predefined properties. */
   private static List<JPPFProperty<?>> properties;
 

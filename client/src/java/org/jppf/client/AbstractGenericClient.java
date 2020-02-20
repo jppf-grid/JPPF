@@ -105,6 +105,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * The default client-side job sla execution policy.
    */
   final AtomicReference<ExecutionPolicy> defaultClientPolicy = new AtomicReference<>(null);
+  /**
+   * Whether the client should print connection events to stdout.
+   */
+  private boolean sysoutEnabled;
 
   /**
    * Initialize this client with a specified application UUID.
@@ -186,8 +190,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   @Override
   protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
+    sysoutEnabled = config.get(JPPFProperties.CLIENT_SYSOUT_ENABLED);
     if (config.get(JPPFProperties.LOCAL_EXECUTION_ENABLED)) {
-      System.out.println("local execution enabled");
+      if (sysoutEnabled) System.out.println("local execution enabled");
       setLocalExecutionEnabled(true);
     }
     discoveryHandler.register(discoveryListener.open()).start();
@@ -488,5 +493,13 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    */
   public void addDriverDiscovery(final ClientDriverDiscovery discovery) {
     discoveryHandler.addDiscovery(discovery);
+  }
+
+  /**
+   * Determine whether the client should print connection events to stdout.
+   * @return {@code true} if the client should print ot the console, {@code false} otherwise.
+   */
+  public boolean isSysoutEnabled() {
+    return sysoutEnabled;
   }
 }
