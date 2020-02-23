@@ -51,4 +51,9 @@ public interface NodeDebugMBean extends Serializable {
    * @throws JPPFScriptingException if an error occurs while evaluating the script. 
    */
   Object executeScript(String language, String script) throws JPPFScriptingException;
+
+  /**
+   * Force the node to disconnect, then reconnect.
+   */
+  void reconnectNode(); 
 }

@@ -20,7 +20,9 @@ package org.jppf.node.debug;
 
 import java.util.*;
 
+import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.node.Node;
+import org.jppf.node.connection.ConnectionReason;
 import org.jppf.scripting.*;
 import org.jppf.server.node.JPPFNode;
 import org.slf4j.*;
@@ -65,12 +67,26 @@ public class NodeDebug implements NodeDebugMBean {
   @Override
   public Object executeScript(final String language, final String script) throws JPPFScriptingException {
     try {
-      final Map<String, Object> bindings = new HashMap<String, Object>() {{ put("node", node); }};
+      final Map<String, Object> bindings = new HashMap<>();
+      bindings.put("node", node);
+      bindings.put("log", log);
       if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script:%n%s", language, script));
       return new ScriptDefinition(language, script, bindings).evaluate();
     } catch (final JPPFScriptingException e) {
       log.error("error exeuting script: ", e);
       throw e;
+    }
+  }
+
+  @Override
+  public void reconnectNode() {
+    try {
+      final JPPFNode jppfNode = (JPPFNode) node;
+      jppfNode.setReconnectionNotification(new JPPFNodeReconnectionNotification("request to reconnect node", null, ConnectionReason.MANAGEMENT_REQUEST));
+      log.info("*** node reconnection requested");
+      jppfNode.closeDataChannel();
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
     }
   }
 }
