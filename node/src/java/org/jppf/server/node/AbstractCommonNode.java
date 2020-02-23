@@ -23,7 +23,7 @@ import static org.jppf.utils.configuration.JPPFProperties.MANAGEMENT_PORT_NODE;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.JPPFReconnectionNotification;
 import org.jppf.classloader.AbstractJPPFClassLoader;
@@ -65,13 +65,9 @@ public abstract class AbstractCommonNode extends AbstractNode {
    */
   AtomicBoolean cacheResetFlag = new AtomicBoolean(false);
   /**
-   * Flag indicating whether a node shutdown or restart has been requested.
+   * The current pending action, if any.
    */
-  final AtomicBoolean shutdownRequestFlag = new AtomicBoolean(false);
-  /**
-   * Flag indicating whether it is a shutdown or restart that was last requested.
-   */
-  final AtomicBoolean restart = new AtomicBoolean(false);
+  final AtomicReference<NodePendingAction> pendingAction = new AtomicReference<>(NodePendingAction.NONE);
   /**
    * Determines whetehr the node is currently processing tasks.
    */
@@ -200,34 +196,13 @@ public abstract class AbstractCommonNode extends AbstractNode {
   }
 
   /**
-   * Request that the node be shut down or restarted when it is no longer executing tasks.
-   * @param restart {@code true} to restart the node, {@code false} to shut it down.
-   * @return {@code true} if the node had no pending action and the request succeeded, {@code false} otherwise.
-   * @exclude
-   */
-  public boolean requestShutdown(final boolean restart) {
-    if (shutdownRequestFlag.compareAndSet(false, true)) {
-      this.restart.set(restart);
-    }
-    return shutdownRequestFlag.get();
-  }
-
-  /**
-   * Cancel a previous deferred shutdown or restart request, if any.
-   * @return {@code true} if the node has a pending action and it was cancelled, {@code false} otherwise.
-   * @exclude
-   */
-  public boolean cancelShutdownRequest() {
-    return shutdownRequestFlag.compareAndSet(true, false);
-  }
-
-  /**
    * Determine whether a node shurdown or restart was requested..
    * @return {@code true} if a shudown or restart was requested, {@code false} otherwise.
    * @exclude
    */
   public boolean isShutdownRequested() {
-    return shutdownRequestFlag.get();
+    final NodePendingAction action = pendingAction.get();
+    return (action == NodePendingAction.RESTART) || (action == NodePendingAction.SHUTDOWN);
   }
 
   /**
@@ -236,7 +211,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * @exclude
    */
   public boolean isRestart() {
-    return restart.get();
+    return pendingAction.get() == NodePendingAction.RESTART;
   }
 
   /**
@@ -454,8 +429,64 @@ public abstract class AbstractCommonNode extends AbstractNode {
 
   /**
    * @return the executor for serialization and deserialization of the tasks.
+   * @exclude
    */
   public ExecutorService getSerializationExecutor() {
     return serializationExecutor;
+  }
+
+  /**
+   * @return the reconnection notification.
+   * @exclude
+   */
+  public JPPFReconnectionNotification getReconnectionNotification() {
+    return reconnectionNotification;
+  }
+
+  /**
+   * @param reconnectionNotification the reconnection notification.
+   * @exclude
+   */
+  public void setReconnectionNotification(final JPPFReconnectionNotification reconnectionNotification) {
+    this.reconnectionNotification = reconnectionNotification;
+  }
+
+  /**
+   * Get the current pending action, if any. 
+   * @return the current pending action, or {@code null} if there isn't one.
+   * @exclude
+   */
+  public NodePendingAction getPendingAction() {
+    return pendingAction.get();
+  }
+
+  /**
+   * Set the current pending action.
+   * @param action the pending aciton to set.
+   * @return {@code true} if the new pending action was set successfully, {@code false} otherwise (if a pending action was already set).
+   * @exclude
+   */
+  public boolean setPendingAction(final NodePendingAction action) {
+    return pendingAction.compareAndSet(NodePendingAction.NONE, (action == null) ? NodePendingAction.NONE : action);
+  }
+
+  /**
+   * Cancel the current pending action, if anty.
+   * @return {@code true} if the pending action was successfully cncelled, {@code false} otherwise.
+   * @exclude
+   */
+  public boolean cancelPendingAction() {
+    final boolean b = pendingAction.get() != NodePendingAction.NONE;
+    if (b) pendingAction.set(NodePendingAction.NONE);
+    return b;
+  }
+
+  /**
+   * @return whether a deferred action was requested.
+   * @exclude
+   */
+  public boolean hasPendingAction() {
+    final NodePendingAction action = pendingAction.get();
+    return (action != null) && (action != NodePendingAction.NONE);
   }
 }

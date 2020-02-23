@@ -55,7 +55,7 @@ class JobReader extends ThreadSynchronization implements Runnable {
 
   @Override
   public void run() {
-    while (!isStopped() && !node.isStopped() && !node.shutdownRequestFlag.get()) {
+    while (!isStopped() && !node.isStopped() && !node.hasPendingAction()) {
       try {
         queue.offer(node.getNodeIO().readJob());
       } catch (final Exception e) {

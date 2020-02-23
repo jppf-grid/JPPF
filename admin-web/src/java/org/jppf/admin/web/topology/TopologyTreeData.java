@@ -76,6 +76,8 @@ public class TopologyTreeData extends TableTreeData {
     ah.addAction(TopologyConstants.NODE_RESTART_ACTION, action);
     ah.addAction(TopologyConstants.NODE_STOP_DEFERRED_ACTION, action);
     ah.addAction(TopologyConstants.NODE_RESTART_DEFERRED_ACTION, action);
+    ah.addAction(TopologyConstants.NODE_RECONNECT_ACTION, action);
+    ah.addAction(TopologyConstants.NODE_RECONNECT_DEFERRED_ACTION, action);
     ah.addAction(TopologyConstants.NODE_SUSPEND_ACTION, new SuspendNodeLink.Action());
   }
 

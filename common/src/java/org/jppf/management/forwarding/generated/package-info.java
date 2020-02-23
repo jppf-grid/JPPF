@@ -17,7 +17,7 @@
  */
 
 /**
- * This package is a place holder for static proxies to nodes MBeans whose requests and notifications are fowrarded through a driver.
+ * This package is a place holder for <a href="https://www.jppf.org/doc/@version@/index.php?title=Managing_and_monitoring_the_nodes_through_the_driver#Node_forwarding_static_proxies">static proxies to nodes MBeans</a> whose requests and notifications are fowrarded through a driver.
  * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.management.forwarding.generated;

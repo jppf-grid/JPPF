@@ -98,6 +98,8 @@ public class TopologyPage extends AbstractTableTreePage {
     actionHandler.addActionLink(toolbar, new StopRestartNodeLink(StopRestartNodeLink.ActionType.RESTART));
     actionHandler.addActionLink(toolbar, new StopRestartNodeLink(StopRestartNodeLink.ActionType.STOP_DEFERRED));
     actionHandler.addActionLink(toolbar, new StopRestartNodeLink(StopRestartNodeLink.ActionType.RESTART_DEFERRED));
+    actionHandler.addActionLink(toolbar, new StopRestartNodeLink(StopRestartNodeLink.ActionType.RECONNECT));
+    actionHandler.addActionLink(toolbar, new StopRestartNodeLink(StopRestartNodeLink.ActionType.RECONNECT_DEFERRED));
     actionHandler.addActionLink(toolbar, new CancelPendingActionLink());
     actionHandler.addActionLink(toolbar, new SuspendNodeLink());
     actionHandler.addActionLink(toolbar, new ProvisioningLink(toolbar));

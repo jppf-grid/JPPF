@@ -59,18 +59,6 @@ public class JPPFNodeProvisioningMBeanForwarder extends AbstractMBeanForwarder {
    * Invoke the {@code provisionSlaveNodes} operation for all selected nodes (provision the specified number of slave nodes, starting new ones or stopping existing ones as needed).
    * @param selector a {@link NodeSelector} instance.
    * @param slaves a {@code Integer}.
-   * @param configOverrides a {@link TypedProperties} instance.
-   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
-   * @throws Exception if any error occurs.
-   */
-  public ResultsMap<String, Void> provisionSlaveNodes(final NodeSelector selector, final int slaves, final TypedProperties configOverrides) throws Exception {
-    return invoke(selector, "provisionSlaveNodes", new Object[] { slaves, configOverrides }, new String[] { int.class.getName(), TypedProperties.class.getName() });
-  }
-
-  /**
-   * Invoke the {@code provisionSlaveNodes} operation for all selected nodes (provision the specified number of slave nodes, starting new ones or stopping existing ones as needed).
-   * @param selector a {@link NodeSelector} instance.
-   * @param slaves a {@code Integer}.
    * @param interrupt a {@code Boolean}.
    * @param configgOverrides a {@link TypedProperties} instance.
    * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
@@ -84,11 +72,12 @@ public class JPPFNodeProvisioningMBeanForwarder extends AbstractMBeanForwarder {
    * Invoke the {@code provisionSlaveNodes} operation for all selected nodes (provision the specified number of slave nodes, starting new ones or stopping existing ones as needed).
    * @param selector a {@link NodeSelector} instance.
    * @param slaves a {@code Integer}.
+   * @param configOverrides a {@link TypedProperties} instance.
    * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
    * @throws Exception if any error occurs.
    */
-  public ResultsMap<String, Void> provisionSlaveNodes(final NodeSelector selector, final int slaves) throws Exception {
-    return invoke(selector, "provisionSlaveNodes", new Object[] { slaves }, new String[] { int.class.getName() });
+  public ResultsMap<String, Void> provisionSlaveNodes(final NodeSelector selector, final int slaves, final TypedProperties configOverrides) throws Exception {
+    return invoke(selector, "provisionSlaveNodes", new Object[] { slaves, configOverrides }, new String[] { int.class.getName(), TypedProperties.class.getName() });
   }
 
   /**
@@ -101,5 +90,16 @@ public class JPPFNodeProvisioningMBeanForwarder extends AbstractMBeanForwarder {
    */
   public ResultsMap<String, Void> provisionSlaveNodes(final NodeSelector selector, final int slaves, final boolean interruptIfRunning) throws Exception {
     return invoke(selector, "provisionSlaveNodes", new Object[] { slaves, interruptIfRunning }, new String[] { int.class.getName(), boolean.class.getName() });
+  }
+
+  /**
+   * Invoke the {@code provisionSlaveNodes} operation for all selected nodes (provision the specified number of slave nodes, starting new ones or stopping existing ones as needed).
+   * @param selector a {@link NodeSelector} instance.
+   * @param slaves a {@code Integer}.
+   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
+   * @throws Exception if any error occurs.
+   */
+  public ResultsMap<String, Void> provisionSlaveNodes(final NodeSelector selector, final int slaves) throws Exception {
+    return invoke(selector, "provisionSlaveNodes", new Object[] { slaves }, new String[] { int.class.getName() });
   }
 }

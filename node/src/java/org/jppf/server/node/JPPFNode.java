@@ -157,7 +157,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     while (!checkStopped()) {
       clearResourceCachesIfRequested();
       if (isShutdownRequested()) shutdown(isRestart());
-      else {
+      else if (getPendingAction() == NodePendingAction.RECONNECT) {
+        reset(true);
+        throw new JPPFNodeReconnectionNotification("request to reconnect the node", null, ConnectionReason.MANAGEMENT_REQUEST);
+      } else {
         try {
           while (isSuspended()) suspendedLock.goToSleep(1000L);
           if (shouldInitDataChannel) {

@@ -144,6 +144,16 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   }
 
   /**
+   * {@inheritDoc}
+   * @since 6.3
+   */
+  @Override
+  public void reconnect(final Boolean interruptIfRunning) throws Exception {
+    if (debugEnabled) log.debug("node {} reconnection requested with interruptIfRunning = {}", this, interruptIfRunning);
+    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "reconnect", new Object[] {interruptIfRunning}, new String[] {Boolean.class.getName()});
+  }
+
+  /**
    * Reset the node's executed tasks counter to zero.
    * @throws Exception if an error is raised when invoking the node mbean.
    */

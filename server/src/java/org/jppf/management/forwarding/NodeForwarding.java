@@ -114,6 +114,11 @@ public class NodeForwarding extends AbstractNodeForwarding implements NodeForwar
   }
 
   @Override
+  public ResultsMap<String, Void> reconnect(final NodeSelector selector, final Boolean interruptIfRunning) throws Exception {
+    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "reconnect", array(interruptIfRunning), array("java.lang.Boolean"));
+  }
+
+  @Override
   public ResultsMap<String, Void> resetTaskCounter(final NodeSelector selector) throws Exception {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "resetTaskCounter");
   }

@@ -71,7 +71,16 @@ public class StopRestartNodeLink extends AbstractActionLink {
     /**
      * Deferred restart.
      */
-    RESTART_DEFERRED(TopologyConstants.NODE_RESTART_DEFERRED_ACTION, "Restart node (deferred)", "traffic_light_red_green_yellow.gif", true, true);
+    RESTART_DEFERRED(TopologyConstants.NODE_RESTART_DEFERRED_ACTION, "Restart node (deferred)", "traffic_light_red_green_yellow.gif", true, true),
+    /**
+     * Reconnect.
+     */
+    RECONNECT(TopologyConstants.NODE_RECONNECT_ACTION, "Reconnect node", "reconnect.png", false, false),
+    /**
+     * Reconnect.
+     */
+    RECONNECT_DEFERRED(TopologyConstants.NODE_RECONNECT_DEFERRED_ACTION, "Reconnect node (deferred)", "reconnect-deferred.png", false, true)
+    ;
 
     /**
      * The action id.
@@ -171,8 +180,20 @@ public class StopRestartNodeLink extends AbstractActionLink {
           if (forwarder == null) continue;
           if (debugEnabled) log.debug("invoking {} with interrupt={} for the nodes: {}", (restart ? "restart()" : "shutdown()"), interruptIfRunning, entry.getValue());
           final NodeSelector selector = new UuidSelector(entry.getValue());
-          if (restart) forwarder.restart(selector, interruptIfRunning);
-          else forwarder.shutdown(selector, interruptIfRunning);
+          switch(actionType) {
+            case RESTART:
+            case RESTART_DEFERRED:
+              forwarder.restart(selector, interruptIfRunning);
+              break;
+            case STOP:
+            case STOP_DEFERRED:
+              forwarder.shutdown(selector, interruptIfRunning);
+              break;
+            case RECONNECT:
+            case RECONNECT_DEFERRED:
+              forwarder.reconnect(selector, interruptIfRunning);
+              break;
+          }
         } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }

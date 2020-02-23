@@ -94,6 +94,36 @@ public class TestJPPFNodeAdminMBeanForwarder extends AbstractTestForwarderProxy 
   }
 
   /**
+   * Test invoking the {@code pendingAction} operation for all selected nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testPendingAction() throws Exception {
+    final ResultsMap<String, NodePendingAction> results = proxy.pendingAction(NodeSelector.ALL_NODES);
+    checkResults(results, NodePendingAction.class);
+  }
+
+  /**
+   * Test invoking the {@code cancelJob} operation for all selected nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testCancelJob() throws Exception {
+    final ResultsMap<String, Void> results = proxy.cancelJob(NodeSelector.ALL_NODES, "some_string", Boolean.FALSE);
+    checkResults(results, void.class);
+  }
+
+  /**
+   * Test invoking the {@code cancelPendingAction} operation for all selected nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testCancelPendingAction() throws Exception {
+    final ResultsMap<String, Boolean> results = proxy.cancelPendingAction(NodeSelector.ALL_NODES);
+    checkResults(results, boolean.class);
+  }
+
+  /**
    * Test invoking the {@code updateThreadsPriority} operation for all selected nodes.
    * @throws Exception if any error occurs.
    */
@@ -104,12 +134,12 @@ public class TestJPPFNodeAdminMBeanForwarder extends AbstractTestForwarderProxy 
   }
 
   /**
-   * Test invoking the {@code cancelJob} operation for all selected nodes.
+   * Test invoking the {@code resetTaskCounter} operation for all selected nodes.
    * @throws Exception if any error occurs.
    */
   @Test
-  public void testCancelJob() throws Exception {
-    final ResultsMap<String, Void> results = proxy.cancelJob(NodeSelector.ALL_NODES, "some_string", Boolean.FALSE);
+  public void testResetTaskCounter() throws Exception {
+    final ResultsMap<String, Void> results = proxy.resetTaskCounter(NodeSelector.ALL_NODES);
     checkResults(results, void.class);
   }
 
@@ -129,7 +159,7 @@ public class TestJPPFNodeAdminMBeanForwarder extends AbstractTestForwarderProxy 
    */
   @Test
   public void testUpdateConfiguration() throws Exception {
-    final ResultsMap<String, Void> results = proxy.updateConfiguration(NodeSelector.ALL_NODES, (Map<Object, Object>) null, Boolean.FALSE);
+    final ResultsMap<String, Void> results = proxy.updateConfiguration(NodeSelector.ALL_NODES, (Map<Object, Object>) null, Boolean.FALSE, Boolean.FALSE);
     checkResults(results, void.class);
   }
 
@@ -139,38 +169,8 @@ public class TestJPPFNodeAdminMBeanForwarder extends AbstractTestForwarderProxy 
    */
   @Test
   public void testUpdateConfiguration2() throws Exception {
-    final ResultsMap<String, Void> results = proxy.updateConfiguration(NodeSelector.ALL_NODES, (Map<Object, Object>) null, Boolean.FALSE, Boolean.FALSE);
+    final ResultsMap<String, Void> results = proxy.updateConfiguration(NodeSelector.ALL_NODES, (Map<Object, Object>) null, Boolean.FALSE);
     checkResults(results, void.class);
-  }
-
-  /**
-   * Test invoking the {@code cancelPendingAction} operation for all selected nodes.
-   * @throws Exception if any error occurs.
-   */
-  @Test
-  public void testCancelPendingAction() throws Exception {
-    final ResultsMap<String, Boolean> results = proxy.cancelPendingAction(NodeSelector.ALL_NODES);
-    checkResults(results, boolean.class);
-  }
-
-  /**
-   * Test invoking the {@code resetTaskCounter} operation for all selected nodes.
-   * @throws Exception if any error occurs.
-   */
-  @Test
-  public void testResetTaskCounter() throws Exception {
-    final ResultsMap<String, Void> results = proxy.resetTaskCounter(NodeSelector.ALL_NODES);
-    checkResults(results, void.class);
-  }
-
-  /**
-   * Test invoking the {@code pendingAction} operation for all selected nodes.
-   * @throws Exception if any error occurs.
-   */
-  @Test
-  public void testPendingAction() throws Exception {
-    final ResultsMap<String, NodePendingAction> results = proxy.pendingAction(NodeSelector.ALL_NODES);
-    checkResults(results, NodePendingAction.class);
   }
 
   /**

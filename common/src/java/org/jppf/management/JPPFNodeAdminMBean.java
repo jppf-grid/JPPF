@@ -95,6 +95,16 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean {
   void shutdown(@MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
 
   /**
+   * Force the node to reconnect without restarting.
+   * @param interruptIfRunning when {@code true}, then reconnect the node even if it is executing tasks,
+   * when {@code false}, then only restart the node when it is no longer executing.
+   * @throws Exception if any error occurs.
+   * @since 6.3
+   */
+  @MBeanDescription("force the node to reconnect without restarting, specifying whether to wait for executing tasks to complete")
+  void reconnect(@MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
+
+  /**
    * Reset the node's executed tasks counter to zero.
    * @throws Exception if any error occurs.
    */

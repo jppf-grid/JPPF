@@ -20,8 +20,10 @@ package org.jppf.management;
 
 import java.util.Map;
 
+import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.*;
 import org.jppf.execute.ExecutionInfo;
+import org.jppf.node.connection.ConnectionReason;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
@@ -163,24 +165,36 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
     if (interrupt || !node.isExecuting()) {
       if (node.getShuttingDown().compareAndSet(false, true)) {
         if (debugEnabled) log.debug("scheduling immediate {}", s);
-        final Runnable r = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              node.shutdown(restart);
-            } catch (final Exception|Error e) {
-              log.error("error trying to {} the node: {}", s, ExceptionUtils.getStackTrace(e));
-              if (e instanceof Error) throw (Error) e;
-              if (e instanceof RuntimeException) throw (RuntimeException) e;
-            }
+        final Runnable r = () -> {
+          try {
+            node.shutdown(restart);
+          } catch (final Exception|Error e) {
+            log.error("error trying to {} the node: ", s, e);
+            if (e instanceof Error) throw (Error) e;
+            if (e instanceof RuntimeException) throw (RuntimeException) e;
           }
         };
         ThreadUtils.startThread(r, "Node " + s);
       }
     } else {
-      node.requestShutdown(restart);
-      nodeState.setPendingAction(pendingAction());
-      if (debugEnabled) log.debug("pending action after {} request: {}", s, nodeState.getPendingAction());
+      final NodePendingAction action = restart ? NodePendingAction.RESTART : NodePendingAction.SHUTDOWN;
+      node.setPendingAction(action);
+      nodeState.setPendingAction(action);
+      if (debugEnabled) log.debug("pending action after {} request: {}", s, action);
+    }
+  }
+
+  @Override
+  public void reconnect(final Boolean interrupt) throws Exception {
+    log.info("{} reconnection requested", interrupt ? "immediate" : "deferred");
+    if (interrupt || !node.isExecuting()) {
+      node.setReconnectionNotification(new JPPFNodeReconnectionNotification("request to reconnect the node", null, ConnectionReason.MANAGEMENT_REQUEST));
+      node.closeDataChannel();
+    } else {
+      final NodePendingAction action = NodePendingAction.RECONNECT;
+      node.setPendingAction(action);
+      nodeState.setPendingAction(action);
+      if (debugEnabled) log.debug("pending action after reconnection request: {}", action);
     }
   }
 
@@ -297,7 +311,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   @Override
   public boolean cancelPendingAction() {
     log.info("cancelPendingAction() requested");
-    final boolean b = node.cancelShutdownRequest();
+    final boolean b = node.cancelPendingAction();
     if (b) nodeState.setPendingAction(NodePendingAction.NONE);
     return b;
   }

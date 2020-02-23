@@ -47,6 +47,7 @@ public class NodeTreeTableMouseListener extends AbstractTopologyMouseListener {
     addItem(menu, "show.information", p);
     menu.addSeparator();
     addItem(menu, "shutdown.restart.driver", p);
+    addItem(menu, "load.balancing.settings", p);
     addItem(menu, "driver.reset.statistics", p);
     menu.addSeparator();
     addItem(menu, "update.configuration", p);
@@ -57,6 +58,8 @@ public class NodeTreeTableMouseListener extends AbstractTopologyMouseListener {
     addItem(menu, "restart.node.deferred", p);
     addItem(menu, "shutdown.node", p);
     addItem(menu, "shutdown.node.deferred", p);
+    addItem(menu, "reconnect.node", p);
+    addItem(menu, "reconnect.node.deferred", p);
     addItem(menu, "cancel.deferred.action", p);
     menu.addSeparator();
     addItem(menu, "toggle.active", p);

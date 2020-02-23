@@ -63,6 +63,14 @@
       <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_yellow.gif"/>
     </child>
 
+    <child name="sep4.2" type="ToolbarSeparator"/>
+    <child name="graph.reconnect.node" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/reconnect.png"/>
+    </child>
+    <child name="graph.reconnect.node.deferred" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/reconnect-deferred.png"/>
+    </child>
+
     <child name="sep4.5" type="ToolbarSeparator"/>
     <child name="graph.cancel.deferred.action" type="Button">
       <property name="icon" value="/org/jppf/ui/resources/cancel_deferred_action.gif"/>

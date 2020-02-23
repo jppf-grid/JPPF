@@ -45,13 +45,13 @@ public class JPPFNodeTaskMonitorMBeanForwarder extends AbstractMBeanForwarder {
   }
 
   /**
-   * Get the value of the {@code TotalTasksSucessfull} attribute for all selected nodes (the total number of tasks that executed successfully).
+   * Get the value of the {@code TotalTasksExecuted} attribute for all selected nodes (the total number of tasks executed by the node).
    * @param selector a {@link NodeSelector} instance.
    * @return a mapping of node uuids to {@link Integer} instances.
    * @throws Exception if any error occurs.
    */
-  public ResultsMap<String, Integer> getTotalTasksSucessfull(final NodeSelector selector) throws Exception {
-    return getAttribute(selector, "TotalTasksSucessfull");
+  public ResultsMap<String, Integer> getTotalTasksExecuted(final NodeSelector selector) throws Exception {
+    return getAttribute(selector, "TotalTasksExecuted");
   }
 
   /**
@@ -65,13 +65,13 @@ public class JPPFNodeTaskMonitorMBeanForwarder extends AbstractMBeanForwarder {
   }
 
   /**
-   * Get the value of the {@code TotalTasksExecuted} attribute for all selected nodes (the total number of tasks executed by the node).
+   * Get the value of the {@code TotalTaskElapsedTime} attribute for all selected nodes (the total elapsed time used by the tasks in milliseconds).
    * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to {@link Integer} instances.
+   * @return a mapping of node uuids to {@link Long} instances.
    * @throws Exception if any error occurs.
    */
-  public ResultsMap<String, Integer> getTotalTasksExecuted(final NodeSelector selector) throws Exception {
-    return getAttribute(selector, "TotalTasksExecuted");
+  public ResultsMap<String, Long> getTotalTaskElapsedTime(final NodeSelector selector) throws Exception {
+    return getAttribute(selector, "TotalTaskElapsedTime");
   }
 
   /**
@@ -85,13 +85,13 @@ public class JPPFNodeTaskMonitorMBeanForwarder extends AbstractMBeanForwarder {
   }
 
   /**
-   * Get the value of the {@code TotalTaskElapsedTime} attribute for all selected nodes (the total elapsed time used by the tasks in milliseconds).
+   * Get the value of the {@code TotalTasksSucessfull} attribute for all selected nodes (the total number of tasks that executed successfully).
    * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to {@link Long} instances.
+   * @return a mapping of node uuids to {@link Integer} instances.
    * @throws Exception if any error occurs.
    */
-  public ResultsMap<String, Long> getTotalTaskElapsedTime(final NodeSelector selector) throws Exception {
-    return getAttribute(selector, "TotalTaskElapsedTime");
+  public ResultsMap<String, Integer> getTotalTasksSucessfull(final NodeSelector selector) throws Exception {
+    return getAttribute(selector, "TotalTasksSucessfull");
   }
 
   /**

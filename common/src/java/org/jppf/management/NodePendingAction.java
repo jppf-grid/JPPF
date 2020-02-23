@@ -35,7 +35,11 @@ public enum NodePendingAction {
   /**
    * A deferred restart was requested.
    */
-  RESTART("node.pending.restart");
+  RESTART("node.pending.restart"),
+  /**
+   * A deferred reconnection was requested.
+   */
+  RECONNECT("node.pending.reconnect");
 
   /**
    * The name to display.

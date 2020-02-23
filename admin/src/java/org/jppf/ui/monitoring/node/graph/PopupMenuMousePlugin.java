@@ -84,6 +84,7 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin {
     menu.add(createMenuItem(actionHandler.getAction("graph.show.information"), point));
     menu.addSeparator();
     menu.add(createMenuItem(actionHandler.getAction("graph.shutdown.restart.driver"), point));
+    menu.add(createMenuItem(actionHandler.getAction("graph.load.balancing.settings"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.driver.reset.statistics"), point));
     menu.addSeparator();
     menu.add(createMenuItem(actionHandler.getAction("graph.update.configuration"), point));
@@ -94,6 +95,8 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin {
     menu.add(createMenuItem(actionHandler.getAction("graph.restart.node.deferred"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.shutdown.node"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.shutdown.node.deferred"), point));
+    menu.add(createMenuItem(actionHandler.getAction("graph.reconnect.node"), point));
+    menu.add(createMenuItem(actionHandler.getAction("graph.reconnect.node.deferred"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.cancel.deferred.action"), point));
     menu.addSeparator();
     menu.add(createMenuItem(actionHandler.getAction("graph.toggle.active"), point));

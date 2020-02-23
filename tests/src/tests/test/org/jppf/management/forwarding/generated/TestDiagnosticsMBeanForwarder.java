@@ -72,16 +72,6 @@ public class TestDiagnosticsMBeanForwarder extends AbstractTestForwarderProxy {
   }
 
   /**
-   * Test invoking the {@code threadNames} operation for all selected nodes.
-   * @throws Exception if any error occurs.
-   */
-  @Test
-  public void testThreadNames() throws Exception {
-    final ResultsMap<String, String[]> results = proxy.threadNames(NodeSelector.ALL_NODES);
-    checkResults(results, String[].class);
-  }
-
-  /**
    * Test invoking the {@code threadDump} operation for all selected nodes.
    * @throws Exception if any error occurs.
    */
@@ -89,6 +79,16 @@ public class TestDiagnosticsMBeanForwarder extends AbstractTestForwarderProxy {
   public void testThreadDump() throws Exception {
     final ResultsMap<String, ThreadDump> results = proxy.threadDump(NodeSelector.ALL_NODES);
     checkResults(results, ThreadDump.class);
+  }
+
+  /**
+   * Test invoking the {@code threadNames} operation for all selected nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testThreadNames() throws Exception {
+    final ResultsMap<String, String[]> results = proxy.threadNames(NodeSelector.ALL_NODES);
+    checkResults(results, String[].class);
   }
 
   /**

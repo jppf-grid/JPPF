@@ -187,6 +187,18 @@ public interface NodeForwardingMBean extends Serializable, NotificationEmitter, 
   ResultsMap<String, Void> shutdown(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
 
   /**
+   * Force the specified nodes to reconnect.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param interruptIfRunning whether to reconnect immediately or wait until each node is idle.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
+   * @throws Exception if any error occurs.
+   * @see org.jppf.management.JPPFNodeAdminMBean#reconnect(Boolean)
+   */
+  @MBeanDescription("shutdown the selected nodes, specifying whther to wait until they are no longer executing jobs")
+  @MBeanElementType(type = ResultsMap.class, parameters = { "java.lang.String", "java.lang.Void" })
+  ResultsMap<String, Void> reconnect(@MBeanParamName("nodeSelector") NodeSelector selector, @MBeanParamName("interruptIfRunning") Boolean interruptIfRunning) throws Exception;
+
+  /**
    * Reset the specified nodes' executed tasks counter to zero.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.

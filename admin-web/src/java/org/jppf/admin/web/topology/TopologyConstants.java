@@ -72,6 +72,14 @@ public class TopologyConstants {
    */
   public static String NODE_RESTART_DEFERRED_ACTION = "topology.node_restart_deferred";
   /**
+   * Reconnect node action id.
+   */
+  public static String NODE_RECONNECT_ACTION = "topology.node_reconnect";
+  /**
+   * Defrred reconnect node action id.
+   */
+  public static String NODE_RECONNECT_DEFERRED_ACTION = "topology.node_reconnect_deferred";
+  /**
    * Deferred suspend node action id.
    */
   public static String NODE_SUSPEND_ACTION = "topology.node_suspend";

@@ -140,6 +140,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     actionHandler.putAction("restart.node.deferred", new ShutdownOrRestartNodeAction(true, false, "restart.node.deferred"));
     actionHandler.putAction("shutdown.node", new ShutdownOrRestartNodeAction(false, true, "shutdown.node"));
     actionHandler.putAction("shutdown.node.deferred", new ShutdownOrRestartNodeAction(false, false, "shutdown.node.deferred"));
+    actionHandler.putAction("reconnect.node", new ReconnectNodeAction(true, "reconnect.node"));
+    actionHandler.putAction("reconnect.node.deferred", new ReconnectNodeAction(false, "reconnect.node.deferred"));
     actionHandler.putAction("toggle.active", new ToggleNodeActiveAction());
     actionHandler.putAction("node.provisioning", new ProvisioningAction());
     actionHandler.putAction("select.drivers", new SelectDriversAction(this));

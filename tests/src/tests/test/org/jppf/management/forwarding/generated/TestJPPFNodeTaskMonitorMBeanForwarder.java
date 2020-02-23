@@ -47,12 +47,12 @@ public class TestJPPFNodeTaskMonitorMBeanForwarder extends AbstractTestForwarder
   }
 
   /**
-   * Test getting the value of the {@code TotalTasksSucessfull} attribute for all selected nodes.
+   * Test getting the value of the {@code TotalTasksExecuted} attribute for all selected nodes.
    * @throws Exception if any error occurs.
    */
   @Test
-  public void testgetTotalTasksSucessfull() throws Exception {
-    final ResultsMap<String, Integer> results = proxy.getTotalTasksSucessfull(NodeSelector.ALL_NODES);
+  public void testgetTotalTasksExecuted() throws Exception {
+    final ResultsMap<String, Integer> results = proxy.getTotalTasksExecuted(NodeSelector.ALL_NODES);
     checkResults(results, Integer.class);
   }
 
@@ -67,13 +67,13 @@ public class TestJPPFNodeTaskMonitorMBeanForwarder extends AbstractTestForwarder
   }
 
   /**
-   * Test getting the value of the {@code TotalTasksExecuted} attribute for all selected nodes.
+   * Test getting the value of the {@code TotalTaskElapsedTime} attribute for all selected nodes.
    * @throws Exception if any error occurs.
    */
   @Test
-  public void testgetTotalTasksExecuted() throws Exception {
-    final ResultsMap<String, Integer> results = proxy.getTotalTasksExecuted(NodeSelector.ALL_NODES);
-    checkResults(results, Integer.class);
+  public void testgetTotalTaskElapsedTime() throws Exception {
+    final ResultsMap<String, Long> results = proxy.getTotalTaskElapsedTime(NodeSelector.ALL_NODES);
+    checkResults(results, Long.class);
   }
 
   /**
@@ -87,13 +87,13 @@ public class TestJPPFNodeTaskMonitorMBeanForwarder extends AbstractTestForwarder
   }
 
   /**
-   * Test getting the value of the {@code TotalTaskElapsedTime} attribute for all selected nodes.
+   * Test getting the value of the {@code TotalTasksSucessfull} attribute for all selected nodes.
    * @throws Exception if any error occurs.
    */
   @Test
-  public void testgetTotalTaskElapsedTime() throws Exception {
-    final ResultsMap<String, Long> results = proxy.getTotalTaskElapsedTime(NodeSelector.ALL_NODES);
-    checkResults(results, Long.class);
+  public void testgetTotalTasksSucessfull() throws Exception {
+    final ResultsMap<String, Integer> results = proxy.getTotalTasksSucessfull(NodeSelector.ALL_NODES);
+    checkResults(results, Integer.class);
   }
 
   /**

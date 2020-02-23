@@ -65,16 +65,6 @@ public class DiagnosticsMBeanForwarder extends AbstractMBeanForwarder {
   }
 
   /**
-   * Invoke the {@code threadNames} operation for all selected nodes (get the names of all live threads in the current JVM).
-   * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to objects that wrap either a [@link String[]} or an exeption.
-   * @throws Exception if any error occurs.
-   */
-  public ResultsMap<String, String[]> threadNames(final NodeSelector selector) throws Exception {
-    return invoke(selector, "threadNames");
-  }
-
-  /**
    * Invoke the {@code threadDump} operation for all selected nodes (get a full thread dump, including detection of deadlocks).
    * @param selector a {@link NodeSelector} instance.
    * @return a mapping of node uuids to objects that wrap either a [@link ThreadDump} or an exeption.
@@ -82,6 +72,16 @@ public class DiagnosticsMBeanForwarder extends AbstractMBeanForwarder {
    */
   public ResultsMap<String, ThreadDump> threadDump(final NodeSelector selector) throws Exception {
     return invoke(selector, "threadDump");
+  }
+
+  /**
+   * Invoke the {@code threadNames} operation for all selected nodes (get the names of all live threads in the current JVM).
+   * @param selector a {@link NodeSelector} instance.
+   * @return a mapping of node uuids to objects that wrap either a [@link String[]} or an exeption.
+   * @throws Exception if any error occurs.
+   */
+  public ResultsMap<String, String[]> threadNames(final NodeSelector selector) throws Exception {
+    return invoke(selector, "threadNames");
   }
 
   /**

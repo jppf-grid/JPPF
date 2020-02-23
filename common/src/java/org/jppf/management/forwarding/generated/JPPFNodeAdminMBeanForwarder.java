@@ -77,6 +77,16 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
   }
 
   /**
+   * Invoke the {@code shutdown} operation for all selected nodes (shutdown the node unconditionally).
+   * @param selector a {@link NodeSelector} instance.
+   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
+   * @throws Exception if any error occurs.
+   */
+  public ResultsMap<String, Void> shutdown(final NodeSelector selector) throws Exception {
+    return invoke(selector, "shutdown");
+  }
+
+  /**
    * Invoke the {@code shutdown} operation for all selected nodes (shutdown the node, specifying whether to wait for executing tasks to complete).
    * @param selector a {@link NodeSelector} instance.
    * @param interruptIfRunning a {@link Boolean} instance.
@@ -85,16 +95,6 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
    */
   public ResultsMap<String, Void> shutdown(final NodeSelector selector, final Boolean interruptIfRunning) throws Exception {
     return invoke(selector, "shutdown", new Object[] { interruptIfRunning }, new String[] { Boolean.class.getName() });
-  }
-
-  /**
-   * Invoke the {@code shutdown} operation for all selected nodes (shutdown the node unconditionally).
-   * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
-   * @throws Exception if any error occurs.
-   */
-  public ResultsMap<String, Void> shutdown(final NodeSelector selector) throws Exception {
-    return invoke(selector, "shutdown");
   }
 
   /**
@@ -108,24 +108,13 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
   }
 
   /**
-   * Invoke the {@code updateThreadsPriority} operation for all selected nodes (update the priority of all processing threads).
+   * Invoke the {@code pendingAction} operation for all selected nodes (determine wether a deffered shutdwon or restartd was requested and not yet performed for the node).
    * @param selector a {@link NodeSelector} instance.
-   * @param newPriority a {@link Integer} instance.
-   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
+   * @return a mapping of node uuids to objects that wrap either a [@link NodePendingAction} or an exeption.
    * @throws Exception if any error occurs.
    */
-  public ResultsMap<String, Void> updateThreadsPriority(final NodeSelector selector, final Integer newPriority) throws Exception {
-    return invoke(selector, "updateThreadsPriority", new Object[] { newPriority }, new String[] { Integer.class.getName() });
-  }
-
-  /**
-   * Invoke the {@code restart} operation for all selected nodes (restart the node unconditionally).
-   * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
-   * @throws Exception if any error occurs.
-   */
-  public ResultsMap<String, Void> restart(final NodeSelector selector) throws Exception {
-    return invoke(selector, "restart");
+  public ResultsMap<String, NodePendingAction> pendingAction(final NodeSelector selector) throws Exception {
+    return invoke(selector, "pendingAction");
   }
 
   /**
@@ -140,6 +129,16 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
   }
 
   /**
+   * Invoke the {@code restart} operation for all selected nodes (restart the node unconditionally).
+   * @param selector a {@link NodeSelector} instance.
+   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
+   * @throws Exception if any error occurs.
+   */
+  public ResultsMap<String, Void> restart(final NodeSelector selector) throws Exception {
+    return invoke(selector, "restart");
+  }
+
+  /**
    * Invoke the {@code cancelJob} operation for all selected nodes (ancel the job with the specified uuid).
    * @param selector a {@link NodeSelector} instance.
    * @param jobUuid a {@link String} instance.
@@ -149,6 +148,48 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
    */
   public ResultsMap<String, Void> cancelJob(final NodeSelector selector, final String jobUuid, final Boolean requeue) throws Exception {
     return invoke(selector, "cancelJob", new Object[] { jobUuid, requeue }, new String[] { String.class.getName(), Boolean.class.getName() });
+  }
+
+  /**
+   * Invoke the {@code cancelPendingAction} operation for all selected nodes (cancel a previous deferred shutdown or restart request, if any).
+   * @param selector a {@link NodeSelector} instance.
+   * @return a mapping of node uuids to objects that wrap either a [@link Boolean} or an exeption.
+   * @throws Exception if any error occurs.
+   */
+  public ResultsMap<String, Boolean> cancelPendingAction(final NodeSelector selector) throws Exception {
+    return invoke(selector, "cancelPendingAction");
+  }
+
+  /**
+   * Invoke the {@code updateThreadsPriority} operation for all selected nodes (update the priority of all processing threads).
+   * @param selector a {@link NodeSelector} instance.
+   * @param newPriority a {@link Integer} instance.
+   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
+   * @throws Exception if any error occurs.
+   */
+  public ResultsMap<String, Void> updateThreadsPriority(final NodeSelector selector, final Integer newPriority) throws Exception {
+    return invoke(selector, "updateThreadsPriority", new Object[] { newPriority }, new String[] { Integer.class.getName() });
+  }
+
+  /**
+   * Invoke the {@code reconnect} operation for all selected nodes (force the node to reconnect without restarting, specifying whether to wait for executing tasks to complete).
+   * @param selector a {@link NodeSelector} instance.
+   * @param interruptIfRunning a {@link Boolean} instance.
+   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
+   * @throws Exception if any error occurs.
+   */
+  public ResultsMap<String, Void> reconnect(final NodeSelector selector, final Boolean interruptIfRunning) throws Exception {
+    return invoke(selector, "reconnect", new Object[] { interruptIfRunning }, new String[] { Boolean.class.getName() });
+  }
+
+  /**
+   * Invoke the {@code resetTaskCounter} operation for all selected nodes (reset the node's executed tasks counter to zero).
+   * @param selector a {@link NodeSelector} instance.
+   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
+   * @throws Exception if any error occurs.
+   */
+  public ResultsMap<String, Void> resetTaskCounter(final NodeSelector selector) throws Exception {
+    return invoke(selector, "resetTaskCounter");
   }
 
   /**
@@ -165,18 +206,6 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
   /**
    * Invoke the {@code updateConfiguration} operation for all selected nodes (update the configuration properties of the node).
    * @param selector a {@link NodeSelector} instance.
-   * @param configUpdates a {@link Map} instance.
-   * @param restartNode a {@link Boolean} instance.
-   * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
-   * @throws Exception if any error occurs.
-   */
-  public ResultsMap<String, Void> updateConfiguration(final NodeSelector selector, final Map<Object, Object> configUpdates, final Boolean restartNode) throws Exception {
-    return invoke(selector, "updateConfiguration", new Object[] { configUpdates, restartNode }, new String[] { Map.class.getName(), Boolean.class.getName() });
-  }
-
-  /**
-   * Invoke the {@code updateConfiguration} operation for all selected nodes (update the configuration properties of the node).
-   * @param selector a {@link NodeSelector} instance.
    * @param cfgUpdates a {@link Map} instance.
    * @param restartNode a {@link Boolean} instance.
    * @param interruptIfRunning a {@link Boolean} instance.
@@ -188,33 +217,15 @@ public class JPPFNodeAdminMBeanForwarder extends AbstractMBeanForwarder {
   }
 
   /**
-   * Invoke the {@code cancelPendingAction} operation for all selected nodes (cancel a previous deferred shutdown or restart request, if any).
+   * Invoke the {@code updateConfiguration} operation for all selected nodes (update the configuration properties of the node).
    * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to objects that wrap either a [@link Boolean} or an exeption.
-   * @throws Exception if any error occurs.
-   */
-  public ResultsMap<String, Boolean> cancelPendingAction(final NodeSelector selector) throws Exception {
-    return invoke(selector, "cancelPendingAction");
-  }
-
-  /**
-   * Invoke the {@code resetTaskCounter} operation for all selected nodes (reset the node's executed tasks counter to zero).
-   * @param selector a {@link NodeSelector} instance.
+   * @param configUpdates a {@link Map} instance.
+   * @param restartNode a {@link Boolean} instance.
    * @return a mapping of node uuids to objects that wrap either {@code null} or an exeption.
    * @throws Exception if any error occurs.
    */
-  public ResultsMap<String, Void> resetTaskCounter(final NodeSelector selector) throws Exception {
-    return invoke(selector, "resetTaskCounter");
-  }
-
-  /**
-   * Invoke the {@code pendingAction} operation for all selected nodes (determine wether a deffered shutdwon or restartd was requested and not yet performed for the node).
-   * @param selector a {@link NodeSelector} instance.
-   * @return a mapping of node uuids to objects that wrap either a [@link NodePendingAction} or an exeption.
-   * @throws Exception if any error occurs.
-   */
-  public ResultsMap<String, NodePendingAction> pendingAction(final NodeSelector selector) throws Exception {
-    return invoke(selector, "pendingAction");
+  public ResultsMap<String, Void> updateConfiguration(final NodeSelector selector, final Map<Object, Object> configUpdates, final Boolean restartNode) throws Exception {
+    return invoke(selector, "updateConfiguration", new Object[] { configUpdates, restartNode }, new String[] { Map.class.getName(), Boolean.class.getName() });
   }
 
   /**

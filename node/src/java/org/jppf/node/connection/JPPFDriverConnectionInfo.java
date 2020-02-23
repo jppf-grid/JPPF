@@ -61,7 +61,7 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
    * @param secure whether SSL/TLS should be used.
    * @param host the driver host name or IP address.
    * @param port the driver port to connect to.
-   * @param recoveryEnabled whether recovery is enabled..
+   * @param recoveryEnabled whether recovery is enabled.
    */
   public JPPFDriverConnectionInfo(final boolean secure, final String host, final int port, final boolean recoveryEnabled) {
     this.secure = secure;

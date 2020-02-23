@@ -241,6 +241,8 @@ public class GraphOption extends AbstractOption implements ActionHolder, MasterS
       actionHandler.putAction("graph.restart.node.deferred", new ShutdownOrRestartNodeAction(true, false, "restart.node.deferred"));
       actionHandler.putAction("graph.shutdown.node", new ShutdownOrRestartNodeAction(false, true, "shutdown.node"));
       actionHandler.putAction("graph.shutdown.node.deferred", new ShutdownOrRestartNodeAction(false, false, "shutdown.node.deferred"));
+      actionHandler.putAction("graph.reconnect.node", new ReconnectNodeAction(true, "reconnect.node"));
+      actionHandler.putAction("graph.reconnect.node.deferred", new ReconnectNodeAction(false, "reconnect.node.deferred"));
       actionHandler.putAction("graph.cancel.deferred.action", new CancelDeferredAction());
       actionHandler.putAction("graph.toggle.active", new ToggleNodeActiveAction());
       actionHandler.putAction("graph.node.provisioning", new ProvisioningAction());
