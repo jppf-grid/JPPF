@@ -30,6 +30,10 @@ import javax.management.Descriptor;
  */
 abstract class AbstractMBeanInfoWriter<E extends AbstractMBeanInfoWriter<E>> extends MBeanInfoVisitorAdapter {
   /**
+   * The current version of JPPF.
+   */
+  static final String JPPF_VERSION = "6.3";
+  /**
    * The writer in which to print the generated wiki code.
    */
   Writer writer;

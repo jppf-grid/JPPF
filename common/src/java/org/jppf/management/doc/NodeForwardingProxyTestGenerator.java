@@ -186,8 +186,8 @@ public class NodeForwardingProxyTestGenerator extends AbstractForwardingCodeGene
    * @param args not used.
    */
   public static void main(final String[] args) {
-    final String[] filteredMBeans = { "JMXNioServerMBean", "PeerDriverMBean", "ServerDebugMBean", "JmxLogger", "PersistedJobsManagerMBean", "NodeDebugMBean" , "NodeForwardingMBean" };
-    final String[] filteredElements = { "addNotificationListener", "removeNotificationListener", "NotificationInfo", "shutdown", "restart", "heapDump" };
+    final String[] filteredMBeans = { "JMXNioServerMBean", "PeerDriverMBean", "ServerDebugMBean", "JmxLogger", "PersistedJobsManagerMBean", "NodeDebugMBean", "NodeForwardingMBean", "NodeTestMBean" };
+    final String[] filteredElements = { "addNotificationListener", "removeNotificationListener", "NotificationInfo", "shutdown", "restart", "heapDump" , "reconnect" };
     final List<DriverConnectionInfo> remotes = Arrays.asList(new DriverConnectionInfo("node", "localhost", 12001));
     try {
       final MBeanFilter mbeanFilter = info -> {
