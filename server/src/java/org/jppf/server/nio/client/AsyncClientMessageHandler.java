@@ -203,6 +203,7 @@ public class AsyncClientMessageHandler {
     final DataLocation dataProvider = IOHelper.serializeData(null);
     final ServerTaskBundleClient bundle = new ServerTaskBundleClient(header, dataProvider, Collections.<DataLocation>emptyList(), true);
     final ClientMessage request = context.serializeBundle(bundle);
+    if (debugEnabled) log.debug("about to send hansdshake bundle {}\n with parameters {}", header, header.getAll());
     context.offerMessageToSend(bundle, request);
   }
 

@@ -122,6 +122,7 @@ public class AsyncNodeMessageHandler {
     final NodeBundleResults received = context.deserializeBundle(message);
     if (debugEnabled) log.debug("received handshake response for channel {} : {}", context, received);
     final TaskBundle bundle = received.bundle();
+    if (debugEnabled) log.debug("bundle parameters: {}", bundle.getAll());
     final boolean offline =  bundle.getParameter(NODE_OFFLINE, false);
     if (offline) {
       context.setOffline(true);
