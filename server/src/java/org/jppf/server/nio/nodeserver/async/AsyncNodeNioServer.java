@@ -190,6 +190,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
     try {
       if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
       final AsyncNodeContext context = createContext(channel, ssl);
+      context.setPeer(peer);
       registerChannel(context, channel);
       messageHandler.sendHandshakeBundle(context, getHandshakeBundle());
     } catch (final Exception e) {

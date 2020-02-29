@@ -339,6 +339,7 @@ public class AsyncNodeContext extends BaseNodeContext {
     sb.append(", sendQueue size=").append(sendQueue.size());
     sb.append(", interestOps=").append(getInterestOps());
     sb.append(", executionStatus=").append(getExecutionStatus());
+    sb.append(", socketChannel=").append(socketChannel);
     sb.append(']');
     return sb.toString();
   }

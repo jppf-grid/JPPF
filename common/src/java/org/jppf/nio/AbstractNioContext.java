@@ -199,6 +199,7 @@ public abstract class AbstractNioContext implements NioContext {
     sb.append(", connectionUuid=").append(connectionUuid);
     sb.append(", peer=").append(peer);
     sb.append(", ssl=").append(ssl);
+    sb.append(", socketChannel=").append(socketChannel);
     sb.append(']');
     return sb.toString();
   }
