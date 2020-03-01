@@ -75,7 +75,7 @@ class AsyncPeerNode extends AbstractPeerConnectionHandler {
       context.setPeer(true);
       context.setConnectionUuid(connectionUuid);
       context.setOnCloseAction(onCloseAction);
-      if (debugEnabled) log.debug("registered peer client channel " + context);
+      if (debugEnabled) log.debug("registered peer client channel {}", context);
       if (secure) {
         context.setSsl(true);
         server.configurePeerSSL(context);

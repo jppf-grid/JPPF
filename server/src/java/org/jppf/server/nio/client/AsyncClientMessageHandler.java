@@ -152,14 +152,15 @@ public class AsyncClientMessageHandler {
   void handshakeReceived(final AsyncClientContext context, final ClientMessage message) throws Exception {
     final ServerTaskBundleClient bundle = context.deserializeBundle(message);
     final TaskBundle header = bundle.getJob();
-    if (debugEnabled) log.debug("read handshake bundle {} from client {}", header, context);
+    if (debugEnabled) log.debug("read handshake bundle {} from client {}\nwith parameters {}", header, context, header.getAll());
+    if (jppfDebugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
     context.setConnectionUuid((String) header.getParameter(BundleParameter.CONNECTION_UUID));
     header.getUuidPath().incPosition();
     final String uuid = header.getUuidPath().getCurrentElement();
     context.setUuid(uuid);
     awaitClassProvider(uuid);
     header.getUuidPath().add(driver.getUuid());
-    if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
+    if (debugEnabled) log.debug("uuid path = {}", header.getUuidPath());
     header.clear();
     header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, driver.getSystemInformation());
     header.setParameter(BundleParameter.DRIVER_UUID_PARAM, driver.getUuid());

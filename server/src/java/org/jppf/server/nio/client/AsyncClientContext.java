@@ -324,6 +324,7 @@ public class AsyncClientContext extends AbstractNioContext {
     sb.append(", jobEntries=").append(entryMap.size());
     sb.append(", sendQueue size=").append(sendQueue.size());
     sb.append(", interestOps=").append(getInterestOps());
+    sb.append(", socketChannel=").append(socketChannel);
     sb.append(']');
     return sb.toString();
   }
