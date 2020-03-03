@@ -18,18 +18,34 @@
 
 package org.jppf.example.webcrawler;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import javax.swing.*;
+import javax.swing.JProgressBar;
+import javax.swing.JWindow;
+import javax.swing.SwingUtilities;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
-import org.jppf.ui.options.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.ui.options.AbstractOption;
+import org.jppf.ui.options.Option;
+import org.jppf.utils.DateTimeUtils;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Example of a workflow to visit a web ste starting from a given page, and matching the visited

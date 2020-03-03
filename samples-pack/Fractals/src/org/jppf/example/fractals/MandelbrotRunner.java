@@ -23,11 +23,15 @@ import java.util.List;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.example.common.AbstractFractalConfiguration;
-import org.jppf.example.fractals.mandelbrot.*;
-import org.jppf.location.*;
+import org.jppf.example.fractals.mandelbrot.MandelbrotConfiguration;
+import org.jppf.example.fractals.mandelbrot.MandelbrotTask;
+import org.jppf.location.FileLocation;
+import org.jppf.location.Location;
+import org.jppf.location.MemoryLocation;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.FileUtils;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the Mandelbrot fractals sample application.

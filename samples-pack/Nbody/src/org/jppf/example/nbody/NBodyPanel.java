@@ -38,8 +38,11 @@
 
 package org.jppf.example.nbody;
 
-import java.awt.*;
-import java.util.concurrent.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JPanel;

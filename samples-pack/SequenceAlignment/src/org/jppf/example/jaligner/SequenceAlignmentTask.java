@@ -18,11 +18,13 @@
 
 package org.jppf.example.jaligner;
 
-import jaligner.*;
+import org.jppf.node.protocol.AbstractTask;
+
+import jaligner.Alignment;
+import jaligner.Sequence;
+import jaligner.SmithWatermanGotoh;
 import jaligner.matrix.Matrix;
 import jaligner.util.SequenceParser;
-
-import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This task performs the alignment of 2 DNA or protein sequences.

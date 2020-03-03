@@ -19,7 +19,8 @@
 package org.jppf.example.datadependency.model;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * This is a trade.

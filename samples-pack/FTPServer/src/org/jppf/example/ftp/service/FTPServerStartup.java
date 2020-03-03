@@ -21,7 +21,8 @@ package org.jppf.example.ftp.service;
 import org.apache.ftpserver.FtpServer;
 import org.jppf.startup.JPPFDriverStartupSPI;
 import org.jppf.utils.JPPFConfiguration;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is a driver startup class wrapper that starts an instance of the Apache Mina FTPServer at driver startup time.

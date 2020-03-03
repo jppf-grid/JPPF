@@ -20,7 +20,8 @@ package org.jppf.example.webcrawler;
 
 import java.io.IOException;
 
-import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpMethodRetryHandler;
 
 /**
  * Retry handler used when a request results in an IO exception.

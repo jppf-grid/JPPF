@@ -18,11 +18,18 @@
 
 package org.jppf.example.concurrentjobs;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import org.jppf.client.*;
-import org.jppf.client.event.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.JobListenerAdapter;
 import org.jppf.client.utils.AbstractJPPFJobStream;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;

@@ -19,12 +19,17 @@ package org.jppf.example.ftp.runner;
 
 import java.util.List;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.node.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.node.protocol.DataProvider;
+import org.jppf.node.protocol.MemoryMapDataProvider;
+import org.jppf.node.protocol.Task;
+import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.Operator;
-import org.slf4j.*;
+import org.jppf.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the matrix multiplication demo.

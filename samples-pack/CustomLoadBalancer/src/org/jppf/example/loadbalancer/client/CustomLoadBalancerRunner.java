@@ -17,13 +17,17 @@
  */
 package org.jppf.example.loadbalancer.client;
 
-import java.io.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
 import org.jppf.example.loadbalancer.common.MyCustomPolicy;
-import org.jppf.node.policy.*;
-import org.jppf.node.protocol.*;
+import org.jppf.node.policy.AtLeast;
+import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.protocol.JobMetadata;
+import org.jppf.node.protocol.Task;
 
 /**
  * This is a fully commented job runner for the Custom Load Balancer sample.

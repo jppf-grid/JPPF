@@ -18,9 +18,13 @@
 
 package org.jppf.example.fractals.moviegenerator.screensaver;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import org.jppf.node.screensaver.impl.NodePanel;
 

@@ -18,8 +18,10 @@
 
 package org.jppf.example.interceptor;
 
-import java.io.*;
-import java.net.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 import org.jppf.comm.interceptor.AbstractNetworkConnectionInterceptor;
 

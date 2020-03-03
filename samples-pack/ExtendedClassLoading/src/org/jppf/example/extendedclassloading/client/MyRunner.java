@@ -20,11 +20,15 @@ package org.jppf.example.extendedclassloading.client;
 
 import java.util.List;
 
-import org.jppf.client.*;
-import org.jppf.example.extendedclassloading.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.example.extendedclassloading.ClassPath;
+import org.jppf.example.extendedclassloading.ClassPathHelper;
+import org.jppf.example.extendedclassloading.RepositoryFilter;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>This client application maintains a repository of Java libraries that are automatically

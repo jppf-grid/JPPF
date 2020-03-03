@@ -18,9 +18,11 @@
 
 package org.jppf.example.datadependency;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.jppf.example.datadependency.model.*;
+import org.jppf.example.datadependency.model.MarketData;
+import org.jppf.example.datadependency.model.Trade;
 import org.jppf.example.datadependency.startup.DataDependencyStartup;
 import org.jppf.node.protocol.AbstractTask;
 import org.jppf.utils.DateTimeUtils;

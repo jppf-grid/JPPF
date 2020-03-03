@@ -18,16 +18,24 @@
 
 package org.jppf.example.nodetray;
 
-import java.awt.*;
+import java.awt.Image;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.management.*;
+import javax.management.Notification;
+import javax.management.NotificationListener;
 
-import org.jppf.management.*;
-import org.jppf.node.event.*;
+import org.jppf.management.JMXNodeConnectionWrapper;
+import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.JPPFNodeTaskMonitorMBean;
+import org.jppf.node.event.NodeLifeCycleEvent;
+import org.jppf.node.event.NodeLifeCycleListenerAdapter;
 import org.jppf.utils.StringUtils;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adds a system tray icon for node monitoring.

@@ -18,17 +18,22 @@
 
 package org.jppf.example.webcrawler;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.apache.commons.httpclient.params.DefaultHttpParams;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.*;
-import org.slf4j.*;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.torunski.crawler.Crawler;
-import com.torunski.crawler.events.*;
+import com.torunski.crawler.events.IParserEventListener;
+import com.torunski.crawler.events.ParserEvent;
 import com.torunski.crawler.filter.ServerFilter;
 import com.torunski.crawler.lucene.LuceneParserEventListener;
 import com.torunski.crawler.model.MaxDepthModel;

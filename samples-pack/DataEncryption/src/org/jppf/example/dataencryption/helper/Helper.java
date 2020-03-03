@@ -18,12 +18,16 @@
 
 package org.jppf.example.dataencryption.helper;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.security.KeyStore;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
-import org.jppf.utils.base64.*;
+import org.jppf.utils.base64.Base64Decoding;
+import org.jppf.utils.base64.Base64Encoding;
 import org.jppf.utils.streams.StreamUtils;
 
 /**

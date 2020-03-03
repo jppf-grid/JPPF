@@ -17,16 +17,27 @@
  */
 package org.jppf.example.nodelifecycle.client;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Collection;
 
-import org.jppf.client.*;
-import org.jppf.client.event.*;
-import org.jppf.management.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.JobListener;
+import org.jppf.client.event.JobListenerAdapter;
+import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.JMXNodeConnectionWrapper;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.Operator;
-import org.slf4j.*;
+import org.jppf.utils.TypedProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the square matrix multiplication demo.

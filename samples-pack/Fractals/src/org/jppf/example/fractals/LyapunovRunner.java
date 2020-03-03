@@ -25,9 +25,11 @@ import javax.imageio.ImageIO;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.example.common.AbstractFractalConfiguration;
-import org.jppf.example.fractals.lyapunov.*;
+import org.jppf.example.fractals.lyapunov.LyapunovConfiguration;
+import org.jppf.example.fractals.lyapunov.LyapunovTask;
 import org.jppf.node.protocol.Task;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the Lyapunov and Mandelbrot fractals sample application.

@@ -21,11 +21,17 @@ package org.jppf.example.android.demo;
 import java.io.File;
 import java.util.List;
 
-import org.jppf.client.*;
-import org.jppf.location.*;
-import org.jppf.node.protocol.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.location.FileLocation;
+import org.jppf.location.Location;
+import org.jppf.location.MemoryLocation;
+import org.jppf.node.protocol.ClassPath;
+import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 
 /**
  * This class is a simple JPPF client application that submits a job for execution on an Android node.

@@ -19,11 +19,18 @@
 package org.jppf.example.wordcount.node;
 
 import java.io.BufferedReader;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.jppf.node.event.*;
+import org.jppf.node.event.NodeLifeCycleErrorHandler;
+import org.jppf.node.event.NodeLifeCycleEvent;
+import org.jppf.node.event.NodeLifeCycleListener;
+import org.jppf.node.event.NodeLifeCycleListenerAdapter;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.FileUtils;
 
 /**
  * This node life cycle listener performs two tasks:

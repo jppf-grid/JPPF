@@ -18,7 +18,8 @@
 
 package org.jppf.example.fractals.moviegenerator.screensaver;
 
-import org.jppf.node.screensaver.impl.*;
+import org.jppf.node.screensaver.impl.JPPFScreenSaverImpl;
+import org.jppf.node.screensaver.impl.NodePanel;
 
 /**
  * This subclass of JPPFScreenSaverImpl replaces the {@link JPPF@home} static image

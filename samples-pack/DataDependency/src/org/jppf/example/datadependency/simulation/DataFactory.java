@@ -20,7 +20,8 @@ package org.jppf.example.datadependency.simulation;
 
 import java.util.List;
 
-import org.jppf.example.datadependency.model.*;
+import org.jppf.example.datadependency.model.MarketData;
+import org.jppf.example.datadependency.model.Trade;
 
 /**
  * Interface for all classes used to generate random data for the simulation.

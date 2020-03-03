@@ -20,8 +20,10 @@ package org.jppf.example.datadependency.startup;
 
 import java.util.Map;
 
-import org.jppf.example.datadependency.model.*;
-import org.jppf.node.*;
+import org.jppf.example.datadependency.model.MarketData;
+import org.jppf.example.datadependency.model.ModelConstants;
+import org.jppf.example.datadependency.model.Trade;
+import org.jppf.node.Node;
 import org.jppf.startup.JPPFNodeStartupSPI;
 
 import com.hazelcast.core.Hazelcast;

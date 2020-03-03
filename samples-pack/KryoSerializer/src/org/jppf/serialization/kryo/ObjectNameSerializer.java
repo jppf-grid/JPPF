@@ -22,8 +22,10 @@ import javax.management.ObjectName;
 
 import org.jppf.management.ObjectNameCache;
 
-import com.esotericsoftware.kryo.*;
-import com.esotericsoftware.kryo.io.*;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 /**
  *

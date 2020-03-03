@@ -18,11 +18,13 @@
 
 package org.jppf.serialization.kryo;
 
-import org.jppf.serialization.*;
+import org.jppf.serialization.JPPFObjectInputStream;
+import org.jppf.serialization.JPPFObjectOutputStream;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
-import com.esotericsoftware.kryo.io.*;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 /**
  * A generic serializer which resorts to default JPPF serialization.

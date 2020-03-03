@@ -18,7 +18,8 @@
 
 package org.jppf.example.fractals;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * 

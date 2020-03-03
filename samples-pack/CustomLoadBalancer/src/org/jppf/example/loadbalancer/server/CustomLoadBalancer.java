@@ -18,12 +18,17 @@
 
 package org.jppf.example.loadbalancer.server;
 
-import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.AbstractBundler;
+import org.jppf.load.balancer.ChannelAwareness;
+import org.jppf.load.balancer.JPPFContext;
+import org.jppf.load.balancer.JobAwareness;
+import org.jppf.load.balancer.LoadBalancingProfile;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.utils.TypedProperties;
 import org.jppf.utils.configuration.JPPFProperties;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This implementation of a load-balancing algorithm illustrates the use of

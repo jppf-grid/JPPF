@@ -17,15 +17,26 @@
  */
 package org.jppf.example.matrix;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.jppf.JPPFException;
-import org.jppf.client.*;
-import org.jppf.client.event.*;
-import org.jppf.node.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.JobListenerAdapter;
+import org.jppf.node.protocol.DataProvider;
+import org.jppf.node.protocol.MemoryMapDataProvider;
+import org.jppf.node.protocol.Task;
+import org.jppf.utils.DateTimeUtils;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.StringUtils;
+import org.jppf.utils.TypedProperties;
 import org.jppf.utils.stats.JPPFStatistics;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the matrix multiplication demo.

@@ -20,7 +20,8 @@ package org.jppf.example.webcrawler;
 
 import javax.swing.SwingUtilities;
 
-import org.jppf.client.event.*;
+import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.JobListenerAdapter;
 import org.jppf.node.protocol.Task;
 
 /**

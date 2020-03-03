@@ -20,14 +20,20 @@ package org.jppf.example.nodelifecycle.node;
 
 import java.sql.Connection;
 import java.util.Properties;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.sql.DataSource;
 import javax.transaction.Status;
 
-import org.jppf.node.event.*;
+import org.jppf.node.event.NodeLifeCycleEvent;
+import org.jppf.node.event.NodeLifeCycleListener;
+import org.jppf.node.event.NodeLifeCycleListenerAdapter;
 import org.jppf.utils.ExceptionUtils;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.jdbc.AtomikosDataSourceBean;

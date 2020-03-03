@@ -18,7 +18,9 @@
 
 package org.jppf.example.extendedclassloading;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Instances of this class compute the differences between two {@link ClassPath} instances.

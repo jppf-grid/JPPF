@@ -18,7 +18,8 @@
 
 package org.jppf.example.nodelifecycle.client;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.concurrent.Callable;
 
 import org.jppf.example.nodelifecycle.node.NodeListener;

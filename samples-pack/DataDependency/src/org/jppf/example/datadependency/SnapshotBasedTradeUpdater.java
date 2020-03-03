@@ -18,13 +18,19 @@
 
 package org.jppf.example.datadependency;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.example.datadependency.model.MarketData;
-import org.jppf.example.datadependency.simulation.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.example.datadependency.simulation.Ticker;
+import org.jppf.example.datadependency.simulation.TickerEvent;
+import org.jppf.utils.DateTimeUtils;
+import org.jppf.utils.LoggingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.Hazelcast;
 

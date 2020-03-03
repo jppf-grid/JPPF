@@ -20,7 +20,8 @@ package org.jppf.example.interceptor;
 
 import java.util.List;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 

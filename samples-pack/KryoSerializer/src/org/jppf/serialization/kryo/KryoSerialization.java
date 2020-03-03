@@ -18,25 +18,47 @@
 
 package org.jppf.serialization.kryo;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationHandler;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.GregorianCalendar;
 
 import javax.management.ObjectName;
 
-import org.jppf.management.*;
+import org.jppf.management.OffloadableNotification;
+import org.jppf.management.TaskExecutionNotification;
 import org.jppf.node.protocol.graph.TaskGraph;
 import org.jppf.serialization.JPPFSerialization;
-import org.jppf.utils.pooling.*;
+import org.jppf.utils.pooling.AbstractObjectPoolQueue;
+import org.jppf.utils.pooling.ObjectPool;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Kryo.DefaultInstantiatorStrategy;
-import com.esotericsoftware.kryo.io.*;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CollectionSerializer;
-import com.esotericsoftware.kryo.util.*;
+import com.esotericsoftware.kryo.util.DefaultClassResolver;
+import com.esotericsoftware.kryo.util.MapReferenceResolver;
 
-import de.javakaffee.kryoserializers.*;
+import de.javakaffee.kryoserializers.ArraysAsListSerializer;
+import de.javakaffee.kryoserializers.CollectionsEmptyListSerializer;
+import de.javakaffee.kryoserializers.CollectionsEmptyMapSerializer;
+import de.javakaffee.kryoserializers.CollectionsEmptySetSerializer;
+import de.javakaffee.kryoserializers.CollectionsSingletonListSerializer;
+import de.javakaffee.kryoserializers.CollectionsSingletonMapSerializer;
+import de.javakaffee.kryoserializers.CollectionsSingletonSetSerializer;
+import de.javakaffee.kryoserializers.EnumMapSerializer;
+import de.javakaffee.kryoserializers.EnumSetSerializer;
+import de.javakaffee.kryoserializers.GregorianCalendarSerializer;
+import de.javakaffee.kryoserializers.JdkProxySerializer;
+import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
+import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 
 /**
  * This implementation uses the <a href="http://code.google.com/p/kryo/">Kryo</a> serialization.

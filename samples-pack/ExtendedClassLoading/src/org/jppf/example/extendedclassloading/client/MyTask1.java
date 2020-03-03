@@ -19,7 +19,8 @@
 package org.jppf.example.extendedclassloading.client;
 
 import org.jppf.example.extendedclassloading.clientlib1.MyClientDynamicClass1;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.AbstractTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * A simple JPPF {@link Task} implementation which demonstrates

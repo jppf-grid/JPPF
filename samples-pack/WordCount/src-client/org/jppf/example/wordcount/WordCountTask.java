@@ -17,7 +17,9 @@
  */
 package org.jppf.example.wordcount;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.jppf.example.wordcount.node.NodeListener;
 import org.jppf.node.protocol.AbstractTask;

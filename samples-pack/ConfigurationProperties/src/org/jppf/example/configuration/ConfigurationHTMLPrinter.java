@@ -18,11 +18,21 @@
 
 package org.jppf.example.configuration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.jppf.utils.FileUtils;
-import org.jppf.utils.collections.*;
-import org.jppf.utils.configuration.*;
+import org.jppf.utils.collections.CollectionMap;
+import org.jppf.utils.collections.SortedSetSortedMap;
+import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.configuration.JPPFProperty;
 
 /**
  * Converts the JPPF predefined properties into an HTML refrence.

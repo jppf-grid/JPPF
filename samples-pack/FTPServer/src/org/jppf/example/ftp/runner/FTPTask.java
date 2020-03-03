@@ -18,7 +18,8 @@
 package org.jppf.example.ftp.runner;
 
 import org.jppf.example.ftp.service.FTPClientWrapper;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.AbstractTask;
+import org.jppf.node.protocol.DataProvider;
 import org.jppf.utils.FileUtils;
 
 /**

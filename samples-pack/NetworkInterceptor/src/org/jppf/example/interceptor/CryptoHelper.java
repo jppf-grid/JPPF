@@ -18,12 +18,23 @@
 
 package org.jppf.example.interceptor;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
-import org.jppf.utils.base64.*;
+import org.jppf.utils.base64.Base64Decoding;
+import org.jppf.utils.base64.Base64Encoding;
 import org.jppf.utils.streams.StreamUtils;
 
 /**

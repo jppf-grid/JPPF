@@ -19,7 +19,8 @@
 package org.jppf.example.nodeconnectionevents;
 
 import org.jppf.management.JPPFManagementInfo;
-import org.jppf.server.event.*;
+import org.jppf.server.event.NodeConnectionEvent;
+import org.jppf.server.event.NodeConnectionListener;
 
 /**
  * This is a test of a driver startup class.

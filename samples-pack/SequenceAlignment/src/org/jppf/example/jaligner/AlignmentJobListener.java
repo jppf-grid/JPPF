@@ -22,10 +22,12 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import org.jppf.client.event.*;
+import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.JobListenerAdapter;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Result collector that updates the progress bar's value during the computation.

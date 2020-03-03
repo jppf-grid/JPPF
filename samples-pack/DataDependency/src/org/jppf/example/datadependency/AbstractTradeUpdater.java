@@ -18,20 +18,40 @@
 
 package org.jppf.example.datadependency;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jppf.client.*;
-import org.jppf.example.datadependency.model.*;
-import org.jppf.example.datadependency.simulation.*;
-import org.jppf.management.*;
-import org.jppf.node.policy.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.example.datadependency.model.MarketData;
+import org.jppf.example.datadependency.model.Trade;
+import org.jppf.example.datadependency.simulation.DataFactory;
+import org.jppf.example.datadependency.simulation.GaussianDataFactory;
+import org.jppf.example.datadependency.simulation.TickerListener;
+import org.jppf.example.datadependency.simulation.UniformDataFactory;
+import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.JPPFManagementInfo;
+import org.jppf.node.policy.Equal;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.Operator;
+import org.jppf.utils.TypedProperties;
 import org.jppf.utils.concurrent.JPPFThreadFactory;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 

@@ -18,12 +18,17 @@
 
 package org.jppf.example.extendedclassloading;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.regex.Pattern;
 
-import org.jppf.utils.*;
+import org.jppf.utils.FileUtils;
+import org.jppf.utils.StringUtils;
 import org.jppf.utils.streams.StreamUtils;
 
 /**

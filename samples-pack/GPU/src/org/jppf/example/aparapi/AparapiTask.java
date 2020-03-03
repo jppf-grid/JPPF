@@ -18,14 +18,17 @@
 
 package org.jppf.example.aparapi;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.node.protocol.AbstractTask;
 
-import com.amd.aparapi.*;
+import com.amd.aparapi.Kernel;
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
+import com.amd.aparapi.OpenCLDevice;
 
 /**
  * This task performs the multiplication of 2 square dense matrices.

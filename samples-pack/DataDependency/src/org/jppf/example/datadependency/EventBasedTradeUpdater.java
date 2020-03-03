@@ -18,9 +18,12 @@
 
 package org.jppf.example.datadependency;
 
-import org.jppf.example.datadependency.simulation.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.example.datadependency.simulation.Ticker;
+import org.jppf.example.datadependency.simulation.TickerEvent;
+import org.jppf.utils.DateTimeUtils;
+import org.jppf.utils.LoggingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.Hazelcast;
 

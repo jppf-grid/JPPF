@@ -18,13 +18,16 @@
 
 package org.jppf.example.adaptivegrid;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.JPPFException;
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.configuration.JPPFProperties;
 
 /**

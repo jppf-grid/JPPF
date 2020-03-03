@@ -17,24 +17,45 @@
  */
 package org.jppf.example.fractals;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JProgressBar;
+import javax.swing.JWindow;
+import javax.swing.SwingUtilities;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
 import org.jppf.example.common.AbstractFractalConfiguration;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.DataProvider;
+import org.jppf.node.protocol.MemoryMapDataProvider;
+import org.jppf.node.protocol.Task;
 import org.jppf.ui.options.factory.OptionsHandler;
-import org.jppf.utils.*;
+import org.jppf.utils.DateTimeUtils;
+import org.jppf.utils.FileUtils;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.StringUtils;
 import org.jppf.utils.concurrent.JPPFThreadFactory;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract runner class for the fractals sample application.

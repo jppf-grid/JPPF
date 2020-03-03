@@ -17,7 +17,8 @@
  */
 package org.jppf.example.webcrawler;
 
-import org.apache.commons.httpclient.params.*;
+import org.apache.commons.httpclient.params.DefaultHttpParamsFactory;
+import org.apache.commons.httpclient.params.HttpParams;
 
 /**
  * Factory used to set the default parameters for the http client.

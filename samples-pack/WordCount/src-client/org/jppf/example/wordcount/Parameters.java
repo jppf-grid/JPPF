@@ -18,7 +18,8 @@
 
 package org.jppf.example.wordcount;
 
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 
 /**
  * Enapsulation of the parameters included in the JPPF configuration file.

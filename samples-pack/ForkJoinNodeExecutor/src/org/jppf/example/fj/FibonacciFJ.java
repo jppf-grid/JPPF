@@ -20,9 +20,12 @@ package org.jppf.example.fj;
 
 import java.util.concurrent.ForkJoinTask;
 
-import org.jppf.client.*;
-import org.jppf.node.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.AbstractTask;
+import org.jppf.node.protocol.Task;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 
 /**
  * Sample class for fork join support demonstration.

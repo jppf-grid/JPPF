@@ -18,9 +18,17 @@
 
 package org.jppf.example.dataencryption;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SealedObject;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.jppf.example.dataencryption.helper.Helper;

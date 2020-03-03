@@ -20,7 +20,8 @@ package org.jppf.example.datadependency;
 
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.node.protocol.Task;
 

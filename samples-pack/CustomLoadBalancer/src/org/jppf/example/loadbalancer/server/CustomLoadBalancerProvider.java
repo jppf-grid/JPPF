@@ -18,7 +18,8 @@
 
 package org.jppf.example.loadbalancer.server;
 
-import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.Bundler;
+import org.jppf.load.balancer.LoadBalancingProfile;
 import org.jppf.load.balancer.spi.JPPFBundlerProvider;
 import org.jppf.utils.TypedProperties;
 

@@ -18,16 +18,37 @@
 
 package org.jppf.example.pluggableview;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Enumeration;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 
-import org.jppf.client.monitoring.jobs.*;
-import org.jppf.client.monitoring.topology.*;
+import org.jppf.client.monitoring.jobs.Job;
+import org.jppf.client.monitoring.jobs.JobDispatch;
+import org.jppf.client.monitoring.jobs.JobMonitoringEvent;
+import org.jppf.client.monitoring.jobs.JobMonitoringListenerAdapter;
+import org.jppf.client.monitoring.topology.TopologyEvent;
+import org.jppf.client.monitoring.topology.TopologyListenerAdapter;
+import org.jppf.client.monitoring.topology.TopologyNode;
 import org.jppf.ui.plugin.PluggableView;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.JPPFConfiguration;

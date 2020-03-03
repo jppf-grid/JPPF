@@ -19,7 +19,8 @@
 package org.jppf.example.extendedclassloading;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * This interface represents a set of classpath elements dynamically added to or removed from the classpath of a node.

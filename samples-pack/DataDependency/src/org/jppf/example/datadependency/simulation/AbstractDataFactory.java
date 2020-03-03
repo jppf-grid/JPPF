@@ -18,9 +18,14 @@
 
 package org.jppf.example.datadependency.simulation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.SortedSet;
 
-import org.jppf.example.datadependency.model.*;
+import org.jppf.example.datadependency.model.MarketData;
+import org.jppf.example.datadependency.model.Trade;
 
 /**
  * Instances of this class generate random MarketData and Trade objects according tot he configuration.

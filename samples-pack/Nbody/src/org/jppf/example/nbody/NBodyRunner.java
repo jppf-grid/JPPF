@@ -38,17 +38,33 @@
 
 package org.jppf.example.nbody;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 
-import org.jppf.client.*;
-import org.jppf.node.protocol.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.DataProvider;
+import org.jppf.node.protocol.MemoryMapDataProvider;
+import org.jppf.node.protocol.Task;
+import org.jppf.utils.DateTimeUtils;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.StringUtils;
+import org.jppf.utils.TypedProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the &quot;N-Body demo&quot; demo.

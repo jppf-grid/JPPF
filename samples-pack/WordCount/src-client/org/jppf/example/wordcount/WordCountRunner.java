@@ -17,13 +17,22 @@
  */
 package org.jppf.example.wordcount;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Locale;
+import java.util.Map;
 
-import org.jppf.client.*;
-import org.jppf.utils.*;
-import org.jppf.utils.collections.*;
-import org.slf4j.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFConnectionPool;
+import org.jppf.client.JPPFJob;
+import org.jppf.utils.TimeMarker;
+import org.jppf.utils.collections.CollectionMap;
+import org.jppf.utils.collections.SortedSetSortedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the &quot;Word Count &quot; example.

@@ -18,14 +18,19 @@
 
 package org.jppf.example.datadependency.simulation;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.example.datadependency.model.MarketData;
-import org.jppf.utils.*;
-import org.jppf.utils.concurrent.*;
-import org.slf4j.*;
+import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
+import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class simulates a market ticker by generating random updates at random intervals.

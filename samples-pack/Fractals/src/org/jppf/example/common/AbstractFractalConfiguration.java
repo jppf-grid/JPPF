@@ -20,7 +20,8 @@ package org.jppf.example.common;
 
 import java.io.Serializable;
 
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 
 /**
  * Instances of this class represent the set of parameters for the Mandelbrot algorithm, based on

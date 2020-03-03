@@ -18,7 +18,9 @@
 
 package org.jppf.example.wordcount;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 
 import org.jppf.utils.streams.StreamUtils;
 

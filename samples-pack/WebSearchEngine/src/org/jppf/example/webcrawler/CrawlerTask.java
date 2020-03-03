@@ -19,18 +19,30 @@
 package org.jppf.example.webcrawler;
 
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.httpclient.params.DefaultHttpParams;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.memory.MemoryIndex;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.Hit;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.jppf.node.protocol.AbstractTask;
 
 import com.torunski.crawler.Crawler;
-import com.torunski.crawler.events.*;
-import com.torunski.crawler.filter.*;
+import com.torunski.crawler.events.IParserEventListener;
+import com.torunski.crawler.events.ParserEvent;
+import com.torunski.crawler.filter.FileExtensionFilter;
+import com.torunski.crawler.filter.ILinkFilter;
+import com.torunski.crawler.filter.LinkFilterUtil;
+import com.torunski.crawler.filter.ServerFilter;
 import com.torunski.crawler.link.Link;
 import com.torunski.crawler.model.MaxDepthModel;
 import com.torunski.crawler.parser.PageData;

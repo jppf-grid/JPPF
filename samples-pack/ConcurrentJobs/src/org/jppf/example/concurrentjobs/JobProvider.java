@@ -18,7 +18,9 @@
 
 package org.jppf.example.concurrentjobs;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.client.utils.AbstractJPPFJobStream;

@@ -18,11 +18,16 @@
 
 package org.jppf.example.adaptivegrid;
 
-import org.jppf.client.*;
-import org.jppf.management.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFConnectionPool;
+import org.jppf.management.ExecutionPolicySelector;
+import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.NodeSelector;
 import org.jppf.management.forwarding.NodeForwardingMBean;
-import org.jppf.node.policy.*;
-import org.jppf.utils.*;
+import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.policy.IsMasterNode;
+import org.jppf.utils.Operator;
+import org.jppf.utils.TypedProperties;
 
 /**
  * This class encapsulates the functionality for managing a JPPF driver

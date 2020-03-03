@@ -18,11 +18,14 @@
 
 package org.jppf.example.job.dependencies;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.jppf.client.*;
-import org.jppf.client.event.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.JobListener;
+import org.jppf.client.event.JobListenerAdapter;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 

@@ -20,7 +20,8 @@ package org.jppf.example.fractals.moviegenerator.screensaver;
 
 import org.jppf.example.common.FractalPoint;
 import org.jppf.example.fractals.mandelbrot.MandelbrotConfiguration;
-import org.jppf.node.event.*;
+import org.jppf.node.event.NodeLifeCycleEvent;
+import org.jppf.node.event.TaskExecutionEvent;
 import org.jppf.node.protocol.DataProvider;
 import org.jppf.node.screensaver.impl.NodeState;
 

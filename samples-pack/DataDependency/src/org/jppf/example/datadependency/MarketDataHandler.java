@@ -18,11 +18,17 @@
 
 package org.jppf.example.datadependency;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import org.jppf.example.datadependency.model.*;
-import org.jppf.example.datadependency.simulation.*;
+import org.jppf.example.datadependency.model.MarketData;
+import org.jppf.example.datadependency.model.ModelConstants;
+import org.jppf.example.datadependency.simulation.TickerEvent;
+import org.jppf.example.datadependency.simulation.TickerListener;
 
 import com.hazelcast.core.Hazelcast;
 
