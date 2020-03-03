@@ -533,7 +533,8 @@ public final class FileUtils {
     @Override
     public FileVisitResult postVisitDirectory(final Path dir, final IOException e) throws IOException {
       if (e != null) throw e;
-      if (dir.toFile().listFiles().length <= 0) Files.delete(dir);
+      final File[] files = dir.toFile().listFiles();
+      if ((files != null) && (files.length <= 0)) Files.delete(dir);
       return FileVisitResult.CONTINUE;
     }
   }
