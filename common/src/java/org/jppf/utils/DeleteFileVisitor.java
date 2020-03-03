@@ -18,7 +18,7 @@
 
 package org.jppf.utils;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -87,7 +87,8 @@ public class DeleteFileVisitor extends SimpleFileVisitor<Path> {
   @Override
   public FileVisitResult postVisitDirectory(final Path dir, final IOException e) throws IOException {
     try {
-      if ((dir.toFile().listFiles().length <= 0) && ((dirMatcher == null) || dirMatcher.matches(dir))) {
+      final File[] files = dir.toFile().listFiles();
+      if ((files != null) && (files.length <= 0) && ((dirMatcher == null) || dirMatcher.matches(dir))) {
         if (debugEnabled)  log.debug("deleting dir = {}", dir);
         Files.delete(dir);
       }
