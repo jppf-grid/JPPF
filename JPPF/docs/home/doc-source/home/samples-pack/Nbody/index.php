@@ -8,7 +8,7 @@ It displays a real-time graphical simulation of the movement of the anti-protons
 
 <h3>How do I run it?</h3>
 Before running this sample application, you need to install a JPPF server and at least one node.<br>
-For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.2/index.php?title=Introduction">JPPF documentation</a>.<br>
+For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
   <li>open a command prompt in JPPF-x.y-samples-pack/Nbody</li>
@@ -38,6 +38,6 @@ nbody.bodies.per.task = 25
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
-  <li><a href="https://www.jppf.org/doc/6.2/">The JPPF documentation</a></li>
+  <li><a href="https://www.jppf.org/doc/6.3/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

@@ -1,7 +1,33 @@
-$template{name="sample-readme-html-header" title="Generation of Mandelbrot Fractals"}$
+$template{name="sample-readme-html-header" title="Grid Failover"}$
+<div style="padding-right: 5px">
 <h3>What does the sample do?</h3>
-This sample generates <a href="http://en.wikipedia.org/wiki/Mandelbrot_set">Mandelbrot fractals</a> images by submitting the computation
-to a JPPF grid.
+This demo illustrates a JPPF grid failover mechanism which ensures that a JPPF driver is not a single point of failure.
+
+<h3>How does it work?</h3>
+The failover mechanism relies on two main components:
+<ul class="samplesList">
+  <li>the nodes have a specific <a href="https://www.jppf.org/doc/6.3/index.php?title=Defining_the_node_connection_strategy">node connection strategy</a>
+  which handles an ordered list of drivers to connect to, as follows:
+    <ul class="samplesList">
+      <li>the first driver in the list is considered the primary driver, all others are backups in case the primary goes down</li>
+      <li>when initially connecting or reconnecting due to a mangement request, the node attemps to connect
+      to the first (highest priority) driver in the list, then goes down the list if the driver is not online</li>
+      <li>when reconnecting due to a disconnection from the driver, the node goes down the list of drivers,
+      rolling back to the top when the end of the list is reached</li>
+    </ul>
+  </li>
+  <li>a JPPF client is used as a controller, to detect when a driver is back up after going down, and decide whether it is the new primary and force the nodes to reconnect to it.
+  This client is used as follows:
+    <ul class="samplesList">
+      <li>it is <a href="https://www.jppf.org/doc/6.3/index.php?title=Client_and_administration_console_configuration#Manual_network_configuration">configured</a>
+      to connect to the same drivers as provided to the nodes. Each configured driver has a <a href="https://www.jppf.org/doc/6.3/index.php?title=Client_and_administration_console_configuration#Priority">priority</a>
+      in descending order of the list given to the nodes</li>
+      <li>for each driver connection, a <a href="https://www.jppf.org/doc/6.3/index.php?title=Connection_pools#Status_notifications_for_existing_connections">connection status listener</a> is registered </li>
+      <li>the listener detects situations when the primary driver goes down or gets back up and determines which dfriver is the current primary</li>
+      <li>when a new primary driver goes back up, the listener issues a management request to <a href="http://localhost:8880/doc/6.3/index.php?title=Node_management_and_monitoring#Shutting_down.2C_restarting_and_reconnecting_the_node">force the nodes to reconnect</a>, once they complete their remaining tasks</li>
+    </ul>
+  </li>
+</ul>
 
 <h3>How do I run it?</h3>
 Before running this sample application, you must have a JPPF server and at least one node running.<br>
@@ -61,4 +87,5 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.3/">The JPPF documentation</a></li>
 </ul>
+</div>
 $template{name="sample-readme-html-footer"}$

@@ -1,12 +1,12 @@
 $template{name="sample-readme-html-header" title="Job Dependencies demo"}$
 <h3>What does the sample do?</h3>
-<p>This demo leverages the built-in <a href="https://www.jppf.org/doc/6.2/index.php?title=Job_dependencies_and_job_graphs">job dependencies</a> feature and provides a easy and intuitive way to define a graph of jobs with dependencies.
+<p>This demo leverages the built-in <a href="https://www.jppf.org/doc/6.3/index.php?title=Job_dependencies_and_job_graphs">job dependencies</a> feature and provides a easy and intuitive way to define a graph of jobs with dependencies.
 It supports any non-cyclic dependency graph and will work even when the jobs in the dependency graph are submitted from multiple JPPF clients running on multiple machines.
 
 <h3>How do I run it?</h3>
 <p style="font-weight: bold">1. Grid setup
 <ul class="samplesList">
-  <li>start a JPPF server and at least one node. For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.2/index.php?title=Introduction">JPPF documentation</a>.</li>
+  <li>start a JPPF server and at least one node. For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.</li>
 </ul>
 <p><b>2. Running the demo</b>
 <ul class="samplesList">
@@ -84,6 +84,6 @@ Job A ==>
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
-  <li><a href="https://www.jppf.org/doc/6.2/">The JPPF documentation</a></li>
+  <li><a href="https://www.jppf.org/doc/6.3/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

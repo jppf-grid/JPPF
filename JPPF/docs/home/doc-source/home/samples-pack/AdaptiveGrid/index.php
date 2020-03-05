@@ -3,8 +3,8 @@ $template{name="sample-readme-html-header" title="Adaptive Grid demo"}$
 <p>This sample demonstrates how a JPPF Grid can be grown or shrunk dynamically based on the current workload.
 <p>To achieve this, the demo will adjust two components of the grid topology:
 <ul class="samplesList">
-  <li>the number of connections in the <a href="https://www.jppf.org/doc/6.2/index.php?title=Connection_pools">JPPF client's connection pool</a></li>
-  <li>the number of nodes in the grid, using the <a href="https://www.jppf.org/doc/6.2/index.php?title=Node_provisioning">node provisioning facility</a></li>
+  <li>the number of connections in the <a href="https://www.jppf.org/doc/6.3/index.php?title=Connection_pools">JPPF client's connection pool</a></li>
+  <li>the number of nodes in the grid, using the <a href="https://www.jppf.org/doc/6.3/index.php?title=Node_provisioning">node provisioning facility</a></li>
 </ul>
 <p>The calculations for the number of client connections and the number of nodes are done as follows:
 <ul class="samplesList">
@@ -15,7 +15,7 @@ $template{name="sample-readme-html-header" title="Adaptive Grid demo"}$
 It will display a message each tile the size of the connection pool or the number of nodes is changed.
 
 <h3>How do I run it?</h3>
-<p>You will first need to start a JPPF server and one node. For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.2/index.php?title=Introduction">JPPF documentation</a>.
+<p>You will first need to start a JPPF server and one node. For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.
 <p>To run the demo, in a command prompt or shell console, type "./run.sh" on Linux or "run.bat" on Windows. You will then see a number of meesages like these while the demo is running:</p>
 
 <pre class="prettyprint lang-txt">
@@ -69,6 +69,6 @@ taskDuration = 1500
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
-  <li><a href="https://www.jppf.org/doc/6.2/">The JPPF documentation</a></li>
+  <li><a href="https://www.jppf.org/doc/6.3/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$
