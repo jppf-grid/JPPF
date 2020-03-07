@@ -2,6 +2,7 @@ function langFromExtension(name) {
   var lang = "txt";
   if (name.endsWith(".java")) lang = "java";
   else if (name.endsWith(".properties")) lang = "conf";
+  else if (name.endsWith(".yaml")) lang = "yaml";
   else if (name.endsWith(".xml")) lang = "xml";
   return lang;
 }

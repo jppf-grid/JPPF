@@ -1,0 +1,14 @@
+# ordered list of drivers to connect to
+# the name property is used on the client side only
+
+- name: "primary"
+  host: "localhost"
+  port: 11111
+  secure: false
+  heartbeatEnabled: false
+
+- name: "backup"
+  host: "localhost"
+  port: 11112
+  secure: false
+  heartbeatEnabled: false

@@ -30,59 +30,76 @@ The failover mechanism relies on two main components:
 </ul>
 
 <h3>How do I run it?</h3>
-Before running this sample application, you must have a JPPF server and at least one node running.<br>
-For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.<br>
-Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix) or, from a command prompt, type: <b>&quot;ant run&quot;</b>.
-
-<h3>How do I use it?</h3>
-<p>The GUI provides many options and a lot of interactivity.
-
-<h4 style="font-style: italic; font-weight: bolder">Generating Mandelbrot images</h4>
-<p>The &quot;Compute&quot; button submits the image generation for processing by JPPF.
-<p>The image generation is governed by a set of 4 parameters:
 <ul class="samplesList">
-  <li>center X: the X coordinate of the center of the image</li>
-  <li>center Y: the Y coordinate of the center of the image</li>
-  <li>diameter: this determines the range of possible values of both X and Y axis</li>
-  <li>iterations: the maximum number of iterations of the algorithm, before considering that a point &quot;escapes&quot; the Mandelbrot set</li>
-</ul>
-<i>Tip: modifying the cordinates of the center is equivalent to a "pan" functionality<br>
-Tip: modifying the diameter provides, in effect, a zooming capability</i>
-<p>You can interact with the image using the mouse:
-<ul class="samplesList">
-  <li>a left click will zoom-in by the value of the zoom factor, and move the center to the selected point</li>
-  <li>a right click will zoom-out by the value of the zoom factor, and move the center to the selected point</li>
-</ul>
-<p>In the toolbar, the <img src="src/icons/zoomIn.gif" border="0" alt="zoom-in"/> and <img src="src/icons/zoomOut.gif" border="0" alt="zoom-out"/>
-buttons provide a static zoom functionality (they do not move the center).<br>
-<i>Tip: setting the zoom factor to 1 and clicking left or right in the image is equivalent to panning with the mouse.</i>
-<p>Additionally, the dimensions of the image can be set in the <b>config/jppf-client.properties</b> configuration file:
-<pre class="prettyprint lang-conf">
-# width of the generated images in pixels
-image.width = 800
-# height of the generated images in pixels
-image.height = 600
+  <li>Before running this sample application, you must have at least two JPPF servers running.<br>
+  For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.</li>
+  <li>Update the <a href="drivers.yaml.html">drivers definition file</a> to reflect the information on your JPPF servers</li>
+  <li>build the sample with this command: <b><tt class="samples">ant zip</tt></b>. This will create a file named <b>jppf-grid-failover.zip</b></li>
+  <li>configure a node to use the driver discovery:
+    <ul class="samplesList">
+      <li>unzip the <b>jppf-grid-failover.zip</b> file into the root installation directory of a node. It will copy the required libraries into the node's <b>/lib</b> directory,
+      and the <b>drivers.yaml</b> file in the node's root installation directory.</li>
+      <li>in a text editor, open the node's configuration file located at <b>&lt;node_install_root&gt;/config/jppf-node.properties</b> and add this line:<br>
+        <tt class="samples">jppf.server.connection.strategy = org.jppf.example.gridfailover.NodeSideDiscovery</tt></li>
+      <li>start the node: <tt class="samples">./startNode.sh</tt> or <tt class="samples">startNode.bat</tt></li>
+    </ul>
+  </li>
+  <li>configure an administration console to use the driver discovery:
+    <ul class="samplesList">
+      <li>unzip the <b>jppf-grid-failover.zip</b> file into the root installation directory of an adminsitration console. It will copy the required libraries into the console's <b>/lib</b> directory,
+      and the <b>drivers.yaml</b> file in the console's root installation directory.</li>
+      <li>in a text editor, open the admin console's configuration file located at <b>&lt;console_install_root&gt;/config/jppf-gui.properties</b> and add this line:
+        <tt class="samples">jppf.remote.execution.enabled = false</tt><br>
+        this will disable the default built-in discovery mechanism, such that only our custom one is used</li>
+      <li>the client-side discovery auto-installs through the Service Provider Interface (SPI), thus no configuration update is needed for this</li>
+      <li>start the admin console: <tt class="samples">./startConsole.sh</tt> or <tt class="samples">startConsole.bat</tt></li>
+      <li>once started, the admin console should show the drivers defined in the drivers.yaml file, along with a node connected to the first driver in the list</li>
+    </ul>
+  </li>
+  <li>from this sample's root directory, start the sample grid controller: <tt class="samples">./run.sh</tt> or <tt class="samples">run.bat</tt>. The console output will show something similar to this:
+<pre class="samples" style="text-align: left; padding-left: 5px; font-size: 0.95em; color: #A0FFA0; background-color: black">
+client process id: 37556, uuid: A9619789-6E4B-4DA9-B267-FC014A811275
+press [Enter] to exit
+discovered new driver: ClientConnectionPoolInfo[name=primary, secure=false, host=localhost,
+ port=11111, priority=2, poolSize=1, jmxPoolSize=1, heartbeatEnabled=false, maxJobs=2147483647]
+discovered new driver: ClientConnectionPoolInfo[name=backup, secure=false, host=localhost,
+ port=11112, priority=1, poolSize=1, jmxPoolSize=1, heartbeatEnabled=false, maxJobs=2147483647]
+[client: primary-1 - ClassServer] Attempting connection to the class server at localhost:11111
+[client: backup-1 - ClassServer] Attempting connection to the class server at localhost:11112
+[client: backup-1 - ClassServer] Reconnected to the class server
+[client: primary-1 - ClassServer] Reconnected to the class server
+[client: primary-1 - TasksServer] Attempting connection to the task server at localhost:11111
+[client: backup-1 - TasksServer] Attempting connection to the task server at localhost:11112
+[client: primary-1 - TasksServer] Reconnected to the JPPF task server
+[client: backup-1 - TasksServer] Reconnected to the JPPF task server
 </pre>
-<h4 style="font-style: italic; font-weight: bolder">Recording and replaying parameters sets</h4>
-The sample allows recording multiple sets of parameters (x, y, diameter and iterations) so they can be replayed later, and eventually saved and loaded as CSV files.
-The saved files can also be reused by the <a href="../FractalMovieGenerator">Mandelbrot movie generator sample</a>.
-<p>The possible actions are:
-<ul class="samplesList">
-  <li><img src="src/icons/record.gif" border="0" alt="record"/> toggle recording: this switches from recording mode "off" to "on" and vice versa. When recording is on, any newly generated image will have its parameters added to the record set</li>
-  <li><img src="src/icons/start.gif" border="0" alt="replay"/> replay: replays the current set of records as a slide show, with 2 seconds between images</li>
-  <li><img src="src/icons/trash.gif" border="0" alt="clear"/> clear: this removes all records from the current set, which therefore becomes empty</li>
-  <li><img src="src/icons/open.gif" border="0" alt="open"/> open: open a previously saved CSV file containng a set of records</li>
-  <li><img src="src/icons/save.gif" border="0" alt="save"/> save: save the current record set to a CSV file</li>
+  <li>shutdown the primary server:
+    <ul class="samplesList">
+      <li>in the administration console's "Tree view", select the driver to which a node is connected</li>
+      <li>click on the "Server restart or shutdown" button (<img src="data/server_restart.gif"/>)</li>
+      <li>in the displayed dialog, enter "<b>0</b>" for the "Shutdown delay" and uncheck the "Restart" checkbox:<br>
+      <img src="data/server_shutdown_dialog.png"/></li>
+      <li>click the "Ok" button to terminate the server</li>
+    </ul>
+  </li>
+  <li>you will notice that the node reconnects to the "backup" server</li>
+  <li>now start the terminated server again</li>
+  <li>observe how the node disconnects from the backup server and reconnects to the one that was just restarted</li>
 </ul>
 
-<h3>How can I build the sample?</h3>
-To compile the source code, from a command prompt, type: <b>&quot;ant compile&quot;</b><br>
-To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;</b>
+<h3>Related source files</h3>
+<ul class="samplesList">
+  <li><a href="src/org/jppf/example/gridfailover/NodeSideDiscovery.java.html">NodeSideDiscovery.java</a> : the node connection strategy</li>
+  <li><a href="src/org/jppf/example/gridfailover/ClientSideDiscovery.java.html">ClientSideDiscovery.java</a> : the client-side driver discovery plugin</li>
+  <li><a href="src/org/jppf/example/gridfailover/ConnectionListener.java.html">ConnectionListener.java</a> : the grid topology monitor and controller, which detects when
+    a primary driver comes back online and forces the node to reconnect to this driver</li>
+  <li><a href="src/org/jppf/example/gridfailover/Utils.java.html">Utils.java</a> : utilities to parse the YAML drivers definition file</li>
+  <li><a href="drivers.yaml.html">drivers.yaml</a> : the jppf drivers defintion file, in YAML format</li>
+  <li><a href="config/jppf.properties.html">jppf.properties</a> : the jppf client configuration file</li>
+</ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>
-<p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
-<a href="javadoc/index.html">API documentation</a>.
-<p>In addition, There are 2 privileged places you can go to:
+<p>There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.3/">The JPPF documentation</a></li>

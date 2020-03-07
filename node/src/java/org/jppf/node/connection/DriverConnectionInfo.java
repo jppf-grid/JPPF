@@ -53,6 +53,15 @@ public interface DriverConnectionInfo {
   /**
    * Determine whether the recovery mechanism (exchange of heartbeat messages) is enabled.
    * @return {@code true} if recovery is enabled, {@code false} otherwise.
+   * @deprecated use {@link #isHeartbeatEnabled()} instead.
    */
   boolean isRecoveryEnabled();
+
+  /**
+   * Determine whether the recovery mechanism (exchange of heartbeat messages) is enabled.
+   * @return {@code true} if the heartbeat mechanism is enabled, {@code false} otherwise.
+   */
+  default boolean isHeartbeatEnabled() {
+    return isRecoveryEnabled();
+  }
 }

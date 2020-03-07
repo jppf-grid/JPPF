@@ -29,15 +29,15 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
   /**
    * The connection priority.
    */
-  private final int priority;
+  private int priority;
   /**
    * The associated JMX connection pool size.
    */
-  private final int jmxPoolSize;
+  private int jmxPoolSize;
   /**
    * The maximum number of jobs that can be processed concurrently by each connection.
    */
-  private final int maxJobs;
+  private int maxJobs;
 
   /**
    * Initialize a pool of plain connections with default name("driver"), host ("localhost"), port (11111), priority (0) and pool size (1).
@@ -126,6 +126,14 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
   }
 
   /**
+   * Set the connection priority.
+   * @param priority the connection priority as an int value.
+   */
+  public void setPriority(final int priority) {
+    this.priority = priority;
+  }
+
+  /**
    * Get the associated JMX connection pool size.
    * @return the JMX pool size as an int value.
    */
@@ -134,11 +142,27 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
   }
 
   /**
+   * Set the associated JMX connection pool size.
+   * @param jmxPoolSize the JMX pool size as an int value.
+   */
+  public void setJmxPoolSize(final int jmxPoolSize) {
+    this.jmxPoolSize = jmxPoolSize;
+  }
+
+  /**
    * Get the maximum number of jobs that can be processed concurrently by each connection.
-   * @return The maximum number of jobs as an {@code int} value.
+   * @return the maximum number of jobs as an {@code int} value.
    */
   public int getMaxJobs() {
     return maxJobs;
+  }
+
+  /**
+   * Set the maximum number of jobs that can be processed concurrently by each connection.
+   * @param maxJobs the maximum number of jobs as an {@code int} value.
+   */
+  public void setMaxJobs(final int maxJobs) {
+    this.maxJobs = maxJobs;
   }
 
   @Override

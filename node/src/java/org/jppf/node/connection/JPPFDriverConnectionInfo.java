@@ -29,19 +29,25 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
   /**
    * Whether SSL/TLS should be used.
    */
-  protected final boolean secure;
+  protected boolean secure;
   /**
    * The driver host name or IP address.
    */
-  protected final String host;
+  protected String host;
   /**
    * The driver port to connect to.
    */
-  protected final int port;
+  protected int port;
   /**
    * Whether recovery is enabled.
    */
-  protected final boolean recoveryEnabled;
+  protected boolean recoveryEnabled;
+
+  /**
+   * Create an unpopulated driver connection info.
+   */
+  public JPPFDriverConnectionInfo() {
+  }
 
   /**
    * Initialize the parameters with the specified values.
@@ -75,14 +81,38 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
     return secure;
   }
 
+  /**
+   * Set whether the connection is secured via SSL/TLS. 
+   * @param secure {@code true} if the connection is secure, {@code false} otherwise.
+   */
+  public void setSecure(final boolean secure) {
+    this.secure = secure;
+  }
+
   @Override
   public String getHost() {
     return host;
   }
 
+  /**
+   * Set the driver host.
+   * @param host the dirver's hostname or ip address.
+   */
+  public void setHost(final String host) {
+    this.host = host;
+  }
+
   @Override
   public int getPort() {
     return port;
+  }
+
+  /**
+   * Set the driver port.
+   * @param port the driver port number.
+   */
+  public void setPort(final int port) {
+    this.port = port;
   }
 
   /**
@@ -94,9 +124,21 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
     return recoveryEnabled ? port : -1;
   }
 
+  /**
+   * {@inheritDoc}
+   * @deprecated use {@link #isHeartbeatEnabled()} instead.
+   */
   @Override
   public boolean isRecoveryEnabled() {
     return recoveryEnabled;
+  }
+
+  /**
+   * Set whether a heatbeat connection is enabled.
+   * @param recoveryEnabled {@code true} if the heartbeat connection is enabled, {@code false} otherwise.
+   */
+  public void setHeartbeatEnabled(final boolean recoveryEnabled) {
+    this.recoveryEnabled = recoveryEnabled;
   }
 
   @Override
@@ -131,7 +173,7 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
     sb.append("secure=").append(secure);
     sb.append(", host=").append(host);
     sb.append(", port=").append(port);
-    sb.append(", recoveryEnabled=").append(recoveryEnabled);
+    sb.append(", heartbeatEnabled=").append(recoveryEnabled);
     sb.append(']');
     return sb.toString();
   }

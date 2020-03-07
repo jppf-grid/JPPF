@@ -104,7 +104,7 @@ public abstract class AbstractCsvConnectionStrategy implements DriverConnectionS
   }
 
   /**
-   * @return a list of csv-fromatted lines.
+   * @return a list of csv-formatted lines.
    */
   abstract List<String> getConnectionInfoAsLines();
 

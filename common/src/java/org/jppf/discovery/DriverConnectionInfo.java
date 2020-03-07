@@ -29,27 +29,27 @@ public class DriverConnectionInfo {
   /**
    * The name given to this connection, used as umbered prefix for individual connection names.
    */
-  final String name;
+  String name;
   /**
    * Whether SSL/TLS should be used.
    */
-  final boolean secure;
+  boolean secure;
   /**
    * The driver host name or IP address.
    */
-  final String host;
+  String host;
   /**
    * The driver port to connect to.
    */
-  final int port;
+  int port;
   /**
    * The connection pool size.
    */
-  final int poolSize;
+  int poolSize;
   /**
    * Whether the heartbeat mechanism is enabled for the connection pool.
    */
-  final boolean heartbeatEnabled;
+  boolean heartbeatEnabled;
 
   /**
    * Initialize a plain connection with default name("driver"), pool size (1), host ("localhost") and port (11111).
@@ -118,11 +118,27 @@ public class DriverConnectionInfo {
   }
 
   /**
+   * Set the name of this connection.
+   * @param name the connection name as a string.
+   */
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  /**
    * Determine whether secure (with SSL/TLS) connections should be established.
    * @return {@code true} for secure connections, {@code false} otherwise.
    */
   public boolean isSecure() {
     return secure;
+  }
+
+  /**
+   * Set whether secure (with SSL/TLS) connections should be established.
+   * @param secure {@code true} for secure connections, {@code false} otherwise.
+   */
+  public void setSecure(final boolean secure) {
+    this.secure = secure;
   }
 
   /**
@@ -134,11 +150,27 @@ public class DriverConnectionInfo {
   }
 
   /**
+   * Set the driver host name or IP address.
+   * @param host the host as a string.
+   */
+  public void setHost(final String host) {
+    this.host = host;
+  }
+
+  /**
    * Get the driver port to connect to.
    * @return the driver port as an int value.
    */
   public int getPort() {
     return port;
+  }
+
+  /**
+   * Set the driver port to connect to.
+   * @param port the driver port as an int value.
+   */
+  public void setPort(final int port) {
+    this.port = port;
   }
 
   /**
@@ -150,11 +182,27 @@ public class DriverConnectionInfo {
   }
 
   /**
+   * Set the connection pool size.
+   * @param poolSize the connection pool size as an int value.
+   */
+  public void setPoolSize(final int poolSize) {
+    this.poolSize = poolSize;
+  }
+
+  /**
    * Determine whether the heartbeat mechanism is enabled for the connection pool.
    * @return {@code true} if heartbeat is enabled, {@code false} otherwise.
    */
   public boolean isHeartbeatEnabled() {
     return heartbeatEnabled;
+  }
+
+  /**
+   * Set whether the heartbeat mechanism is enabled for the connection pool.
+   * @param heartbeatEnabled {@code true} if heartbeat is enabled, {@code false} otherwise.
+   */
+  public void setHeartbeatEnabled(final boolean heartbeatEnabled) {
+    this.heartbeatEnabled = heartbeatEnabled;
   }
 
   @Override

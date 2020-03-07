@@ -37,3 +37,4 @@ The current applications in the samples pack are:
 * [Using network interceptors to implement a simple auhentication protocol](NetworkInterceptor)
 * [Using the configurtion API to generate the documentation of all predefined JPPF properties](ConfigurationProperties)
 * [Start a full JPPF grid programmatically in a single JVM](EmbeddedGrid)
+* [Manage a grid without single point of failure](GridFailover)

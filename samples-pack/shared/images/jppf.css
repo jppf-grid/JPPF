@@ -181,7 +181,7 @@ sub { font-size: 0.8em; }
 ul.samplesList, ul.samplesNestedList { margin-left: 10px; padding-left: 10px; }
 ol.samplesList { margin-left: 15px; padding-left: 10px; }
 ul.samplesNestedList { margin-top: 1px; margin-bottom: 1px; list-style-type: disc }
-pre.samples { margin-top: 0px; margin-bottom: 0px; background: #D8D8D8; }
+.samples { margin-top: 0px; margin-bottom: 0px; background: #D8D8D8; }
 
 ul.list_nomargin { margin-left: 5px; margin-top: 0px; padding-left: 10px; }
 

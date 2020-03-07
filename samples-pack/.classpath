@@ -16,6 +16,7 @@
 	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
 	<classpathentry kind="src" output="FTPServer/classes" path="FTPServer/src"/>
 	<classpathentry kind="src" output="GPU/classes" path="GPU/src"/>
+	<classpathentry kind="src" output="GridFailover/classes" path="GridFailover/src"/>
 	<classpathentry kind="src" output="InitializationHook/classes" path="InitializationHook/src"/>
 	<classpathentry kind="src" output="JobDependencies/classes" path="JobDependencies/src"/>
 	<classpathentry kind="src" path="JobRecovery/src"/>
@@ -74,5 +75,10 @@
 	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-serializers-0.42.jar"/>
 	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-shaded-4.0.2.jar"/>
 	<classpathentry kind="lib" path="KryoSerializer/lib/objenesis-2.1.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jackson-annotations-2.10.2.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jackson-core-2.10.2.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jackson-databind-2.10.2.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jackson-dataformat-yaml-2.10.2.jar"/>
+	<classpathentry kind="lib" path="shared/lib/snakeyaml-1.24.jar"/>
 	<classpathentry kind="output" path="JobRecovery/classes"/>
 </classpath>
