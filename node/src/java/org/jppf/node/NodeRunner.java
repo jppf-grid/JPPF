@@ -75,11 +75,11 @@ public class NodeRunner {
   /**
    * The current server connection information.
    */
-  private DriverConnectionInfo currentConnectionInfo = null;
+  private DriverConnectionInfo currentConnectionInfo;
   /**
    * 
    */
-  private LauncherListener launcherListener = null;
+  private LauncherListener launcherListener;
   /**
    * Whether this is anAndroid node.
    */
