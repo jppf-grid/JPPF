@@ -34,7 +34,7 @@ The failover mechanism relies on two main components:
 <ul class="samplesList">
   <li>Before running this sample application, you must have at least two JPPF servers running.<br>
   For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.</li>
-  <li>Update the <a href="drivers.yaml.html">drivers definition file</a> to reflect the information on your JPPF servers</li>
+  <li>Update the <a href="drivers.yaml">drivers definition file</a> to reflect the information on your JPPF servers</li>
   <li>build the sample with this command: <b><tt class="samples">ant zip</tt></b>. This will create a file named <b>jppf-grid-failover.zip</b></li>
   <li>configure a node to use the driver discovery:
     <ul class="samplesList">
@@ -54,7 +54,7 @@ The failover mechanism relies on two main components:
         this will disable the default built-in discovery mechanism, such that only our custom one is used</li>
       <li>the client-side discovery auto-installs through the Service Provider Interface (SPI), thus no configuration update is needed for this</li>
       <li>start the admin console: <tt class="samples">./startConsole.sh</tt> or <tt class="samples">startConsole.bat</tt></li>
-      <li>once started, the admin console should show the drivers defined in the drivers.yaml file, along with a nnode connected to the first driver in the list</li>
+      <li>once started, the admin console should show the drivers defined in the drivers.yaml file, along with a node connected to the first driver in the list</li>
     </ul>
   </li>
   <li>from this sample's root directory, start the sample grid controller: <tt class="samples">./run.sh</tt> or <tt class="samples">run.bat</tt>. The console output will show something similar to this:
@@ -95,7 +95,7 @@ discovered new driver: ClientConnectionPoolInfo[name=backup, secure=false, host=
   <li><a href="src/org/jppf/example/gridfailover/ConnectionListener.java">ConnectionListener.java</a> : the grid topology monitor and controller, which detects when
     a primary driver comes back online and forces the node to reconnect to this driver</li>
   <li><a href="src/org/jppf/example/gridfailover/Utils.java">Utils.java</a> : utilities to parse the YAML drivers definition file</li>
-  <li><a href="drivers.yaml.html">drivers.yaml</a> : the jppf drivers defintion file, in YAML format</li>
+  <li><a href="drivers.yaml">drivers.yaml</a> : the jppf drivers defintion file, in YAML format</li>
   <li><a href="config/jppf.properties">jppf.properties</a> : the jppf client configuration file</li>
 </ul>
 

@@ -180,6 +180,7 @@
       <replace token=".properties.html" value=".properties" dir="${samples-pack}" includes="@{samples}/*.md"/>
       <replace token=".xml.html"        value=".xml"        dir="${samples-pack}" includes="@{samples}/*.md"/>
       <replace token=".c.html"          value=".c"          dir="${samples-pack}" includes="@{samples}/*.md"/>
+      <replace token=".yaml.html"       value=".yaml"       dir="${samples-pack}" includes="@{samples}/*.md"/>
     </sequential>
   </macrodef>
   
