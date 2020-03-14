@@ -142,7 +142,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   public void addIdleChannel(final ChannelWrapper channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
-    channelsExecutor.execute(new Runnable() {
+    if (!isStopped() && !channelsExecutor.isShutdown()) channelsExecutor.execute(new Runnable() {
       @Override
       public void run() {
         if (traceEnabled) log.trace("Adding idle channel " + channel);
@@ -170,7 +170,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * @return a reference to the removed channel.
    */
   public ChannelWrapper removeIdleChannel(final ChannelWrapper channel) {
-    channelsExecutor.execute(new Runnable() {
+    if (!isStopped() && !channelsExecutor.isShutdown()) channelsExecutor.execute(new Runnable() {
       @Override
       public void run() {
         if (traceEnabled) log.trace("Removing idle channel " + channel);
@@ -200,6 +200,10 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
     while (!isStopped()) {
       if (!dispatch()) goToSleep(10L, 10000);
     }
+    synchronized (idleChannels) {
+      idleChannels.clear();
+    }
+    if (!channelsExecutor.isShutdown()) channelsExecutor.shutdown();
   }
 
   /**
