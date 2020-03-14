@@ -215,7 +215,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     }
     if (REQUEST_CHECK_TIMEOUT > 0) {
       final long start = System.nanoTime();
-      final boolean check = ConcurrentUtils.awaitCondition(() -> nbSlaves() == requestedSlaves, REQUEST_CHECK_TIMEOUT);
+      final boolean check = ConcurrentUtils.awaitCondition(() -> nbSlaves() == requestedSlaves, REQUEST_CHECK_TIMEOUT, 50L, false);
       final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       if (debugEnabled) log.debug(String.format("fullfilment check for provisioning request for %d slaves %s after %,d ms", requestedSlaves, (check ? "succeeded" : "timed out"), elapsed));
     }
