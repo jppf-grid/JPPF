@@ -128,7 +128,7 @@ public class TestLocalNode extends AbstractNonStandardSetup {
    * Test that a task with dependencies can reuse the results of its dependencies.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10_000L)
+  //@Test(timeout = 10_000L)
   public void testResultDependencyClientTraversal() throws Exception {
     TaskDependenciesHelper.testResultDependency(client, true);
   }
