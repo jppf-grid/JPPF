@@ -134,7 +134,14 @@ public class AsyncClientContext extends AbstractNioContext {
     //if (traceEnabled) log.trace("deserializing {}", message);
     final TaskBundle bundle = message.getBundle();
     if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1), Collections.<DataLocation>emptyList(), false);
-    return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()), isPeer());
+    final ServerTaskBundleClient clientBundle = new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, 2 + bundle.getTaskCount()), isPeer());
+    final int dependencyCount = bundle.getParameter(BundleParameter.CLIENT_DEPENDENCY_COUNT, 0);
+    if (dependencyCount > 0) {
+      if (debugEnabled) log.debug("there are {} dependencies for {}", dependencyCount,this);
+      final int[] depsPositions = bundle.getParameter(BundleParameter.CLIENT_DEPENDENCY_POSITIONS, null);
+      clientBundle.setDependencies(locations.subList(2 + bundle.getTaskCount(), locations.size()), depsPositions);
+    }
+    return clientBundle;
   }
 
   /**

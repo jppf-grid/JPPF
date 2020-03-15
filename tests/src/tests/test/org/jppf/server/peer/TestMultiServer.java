@@ -18,8 +18,8 @@
 
 package test.org.jppf.server.peer;
 
-import static org.junit.Assert.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.*;
 import static org.junit.Assume.assumeThat;
 import static test.org.jppf.test.setup.common.TaskDependenciesHelper.createLayeredTasks;
 
@@ -29,7 +29,7 @@ import org.jppf.client.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.node.policy.Equal;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
@@ -252,5 +252,29 @@ public class TestMultiServer extends AbstractNonStandardSetup {
       assertTrue(map.containsKey(key));
       assertEquals(0, map.getValues(key).size() % tasksPerNode);
     }
+  }
+
+  /**
+   * Test that a task with dependencies can reuse the results of its dependencies.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10_000L)
+  public void testResultDependencyServerTraversal() throws Exception {
+    TaskDependenciesHelper.testResultDependency(client, false, job -> {
+      job.getClientSLA().setExecutionPolicy(new Equal("jppf.uuid", true, "d1"));
+      job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", true, "n1").negate());
+    });
+  }
+
+  /**
+   * Test that a task with dependencies can reuse the results of its dependencies.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10_000L)
+  public void testResultDependencyClientTraversal() throws Exception {
+    TaskDependenciesHelper.testResultDependency(client, true, job -> {
+      job.getClientSLA().setExecutionPolicy(new Equal("jppf.uuid", true, "d1"));
+      job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", true, "n1").negate());
+    });
   }
 }

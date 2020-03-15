@@ -19,7 +19,7 @@
 package test.org.jppf.test.setup;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
 import javax.management.remote.JMXServiceURL;
 
@@ -82,6 +82,10 @@ public class BaseSetup {
    * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
    */
   protected static Thread shutdownHook;
+  /**
+   * Sequence number to build client uuids.
+   */
+  private static final AtomicInteger clientUuidSequence = new AtomicInteger(0);
 
   /**
    * Get a proxy ot the job management MBean.
@@ -168,7 +172,7 @@ public class BaseSetup {
       ThreadUtils.startDaemonThread(nodes[i], nodes[i].getName().trim() + "-Launcher");
     }
     if (createClient) {
-      client = createClient(null, true, config, listeners);
+      client = createClient("client-" + clientUuidSequence.incrementAndGet(), true, config, listeners);
       if (checkDriversAndNodes) checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     } else {
       JPPFConfiguration.reset();

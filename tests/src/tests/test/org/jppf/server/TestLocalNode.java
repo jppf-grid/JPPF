@@ -30,7 +30,7 @@ import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.common.BaseTestHelper;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Test a topology with 1 servers with a local node and 1 client.
@@ -55,7 +55,7 @@ public class TestLocalNode extends AbstractNonStandardSetup {
   }
 
   @Override
-  @Test(timeout = 10000)
+  @Test(timeout = 10_000)
   public void testCancelJob() throws Exception {
     BaseTestHelper.printToServers(client, "start of %s()", ReflectionUtils.getCurrentMethodName());
     super.testCancelJob();
@@ -64,24 +64,24 @@ public class TestLocalNode extends AbstractNonStandardSetup {
   /**
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000)
+  @Test(timeout = 10_000)
   public void testSimpleJob() throws Exception {
     BaseTestHelper.printToServers(client, "start of %s()", ReflectionUtils.getCurrentMethodName());
     super.testSimpleJob(null, "ln");
   }
 
   @Override
-  @Test(timeout = 15000)
+  @Test(timeout = 15_000)
   public void testMultipleJobs() throws Exception {
     BaseTestHelper.printToServers(client, "start of %s()", ReflectionUtils.getCurrentMethodName());
     super.testMultipleJobs();
   }
 
   /**
-   * Test there there are 2 distinct connection pools, with 1 driver connection each.
+   * Test that there are 2 distinct connection pools, with 1 driver connection each.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000)
+  @Test(timeout = 10_000)
   public void testServerConnections() throws Exception {
     Thread.sleep(200L);
     final List<JPPFConnectionPool> pools = client.getConnectionPools();
@@ -103,17 +103,34 @@ public class TestLocalNode extends AbstractNonStandardSetup {
   }
 
   @Override
-  @Test(timeout = 10000)
+  @Test(timeout = 10_000)
   public void testForwardingMBean() throws Exception {
     super.testForwardingMBean();
   }
 
   @Override
-  //@Test
   @Test(timeout = 10_000)
   public void testNotSerializableExceptionFromNode() throws Exception {
     BaseTestHelper.printToServers(client, "start of %s()", ReflectionUtils.getCurrentMethodName());
     super.testNotSerializableExceptionFromNode();
+  }
+
+  /**
+   * Test that a task with dependencies can reuse the results of its dependencies.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10_000L)
+  public void testResultDependencyServerTraversal() throws Exception {
+    TaskDependenciesHelper.testResultDependency(client, false);
+  }
+
+  /**
+   * Test that a task with dependencies can reuse the results of its dependencies.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10_000L)
+  public void testResultDependencyClientTraversal() throws Exception {
+    TaskDependenciesHelper.testResultDependency(client, true);
   }
 
   @Override

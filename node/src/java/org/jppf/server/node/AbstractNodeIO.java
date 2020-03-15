@@ -24,7 +24,9 @@ import java.io.InvalidClassException;
 import java.util.*;
 
 import org.jppf.node.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.node.protocol.graph.TaskNode;
+import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.collections.CollectionMap;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
@@ -66,10 +68,31 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
       final List<Task<?>> taskList = new ArrayList<>(result.length - 2);
       if (!currentBundle.isHandshake() && (currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null)) {
         final DataProvider dataProvider = (DataProvider) result[1];
-        for (int i=0; i<currentBundle.getTaskCount(); i++) {
+        final int taskCount = currentBundle.getTaskCount();
+        for (int i=0; i<taskCount; i++) {
           final Task<?> task = (Task<?>) result[2 + i];
           task.setDataProvider(dataProvider).setInNode(true).setNode(node).setJob(currentBundle);
           taskList.add(task);
+        }
+        final Integer dependencyCount = currentBundle.getParameter(BundleParameter.NODE_DEPENDENCY_COUNT, 0);
+        if (dependencyCount > 0) {
+          final CollectionMap<Integer, Integer> dependencyMapping = currentBundle.getParameter(BundleParameter.NODE_DEPENDENCY_MAPPING);
+          final Map<Integer, Task<?>> depsByPosition = new HashMap<>();
+          for (int i=0; i<dependencyCount; i++) {
+            final Task<?> task = (Task<?>) result[2 + taskCount + i];
+            depsByPosition.put(task.getPosition(), task);
+          }
+          for (final Task<?> task: taskList) {
+            if (!(task instanceof TaskNode)) continue;
+            final TaskNode<?> taskNode = (TaskNode<?>) task;
+            final Collection<Integer> depsPositions = dependencyMapping.getValues(task.getPosition());
+            if (depsPositions != null) {
+              for (final Integer pos: depsPositions) {
+                final TaskNode<?> dep = (TaskNode<?>) depsByPosition.get(pos);
+                if (dep != null) taskNode.dependsOn(dep);
+              }
+            }
+          }
         }
       }
       return new BundleWithTasks(currentBundle, taskList);

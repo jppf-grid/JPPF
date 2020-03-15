@@ -25,7 +25,9 @@ import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
 import org.jppf.job.JobReturnReason;
 import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.graph.TaskGraph;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -102,6 +104,14 @@ public class ServerTaskBundleNode {
    * The time at which this dispatch started.
    */
   private final long dispatchStartTime;
+  /**
+   * The dependencies of the tasks to send.
+   */
+  private Set<ServerTask> dependencies;
+  /**
+   * A mapping of tasks to their dependencies.
+   */
+  private CollectionMap<Integer, Integer> dependenciesMap;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -125,6 +135,7 @@ public class ServerTaskBundleNode {
     this.dispatchStartTime = System.currentTimeMillis();
     this.taskBundle.setParameter("node.bundle.id", this.id);
     checkTaskCount();
+    resolveDependencies();
   }
 
   /**
@@ -322,6 +333,8 @@ public class ServerTaskBundleNode {
     sb.append(", taskCount=").append(taskCount);
     sb.append(", cancelled=").append(cancelled);
     sb.append(", requeued=").append(requeued);
+    sb.append(", dependencies=").append(dependencies == null ? 0 : dependencies.size());
+    sb.append(", dependenciesMap=").append(dependenciesMap == null ? 0 : dependenciesMap.size());
     sb.append(", channel=").append(channel);
     sb.append(']');
     return sb.toString();
@@ -408,5 +421,61 @@ public class ServerTaskBundleNode {
    */
   public long getDispatchStartTime() {
     return dispatchStartTime;
+  }
+
+  /**
+   * Find and capture a canonical set of direct dependencies for all the tasks in this dispatch bundle.
+   */
+  private void resolveDependencies() {
+    final TaskGraph graph = job.getTaskGraph();
+    if (graph == null) return;
+    job.lock.lock();
+    try {
+      for (final ServerTask task: taskList) {
+        final TaskGraph.Node node = graph.nodeAt(task.getPosition());
+        if (node == null) continue;
+        final List<TaskGraph.Node> deps = node.getDependencies();
+        if ((deps != null) && !deps.isEmpty()) {
+          for (final TaskGraph.Node dep: deps) {
+            if (dependencies == null) {
+              dependencies = new HashSet<>();
+              dependenciesMap = new ArrayListHashMap<>();
+            }
+            if (!dependencies.contains(dep)) {
+              ServerTask depTask = job.tasks.get(dep.getPosition());
+              if (depTask == null) depTask = job.dependendedOnTasks.get(dep.getPosition());
+              if (depTask == null) {
+                final ServerTaskBundleClient clientBundle = task.getBundle();
+                final Map<Integer, ServerTask> clientBundleDeps = clientBundle.getDependencies();
+                if (clientBundleDeps != null) depTask = clientBundleDeps.get(dep.getPosition());
+              }
+              if (depTask == null) log.warn("server task null for dependency {} added to {}", depTask, task);
+              else {
+                dependencies.add(depTask);
+                dependenciesMap.putValue(task.getPosition(), dep.getPosition());
+              }
+            }
+          }
+        }
+      }
+    } finally {
+      job.lock.unlock();
+    }
+  }
+
+  /**
+   * Get a canonical set of direct dependencies for all the tasks in this dispatch bundle.
+   * @return a {@code Set} of {@link ServerTask} instances.
+   */
+  public Set<ServerTask> getDependencies() {
+    return dependencies;
+  }
+
+  /**
+   * Get the mapping of tasks to their dependencies.
+   * @return a mming of taks positions to the positions of their dependencies.
+   */
+  public CollectionMap<Integer, Integer> getDependenciesMap() {
+    return dependenciesMap;
   }
 }

@@ -49,7 +49,7 @@ public class ClientJob extends AbstractClientJob {
   /**
    * The list of the tasks.
    */
-  private final Map<Integer, Task<?>> tasks;
+  final Map<Integer, Task<?>> tasks;
   //private final List<Task<?>> tasks;
   /**
    * The broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
@@ -190,9 +190,8 @@ public class ClientJob extends AbstractClientJob {
         }
         if (debugEnabled) log.debug("taskGraph = {}, sentTasks = {}", taskGraph, dispatchedTasks);
       }
-      final ClientTaskBundle bundle = new ClientTaskBundle(this, list); // constructor makes a copy of the list
+      final ClientTaskBundle bundle = new ClientTaskBundle(this, list);
       for (final Task<?> task: list) tasks.remove(task.getPosition());
-      //list.clear();
       return bundle;
     }
   }

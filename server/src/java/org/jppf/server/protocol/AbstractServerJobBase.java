@@ -71,6 +71,10 @@ public class AbstractServerJobBase extends AbstractServerJob {
    * Total number of dispatches in this job.
    */
   protected final AtomicInteger totalDispatches = new AtomicInteger(0);
+  /**
+   * The list of the tasks.
+   */
+  protected final Map<Integer, ServerTask> dependendedOnTasks = new TreeMap<>();
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.

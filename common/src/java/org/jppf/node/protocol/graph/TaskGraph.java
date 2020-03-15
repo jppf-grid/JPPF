@@ -114,7 +114,7 @@ public class TaskGraph implements Serializable {
    * @param position the position of the node to lookup.
    * @return the {@link Node} at the specified position, or {@link null} if there isn't one.
    */
-  Node nodeAt(final int position) {
+  public Node nodeAt(final int position) {
     return nodesMap.get(position);
   }
 
@@ -152,6 +152,15 @@ public class TaskGraph implements Serializable {
    */
   public boolean isDone() {
     return doneCount >= nodesMap.size();
+  }
+
+  /**
+   * Determine whether a task at the given position has tasks that depend on it.
+   * @param position the position of the task in the job.
+   * @return {@code true} if the task has other tasks that depend on it, {@code false} otherwise.
+   */
+  public boolean isDependendOn(final int position) {
+    return dependantsMap.getValues(position) != null;
   }
 
   /**

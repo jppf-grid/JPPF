@@ -101,12 +101,13 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
    * @throws Exception if an error occurs while deserializing.
    */
   protected Object[] deserializeObjects(final TaskBundle bundle, final LocalNodeMessage currentMessage) throws Exception {
-    final int count = bundle.getTaskCount();
+    final Integer dependencyCount = bundle.getParameter(BundleParameter.NODE_DEPENDENCY_COUNT, 0);
+    final int count = bundle.getTaskCount() + dependencyCount;
     final Object[] list = new Object[count + 2];
     list[0] = bundle;
     try {
       initializeBundleData(bundle);
-      if (debugEnabled) log.debug("bundle task count = {}, handshake = {}", count, bundle.isHandshake());
+      if (debugEnabled) log.debug("bundle task count = {}, dependencies = {}, handshake = {}", bundle.getTaskCount(), dependencyCount, bundle.isHandshake());
       if (!bundle.isHandshake()) {
         TaskThreadLocals.setRequestUuid(bundle.getUuid());
         final boolean clientAccess = !bundle.getParameter(FROM_PERSISTENCE, false);

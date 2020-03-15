@@ -289,8 +289,7 @@ public class TestExecutionPolicy extends AbstractTestExecutionPolicy {
   }
 
   /** @throws Exception if any error occurs. */
-  //@Test(timeout=5000)
-  @Test
+  @Test(timeout=5000)
   public void testIsLocalChannel() throws Exception {
     checkPolicy(new IsLocalChannel(), true);
   }

@@ -20,15 +20,24 @@ package org.jppf.server.nio.client;
 
 import org.jppf.io.IOHelper;
 import org.jppf.nio.*;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.protocol.ServerTaskBundleClient;
+import org.slf4j.*;
 
 /**
  * Representation of a message sent or received by a remote node.
  * @author Laurent Cohen
  */
 public class ClientMessage extends AbstractTaskBundleMessage {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ClientMessage.class);
+  /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * The actual client task bundle from which this message is created
    */
@@ -51,7 +60,10 @@ public class ClientMessage extends AbstractTaskBundleMessage {
   @Override
   protected void afterFirstRead() throws Exception {
     bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0));
-    nbObjects = bundle.getTaskCount() + 2;
+    final int dependencyCount = bundle.getParameter(BundleParameter.CLIENT_DEPENDENCY_COUNT, 0);
+    nbObjects = bundle.getTaskCount() + 2 + dependencyCount;
+    if (traceEnabled) log.trace("read task bundle with {} dependencies : {}, context = {}", dependencyCount, bundle, channel);
+    
   }
 
   /**
@@ -80,5 +92,12 @@ public class ClientMessage extends AbstractTaskBundleMessage {
    */
   public ServerTaskBundleClient getClientBundle() {
     return clientBundle;
+  }
+
+  @Override
+  protected boolean readNextObject() throws Exception {
+    final boolean result = super.readNextObject();
+    if (traceEnabled && result) log.trace("read next object of {}, context = {}", this, channel);;
+    return result;
   }
 }

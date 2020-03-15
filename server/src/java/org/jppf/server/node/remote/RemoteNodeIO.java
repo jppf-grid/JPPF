@@ -24,7 +24,7 @@ import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.*;
+import org.jppf.JPPFSuspendedNodeException;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
@@ -80,12 +80,13 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
 
   @Override
   protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception {
-    final int count = bundle.getTaskCount();
+    final Integer dependencyCount = bundle.getParameter(BundleParameter.NODE_DEPENDENCY_COUNT, 0);
+    final int count = bundle.getTaskCount() + dependencyCount;
     final Object[] list = new Object[count + 2];
     list[0] = bundle;
     try {
       initializeBundleData(bundle);
-      if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
+      if (debugEnabled) log.debug("bundle task count = {}, dependencies = {}, handshake = {}", bundle.getTaskCount(), dependencyCount, bundle.isHandshake());
       if (!bundle.isHandshake()) {
         TaskThreadLocals.setRequestUuid(bundle.getUuid());
         final boolean clientAccess = !bundle.getParameter(FROM_PERSISTENCE, false);

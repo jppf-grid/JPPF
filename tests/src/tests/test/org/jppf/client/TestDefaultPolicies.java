@@ -102,7 +102,6 @@ public class TestDefaultPolicies extends Setup1D2N {
    * Test a default server-side policy parsed from an inline XML definition in the config.
    * @throws Exception if any error occurs.
    */
-  //@Test
   @Test(timeout = TEST_TIMEOUT)
   public void testDefaultServerPolicyFromInlineXML() throws Exception {
     // source type is ommitted, it should default to "inline"

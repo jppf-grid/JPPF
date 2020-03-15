@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package test.org.jppf.server.protocol;
+package test.org.jppf.node.protocol.graph;
 
 import static org.junit.Assert.*;
 

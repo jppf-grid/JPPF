@@ -22,15 +22,19 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.management.*;
 
+import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.job.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.node.protocol.graph.*;
 import org.jppf.node.protocol.graph.TaskGraph.Node;
 import org.jppf.serialization.JPPFSerialization;
-import org.jppf.utils.ExceptionThrowingRunnable;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 import test.org.jppf.test.setup.BaseTest;
 
@@ -122,7 +126,7 @@ public class TaskDependenciesHelper {
   }
 
   /**
-   * @return a graph with diamonfd dependencies.
+   * @return a graph with diamond dependencies.
    * @throws Exception if any error occurs.
    */
   public static TaskGraph createGraph() throws Exception {
@@ -350,6 +354,184 @@ public class TaskDependenciesHelper {
      */
     public synchronized int getNbDispatches() {
       return dispatches.size();
+    }
+  }
+
+  /** */
+  public static class ResultDependencyTask extends AbstractTaskNode<String> implements Comparable<ResultDependencyTask> {
+    /**
+     * Logger for this class.
+     */
+    private static final Logger log = LoggerFactory.getLogger(TaskDependenciesHelper.ResultDependencyTask.class);
+    /** */
+    public final Coord coord;
+    /** */
+    public List<Coord> resultCoords;
+  
+    /**
+     * @param layer .
+     * @param index .
+     */
+    public ResultDependencyTask(final int layer, final int index) {
+      this.coord = new Coord(layer, index);
+      this.setId(String.format("task-L%04d-I%04d", layer, index)); 
+    }
+  
+    @Override
+    public void run() {
+      resultCoords = new ArrayList<>();
+      resultCoords.add(coord);
+      final Collection<TaskNode<?>> deps = getDependencies();
+      log.info("executing task '{}' with {} dependencies", getId(), ((deps == null ? 0 : deps.size())));
+      if (deps != null) {
+        for (final TaskNode<?> dep: deps) {
+          final ResultDependencyTask actual = (ResultDependencyTask) dep;
+          log.info("task '{}' processing dependency with id={}, index={}, indices={}", getId(), actual.getId(), actual.coord, actual.resultCoords);
+          resultCoords.add(actual.coord);
+        }
+      }
+      Collections.sort(resultCoords);
+      setResult("success");
+    }
+
+    @Override
+    public int compareTo(final ResultDependencyTask o) {
+      if (o == null) return -1;
+      return coord.compareTo(o.coord);
+    }
+  }
+
+  /** */
+  public static class Coord implements Serializable, Comparable<Coord> {
+    /** */
+    public final int layer, index;
+
+    /**
+     * @param layer .
+     * @param index .
+     */
+    public Coord(final int layer, final int index) {
+      this.layer = layer;
+      this.index = index;
+    }
+
+    @Override
+    public String toString() {
+      return  new StringBuilder().append("Coord[l=").append(layer).append(", i=").append(index).append("]").toString();
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      final int result = prime + index;
+      return prime * result + layer;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if (this == obj) return true;
+      if (obj == null) return false;
+      if (getClass() != obj.getClass()) return false;
+      final Coord other = (Coord) obj;
+      return (index == other.index) && (layer == other.layer);
+    }
+
+    @Override
+    public int compareTo(final Coord o) {
+      if (o == null) return 1;
+      if (o.layer > layer) return -1;
+      if (o.layer < layer) return 1;
+      if (o.index > index) return -1;
+      if (o.index < index) return 1;
+      return 0;
+    }
+  }
+
+  /**
+   * Interface for configuring a job after it has been constructed.
+   */
+  @FunctionalInterface
+  public interface JobConfigurator {
+    /**
+     * Configure the specified job.
+     * @param job the job to configure.
+     */
+    void configure(JPPFJob job);
+  }
+
+  /**
+   * Test that a task with dependencies can reuse the results of its dependencies.
+   * @param client the JPPF client to use.
+   * @param clientTraversal whether to perform the graph traversal on the client or server side.
+   * @throws Exception if any error occurs.
+   */
+  public static void testResultDependency(final JPPFClient client, final boolean clientTraversal) throws Exception {
+    testResultDependency(client, clientTraversal, null);
+  }
+
+  /**
+   * Test that a task with dependencies can reuse the results of its dependencies.
+   * @param client the JPPF client to use.
+   * @param clientTraversal whether to perform the graph traversal on the client or server side.
+   * @param configurator used to configure the job.
+   * @throws Exception if any error occurs.
+   */
+  public static void testResultDependency(final JPPFClient client, final boolean clientTraversal, final JobConfigurator configurator) throws Exception {
+    testResultDependency(client, clientTraversal, 5, 10, configurator);
+  }
+
+  /**
+   * Test that a task with dependencies can reuse the results of its dependencies.
+   * This test uses a layered graph of tasks, where each task of a layer depends on all the tasks of the next layer, if any.
+   * @param client the JPPF client to use.
+   * @param clientTraversal whether to perform the graph traversal on the client or server side.
+   * @param configurator used to configure the job.
+   * @param nbLayers the number of layers.
+   * @param tasksPerLayer the number of tasks in each layer.
+   * @throws Exception if any error occurs.
+   */
+  public static void testResultDependency(final JPPFClient client, final boolean clientTraversal, final int nbLayers, final int tasksPerLayer, final JobConfigurator configurator) throws Exception {
+    final ResultDependencyTask[][] tasks = new ResultDependencyTask[nbLayers][tasksPerLayer];
+    for (int layer=nbLayers-1; layer>=0; layer--) {
+      for (int i=0; i<tasksPerLayer; i++) {
+        tasks[layer][i] = new ResultDependencyTask(layer, i);
+        if (layer < nbLayers-1) {
+          for (int j=0; j<tasksPerLayer; j++) tasks[layer][i].dependsOn(tasks[layer + 1][j]);
+        }
+      }
+    }
+    final int nbTasks = nbLayers * tasksPerLayer;
+    final JPPFJob job = new JPPFJob();
+    job.setName(ReflectionUtils.getCurrentMethodName());
+    for (int i=0; i<tasksPerLayer; i++) job.add(tasks[0][i]);
+    job.getClientSLA().setGraphTraversalInClient(clientTraversal);
+    if (configurator != null) configurator.configure(job);
+    final List<Task<?>> res = client.submit(job);
+    final List<ResultDependencyTask> results = res.stream().map(t -> (ResultDependencyTask) t).sorted().collect(Collectors.toList());
+    assertEquals(nbTasks, results.size());
+    for (int i=0; i<nbTasks; i++) {
+      final Task<?> task = results.get(i);
+      final Throwable t = task.getThrowable();
+      assertNull(String.format("task %d raised throwable: %s", i, ExceptionUtils.getStackTrace(t)), t);
+      assertEquals("success", task.getResult());
+      assertTrue(task instanceof ResultDependencyTask);
+      final ResultDependencyTask depTask = (ResultDependencyTask) task;
+      BaseTest.print(false, false, "task '%s' coord = %s, resultCoords = %s", depTask.getId(), depTask.coord, depTask.resultCoords);
+      assertNotNull(depTask.coord);
+      final int layer = i / tasksPerLayer;
+      assertEquals(layer, depTask.coord.layer);
+      final int index = i % tasksPerLayer;
+      assertEquals(index, depTask.coord.index);
+      assertNotNull(depTask.resultCoords);
+      assertEquals("deps result for task " + depTask.getId() + " : " + depTask.resultCoords, (layer >= nbLayers -1 ? 1 : 1 + tasksPerLayer), depTask.resultCoords.size());
+      for (int j=0; j<depTask.resultCoords.size(); j++) {
+        final Coord c = depTask.resultCoords.get(j);
+        if (j == 0) assertEquals(depTask.coord, c);
+        else {
+          assertEquals(layer + 1, c.layer);
+          assertEquals(j - 1, c.index);
+        }
+      }
     }
   }
 }

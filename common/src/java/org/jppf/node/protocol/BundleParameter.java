@@ -171,5 +171,21 @@ public enum BundleParameter {
   /**
    * Whether a job graph is already being handled by a driver.
    */
-  JOB_GRAPH_ALREADY_HANDLED
+  JOB_GRAPH_ALREADY_HANDLED,
+  /**
+   * A mapping of tasks positions to the positions of their dependencies.
+   */
+  NODE_DEPENDENCY_MAPPING,
+  /**
+   * Number of dependencies in a dispatched task bundle.
+   */
+  NODE_DEPENDENCY_COUNT,
+  /**
+   * Number of dependencies in a task bundle dispatched by a client.
+   */
+  CLIENT_DEPENDENCY_COUNT,
+  /**
+   * Positions of the dependencies in a task bundle dispatched by a client.
+   */
+  CLIENT_DEPENDENCY_POSITIONS
 }

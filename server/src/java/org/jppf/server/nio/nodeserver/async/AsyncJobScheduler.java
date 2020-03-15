@@ -366,7 +366,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    */
   private boolean checkExecutionPolicy(final BaseNodeContext channel, final ServerJob job, final ExecutionPolicy policy, final JPPFSystemInformation info, final int nbJobChannels) {
     if (policy == null) return true;
-    if (debugEnabled) log.debug("job has an execution policy: {}\n{}", job, policy);
+    if (debugEnabled) log.debug("job has an execution policy: {}\n{}", job, policy.toString().trim());
       boolean b = false;
       try {
         preparePolicy(policy, job, stats, nbJobChannels);

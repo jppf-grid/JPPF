@@ -16,49 +16,43 @@
  * limitations under the License.
  */
 
-package test.org.jppf.server.protocol;
+package test.org.jppf.node.protocol.graph;
 
 import static org.junit.Assert.*;
-import static test.org.jppf.test.setup.common.TaskDependenciesHelper.*;
+import static test.org.jppf.test.setup.common.TaskDependenciesHelper.createDiamondTasks;
 
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.ReflectionUtils;
-import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.Test;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.Setup1D2N1C;
 import test.org.jppf.test.setup.common.*;
+import test.org.jppf.test.setup.common.TaskDependenciesHelper.*;
 
 /**
- * 
+ * Test graphs of tasks with graph traversal on the client side.
  * @author Laurent Cohen
  */
-public class TestTaskGraphServerTraversal extends Setup1D2N1C {
+public class TestTaskGraphClientTraversal extends Setup1D2N1C {
   /**
    * Test the submission of a job with tasks dependencies.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10_000L)
+  @Test(timeout = 5000L)
   public void testGraphSubmission() throws Exception {
     int oldMaxJobs = 1;
     JPPFConnectionPool pool = null;
-    final int layers = 3, tasksPerLayer = 10, nbTasks = layers * tasksPerLayer;
-    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    final ServerDispatchListener serverListener = new ServerDispatchListener();
-    jmx.getJobManager().addNotificationListener(serverListener, null, null);
     try {
       pool = client.awaitWorkingConnectionPool();
       oldMaxJobs = pool.getMaxJobs();
       pool.setMaxJobs(Integer.MAX_VALUE);
-      final MyTask[] tasks = createLayeredTasks(layers, tasksPerLayer);
+      final MyTask[] tasks = createDiamondTasks();
       final JPPFJob job = new JPPFJob();
-      for (int i=0; i<tasksPerLayer; i++) job.add(tasks[i]);
-      assertEquals(nbTasks, job.unexecutedTaskCount());
+      job.add(tasks[0]);
       assertTrue(job.hasTaskGraph());
+      job.getClientSLA().setGraphTraversalInClient(true);
       final DispatchListener listener = new DispatchListener();
       job.addJobListener(listener);
       final List<Task<?>> result = client.submit(job);
@@ -72,15 +66,12 @@ public class TestTaskGraphServerTraversal extends Setup1D2N1C {
         assertEquals("executed " + myTask.getId(), myTask.getResult());
       }
       final List<Integer> dispatches = listener.dispatches;
-      assertEquals(1, dispatches.size());
-      assertEquals(nbTasks, (int) dispatches.get(0));
-
-      assertTrue(ConcurrentUtils.awaitCondition(() -> serverListener.getNbDispatches() == 6, 5000L, 250L, true));
-      final List<Integer> serverDispatches = serverListener.dispatches;
-      for (int i=0; i<6; i++) assertEquals(5, (int) serverDispatches.get(i));
+      assertEquals(3, dispatches.size());
+      assertEquals(1, (int) dispatches.get(0));
+      assertEquals(2, (int) dispatches.get(1));
+      assertEquals(1, (int) dispatches.get(2));
     } finally {
       if (pool != null) pool.setMaxJobs(oldMaxJobs);
-      jmx.getJobManager().removeNotificationListener(serverListener);
     }
   }
 
@@ -88,13 +79,10 @@ public class TestTaskGraphServerTraversal extends Setup1D2N1C {
    * Test the submission and cancellation of a job with tasks dependencies.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10_000L)
+  @Test(timeout = 5000L)
   public void testCancelGraphSubmission() throws Exception {
     int oldMaxJobs = 1;
     JPPFConnectionPool pool = null;
-    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    final ServerDispatchListener serverListener = new ServerDispatchListener();
-    jmx.getJobManager().addNotificationListener(serverListener, null, null);
     try {
       pool = client.awaitWorkingConnectionPool();
       oldMaxJobs = pool.getMaxJobs();
@@ -104,9 +92,10 @@ public class TestTaskGraphServerTraversal extends Setup1D2N1C {
       for (final MyTask task: tasks) taskMap.put(task.getId(), task);
       taskMap.get("T1").setDuration(5000L).setStartNotif("start");
       taskMap.get("T2").setDuration(5000L).setStartNotif("start");
-      final JPPFJob job = new JPPFJob().setName(ReflectionUtils.getCurrentMethodName());
+      final JPPFJob job = new JPPFJob();
       job.add(tasks[0]);
       assertTrue(job.hasTaskGraph());
+      job.getClientSLA().setGraphTraversalInClient(true);
       final DispatchListener listener = new DispatchListener();
       job.addJobListener(listener);
       final AwaitTaskNotificationListener notifListener = new AwaitTaskNotificationListener(client, "start");
@@ -130,19 +119,21 @@ public class TestTaskGraphServerTraversal extends Setup1D2N1C {
           assertEquals("executed " + myTask.getId(), myTask.getResult());
         } else assertNull(myTask.getResult());
       }
-
       final List<Integer> dispatches = listener.dispatches;
-      assertEquals(1, dispatches.size());
-      assertEquals(4, (int) dispatches.get(0));
-
-      assertTrue(ConcurrentUtils.awaitCondition(() -> serverListener.getNbDispatches() > 1, 5000L, 250L, true));
-      final List<Integer> serverDispatches = serverListener.dispatches;
-      assertEquals(2, serverDispatches.size());
-      assertEquals(1, (int) serverDispatches.get(0));
-      assertEquals(2, (int) serverDispatches.get(1));
+      assertEquals(2, dispatches.size());
+      assertEquals(1, (int) dispatches.get(0));
+      assertEquals(2, (int) dispatches.get(1));
     } finally {
       if (pool != null) pool.setMaxJobs(oldMaxJobs);
-      jmx.getJobManager().removeNotificationListener(serverListener);
     }
+  }
+
+  /**
+   * Test that a task with dependencies can reuse the results of its dependencies.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10_000L)
+  public void testSimpleResultDependency() throws Exception {
+    TaskDependenciesHelper.testResultDependency(client, true);
   }
 }

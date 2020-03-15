@@ -101,6 +101,10 @@ public class ServerTaskBundleClient {
    * The positions of the tasks in this bundle.
    */
   private final int[] tasksPositions;
+  /**
+   * The tasks to be executed by the node.
+   */
+  private Map<Integer, ServerTask> dependencies;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -441,6 +445,7 @@ public class ServerTaskBundleClient {
     sb.append(", taskList.size()=").append(taskList.size());
     sb.append(", cancelled=").append(cancelled);
     sb.append(", done=").append(done);
+    sb.append(", dependencies=").append(dependencies == null ? 0 : dependencies.size());
     sb.append(", job=").append(job);
     sb.append("; strategy=").append(strategy == null ? "null" : strategy.getName());
     sb.append(']');
@@ -487,5 +492,29 @@ public class ServerTaskBundleClient {
    */
   public int[] getTasksPositions() {
     return tasksPositions;
+  }
+
+  /**
+   * Get the dependencies of the tasks in this bundle.
+   * @return the list of dependencies.
+   */
+  public Map<Integer, ServerTask> getDependencies() {
+    return dependencies;
+  }
+
+  /**
+   * Set the dependencies of the tasks in this bundle.
+   * @param dependenciesLocations the list of dependencies.
+   * @param positions the positions of the dependencies in the job.
+   */
+  public void setDependencies(final List<DataLocation> dependenciesLocations, final int[] positions) {
+    this.dependencies = new HashMap<>(dependenciesLocations.size());
+    for (int i=0; i<positions.length; i++) {
+      final DataLocation location = dependenciesLocations.get(i);
+      final ServerTask task = new ServerTask(this, location, positions[i], 0);
+      task.setResult(location);
+      task.setState(TaskState.RESULT);
+      this.dependencies.put(positions[i], task);
+    }
   }
 }

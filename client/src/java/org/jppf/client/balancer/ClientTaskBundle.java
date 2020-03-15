@@ -23,6 +23,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.TaskGraph;
+import org.jppf.utils.collections.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -32,6 +35,10 @@ import org.jppf.node.protocol.*;
  * @author Laurent Cohen
  */
 public class ClientTaskBundle extends JPPFTaskBundle {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ClientTaskBundle.class);
   /**
    * Explicit serialVersionUID.
    */
@@ -57,6 +64,14 @@ public class ClientTaskBundle extends JPPFTaskBundle {
    */
   private transient List<Task<?>> tasks;
   /**
+   * The dependencies of the tasks.
+   */
+  private transient Set<Task<?>> dependencies;
+  /**
+   * A mapping of tasks to their dependencies.
+   */
+  private CollectionMap<Integer, Integer> dependenciesMap;
+  /**
    * The broadcast UUID.
    */
   private transient String broadcastUUID;
@@ -72,7 +87,8 @@ public class ClientTaskBundle extends JPPFTaskBundle {
   /**
    * Initialize this task bundle and set its build number.
    * @param job the job to execute.
-   * @param tasks the tasks to execute.
+   * @param tasks the list of tasks to execute. This list is copy before being stored in this object,
+   * such that no link subsists between the input list and the one retained by this {@code ClientTaskBundle}.
    */
   public ClientTaskBundle(final ClientJob job, final Collection<Task<?>> tasks) {
     if (job == null) throw new IllegalArgumentException("job is null");
@@ -83,6 +99,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
     this.setName(job.getJob().getName());
     setUuid(job.getUuid());
     setTaskCount(this.tasks.size());
+    resolveDependencies();
   }
 
   /**
@@ -233,5 +250,48 @@ public class ClientTaskBundle extends JPPFTaskBundle {
   @Override
   public Long getBundleId() {
     return bundleId;
+  }
+
+  /**
+   * Resolve the dependneices, if any, of the atsks in this bundle.
+   */
+  private void resolveDependencies() {
+    final TaskGraph graph = job.getTaskGraph();
+    if (graph == null) return;
+    for (final Task<?> task: tasks) {
+      final TaskGraph.Node node = graph.nodeAt(task.getPosition());
+      if (node == null) continue;
+      final List<TaskGraph.Node> deps = node.getDependencies();
+      if ((deps != null) && !deps.isEmpty()) {
+        for (final TaskGraph.Node dep: deps) {
+          if (dependencies == null) {
+            dependencies = new HashSet<>();
+            dependenciesMap = new ArrayListHashMap<>();
+          }
+          final Task<?> depTask = job.getJob().getResults().getResultTask(dep.getPosition());
+          if (depTask == null) log.warn("server task null for dependency {} added to {}", depTask, task);
+          else { 
+            dependencies.add(depTask);
+            dependenciesMap.putValue(task.getPosition(), dep.getPosition());
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Get a canonical set of direct dependencies for all the tasks in this dispatch bundle.
+   * @return a {@code Set} of {@link ServerTask} instances.
+   */
+  public Set<Task<?>> getDependencies() {
+    return dependencies;
+  }
+
+  /**
+   * Get the mapping of tasks to their dependencies.
+   * @return a mming of taks positions to the positions of their dependencies.
+   */
+  public CollectionMap<Integer, Integer> getDependenciesMap() {
+    return dependenciesMap;
   }
 }

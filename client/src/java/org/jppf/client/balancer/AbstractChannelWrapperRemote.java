@@ -201,7 +201,8 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
     bundle.setUuid(clientBundle.getUuid());
     bundle.setParameter(BundleParameter.CLIENT_BUNDLE_ID, bundleId);
     final ClientJob job = clientBundle.getClientJob();
-    if ((job.getTaskGraph() != null) && !job.getClientSLA().isGraphTraversalInClient()) bundle.setParameter(BundleParameter.JOB_TASK_GRAPH, job.getTaskGraph());
+    //if ((job.getTaskGraph() != null) && !job.getClientSLA().isGraphTraversalInClient()) bundle.setParameter(BundleParameter.JOB_TASK_GRAPH, job.getTaskGraph());
+    if (job.getTaskGraph() != null) bundle.setParameter(BundleParameter.JOB_TASK_GRAPH, job.getTaskGraph());
     return bundle;
   }
 

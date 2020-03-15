@@ -130,7 +130,19 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     header.setUuid(job.getUuid());
     header.setSLA(job.getSLA());
     header.setMetadata(job.getMetadata());
-    final Task<?>[] tasks = prepareTasksToSend(header, clientBundle);
+    final Set<Task<?>> dependencies = clientBundle.getDependencies();
+    List<Task<?>> deps = null;
+    if (dependencies != null) {
+      deps = new ArrayList<>(dependencies);
+      header.setParameter(BundleParameter.CLIENT_DEPENDENCY_COUNT, deps.size());
+      final int[] positions = new int[deps.size()];
+      int i = 0;
+      for (final Task<?> task: deps) positions[i++] = task.getPosition();
+      header.setParameter(BundleParameter.CLIENT_DEPENDENCY_POSITIONS, positions);
+      if (debugEnabled) log.debug("sending {} dependencies with positions {}", deps.size(), Arrays.toString(positions));
+    }
+    if (debugEnabled) log.debug("found {} dependencies for bundle {}", (deps == null ? 0 : deps.size()), clientBundle);
+    final List<Task<?>> tasks = prepareTasksToSend(header, clientBundle);
 
     final SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
@@ -140,7 +152,25 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       log.error("error serializing data provider for {} : {}\nthe job will be cancelled", job, ExceptionUtils.getStackTrace(e));
       IOHelper.sendData(socketClient, null, ser);
     }
-    final List<Task<?>> notSerializableTasks = new ArrayList<>(tasks.length);
+    final List<Task<?>> notSerializableTasks = sendTasks(job, ser, socketClient, tasks);
+    if (deps != null) {
+      sendTasks(job, ser, socketClient, deps);
+    }
+    socketClient.flush();
+    return notSerializableTasks;
+  }
+
+  /**
+   * Send a set of tasks to a driver.
+   * @param job the job towhich the tasks belong.
+   * @param ser the serializer to use.
+   * @param socketClient an abstraction of the socket connection to send the tasks through.
+   * @param tasks the tasks to send.
+   * @return a list of tasks that couldn't be serialized, possibly empty.
+   * @throws Exception if an error occurs while sending the request.
+   */
+  private static List<Task<?>> sendTasks(final JPPFJob job, final ObjectSerializer ser, final SocketWrapper socketClient, final Collection<Task<?>> tasks) throws Exception {
+    final List<Task<?>> notSerializableTasks =  new ArrayList<>(tasks.size());
     for (final Task<?> task : tasks) {
       try {
         IOHelper.sendData(socketClient, task, ser);
@@ -151,7 +181,6 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
         notSerializableTasks.add(task);
       }
     }
-    socketClient.flush();
     return notSerializableTasks;
   }
 
@@ -161,18 +190,19 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @param clientBundle the job whose taskss are to be sent.
    * @return an array of the tasks to send.
    */
-  private Task<?>[] prepareTasksToSend(final TaskBundle header, final ClientTaskBundle clientBundle) {
+  private List<Task<?>> prepareTasksToSend(final TaskBundle header, final ClientTaskBundle clientBundle) {
     final List<Task<?>> allTasks = clientBundle.getTasksL();
     final int count = allTasks.size();
     final int[] positions = new int[count];
     final int[] maxResubmits = new int[count];
-    final Task<?>[] tasks = new Task<?>[count];
+    final List<Task<?>> tasks = new ArrayList<>(count);
     int i = 0;
     final JPPFJob job = clientBundle.getClientJob().getJob();
     for (final Task<?> task : allTasks) {
       final int pos = task.getPosition();
       if (!job.getResults().hasResult(pos)) {
-        tasks[i] = task;
+        //tasks[i] = task;
+        tasks.add(task);
         positions[i] = pos;
         maxResubmits[i] = task.getMaxResubmits();
         i++;
