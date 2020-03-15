@@ -205,6 +205,14 @@ public abstract class ExecutionPolicy implements Serializable {
   }
 
   /**
+   * Create an execution policy that is a negation of this policy.
+   * @return an execution policy that negates this policy.
+   */
+  public ExecutionPolicy negate() {
+    return new NotRule(this);
+  }
+
+  /**
    * Get the children of this rule.
    * @return an array of {@link ExecutionPolicy} instances, or {@code null} for leaf rules.
    * @exclude
@@ -518,7 +526,6 @@ public abstract class ExecutionPolicy implements Serializable {
    * @param metadata the job metadata.
    * @param jobDispatches the number of nodes the job is already dispatched to.
    * @param stats the server statistics.
-   * @since 5.0
    * @exclude
    */
   public void setContext(final JobSLA sla, final JobClientSLA clientSla, final JobMetadata metadata, final int jobDispatches, final JPPFStatistics stats) {
@@ -528,7 +535,6 @@ public abstract class ExecutionPolicy implements Serializable {
   /**
    * Set this policy's context.
    * @param context the context to set.
-   * @since 5.2
    * @exclude
    */
   protected void setContext(final PolicyContext context) {
