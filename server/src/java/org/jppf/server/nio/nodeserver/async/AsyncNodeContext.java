@@ -31,7 +31,7 @@ import org.jppf.job.JobReturnReason;
 import org.jppf.load.balancer.*;
 import org.jppf.management.JMXConnectionWrapper;
 import org.jppf.node.protocol.*;
-import org.jppf.node.protocol.graph.TaskGraph;
+import org.jppf.node.protocol.graph.*;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.*;
@@ -170,7 +170,7 @@ public class AsyncNodeContext extends BaseNodeContext {
     final TaskBundle taskBundle = bundle.getJob();
     final AbstractTaskBundleMessage message = newMessage();
     taskBundle.setBundleId(bundle.getId());
-    CollectionMap<Integer, Integer> dependencyMap = null;
+    final TaskGraphInfo graphInfo = bundle.getTaskGraphInfo();
     if (!taskBundle.isHandshake()) {
       if (!isPeer()) taskBundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
       else {
@@ -180,34 +180,22 @@ public class AsyncNodeContext extends BaseNodeContext {
         for (final ServerTask task: bundle.getTaskList()) positions[count++] = task.getPosition();
         taskBundle.setParameter(BundleParameter.TASK_POSITIONS, positions);
       }
-      dependencyMap = bundle.getDependenciesMap();
-      if (dependencyMap != null) {
-        final int depCount = bundle.getDependencies().size();
+      if (graphInfo != null) {
+        final int depCount = graphInfo.getDependencies().size();
         if (debugEnabled) log.debug("there are {} dependencies for {}", depCount, this);
-        if (!isPeer()) {
-          taskBundle.setParameter(BundleParameter.NODE_DEPENDENCY_COUNT, depCount);
-          taskBundle.setParameter(BundleParameter.NODE_DEPENDENCY_MAPPING, dependencyMap);
-        } else {
-          final int[] depPositions = new int[depCount];
-          int i = 0;
-          for (final ServerTask task: bundle.getDependencies()) depPositions[i++] = task.getPosition();
-          taskBundle.setParameter(BundleParameter.CLIENT_DEPENDENCY_COUNT, depCount);
-          taskBundle.setParameter(BundleParameter.CLIENT_DEPENDENCY_POSITIONS, depPositions);
-          final TaskGraph graph = bundle.getServerJob().getTaskGraph();
-          if (graph != null) taskBundle.setParameter(BundleParameter.JOB_TASK_GRAPH, graph);
-        }
+        taskBundle.setParameter(BundleParameter.JOB_TASK_GRAPH_INFO, graphInfo);
       }
     }
     message.addLocation(IOHelper.serializeData(taskBundle, server.getDriver().getSerializer()));
     message.addLocation(bundle.getDataProvider());
     for (ServerTask task: bundle.getTaskList()) message.addLocation(task.getInitialTask());
-    if (dependencyMap != null) {
-      for (final ServerTask task: bundle.getDependencies()) {
+    if (graphInfo != null) {
+      for (final PositionalElement<?> elt: graphInfo.getDependencies()) {
+        final ServerTask task = (ServerTask) elt;
         if (debugEnabled) log.debug("adding dependency {} with result = {}", task, task.getResult());
         message.addLocation(task.getResult());
       }
     }
-
     message.setBundle(taskBundle);
     return message;
   }

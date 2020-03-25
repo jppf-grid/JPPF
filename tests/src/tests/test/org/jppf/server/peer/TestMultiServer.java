@@ -80,7 +80,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
   }
 
   @Override
-  @Test(timeout = TIMEOUT)
+  //@Test(timeout = TIMEOUT)
   public void testCancelJob() throws Exception {
     BaseTestHelper.printToServers(client, "start of %s()", ReflectionUtils.getCurrentMethodName());
     super.testCancelJob();

@@ -20,6 +20,7 @@ package org.jppf.server.nio.nodeserver;
 
 import org.jppf.io.IOHelper;
 import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.TaskGraphInfo;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 
 /**
@@ -52,7 +53,8 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage {
    */
   @Override
   protected void beforeFirstWrite() throws Exception {
-    final int dependencyCount = bundle.getParameter(channel.isPeer() ? BundleParameter.CLIENT_DEPENDENCY_COUNT : BundleParameter.NODE_DEPENDENCY_COUNT, 0);
+    final TaskGraphInfo graphInfo = bundle.getParameter(BundleParameter.JOB_TASK_GRAPH_INFO, null);
+    final int dependencyCount = (graphInfo == null) ? 0 : graphInfo.getNbDependencies();
     nbObjects = bundle.getTaskCount() + 2 + dependencyCount;
   }
 

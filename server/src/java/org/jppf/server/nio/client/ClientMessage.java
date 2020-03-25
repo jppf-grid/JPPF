@@ -21,6 +21,7 @@ package org.jppf.server.nio.client;
 import org.jppf.io.IOHelper;
 import org.jppf.nio.*;
 import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.TaskGraphInfo;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.protocol.ServerTaskBundleClient;
 import org.slf4j.*;
@@ -60,7 +61,8 @@ public class ClientMessage extends AbstractTaskBundleMessage {
   @Override
   protected void afterFirstRead() throws Exception {
     bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0));
-    final int dependencyCount = bundle.getParameter(BundleParameter.CLIENT_DEPENDENCY_COUNT, 0);
+    final TaskGraphInfo graphInfo = bundle.getParameter(BundleParameter.JOB_TASK_GRAPH_INFO, null);
+    final int dependencyCount = (graphInfo == null) ? 0 : graphInfo.getNbDependencies();
     nbObjects = bundle.getTaskCount() + 2 + dependencyCount;
     if (traceEnabled) log.trace("read task bundle with {} dependencies : {}, context = {}", dependencyCount, bundle, channel);
     

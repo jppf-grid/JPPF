@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.*;
 import org.jppf.io.*;
 import org.jppf.nio.AbstractNioContext;
 import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.TaskGraphInfo;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -135,11 +136,11 @@ public class AsyncClientContext extends AbstractNioContext {
     final TaskBundle bundle = message.getBundle();
     if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1), Collections.<DataLocation>emptyList(), false);
     final ServerTaskBundleClient clientBundle = new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, 2 + bundle.getTaskCount()), isPeer());
-    final int dependencyCount = bundle.getParameter(BundleParameter.CLIENT_DEPENDENCY_COUNT, 0);
+    final TaskGraphInfo graphInfo = bundle.getParameter(BundleParameter.JOB_TASK_GRAPH_INFO, null);
+    final int dependencyCount = (graphInfo == null) ? 0 : graphInfo.getNbDependencies();
     if (dependencyCount > 0) {
       if (debugEnabled) log.debug("there are {} dependencies for {}", dependencyCount,this);
-      final int[] depsPositions = bundle.getParameter(BundleParameter.CLIENT_DEPENDENCY_POSITIONS, null);
-      clientBundle.setDependencies(locations.subList(2 + bundle.getTaskCount(), locations.size()), depsPositions);
+      clientBundle.setDependencies(locations.subList(2 + bundle.getTaskCount(), locations.size()), graphInfo);
     }
     return clientBundle;
   }

@@ -21,6 +21,7 @@ package org.jppf.node.protocol.graph;
 import java.io.*;
 import java.util.*;
 
+import org.jppf.node.protocol.PositionalElement;
 import org.jppf.serialization.SerializationUtils;
 import org.jppf.utils.collections.*;
 
@@ -337,7 +338,7 @@ public class TaskGraph implements Serializable {
    * A node in the graph of the tasks in a job which represents a task and its dependants.
    * @exclude
    */
-  public static class Node implements Serializable {
+  public static class Node implements Serializable, PositionalElement<Node> {
     /**
      * The dependencies of this task, if any.
      */
@@ -378,9 +379,7 @@ public class TaskGraph implements Serializable {
       return dependencies;
     }
 
-    /**
-     * @return the position of this task in the job.
-     */
+    @Override
     public int getPosition() {
       return position;
     }

@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
 import org.jppf.job.JobReturnReason;
-import org.jppf.node.protocol.TaskBundle;
-import org.jppf.node.protocol.graph.TaskGraph;
+import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.*;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
@@ -44,6 +44,10 @@ public class ServerTaskBundleNode {
    * Determines whether debug-level logging is enabled.
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * Determines whether trace-level logging is enabled.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * Count of instances of this class.
    */
@@ -105,13 +109,9 @@ public class ServerTaskBundleNode {
    */
   private final long dispatchStartTime;
   /**
-   * The dependencies of the tasks to send.
+   * Info on the dependenencies of the tasks in this bundle.
    */
-  private Set<ServerTask> dependencies;
-  /**
-   * A mapping of tasks to their dependencies.
-   */
-  private CollectionMap<Integer, Integer> dependenciesMap;
+  private TaskGraphInfo graphInfo;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -333,8 +333,7 @@ public class ServerTaskBundleNode {
     sb.append(", taskCount=").append(taskCount);
     sb.append(", cancelled=").append(cancelled);
     sb.append(", requeued=").append(requeued);
-    sb.append(", dependencies=").append(dependencies == null ? 0 : dependencies.size());
-    sb.append(", dependenciesMap=").append(dependenciesMap == null ? 0 : dependenciesMap.size());
+    sb.append(", dependencies=").append(graphInfo == null ? 0 : graphInfo.getNbDependencies());
     sb.append(", channel=").append(channel);
     sb.append(']');
     return sb.toString();
@@ -428,35 +427,58 @@ public class ServerTaskBundleNode {
    */
   private void resolveDependencies() {
     final TaskGraph graph = job.getTaskGraph();
-    if (graph == null) return;
     job.lock.lock();
     try {
+      final Set<Integer> depsPositions = new HashSet<>();
+      final Set<ServerTask> dependencies = new HashSet<>();
+      final CollectionMap<Integer, Integer> dependenciesMap = new ArrayListHashMap<>();
       for (final ServerTask task: taskList) {
-        final TaskGraph.Node node = graph.nodeAt(task.getPosition());
-        if (node == null) continue;
-        final List<TaskGraph.Node> deps = node.getDependencies();
-        if ((deps != null) && !deps.isEmpty()) {
-          for (final TaskGraph.Node dep: deps) {
-            if (dependencies == null) {
-              dependencies = new HashSet<>();
-              dependenciesMap = new ArrayListHashMap<>();
-            }
-            if (!dependencies.contains(dep)) {
+        if (graph != null) { 
+          final TaskGraph.Node node = graph.nodeAt(task.getPosition());
+          if (node == null) continue;
+          if (traceEnabled) log.trace("found node in graph for {}", task);
+          final List<TaskGraph.Node> deps = node.getDependencies();
+          if ((deps != null) && !deps.isEmpty()) {
+            for (final TaskGraph.Node dep: deps) {
               ServerTask depTask = job.tasks.get(dep.getPosition());
               if (depTask == null) depTask = job.dependendedOnTasks.get(dep.getPosition());
-              if (depTask == null) {
-                final ServerTaskBundleClient clientBundle = task.getBundle();
-                final Map<Integer, ServerTask> clientBundleDeps = clientBundle.getDependencies();
-                if (clientBundleDeps != null) depTask = clientBundleDeps.get(dep.getPosition());
-              }
-              if (depTask == null) log.warn("server task null for dependency {} added to {}", depTask, task);
-              else {
+              if (depTask != null) {
                 dependencies.add(depTask);
                 dependenciesMap.putValue(task.getPosition(), dep.getPosition());
               }
             }
           }
+        } else {
+          final ServerTaskBundleClient clientBundle = task.getBundle();
+          final TaskGraphInfo clientGraphInfo = clientBundle.getTaskGraphInfo();
+          if (clientGraphInfo != null) {
+            if (traceEnabled) log.trace("found graph info for {}", task);
+            final Collection<Integer> positions = clientGraphInfo.getDependenciesMap().getValues(task.getPosition());
+            if (positions != null) {
+              for (final int position: positions) {
+                final ServerTask dep = (ServerTask) clientGraphInfo.getDependencyAt(position);
+                if (dep != null) {
+                  dependencies.add(dep);
+                  depsPositions.add(position);
+                  dependenciesMap.putValue(task.getPosition(), dep.getPosition());
+                }
+              }
+            }
+          } else {
+            if (traceEnabled) log.trace("no graph info found for {}", task);
+          }
         }
+      }
+      if (!dependencies.isEmpty()) {
+        final List<ServerTask> depsList = new ArrayList<>(dependencies);
+        final int[] positions = new int[depsList.size()];
+        int count = 0;
+        for (final ServerTask task: depsList) positions[count++] = task.getPosition();
+        graphInfo = new TaskGraphInfo(depsList.size(), dependenciesMap, positions);
+        graphInfo.setDependencies(depsList);
+        if (debugEnabled) log.debug("there are {} dependencies in {}", graphInfo.getNbDependencies(), this);
+      } else {
+        if (debugEnabled) log.debug("there are no dependencies in {}", this);
       }
     } finally {
       job.lock.unlock();
@@ -464,18 +486,10 @@ public class ServerTaskBundleNode {
   }
 
   /**
-   * Get a canonical set of direct dependencies for all the tasks in this dispatch bundle.
-   * @return a {@code Set} of {@link ServerTask} instances.
+   * Get the dependencies of the tasks in this bundle.
+   * @return the list of dependencies.
    */
-  public Set<ServerTask> getDependencies() {
-    return dependencies;
-  }
-
-  /**
-   * Get the mapping of tasks to their dependencies.
-   * @return a mming of taks positions to the positions of their dependencies.
-   */
-  public CollectionMap<Integer, Integer> getDependenciesMap() {
-    return dependenciesMap;
+  public TaskGraphInfo getTaskGraphInfo() {
+    return graphInfo;
   }
 }

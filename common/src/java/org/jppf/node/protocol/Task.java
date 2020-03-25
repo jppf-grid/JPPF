@@ -29,7 +29,7 @@ import org.jppf.utils.JPPFCallable;
  * @param <T> the type of results produced by the task.
  * @author Laurent Cohen
  */
-public interface Task<T> extends Runnable, Serializable, Interruptibility {
+public interface Task<T> extends Runnable, Serializable, Interruptibility, PositionalElement<Task<T>> {
   /**
    * Get the result of the task execution.
    * @return the task result.
@@ -118,21 +118,6 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
    * @return this task, for method chaining.
    */
   Task<T> setTimeoutSchedule(JPPFSchedule timeoutSchedule);
-
-  /**
-   * Returns the position of this task in the job in which it was submitted.
-   * @return the position of this task as an {@code int}.
-   * @exclude
-   */
-  int getPosition();
-
-  /**
-   * Set the position of this task in the job in which it was submitted.
-   * @param position the position of this task as an <code>int</code>.
-   * @return this task, for method chaining.
-   * @exclude
-   */
-  Task<T> setPosition(int position);
 
   /**
    * Determine whether this task is executing within a node, or locally on the client side.

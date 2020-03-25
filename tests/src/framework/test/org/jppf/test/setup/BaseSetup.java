@@ -172,7 +172,7 @@ public class BaseSetup {
       ThreadUtils.startDaemonThread(nodes[i], nodes[i].getName().trim() + "-Launcher");
     }
     if (createClient) {
-      client = createClient("client-" + clientUuidSequence.incrementAndGet(), true, config, listeners);
+      client = createClient(newClientUuid(), true, config, listeners);
       if (checkDriversAndNodes) checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     } else {
       JPPFConfiguration.reset();
@@ -508,5 +508,13 @@ public class BaseSetup {
       final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(name);
       if (logger != null) logger.setLevel(level);
     }
+  }
+
+  /**
+   * Generate a client UUID in the form "client-[sequence_number]".
+   * @return a new unique client UUID.
+   */
+  public static String newClientUuid() {
+    return "client-" + clientUuidSequence.incrementAndGet();
   }
 }

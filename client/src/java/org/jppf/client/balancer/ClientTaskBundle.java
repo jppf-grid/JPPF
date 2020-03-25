@@ -21,9 +21,9 @@ package org.jppf.client.balancer;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.node.protocol.*;
-import org.jppf.node.protocol.graph.TaskGraph;
+import org.jppf.node.protocol.graph.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -64,14 +64,6 @@ public class ClientTaskBundle extends JPPFTaskBundle {
    */
   private transient List<Task<?>> tasks;
   /**
-   * The dependencies of the tasks.
-   */
-  private transient Set<Task<?>> dependencies;
-  /**
-   * A mapping of tasks to their dependencies.
-   */
-  private CollectionMap<Integer, Integer> dependenciesMap;
-  /**
    * The broadcast UUID.
    */
   private transient String broadcastUUID;
@@ -83,6 +75,10 @@ public class ClientTaskBundle extends JPPFTaskBundle {
    * Job cancel indicator.
    */
   private boolean cancelled;
+  /**
+   * Information about the task graph, if any, for a job.
+   */
+  private TaskGraphInfo graphInfo;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -258,6 +254,11 @@ public class ClientTaskBundle extends JPPFTaskBundle {
   private void resolveDependencies() {
     final TaskGraph graph = job.getTaskGraph();
     if (graph == null) return;
+    if (!job.getJob().getClientSLA().isGraphTraversalInClient()) return;
+    List<PositionalElement<?>> dependencies = null;
+    CollectionMap<Integer, Integer> dependenciesMap = null;
+    final JobResults jobResults = job.getJob().getResults();
+    final Set<Integer> nullResultPositions = new HashSet<>();
     for (final Task<?> task: tasks) {
       final TaskGraph.Node node = graph.nodeAt(task.getPosition());
       if (node == null) continue;
@@ -265,33 +266,35 @@ public class ClientTaskBundle extends JPPFTaskBundle {
       if ((deps != null) && !deps.isEmpty()) {
         for (final TaskGraph.Node dep: deps) {
           if (dependencies == null) {
-            dependencies = new HashSet<>();
+            dependencies = new ArrayList<>();
             dependenciesMap = new ArrayListHashMap<>();
           }
-          final Task<?> depTask = job.getJob().getResults().getResultTask(dep.getPosition());
-          if (depTask == null) log.warn("server task null for dependency {} added to {}", depTask, task);
-          else { 
+          final int depPosition = dep.getPosition();
+          if (nullResultPositions.contains(depPosition)) continue;
+          final Task<?> depTask = jobResults.getResultTask(depPosition);
+          if (depTask == null) {
+            log.warn("null dependency at position {} added to {}", depPosition, task);
+            nullResultPositions.add(depPosition);
+          } else { 
             dependencies.add(depTask);
-            dependenciesMap.putValue(task.getPosition(), dep.getPosition());
+            dependenciesMap.putValue(task.getPosition(), depPosition);
           }
         }
       }
     }
+    if (dependencies != null) {
+      final int[] depsPositions = new int[dependencies.size()];
+      int count = 0;
+      for (PositionalElement<?> elt: dependencies) depsPositions[count++] = elt.getPosition();
+      this.graphInfo = new TaskGraphInfo(dependencies.size(), dependenciesMap, depsPositions);
+      this.graphInfo.setDependencies(dependencies);
+    }
   }
 
   /**
-   * Get a canonical set of direct dependencies for all the tasks in this dispatch bundle.
-   * @return a {@code Set} of {@link ServerTask} instances.
+   * @return information about the task graph, if any, for a job. 
    */
-  public Set<Task<?>> getDependencies() {
-    return dependencies;
-  }
-
-  /**
-   * Get the mapping of tasks to their dependencies.
-   * @return a mming of taks positions to the positions of their dependencies.
-   */
-  public CollectionMap<Integer, Integer> getDependenciesMap() {
-    return dependenciesMap;
+  public TaskGraphInfo getGraphInfo() {
+    return graphInfo;
   }
 }

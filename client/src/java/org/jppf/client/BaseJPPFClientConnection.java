@@ -30,6 +30,7 @@ import org.jppf.client.balancer.ClientTaskBundle;
 import org.jppf.comm.socket.*;
 import org.jppf.io.IOHelper;
 import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.TaskGraphInfo;
 import org.jppf.serialization.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -130,15 +131,13 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     header.setUuid(job.getUuid());
     header.setSLA(job.getSLA());
     header.setMetadata(job.getMetadata());
-    final Set<Task<?>> dependencies = clientBundle.getDependencies();
-    List<Task<?>> deps = null;
-    if (dependencies != null) {
-      deps = new ArrayList<>(dependencies);
-      header.setParameter(BundleParameter.CLIENT_DEPENDENCY_COUNT, deps.size());
-      final int[] positions = new int[deps.size()];
-      int i = 0;
-      for (final Task<?> task: deps) positions[i++] = task.getPosition();
-      header.setParameter(BundleParameter.CLIENT_DEPENDENCY_POSITIONS, positions);
+    List<? extends PositionalElement<?>> deps = null;
+    TaskGraphInfo graphInfo = null;
+    if ((clientBundle.getClientJob().getTaskGraph() != null) && job.getClientSLA().isGraphTraversalInClient()) graphInfo = clientBundle.getGraphInfo();
+    if (graphInfo != null) {
+      deps = graphInfo.getDependencies();
+      header.setParameter(BundleParameter.JOB_TASK_GRAPH_INFO, graphInfo);
+      final int[] positions = graphInfo.getDependenciesPositions();
       if (debugEnabled) log.debug("sending {} dependencies with positions {}", deps.size(), Arrays.toString(positions));
     }
     if (debugEnabled) log.debug("found {} dependencies for bundle {}", (deps == null ? 0 : deps.size()), clientBundle);
@@ -153,9 +152,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       IOHelper.sendData(socketClient, null, ser);
     }
     final List<Task<?>> notSerializableTasks = sendTasks(job, ser, socketClient, tasks);
-    if (deps != null) {
-      sendTasks(job, ser, socketClient, deps);
-    }
+    if (deps != null) sendTasks(job, ser, socketClient, deps);
     socketClient.flush();
     return notSerializableTasks;
   }
@@ -169,16 +166,16 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @return a list of tasks that couldn't be serialized, possibly empty.
    * @throws Exception if an error occurs while sending the request.
    */
-  private static List<Task<?>> sendTasks(final JPPFJob job, final ObjectSerializer ser, final SocketWrapper socketClient, final Collection<Task<?>> tasks) throws Exception {
+  private static List<Task<?>> sendTasks(final JPPFJob job, final ObjectSerializer ser, final SocketWrapper socketClient, final List<? extends PositionalElement<?>> tasks) throws Exception {
     final List<Task<?>> notSerializableTasks =  new ArrayList<>(tasks.size());
-    for (final Task<?> task : tasks) {
+    for (final PositionalElement<?> task : tasks) {
       try {
         IOHelper.sendData(socketClient, task, ser);
       } catch(final NotSerializableException e) {
         log.error("error serializing task {} for {} : {}", task, job, ExceptionUtils.getStackTrace(e));
-        task.setThrowable(e);
+        ((Task<?>) task).setThrowable(e);
         IOHelper.sendNullData(socketClient);
-        notSerializableTasks.add(task);
+        notSerializableTasks.add((Task<?>) task);
       }
     }
     return notSerializableTasks;
@@ -201,7 +198,6 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     for (final Task<?> task : allTasks) {
       final int pos = task.getPosition();
       if (!job.getResults().hasResult(pos)) {
-        //tasks[i] = task;
         tasks.add(task);
         positions[i] = pos;
         maxResubmits[i] = task.getMaxResubmits();

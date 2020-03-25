@@ -24,7 +24,7 @@ import java.io.InvalidClassException;
 import java.util.*;
 
 import org.jppf.node.protocol.*;
-import org.jppf.node.protocol.graph.TaskNode;
+import org.jppf.node.protocol.graph.*;
 import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -74,9 +74,10 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
           task.setDataProvider(dataProvider).setInNode(true).setNode(node).setJob(currentBundle);
           taskList.add(task);
         }
-        final Integer dependencyCount = currentBundle.getParameter(BundleParameter.NODE_DEPENDENCY_COUNT, 0);
+        final TaskGraphInfo graphInfo = currentBundle.getParameter(BundleParameter.JOB_TASK_GRAPH_INFO, null);
+        final int dependencyCount = (graphInfo == null) ? 0 : graphInfo.getNbDependencies();
         if (dependencyCount > 0) {
-          final CollectionMap<Integer, Integer> dependencyMapping = currentBundle.getParameter(BundleParameter.NODE_DEPENDENCY_MAPPING);
+          final CollectionMap<Integer, Integer> dependencyMapping = graphInfo.getDependenciesMap();
           final Map<Integer, Task<?>> depsByPosition = new HashMap<>();
           for (int i=0; i<dependencyCount; i++) {
             final Task<?> task = (Task<?>) result[2 + taskCount + i];

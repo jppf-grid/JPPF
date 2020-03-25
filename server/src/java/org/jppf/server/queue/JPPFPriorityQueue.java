@@ -277,7 +277,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         final String uuid = serverJob.getUuid();
         if (jobMap.remove(uuid) != null) {
           scheduleManager.clearSchedules(serverJob.getUuid());
-          dependenciesHandler.jobEnded(serverJob);
+          if (serverJob.getSLA().getDependencySpec().getId() != null) dependenciesHandler.jobEnded(serverJob);
           jobManager.jobEnded(serverJob);
         } else if (debugEnabled) log.debug("could not remove {}", serverJob);
         final Condition cond = jobRemovalConditions.remove(uuid);

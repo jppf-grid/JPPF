@@ -50,7 +50,6 @@ public class ClientJob extends AbstractClientJob {
    * The list of the tasks.
    */
   final Map<Integer, Task<?>> tasks;
-  //private final List<Task<?>> tasks;
   /**
    * The broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
    */

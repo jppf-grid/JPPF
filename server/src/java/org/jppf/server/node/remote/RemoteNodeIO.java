@@ -28,6 +28,7 @@ import org.jppf.JPPFSuspendedNodeException;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.TaskGraphInfo;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.node.*;
 import org.jppf.utils.LoggingUtils;
@@ -80,7 +81,8 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
 
   @Override
   protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception {
-    final Integer dependencyCount = bundle.getParameter(BundleParameter.NODE_DEPENDENCY_COUNT, 0);
+    final TaskGraphInfo graphInfo = bundle.getParameter(BundleParameter.JOB_TASK_GRAPH_INFO, null);
+    final int dependencyCount = (graphInfo == null) ? 0 : graphInfo.getNbDependencies();
     final int count = bundle.getTaskCount() + dependencyCount;
     final Object[] list = new Object[count + 2];
     list[0] = bundle;

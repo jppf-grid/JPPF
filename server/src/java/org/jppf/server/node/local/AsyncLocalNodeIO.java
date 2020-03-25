@@ -26,6 +26,7 @@ import java.util.concurrent.*;
 import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.TaskGraphInfo;
 import org.jppf.server.nio.nodeserver.LocalNodeMessage;
 import org.jppf.server.nio.nodeserver.async.*;
 import org.jppf.server.node.*;
@@ -101,7 +102,8 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
    * @throws Exception if an error occurs while deserializing.
    */
   protected Object[] deserializeObjects(final TaskBundle bundle, final LocalNodeMessage currentMessage) throws Exception {
-    final Integer dependencyCount = bundle.getParameter(BundleParameter.NODE_DEPENDENCY_COUNT, 0);
+    final TaskGraphInfo graphInfo = bundle.getParameter(BundleParameter.JOB_TASK_GRAPH_INFO, null);
+    final int dependencyCount = (graphInfo == null) ? 0 : graphInfo.getNbDependencies();
     final int count = bundle.getTaskCount() + dependencyCount;
     final Object[] list = new Object[count + 2];
     list[0] = bundle;

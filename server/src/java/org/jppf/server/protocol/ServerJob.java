@@ -72,7 +72,7 @@ public class ServerJob extends AbstractServerJobBase {
    */
   public ServerJob(final Lock lock, final ServerJobChangeListener notificationEmitter, final TaskBundle job, final DataLocation dataProvider) {
     super(lock, notificationEmitter, job, dataProvider);
-    taskGraph = job.getParameter(BundleParameter.JOB_TASK_GRAPH);
+    taskGraph = job.removeParameter(BundleParameter.JOB_TASK_GRAPH);
   }
 
   /**

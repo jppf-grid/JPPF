@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.*;
 
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.graph.TaskGraphInfo;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -102,9 +103,9 @@ public class ServerTaskBundleClient {
    */
   private final int[] tasksPositions;
   /**
-   * The tasks to be executed by the node.
+   * Info on the dependenencies of the tasks in this bundle.
    */
-  private Map<Integer, ServerTask> dependencies;
+  private TaskGraphInfo graphInfo;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -438,18 +439,17 @@ public class ServerTaskBundleClient {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName()).append('[');
-    sb.append("id=").append(id);
-    sb.append(", pendingTasks=").append(pendingTasksCount);
-    sb.append(", taskList.size()=").append(taskList.size());
-    sb.append(", cancelled=").append(cancelled);
-    sb.append(", done=").append(done);
-    sb.append(", dependencies=").append(dependencies == null ? 0 : dependencies.size());
-    sb.append(", job=").append(job);
-    sb.append("; strategy=").append(strategy == null ? "null" : strategy.getName());
-    sb.append(']');
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("id=").append(id)
+      .append(", pendingTasks=").append(pendingTasksCount)
+      .append(", tasks=").append(taskList.size())
+      .append(", cancelled=").append(cancelled)
+      .append(", done=").append(done)
+      .append(", dependencies=").append(graphInfo == null ? 0 : graphInfo.getNbDependencies())
+      .append(", job=").append(job)
+      .append("; strategy=").append(strategy == null ? "null" : strategy.getName())
+      .append(']')
+      .toString();
   }
 
   /**
@@ -498,23 +498,26 @@ public class ServerTaskBundleClient {
    * Get the dependencies of the tasks in this bundle.
    * @return the list of dependencies.
    */
-  public Map<Integer, ServerTask> getDependencies() {
-    return dependencies;
+  public TaskGraphInfo getTaskGraphInfo() {
+    return graphInfo;
   }
 
   /**
    * Set the dependencies of the tasks in this bundle.
    * @param dependenciesLocations the list of dependencies.
-   * @param positions the positions of the dependencies in the job.
+   * @param graphInfo information on the task graph, if any.
    */
-  public void setDependencies(final List<DataLocation> dependenciesLocations, final int[] positions) {
-    this.dependencies = new HashMap<>(dependenciesLocations.size());
+  public void setDependencies(final List<DataLocation> dependenciesLocations, final TaskGraphInfo graphInfo) {
+    this.graphInfo = graphInfo;
+    final List<ServerTask> deps = new ArrayList<>(dependenciesLocations.size());
+    final int[] positions = graphInfo.getDependenciesPositions();
     for (int i=0; i<positions.length; i++) {
       final DataLocation location = dependenciesLocations.get(i);
       final ServerTask task = new ServerTask(this, location, positions[i], 0);
       task.setResult(location);
       task.setState(TaskState.RESULT);
-      this.dependencies.put(positions[i], task);
+      deps.add(task);
     }
+    graphInfo.setDependencies(deps);
   }
 }
