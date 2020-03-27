@@ -18,11 +18,12 @@
 
 package org.jppf.node.protocol.graph;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 
 import org.jppf.node.protocol.PositionalElement;
-import org.jppf.utils.collections.CollectionMap;
+import org.jppf.serialization.SerializationUtils;
+import org.jppf.utils.collections.*;
 
 /**
  * Information about the task graph, if any, for a job.
@@ -38,15 +39,15 @@ public class TaskGraphInfo implements Serializable {
   /**
    * The total number of dependencies for all the tasks.
    */
-  private final int nbDependencies;
+  private int nbDependencies;
   /**
    * Mapping of each task position to the positions of its dependencies.
    */
-  private final CollectionMap<Integer, Integer> dependenciesMap;
+  private CollectionMap<Integer, Integer> dependenciesMap;
   /**
    * An ordered set of positions of the dependencies.
    */
-  private final int[] dependenciesPositions;
+  private int[] dependenciesPositions;
   /**
    * The actual dpeendencies, if available.
    */
@@ -113,5 +114,48 @@ public class TaskGraphInfo implements Serializable {
    */
   public PositionalElement<?> getDependencyAt(final int position) {
     return (dependenciesbyPosition == null) ? null : dependenciesbyPosition.get(position);
+  }
+
+  /**
+   * Save the state of this object to a stream (i.e.,serialize it).
+   * @param out the output stream to which to write the object. 
+   * @throws IOException if any I/O error occurs.
+   */
+  private synchronized void writeObject(final ObjectOutputStream out) throws IOException {
+    final byte[] buf = new byte[8];
+    SerializationUtils.writeVarInt(out, nbDependencies, buf);
+    if (nbDependencies > 0) {
+      SerializationUtils.writeVarInt(out, dependenciesMap.keySet().size(), buf);
+      for (final Map.Entry<Integer, Collection<Integer>> entry: dependenciesMap.entrySet()) {
+        SerializationUtils.writeVarInt(out, entry.getKey(), buf);
+        final Collection<Integer> values = entry.getValue();
+        SerializationUtils.writeVarInt(out, values.size(), buf);
+        for (final Integer pos: values) SerializationUtils.writeVarInt(out, pos, buf);
+      }
+      for (final int pos: dependenciesPositions) SerializationUtils.writeVarInt(out, pos, buf);
+    }
+  }
+
+  /**
+   * Reconstitute the obejct from a stream (i.e., deserialize it).
+   * @param in the input stream from which to read the object. 
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if the class of an object in the object graph can not be found.
+   */
+  @SuppressWarnings("unchecked")
+  private synchronized void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+    final byte[] buf = new byte[8];
+    nbDependencies = SerializationUtils.readVarInt(in, buf);
+    if (nbDependencies > 0) {
+      dependenciesMap = new ArrayListHashMap<>();
+      final int nbKeys = SerializationUtils.readVarInt(in, buf);
+      for (int i=0; i<nbKeys; i++) {
+        final int key = SerializationUtils.readVarInt(in, buf);
+        final int nbValues = SerializationUtils.readVarInt(in, buf);
+        for (int j=0; j<nbValues; j++) dependenciesMap.putValue(key, SerializationUtils.readVarInt(in, buf));
+      }
+      dependenciesPositions = new int[nbDependencies];
+      for (int i=0; i<nbDependencies; i++) dependenciesPositions[i] = SerializationUtils.readVarInt(in, buf);
+    }
   }
 }
