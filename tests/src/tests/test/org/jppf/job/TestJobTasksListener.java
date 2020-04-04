@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.job.*;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
@@ -115,14 +116,16 @@ public class TestJobTasksListener extends Setup1D1N {
   public void testResultsReceived() throws Exception {
     final int nbTasks = 10;
     configure();
-    final AwaitJobNotificationListener jobQueuedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_QUEUED);
+    final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
+    jmx.changeLoadBalancerSettings("manual", new TypedProperties().setInt("size", 1));
+    final AwaitJobNotificationListener jobQueuedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_RETURNED);
     final AwaitJobNotificationListener jobEndedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_ENDED);
     final JPPFJob job = new JPPFJob();
     try (JPPFClient client = new JPPFClient()) {
       client.awaitWorkingConnectionPool();
       job.setName(ReflectionUtils.getCurrentMethodName());
       job.getSLA().setCancelUponClientDisconnect(false);
-      for (int i=1; i<=nbTasks; i++) job.add(new MyJobTasksListenerTask(String.format("#%02d", i), 100L));
+      for (int i=1; i<=nbTasks; i++) job.add(new MyJobTasksListenerTask(String.format("#%02d", i), 10L));
       final CountDownJobListener jobListener = new CountDownJobListener();
       job.addJobListener(jobListener);
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> submitting job");
@@ -154,6 +157,7 @@ public class TestJobTasksListener extends Setup1D1N {
       assertEquals(0, result.expirationCount);
       assertEquals(0, result.resubmitCount);
     }
+    jmx.changeLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
   }
 
   /**
@@ -165,7 +169,7 @@ public class TestJobTasksListener extends Setup1D1N {
   public void testWithDispatchExpiration() throws Exception {
     final int nbTasks = 1, maxExpirations = 2, nbRuns = maxExpirations + 1;
     configure();
-    final AwaitJobNotificationListener jobQueuedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_QUEUED);
+    final AwaitJobNotificationListener jobQueuedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);
     final AwaitJobNotificationListener jobEndedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_ENDED);
     final JPPFJob job = new JPPFJob();
     try (final JPPFClient client = new JPPFClient()) {
