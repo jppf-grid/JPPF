@@ -359,7 +359,9 @@ public class TestJPPFClient extends Setup1D1N {
     @Override
     public void jobDispatched(final JobEvent event) {
       int n = dispatchCount.incrementAndGet();
-      tasksPerDispatch.put(n, event.getJobTasks().size());
+      final int nbTasks = event.getJobTasks().size();
+      tasksPerDispatch.put(n, nbTasks);
+      BaseTest.print(false, false, "dispatched %d tasks of job '%s', n = %d, connection = %s", nbTasks, event.getJob().getName(), n, (event.isRemoteExecution() ? event.getConnection() : "local"));
     }
   }
 }
