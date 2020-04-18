@@ -169,18 +169,19 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public void testSimplePersistedJobCancellation() throws Exception {
     final int nbTasks = 40;
     final String method = ReflectionUtils.getCurrentMethodName();
+    final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     final JPPFJob job = BaseTestHelper.createJob(method, false, nbTasks, LifeCycleTask.class, 100L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(true);
     print(false, false, "submitting job");
+    final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);
     client.submitAsync(job);
-    Thread.sleep(1000L);
+    listener.await();
     print(false, false, "cancelling job");
     assertTrue(job.cancel());
     final List<Task<?>> results = job.awaitResults();
     print(false, false, "checking job results");
     checkJobResults(nbTasks, results, true);
-    final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     print(false, false, "got jmx connection");
     final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
     assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS, 250, false));
