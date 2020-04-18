@@ -302,11 +302,11 @@ public class ServerJob extends AbstractServerJobBase {
     }
     if (debugEnabled) log.debug("requeue = {} for bundle {}, job = {}", requeue, bundle, this);
     if (hasPending()) {
-      if (debugEnabled) log.debug("processing hasPedning=true");
+      if (debugEnabled) log.debug("processing hasPending=true");
       if ((throwable != null) && !requeue) setSubmissionStatus(SubmissionStatus.FAILED);
       if (!isCancelled() && requeue && (onRequeue != null)) onRequeue.run();
     } else {
-      if (debugEnabled) log.debug("processing hasPedning=false");
+      if (debugEnabled) log.debug("processing hasPending=false");
       setSubmissionStatus(SubmissionStatus.COMPLETE);
       updateStatus(ServerJobStatus.EXECUTING, ServerJobStatus.DONE);
     }
