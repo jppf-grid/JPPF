@@ -71,6 +71,7 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
       }
     }
     config.driver.log4j = "classes/tests/config/" + prefix + "/log4j-driver.properties";
+    config.node.log4j = "classes/tests/config/" + prefix + "/log4j-node.properties";
     client = BaseSetup.setup(2, 2, true, true, config);
   }
 

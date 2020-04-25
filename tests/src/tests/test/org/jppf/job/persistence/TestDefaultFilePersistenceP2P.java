@@ -49,6 +49,7 @@ public class TestDefaultFilePersistenceP2P extends AbstractDatabaseSetup {
     final String prefix = "job_persistence_p2p";
     final TestConfiguration config = createConfig(prefix);
     config.driver.log4j = "classes/tests/config/" + prefix + "/log4j-driver.properties";
+    config.node.log4j = "classes/tests/config/" + prefix + "/log4j-node.properties";
     client = BaseSetup.setup(2, 2, true, true, config);
   }
 
