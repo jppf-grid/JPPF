@@ -157,6 +157,7 @@ public class FileReplacer {
    */
   public static void main(final String...args) {
     try {
+      final long start = System.nanoTime();
       System.out.println("using " + Arrays.asList(args));
       final NamedArguments namedArgs = new NamedArguments()
         .addArg("-i", "The input file containing the text or expression to match")
@@ -170,6 +171,8 @@ public class FileReplacer {
       System.out.println("parsed arguments:\n" + namedArgs);
       //namedArgs.printUsage();
       new FileReplacer().replace(namedArgs);
+      final long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      System.out.println("total time: " + StringUtils.toStringDuration(elapsed));
     } catch(final Exception e) {
       e.printStackTrace();
     }
