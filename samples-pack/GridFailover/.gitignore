@@ -1,2 +1,4 @@
 /classes/
 *.jar
+**/*.yaml.html
+
