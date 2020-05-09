@@ -49,7 +49,8 @@ class PolicyBuilder {
       case "BetweenIE": return buildBetweenIEPolicy(desc);
       case "BetweenEI": return buildBetweenEIPolicy(desc);
       case "BetweenEE": return buildBetweenEEPolicy(desc);
-      case "Equal": return buildEqualPolicy(desc);
+      case "Equal":
+      case "NotEqual": return buildEqualityPolicy(desc);
       case "Contains": return buildContainsPolicy(desc);
       case "OneOf": return buildOneOfPolicy(desc);
       case "RegExp": return buildRegExpPolicy(desc);
@@ -229,24 +230,25 @@ class PolicyBuilder {
   /**
    * Build a Equal policy from a descriptor.
    * @param desc the descriptor to use.
-   * @return an <code>ExecutionPolicy</code> instance.
+   * @return an {@link ExecutionPolicy} instance.
    */
-  private static ExecutionPolicy buildEqualPolicy(final PolicyDescriptor desc) {
+  private static ExecutionPolicy buildEqualityPolicy(final PolicyDescriptor desc) {
+    final boolean isEqualPolicy = "Equal".equals(desc.type);
     final String s = desc.operands.get(1);
     if ("string".equals(desc.valueType)) {
       final boolean ignoreCase = (desc.ignoreCase == null) ? false : Boolean.valueOf(desc.ignoreCase);
-      return new Equal(desc.operands.get(0), ignoreCase, s);
+      return isEqualPolicy ? new Equal(desc.operands.get(0), ignoreCase, s) : new NotEqual(desc.operands.get(0), ignoreCase, s);
     }
     if ("numeric".equals(desc.valueType)) {
       double value = 0.0d;
       try {
         value = Double.valueOf(s);
-        return new Equal(desc.operands.get(0), value);
+        return isEqualPolicy ? new Equal(desc.operands.get(0), value) : new NotEqual(desc.operands.get(0), value);
       } catch(@SuppressWarnings("unused") final NumberFormatException e) {
-        return new Equal(ValueType.NUMERIC, desc.operands.get(0), s);
+        return isEqualPolicy ? new Equal(ValueType.NUMERIC, desc.operands.get(0), s) : new NotEqual(ValueType.NUMERIC, desc.operands.get(0), s);
       }
     }
-    return new Equal(ValueType.BOOLEAN, desc.operands.get(0), s);
+    return isEqualPolicy ? new Equal(ValueType.BOOLEAN, desc.operands.get(0), s) : new NotEqual(ValueType.BOOLEAN, desc.operands.get(0), s);
   }
 
   /**

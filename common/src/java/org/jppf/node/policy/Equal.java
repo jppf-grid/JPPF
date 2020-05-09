@@ -33,19 +33,19 @@ public class Equal extends LeftOperandRule {
   /**
    * A numeric value to compare with.
    */
-  private Expression<Double> numberValue;
+  Expression<Double> numberValue;
   /**
    * A string value to compare with.
    */
-  private Expression<String> stringValue;
+  Expression<String> stringValue;
   /**
    * An object value to compare with.
    */
-  private Expression<Boolean> booleanValue;
+  Expression<Boolean> booleanValue;
   /**
    * Determines if the comparison should ignore the string case.
    */
-  private boolean ignoreCase;
+  boolean ignoreCase;
 
   /**
    * Define an equality comparison between the numeric value of a property and another numeric value.<br>
@@ -112,7 +112,10 @@ public class Equal extends LeftOperandRule {
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
     final Object o = getLeftOperandValue(info);
-    if (numberValue != null) return (o == null) ? false : o.equals(numberValue.evaluate(info));
+    if (numberValue != null) {
+      final Double eval = numberValue.evaluate(info);
+      return (o == null) ? false : o.equals(eval);
+    }
     else if (stringValue != null) return ignoreCase ? stringValue.evaluate(info).equalsIgnoreCase((String) o) : stringValue.evaluate(info).equals(o);
     else if (booleanValue != null) return (o == null) ? false : o.equals(booleanValue.evaluate(info));
     else return o == null;
@@ -120,7 +123,8 @@ public class Equal extends LeftOperandRule {
 
   @Override
   public String toString(final int n) {
-    final StringBuilder sb = new StringBuilder(indent(n)).append("<Equal valueType=\"");
+    final String xmlTag = getClass().getSimpleName();
+    final StringBuilder sb = new StringBuilder(indent(n)).append('<').append(xmlTag).append(" valueType=\"");
     if (stringValue != null) sb.append("string");
     else if (numberValue != null) sb.append("numeric");
     else if (booleanValue != null) sb.append("boolean");
@@ -131,7 +135,7 @@ public class Equal extends LeftOperandRule {
     else if (numberValue != null) sb.append(numberValue.getExpression());
     else if (booleanValue != null) sb.append(booleanValue.getExpression());
     sb.append("</Value>\n");
-    sb.append(indent(n)).append("</Equal>\n");
+    sb.append(indent(n)).append("</").append(xmlTag).append(">\n");
     return sb.toString();
   }
 }

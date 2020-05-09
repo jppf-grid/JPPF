@@ -78,6 +78,7 @@ public class AbstractTestExecutionPolicy extends BaseTest {
       fail(message);
     }
     final ExecutionPolicy parsed = PolicyParser.parsePolicy(str);
+    assertEquals(policy.getClass(), parsed.getClass());
     assertNotNull(parsed);
     assertEquals(expected, parsed.accepts(systemInfo));
     assertEquals(s1, parsed.toString());

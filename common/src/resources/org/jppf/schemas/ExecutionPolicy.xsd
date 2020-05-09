@@ -41,6 +41,7 @@
       <element name="BetweenEI" type="jppf:Numeric3Type"/>
       <element name="BetweenEE" type="jppf:Numeric3Type"/>
       <element name="Equal" type="jppf:EqualType"/>
+      <element name="NotEqual" type="jppf:EqualType"/>
       <element name="Contains" type="jppf:ContainsType"/>
       <element name="OneOf" type="jppf:OneOfType"/>
       <element name="RegExp" type="jppf:RegExpType"/>

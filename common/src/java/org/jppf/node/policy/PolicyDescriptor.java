@@ -30,19 +30,19 @@ class PolicyDescriptor {
   /**
    * The type of rule, eg AND, NOT, OneOf, Equal, etc.
    */
-  String type = null;
+  String type;
   /**
    * Type of value used for some rules (currently Equal and OneOf).
    */
-  String valueType = null;
+  String valueType;
   /**
    * Determines whether case should be ignored in string comparisons.
    */
-  String ignoreCase = null;
+  String ignoreCase;
   /**
    * The fully qualified class name of a custom policy class.
    */
-  String className = null;
+  String className;
   /**
    * The operands for this element, applies to non-logical rules (ie not AND, OR, XOR, NOT).
    * The first operand is always a property name.
@@ -59,11 +59,11 @@ class PolicyDescriptor {
   /**
    * The script language to use for ScriptedRule elements.
    */
-  String language = null;
+  String language;
   /**
    * The actual script to use for ScriptedRule elements.
    */
-  String script = null;
+  String script;
   /**
    * The comparison operator for a global policy.
    */

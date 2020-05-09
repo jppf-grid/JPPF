@@ -114,6 +114,46 @@ public class TestExecutionPolicy extends AbstractTestExecutionPolicy {
 
   /** @throws Exception if any error occurs. */
   @Test(timeout=5000)
+  public void testNotEqualString() throws Exception {
+    checkPolicy(new NotEqual("string.4a", true, "string4"), false);
+    checkPolicy(new NotEqual("string.4a", false, "string4"), false);
+    checkPolicy(new NotEqual("string.4a", true, "STRING4"), false);
+    checkPolicy(new NotEqual("string.4a", false, "STRING4"), true);
+    checkPolicy(new NotEqual("string.4a", true, "string51"), true);
+    checkPolicy(new NotEqual("string.4b", true, "string4"), false);
+    checkPolicy(new NotEqual("string.4b", false, "string4"), true);
+    checkPolicy(new NotEqual("string.4b", true, "stRIng4"), false);
+    checkPolicy(new NotEqual("string.4b", true, "string51"), true);
+    checkPolicy(new NotEqual("$script{ '${string}' + 4; }$", true, "string4"), false);
+    checkPolicy(new NotEqual("$script{ '${string}' + 4; }$", true, "${string.4a}"), false);
+  }
+
+  /** @throws Exception if any error occurs. */
+  @Test(timeout=5000)
+  public void testNotEqualBoolean() throws Exception {
+    checkPolicy(new NotEqual("boolean.1", true), false);
+    checkPolicy(new NotEqual("boolean.1", false), true);
+    checkPolicy(new NotEqual("boolean.2", true), true);
+    checkPolicy(new NotEqual("boolean.2", false), false);
+    checkPolicy(new NotEqual(ValueType.BOOLEAN, "$script{ '${string.tr}' + '${string.ue}'; }$", "${boolean.1}"), false);
+  }
+
+  /** @throws Exception if any error occurs. */
+  @Test(timeout=5000)
+  public void testNotEqualNumeric() throws Exception {
+    checkPolicy(new NotEqual("int.1", 1), false);
+    checkPolicy(new NotEqual("int.1", 2), true);
+    checkPolicy(new NotEqual("int.1", 1L), false);
+    checkPolicy(new NotEqual("int.1", 2L), true);
+    checkPolicy(new NotEqual("int.1", 1f), false);
+    checkPolicy(new NotEqual("int.1", 2f), true);
+    checkPolicy(new NotEqual("int.1", 1d), false);
+    checkPolicy(new NotEqual("int.1", 2d), true);
+    checkPolicy(new NotEqual(ValueType.NUMERIC, "$script{ ${int.1} + ${int.2}; }$", "${int.3}"), false);
+  }
+
+  /** @throws Exception if any error occurs. */
+  @Test(timeout=5000)
   public void testBetweenII() throws Exception {
     checkPolicy(new BetweenII("int.3", 0, 6), true);
     checkPolicy(new BetweenII("int.3", 3, 6), true);
