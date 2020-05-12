@@ -106,6 +106,10 @@ public class ServerTaskBundleClient {
    * Info on the dependenencies of the tasks in this bundle.
    */
   private TaskGraphInfo graphInfo;
+  /**
+   * Whether ths client bundle is ended.
+   */
+  private final AtomicBoolean isEnded = new AtomicBoolean(false);
 
   /**
    * Initialize this task bundle and set its build number.
@@ -415,7 +419,9 @@ public class ServerTaskBundleClient {
    */
   public void bundleEnded() {
     if (debugEnabled) log.debug("bundle ended {}", this);
-    for (final CompletionListener listener : listenerList) listener.bundleEnded(this);
+    if (isEnded.compareAndSet(false, true)) {
+      for (final CompletionListener listener : listenerList) listener.bundleEnded(this);
+    }
   }
 
   /**
