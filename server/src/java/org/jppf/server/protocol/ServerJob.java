@@ -130,7 +130,9 @@ public class ServerJob extends AbstractServerJobBase {
         if (!job.isHandshake() && getSLA().getDependencySpec().getId() != null) newTaskBundle.setParameter(BundleParameter.JOB_GRAPH_ALREADY_HANDLED, true);
         return new ServerTaskBundleNode(this, newTaskBundle, list);
       } finally {
-        for (final ServerTask task: list) tasks.remove(task.getPosition());
+        if (list != null) {
+          for (final ServerTask task: list) tasks.remove(task.getPosition());
+        }
         fireJobUpdated(false);
       }
     } finally {
