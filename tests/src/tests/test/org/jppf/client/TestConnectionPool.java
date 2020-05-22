@@ -171,12 +171,14 @@ public class TestConnectionPool extends Setup1D1N {
       // trigger close of pool1
       JPPFConnectionPool pool = client.findConnectionPool("pool1");
       assertNotNull(pool);
+      print(false, false, "closing pool1");
       JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) pool.awaitWorkingConnection();
       AbstractClassServerDelegate csd = (AbstractClassServerDelegate) c.getDelegate();
       csd.getSocketInitializer().close();
       csd.getSocketClient().close();
       awaitConnections(client, Operator.AT_MOST, 1);
       testJobsInPool(client, "pool2", methodName);
+      print(false, false, "waiting for active pool");
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 1) Thread.sleep(10L);
       discovery.emitPool("pool1", 10);
       awaitConnections(client, Operator.AT_LEAST, 2);
@@ -200,9 +202,14 @@ public class TestConnectionPool extends Setup1D1N {
       job.addJobListener(listener);
       jobs.add(job);
     }
-    for (JPPFJob job: jobs) client.submitJob(job);
     for (JPPFJob job: jobs) {
+      print(false, false, "submitting job %s", job.getName());
+      client.submitJob(job);
+    }
+    for (JPPFJob job: jobs) {
+      print(false, false, "awaiting results for job %s", job.getName());
       List<Task<?>> result = job.awaitResults();
+      print(false, false, "got results for job %s", job.getName());
       testJobResults(1, result);
       String name = listener.jobToPool.get(job.getUuid());
       assertNotNull(name);
