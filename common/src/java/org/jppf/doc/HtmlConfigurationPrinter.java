@@ -18,7 +18,7 @@
 
 package org.jppf.doc;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.utils.FileUtils;
 import org.jppf.utils.configuration.*;
@@ -28,7 +28,18 @@ import org.jppf.utils.configuration.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
+public class HtmlConfigurationPrinter extends AbstractConfigurationPrinter {
+  /**
+   * HTML character entity conversions for the description column.
+   */
+  private final static Map<String, String> DESCRIPTION_CONVERSIONS = new LinkedHashMap<String, String>() {{
+    put("_i_", "<i>");
+    put("_/i_", "</i>");
+    put("_b_", "<b>");
+    put("_/b_", "</b>");
+    put("_br_", "<br>");
+  }};
+
   /**
    * Entry point.
    * @param args not used.
@@ -36,12 +47,12 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
   public static void main(final String[] args) {
     try {
       if ((args == null) || (args.length <= 0))
-        FileUtils.writeTextFile("JPPFConfiguration.html", new WikiConfigurationPrinter().printProperties("JPPF configuration properties", JPPFProperties.allProperties()));
+        FileUtils.writeTextFile("JPPFConfiguration.html", new HtmlConfigurationPrinter().printProperties("JPPF configuration properties", JPPFProperties.allProperties()));
       else for (final String arg: args) {
         final String[] tokens = arg.split("\\|");
         final Class<?> c = Class.forName(tokens[0]);
         final List<JPPFProperty<?>> props = ConfigurationUtils.allProperties(c);
-        FileUtils.writeTextFile(tokens[1], new WikiConfigurationPrinter().printProperties(tokens[2], props));
+        FileUtils.writeTextFile(tokens[1], new HtmlConfigurationPrinter().printProperties(tokens[2], props));
       }
     } catch (final Exception e) {
       e.printStackTrace();
@@ -53,8 +64,9 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter prologue() {
-    return println("{{NavPath|[[Main Page]] > [[Configuration properties reference]]}}<br/>").println("");
+  HtmlConfigurationPrinter prologue() {
+    //
+    return println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"http://www.jppf.org/jppf.css\" title=\"Style\"></head><body>");
   }
 
   /**
@@ -62,8 +74,8 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter epilogue() {
-    return println("{{NavPathBottom|[[Main Page]] > [[Configuration properties reference]]}}");
+  HtmlConfigurationPrinter epilogue() {
+    return println("</body></html>");
   }
 
   /**
@@ -72,8 +84,8 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter doTagTitle(final String tag) {
-    return print("=== ").print(convertTag(tag)).print(" properties").println(" ===").println("");
+  HtmlConfigurationPrinter doTagTitle(final String tag) {
+    return print("<h2>").print(convertTag(tag)).print(" properties").println("</h2>").println("");
   }
 
   /**
@@ -81,8 +93,8 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter startTable() {
-    return println("{| border=\"1\" cellspacing=\"0\" cellpadding=\"2\" width=\"100%\"");
+  HtmlConfigurationPrinter startTable() {
+    return println("<table border=\"1\" cellspacing=\"0\" cellpadding=\"2\" width=\"100%\">");
   }
 
   /**
@@ -90,8 +102,8 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter endTable() {
-    return println("|}").println("");
+  HtmlConfigurationPrinter endTable() {
+    return println("</table>").println("");
   }
 
   /**
@@ -99,15 +111,12 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter doHeaderRow() {
-    println("|-style=\"background-color: #E8EAFD; line-height: 1.3em\"");
+  HtmlConfigurationPrinter doHeaderRow() {
+    println("<tr style=\"background-color: #E8EAFD\">");
     doHeaderCell("Name");
     doHeaderCell("Default value");
-    /*
-    doHeaderCell("Aliases");
-    doHeaderCell("Value type");
-     */
     doHeaderCell("Description");
+    println("</tr>");
     return this;
   }
 
@@ -117,8 +126,8 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter doPropertyRow(final JPPFProperty<?> property) {
-    println("|-style=\"line-height: 1.1em\"");
+  HtmlConfigurationPrinter doPropertyRow(final JPPFProperty<?> property) {
+    println("<tr>");
     // property name
     String name = convert(property.getName());
     if (property.isDeprecated()) name = "<span style=\"text-decoration: line-through\">" + name + "</span>";
@@ -133,15 +142,11 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
     String val = ((value == null) ? "null" : convert(value.toString()));
     if (property.isDeprecated()) val = "<span style=\"text-decoration: line-through\">" + val + "</span>";
     doCell(val);
-    /*
-    // aliases
-    doCell(toString(prop.getAliases()));
-    // value type
-    doCell(prop.valueType().getSimpleName());
-     */
     // description
     value = getPropertyDoc(property);
-    doCell(value == null ? "" : convertDescription(value.toString()));
+    val = ((value == null) ? "null" :convertDescriptionWithFormatting(convert(value.toString())));
+    doCell(val);
+    println("</tr>");
     return this;
   }
 
@@ -151,8 +156,8 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter doCell(final String value) {
-    return print("| ").println(value);
+  HtmlConfigurationPrinter doCell(final String value) {
+    return print("<td>").print(value).println("</td>");
   }
 
   /**
@@ -161,8 +166,8 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter doHeaderCell(final String value) {
-    return print("| '''").print(value).println("'''");
+  HtmlConfigurationPrinter doHeaderCell(final String value) {
+    return print("<td><b>").print(value).println("</b></td>");
   }
 
   /**
@@ -171,7 +176,7 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter print(final String s) {
+  HtmlConfigurationPrinter print(final String s) {
     sb.append(s);
     return this;
   }
@@ -182,7 +187,7 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   @Override
-  WikiConfigurationPrinter println(final String s) {
+  HtmlConfigurationPrinter println(final String s) {
     sb.append(s).append('\n');
     return this;
   }
@@ -195,14 +200,26 @@ public class WikiConfigurationPrinter extends AbstractConfigurationPrinter {
   @Override
   String getPropertyDoc(final JPPFProperty<?> property) {
     final StringBuilder sb = new StringBuilder();
-    if (property.isDeprecated()) sb.append("'''''Deprecated:''' ").append(convert(property.getDeprecatedDoc())).append("''<br>");
+    if (property.isDeprecated()) sb.append("_i__b_Deprecated:_/b_ ").append(convert(property.getDeprecatedDoc())).append("_/i__br_");
     sb.append(property.getDocumentation());
     final String[] params = property.getParameters();
     if ((params != null) && (params.length > 0)) for (String param: params) {
-      sb.append("<br>- <i>").append(param).append("</i>: ");
+      sb.append("_br_- _i_").append(param).append("_/i_: ");
       final String doc = property.getParameterDoc(param);
       if (doc != null) sb.append(convert(doc));
     }
     return sb.toString();
   }
+
+  /**
+   * Convert special characters into character entities in the description column.
+   * @param src the source string to convert.
+   * @return the converted string.
+   */
+  private static String convertDescriptionWithFormatting(final String src) {
+    String s = src;
+    for (Map.Entry<String, String> entry: DESCRIPTION_CONVERSIONS.entrySet()) s = s.replace(entry.getKey(), entry.getValue());
+    return s;
+  }
+
 }

@@ -174,7 +174,7 @@ public class JPPFProperties {
   /** Whether the node is an Android node. */
   public static final JPPFProperty<Boolean> NODE_ANDROID = new BooleanProperty("jppf.node.android", false);
   /** Whether the node is .Net-enabled. */
-  public static final JPPFProperty<Boolean> DOTNET_BRIDGE_INITIALIZED = new BooleanProperty("jppf.dotnet.bridge.initialized", false);
+  public static final JPPFProperty<Boolean> DOTNET_BRIDGE_INITIALIZED = new BooleanProperty("jppf.dotnet.bridge.initialized", false).setDeprecated(true);
   /** Whether the node is a master node. */
   public static final JPPFProperty<Boolean> PROVISIONING_MASTER = new BooleanProperty("jppf.node.provisioning.master", true);
   /** Whether the node is a slave node. */
