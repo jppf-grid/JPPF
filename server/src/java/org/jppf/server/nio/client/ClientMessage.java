@@ -65,7 +65,6 @@ public class ClientMessage extends AbstractTaskBundleMessage {
     final int dependencyCount = (graphInfo == null) ? 0 : graphInfo.getNbDependencies();
     nbObjects = bundle.getTaskCount() + 2 + dependencyCount;
     if (traceEnabled) log.trace("read task bundle with {} dependencies : {}, context = {}", dependencyCount, bundle, channel);
-    
   }
 
   /**
@@ -79,14 +78,13 @@ public class ClientMessage extends AbstractTaskBundleMessage {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("nb locations=").append(locations == null ? -1 : locations.size());
-    sb.append(", position=").append(position);
-    sb.append(", nbObjects=").append(nbObjects);
-    sb.append(", count=").append(count);
-    sb.append(", currentLength=").append(currentLength);
-    sb.append(']');
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("nb locations=").append(locations == null ? -1 : locations.size())
+      .append(", position=").append(position)
+      .append(", nbObjects=").append(nbObjects)
+      .append(", count=").append(count)
+      .append(", currentLength=").append(currentLength)
+      .append(']').toString();
   }
 
   /**
