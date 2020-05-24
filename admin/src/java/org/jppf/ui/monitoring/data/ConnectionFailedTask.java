@@ -83,7 +83,7 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable {
         }
       }
       if ((idx >= 0) && (box.getItemCount() > 0)) {
-        if ((statsHandler.getClientHandler().currentDriver == null) || c.equals(statsHandler.getClientHandler().currentDriver)) {
+        if ((statsHandler.getClientHandler().currentDriver == null) || c.equals(statsHandler.getClientHandler().currentDriver.getConnection())) {
           int n = Math.min(idx, box.getItemCount()-1);
           TopologyDriver item = (TopologyDriver) box.getItemAt(n);
           statsHandler.getClientHandler().currentDriver = item;
