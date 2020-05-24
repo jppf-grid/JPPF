@@ -165,9 +165,10 @@ public class TestConnectionPool extends Setup1D1N {
       discovery.emitPool("pool1", 10);
       discovery.emitPool("pool2", 1);
       awaitConnections(client, Operator.AT_LEAST, 2);
+      Thread.sleep(500L);
       testJobsInPool(client, "pool1", methodName);
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 2) Thread.sleep(10L);
-      // trigger close of pool1
+      // trigger close of poo11
       JPPFConnectionPool pool = client.findConnectionPool("pool1");
       assertNotNull(pool);
       print(false, false, "closing pool1");
@@ -262,6 +263,7 @@ public class TestConnectionPool extends Setup1D1N {
 
     @Override
     public void jobDispatched(final JobEvent event) {
+      print(false, false, "dispatching %d tasks of job %s to %s", event.getJobTasks().size(), event.getJob().getName(), event.getConnection().getConnectionPool());
       jobToPool.put(event.getJob().getUuid(), event.getConnection().getConnectionPool().getName());
     }
   }
@@ -278,10 +280,10 @@ public class TestConnectionPool extends Setup1D1N {
       while (!stopped) {
         ClientConnectionPoolInfo info;
         while ((info = queue.poll()) != null) {
-          BaseTest.print(false, false, "found new connection pool %s", info);
+          print(false, false, "found new connection pool %s", info);
           newConnection(info);
         }
-        BaseTest.print(false, false, "SimpleDiscovery  about to wait in discover()");
+        print(false, false, "SimpleDiscovery  about to wait in discover()");
         wait();
       }
     }
