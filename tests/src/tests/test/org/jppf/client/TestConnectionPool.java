@@ -25,7 +25,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.*;
-import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.event.*;
 import org.jppf.discovery.*;
 import org.jppf.node.protocol.Task;
@@ -243,10 +242,15 @@ public class TestConnectionPool extends Setup1D1N {
    * @throws Exception if any error occurs.
    */
   private void awaitConnections(final JPPFClient client, final Operator operator, final int nbPools) throws Exception {
-    BaseTest.print(false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
-    while (!operator.evaluate(client.awaitWorkingConnectionPools().size(), nbPools)) Thread.sleep(10L);
-    JobManagerClient mgr = (JobManagerClient) client.getJobManager();
-    while (!operator.evaluate(mgr.nbAvailableConnections(), nbPools)) Thread.sleep(10L);
+    BaseTest.print(false, false, "waiting for %s %d available connection(s)", operator, nbPools);
+    List<JPPFConnectionPool> pools = null;
+    while (!operator.evaluate((pools = client.awaitWorkingConnectionPools()).size(), nbPools)) Thread.sleep(50L);
+    while (true) {
+      int sum = 0;
+      for (final JPPFConnectionPool pool: pools) sum += pool.connectionCount(JPPFClientConnectionStatus.workingStatuses());
+      if (operator.evaluate(sum, nbPools)) break;
+      Thread.sleep(50L);
+    }
   }
 
   /** */
