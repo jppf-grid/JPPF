@@ -36,7 +36,6 @@
   <property name="J2EE.inc"             value="*.jar"/>
   <property name="XChart.inc"           value="*.jar"/>
   <property name="JGoodies.inc"         value="*.jar"/>
-  <property name="jmxremote.inc"        value="*.jar"/>
   <property name="JNA.inc"              value="*.jar"/>
   <property name="oshi.inc"             value="*.jar"/>
   <property name="Jung.inc"             value="*.jar"/>

@@ -1,7 +1,7 @@
 <?php
   $currentPage = "download-unstable";
-  $tag1 = "v_6_2_beta";
-  $ver1 = "6.2-beta";
+  $tag1 = "v_6_3_alpha";
+  $ver1 = "6.3-alpha";
   $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
 ?>
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -116,7 +116,7 @@
         <br/>
 				</div>
 				<div class="jppf_content">
-  <h1 align="center">Downloads - JPPF 6.2 beta preview</h1>
+  <h1 align="center">Downloads - JPPF 6.3 alpha preview</h1>
   <div class="blockWithHighlightedTitle" style="vertical-align: middle">
     <div style="margin: 10px 5px">
       <img src="images/icons/folder-download.png" width="20"/>
@@ -130,22 +130,6 @@
   </div>
   <br>
   <div class="column_left" style="text-align: justify; padding: 0px">
-    <!--
-    <div class="blockWithHighlightedTitle">
-      <a name="<?php echo $ver1 ?>"></a>
-      <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
-  <h1 style="margin: 10px 0px">&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h1>
-</div>
-      <div style="border: solid 1px #6D78B6; background-color: #FFFD94; padding: 5px">
-        <b>Notice:</b> the development of JPPF <?php echo $ver1 ?> has just started. There is currently no binary distribution. Stay tuned!
-      </div>
-      <h3>Samples and tutorials</h3>
-      <ul class="list_nomargin">
-        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-samples-pack.zip'; ?>">JPPF samples pack</a></li>
-        <li>Make sure to get started with our <a href="/doc/6.2/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/></li>
-      </ul>
-    </div>
-    -->
     <div class="blockWithHighlightedTitle">
       <a name="<?php echo $ver1 ?>"></a>
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
@@ -202,13 +186,13 @@
       <p><table style="width: 100%"><tr>
         <td valign="top">
           <ul class="samplesList" style="margin-bottom: 0px">
-            <li><a href="/doc/6.2">JPPF 6.2 User Guide</a></li>
-            <li><a href="/javadoc/6.2">JPPF 6.2 Javadoc</a></li>
+            <li><a href="/doc/6.3">JPPF 6.3 User Guide</a></li>
+            <li><a href="/javadoc/6.3">JPPF 6.3 Javadoc</a></li>
           </ul>
         </td>
         <td valign="top">
           <ul class="samplesList" style="margin-bottom: 0px">
-            <li><a href="/release_notes.php?version=6.1">Release notes</a></li>
+            <li><a href="/release_notes.php?version=6.3-alpha">Release notes</a></li>
           </ul>
         </td>
       </tr></table>
@@ -216,10 +200,10 @@
     <div style="height: 28px"></div>
     <div class="blockWithHighlightedTitle">
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
-  <h3 style="${style}">&nbsp;<img src="images/icons/folder-download.png" class="titleWithIcon"/>JPPF 6.2 roadmap</h3>
+  <h3 style="${style}">&nbsp;<img src="images/icons/folder-download.png" class="titleWithIcon"/>JPPF 6.3 roadmap</h3>
 </div>
       <ul class="samplesList">
-        <li>The current state of the 6.2 milestone can be found <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/8/search/1"><b>here</b></a>.<br/></li>
+        <li>The current state of the 6.3 milestone can be found <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/8/search/1"><b>here</b></a>.<br/></li>
         <li><a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/18/search/1">Open issues</a> and <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/7/search/1">closed issues</a></li>
       </ul>
     </div>

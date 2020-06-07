@@ -18,17 +18,24 @@
 
 package test.org.jppf.test.setup;
 
+import java.lang.reflect.Method;
+
 import javax.naming.*;
 import javax.resource.ResourceException;
 import javax.resource.cci.ConnectionFactory;
 
 import org.jppf.jca.cci.*;
+import org.slf4j.*;
 
 /**
  * Utility class for obtaining and releasing Resource adapter connections.
  * @author Laurent Cohen
  */
 public class JPPFHelper {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(JPPFHelper.class);
   /**
    * JNDI name of the connection factory for JBoss app server.
    */
@@ -41,6 +48,18 @@ public class JPPFHelper {
    * JNDI name of the JCA connection factory to use.
    */
   private static String jndiName = JNDI_NAME_JBOSS;
+  /**
+   * Invocation of "javax.rmi.PortableRemoteObject.narrow()".
+   */
+  private static Method narrowMethod;
+  static {
+    try {
+      final Class<?> c = Class.forName("javax.rmi.PortableRemoteObject");
+      narrowMethod = c.getDeclaredMethod("narrow", Object.class, Class.class);
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
+  }
 
   /**
    * Obtain a JPPF connection from the resource adapter's connection pool.
@@ -54,7 +73,14 @@ public class JPPFHelper {
     final Object objref = context.lookup(jndiName);
     JPPFConnectionFactory cf;
     if (objref instanceof JPPFConnectionFactory) cf = (JPPFConnectionFactory) objref;
-    else cf = (JPPFConnectionFactory) javax.rmi.PortableRemoteObject.narrow(objref, ConnectionFactory.class);
+    else if (narrowMethod != null) {
+      try {
+        cf = (JPPFConnectionFactory) narrowMethod.invoke(null, objref, ConnectionFactory.class);
+      } catch (final Exception e) {
+        throw new ResourceException(e);
+      }
+    }
+    else throw new ResourceException("couldn't get a connection factory");
     return (JPPFConnection) cf.getConnection();
   }
 

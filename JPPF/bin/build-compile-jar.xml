@@ -29,7 +29,6 @@ limitations under the License.
       <fileset dir="${lib}/Checkstyle" includes="${Checkstyle.inc}"/>
     </path>
     <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpathref="checkstyle.path"/>
-    <compile.module path="${jmxremote}"/>
     <compile.module path="${common}"/>
     <compile.module path="${jmxremote-nio}"/>
     <compile.module path="${node}"/>
@@ -38,14 +37,6 @@ limitations under the License.
     <compile.module path="${server}"/>
     <compile.module path="${demo}"/>
     <compile.module.simple path="${application.template}"/>
-  </target>
-
-  <target name="compile.jmxremote" depends="init, i18n" unless="${compile.done}">
-    <path id="checkstyle.path">
-      <fileset dir="${lib}/Checkstyle" includes="${Checkstyle.inc}"/>
-    </path>
-    <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpathref="checkstyle.path"/>
-    <compile.module path="${jmxremote}"/>
   </target>
 
   <!--

@@ -19,20 +19,6 @@
 <project name="JPPF-utils" basedir="..">
 
   <!-- ========================================================================= -->
-  <!-- Build the JMX remote jar                                                  -->
-  <!-- ========================================================================= -->
-  
-  <target name="jmxremote" depends="" description="">
-    <ant antfile="${jmxremote}/build.xml" target="build"/>
-    <delete quiet="true">
-      <fileset dir="${basedir}/lib/jmxremote" includes="*.jar"/>
-    </delete>
-    <copy toDir="${basedir}/lib/jmxremote">
-      <fileset dir="${jmxremote}/build" includes="*.jar"/>
-    </copy>
-  </target>
-  
-  <!-- ========================================================================= -->
   <!-- Build a separate and self-contained jar with common JPPF utility classes  -->
   <!-- ========================================================================= -->
 

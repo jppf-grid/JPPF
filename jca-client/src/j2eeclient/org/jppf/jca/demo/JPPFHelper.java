@@ -18,6 +18,7 @@
 
 package org.jppf.jca.demo;
 
+import java.lang.reflect.*;
 import java.util.*;
 
 import javax.naming.*;
@@ -57,6 +58,18 @@ public class JPPFHelper {
    * <ul>
    */
   public static final String JNDI_NAME = "eis/JPPFConnectionFactory";
+  /**
+   * Invocation of "javax.rmi.PortableRemoteObject.narrow()".
+   */
+  private static Method narrowMethod;
+  static {
+    try {
+      final Class<?> c = Class.forName("javax.rmi.PortableRemoteObject");
+      narrowMethod = c.getDeclaredMethod("narrow", Object.class, Class.class);
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
+  }
 
   /**
    * Obtain a JPPF connection from the resource adapter's connection pool.
@@ -93,9 +106,16 @@ public class JPPFHelper {
   public static JPPFConnectionFactory getConnectionFactory(final String jndiName) throws NamingException, ResourceException {
     final InitialContext context = new InitialContext();
     final Object objref = context.lookup(jndiName);
-    JPPFConnectionFactory cf;
+    JPPFConnectionFactory cf = null;
     if (objref instanceof JPPFConnectionFactory) cf = (JPPFConnectionFactory) objref;
-    else cf = (JPPFConnectionFactory) javax.rmi.PortableRemoteObject.narrow(objref, ConnectionFactory.class);
+    else if (narrowMethod != null) {
+      try {
+        cf = (JPPFConnectionFactory) narrowMethod.invoke(null, objref, ConnectionFactory.class);
+      } catch (final Exception e) {
+        throw new ResourceException(e);
+      }
+    }
+    else throw new ResourceException("couldn't get a connection factory");
     if (debugEnabled) log.debug("got connection factory {} from '{}'", cf, jndiName);
     return cf;
   }

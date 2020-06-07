@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 
-<project name="JPPF-docs" basedir="..">
+<project name="JPPF-docs" basedir=".." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <!-- ========================================================================= -->
   <!-- Build the web site content                                                -->
@@ -86,14 +86,22 @@
   <!-- ========================================================================= -->
   <!-- Generate the Javadoc                                                      -->
   <!-- ========================================================================= -->
-
-  <target name="javadoc" depends="build.doclet" description="Generate all javadoc">
-    <delete dir="${javadoc}" quiet="true"/>
-    <mkdir dir="${javadoc}"/>
+  
+  <target name="javadoc.init">
+    <condition property="java_8">
+      <equals arg1="${ant.java.version}" arg2="1.8"/>
+    </condition>    
+    <echo message="java_8 = ${java_8} (ant.java.version = ${ant.java.version})"/>
     <exec executable="java">
       <arg value="-version"/>
     </exec>
-    <antcall target="javadoc.anttask"/>
+  </target>
+
+  <target name="javadoc" depends="javadoc.init, build.doclet" description="Generate all javadoc">
+    <delete dir="${javadoc}" quiet="true"/>
+    <mkdir dir="${javadoc}"/>
+    <antcall target="javadoc.anttask" if:true="${java_8}"/>
+    <antcall target="javadoc.anttask.java_11" unless:true="${java_8}"/>
     <copy todir="${javadoc}/resources" overwrite="true">
       <fileset dir="${bin}">
         <include name="*.gif"/>
@@ -114,11 +122,6 @@
     <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath" source="1.8" locale="en_US"
       stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes">
       <arg value="-J-Xmx512m"/>
-      <!--
-      <arg value="-J-Duser.language=fr"/>
-      <arg value="-J-Duser.country=FR"/>
-      <arg value="-J-Xrunjdwp:transport=dt_socket,address=localhost:8000,server=y,suspend=y"/>
-      -->
       <arg value="-linksource"/>
       <arg value="-quiet"/>
       <packageset dir="${node}/src/java"/>
@@ -129,18 +132,11 @@
       <packageset dir="${admin}/src/java"/>
       <packageset dir="${jca-client}/src/java"/>
       <packageset dir="${jca-client}/src/j2eeclient"/>
-      <!--
-      <packageset dir="${node-android}/events/src/main/java"/>
-      <packageset dir="${jmxremote}/src/java"/>
-      -->
       <link href="https://docs.oracle.com/javase/8/docs/api/"/>
       <link href="https://docs.oracle.com/javaee/6/api/"/>
       <link href="https://junit.org/junit4/javadoc/latest"/>
       <link href="http://x-stream.github.io/javadoc"/>
       <link href="http://oshi.github.io/oshi/apidocs/"/>
-      <!--
-      <link offline="true" href="https://d.android.com/reference" packagelistURL="file:${env.ANDROID_HOME}/docs/reference"/>
-      -->
       <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
       <header>${javadoc.header}</header>
       <bottom>${javadoc.bottom}</bottom>
@@ -153,18 +149,53 @@
       <group title="Persistence" packages="org.jppf.persistence*:org.jppf.job.persistence*:org.jppf.load.balancer.persistence"/>
       <group title="Desktop admin console" packages="org.jppf.ui*"/>
       <group title="J2EE connector" packages="org.jppf.jca*"/>
-      <!--
-      <group title="Android node" packages="org.jppf.android*"/>
-      -->
     </javadoc>
     <echo message="Javadoc generated in ${javadoc}"/>
   </target>
-  
+
+  <!-- Javadoc without '@exclude'doclet for Java 11+ -->
+  <target name="javadoc.anttask.java_11">
+    <echo message="Generating javadoc in ${javadoc}"/>
+    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath" source="1.8" locale="en_US"
+      stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true">
+      <arg value="-J-Xmx512m"/>
+      <arg value="-linksource"/>
+      <arg value="-quiet"/>
+      <packageset dir="${node}/src/java"/>
+      <packageset dir="${common}/src/java"/>
+      <packageset dir="${jmxremote-nio}/src/java"/>
+      <packageset dir="${client}/src/java"/>
+      <packageset dir="${server}/src/java"/>
+      <packageset dir="${admin}/src/java"/>
+      <packageset dir="${jca-client}/src/java"/>
+      <packageset dir="${jca-client}/src/j2eeclient"/>
+      <link href="https://docs.oracle.com/javase/8/docs/api/"/>
+      <link href="https://docs.oracle.com/javaee/6/api/"/>
+      <link href="https://junit.org/junit4/javadoc/latest"/>
+      <link href="http://x-stream.github.io/javadoc"/>
+      <link href="http://oshi.github.io/oshi/apidocs/"/>
+      <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
+      <header>${javadoc.header}</header>
+      <bottom>${javadoc.bottom}</bottom>
+      <group title="Client API" packages="org.jppf.client*"/>
+      <group title="Node API" packages="org.jppf.node*:org.jppf.server.node*:org.jppf.classloader*"/>
+      <group title="Server API" packages="org.jppf.server:org.jppf.server.event"/>
+      <group title="Management" packages="org.jppf.management*:org.jppf.jmxremote:org.jppf.jmx:javax.management*"/>
+      <group title="Job management" packages="org.jppf.job*:org.jppf.server.job.management"/>
+      <group title="Load-balancing" packages="org.jppf.load.balancer*"/>
+      <group title="Persistence" packages="org.jppf.persistence*:org.jppf.job.persistence*:org.jppf.load.balancer.persistence"/>
+      <group title="Desktop admin console" packages="org.jppf.ui*"/>
+      <group title="J2EE connector" packages="org.jppf.jca*"/>
+    </javadoc>
+    <echo message="Javadoc generated in ${javadoc}"/>
+  </target>
+
   <path id="doclet.classpath">
     <pathelement location="${java.home}/lib/tools.jar"/>
   </path>
   
-  <target name="build.doclet">
+  <target name="build.doclet" if="java_8">
+    <echo message="building the '@exclude' doclet"/>
     <delete quiet="true"><fileset dir="${basedir}/classes" includes="**/*.*"/></delete>
     <mkdir dir="${basedir}/classes"/>
     <javac srcdir="" destdir="${basedir}/classes" source="1.8" target="1.8"
