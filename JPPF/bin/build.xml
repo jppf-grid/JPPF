@@ -163,6 +163,11 @@
     <echo append="false" file="${version.file}">version.number = ${version.number}
 build.number = ${build.number}
 build.date = ${readable.now}</echo>
+    <!-- Check jdk version -->
+    <echo message="Java version = ${ant.java.version}"/>
+    <condition property="java_8">
+      <equals arg1="${ant.java.version}" arg2="1.8"/>
+    </condition>    
   </target>
 
   <!-- ========================================================================= -->

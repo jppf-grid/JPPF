@@ -17,6 +17,7 @@
  */
 package org.jppf.javadoc;
 
+import java.io.IOException;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -37,6 +38,13 @@ public class ExcludeDoclet {
    * Name of the javadoc tag processed by this doclet.
    */
   private static final String TAG_NAME = "exclude";
+  /**
+   * Pre-initialized method invocation.
+   */
+  private static Method optionsValidationMethod;
+  static {
+    init();
+  }
 
   /**
    * Entry point for this doclet.
@@ -55,8 +63,32 @@ public class ExcludeDoclet {
    * @return true if the options are valid, false otherwise.
    * @throws java.io.IOException if an I/O exception occurs while processing the options.
    */
-  public static boolean validOptions(final String[][] options, final DocErrorReporter reporter) throws java.io.IOException {
-    return Standard.validOptions(options, reporter);
+  public static boolean validOptions(final String[][] options, final DocErrorReporter reporter) throws IOException {
+    try {
+      return (Boolean) optionsValidationMethod.invoke(null, options, reporter);
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new IOException(e);
+    }
+    //return Standard.validOptions(options, reporter);
+  }
+
+  /**
+   * Determine whether command line options are valid.
+   * @throws Exception if any error occurs.
+   */
+  private static void init() {
+    try {
+      final Class<?> standardClass = Class.forName("com.sun.tools.doclets.standard.Standard");
+      final Class<?> errorReporterClass = Class.forName("com.sun.javadoc.DocErrorReporter");
+      optionsValidationMethod = standardClass.getDeclaredMethod("validOptions", String[][].class, errorReporterClass);
+      System.out.println("optionsValidationMethod = " + optionsValidationMethod);
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

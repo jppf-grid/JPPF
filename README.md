@@ -27,7 +27,6 @@ This is the home for the JPPF source code. Other services can be found at the fo
 * **[demo](demo)**: some demos and tests of JPPF features, which may be useful as code samples
 * **[dotnet-bridge](dotnet-bridge)**: source code and resources for the .Net bridge
 * **[jca-client](jca-client)**: source code for the J2EE connector
-* **[jmxremote](jmxremote)**: a fork of the JMXMP JMX remote connector
 * **[jmxremote-nio](jmxremote-nio)**: the JPPF JMX remote connector, based on NIO
 * **[node](node)**: source code for the nodes
 * **[node-android](node-android)**: source code for the Android node

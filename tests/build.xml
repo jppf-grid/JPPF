@@ -40,7 +40,6 @@
   <!-- JPPF modules -->
   <property name="client"             value="${basedir}/../client"/>
   <property name="common"             value="${basedir}/../common"/>
-  <property name="jmxremote"          value="${basedir}/../jmxremote"/>
   <property name="jmxremote-nio"      value="${basedir}/../jmxremote-nio"/>
   <property name="node"               value="${basedir}/../node"/>
   <property name="samples-pack"       value="${basedir}/../samples-pack"/>

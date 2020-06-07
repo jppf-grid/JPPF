@@ -36,8 +36,6 @@ import org.jppf.utils.concurrent.SynchronizedLong;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
-import com.sun.xml.internal.ws.api.policy.PolicyResolver.ClientContext;
-
 /**
  * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node or client.
  * @author Laurent Cohen
