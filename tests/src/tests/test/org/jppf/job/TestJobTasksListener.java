@@ -174,10 +174,10 @@ public class TestJobTasksListener extends Setup1D1N {
     final JPPFJob job = new JPPFJob();
     try (final JPPFClient client = new JPPFClient()) {
       client.awaitWorkingConnectionPool();
-      job.setName(ReflectionUtils.getCurrentMethodName());
-      job.getSLA().setCancelUponClientDisconnect(false);
-      job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(300L));
-      job.getSLA().setMaxDispatchExpirations(maxExpirations);
+      job.setName(ReflectionUtils.getCurrentMethodName())
+        .getSLA().setCancelUponClientDisconnect(false)
+        .setDispatchExpirationSchedule(new JPPFSchedule(300L))
+        .setMaxDispatchExpirations(maxExpirations);
       for (int i=1; i<=nbTasks; i++) job.add(new MyJobTasksListenerTask(String.format("#%02d", i), 5000L));
       final CountDownJobListener jobListener = new CountDownJobListener();
       job.addJobListener(jobListener);
@@ -246,12 +246,13 @@ public class TestJobTasksListener extends Setup1D1N {
 
   /** */
   private static void configure() {
-    JPPFConfiguration.set(JPPFProperties.DRIVERS, new String[] {"driver1"})
-      .setString("driver1.jppf.server.host", "localhost")
-      .setInt("driver1.jppf.server.port", 11101)
-      .setString("jppf.load.balancing.algorithm", "manual")
-      .setString("jppf.load.balancing.profile", "manual")
-      .setInt("jppf.load.balancing.profile.manual.size", 1000000);
+    final String driver = "driver1";
+    JPPFConfiguration.set(JPPFProperties.DRIVERS, new String[] { driver })
+      .set(JPPFProperties.PARAM_SERVER_HOST, "localhost", driver)
+      .set(JPPFProperties.PARAM_SERVER_PORT, 11101, driver)
+      .set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")
+      .set(JPPFProperties.LOAD_BALANCING_PROFILE, "manual")
+      .setInt("jppf.load.balancing.profile.manual.size", 1_000_000);
   }
 
   /**

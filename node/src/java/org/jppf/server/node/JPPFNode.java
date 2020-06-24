@@ -17,6 +17,8 @@
  */
 package org.jppf.server.node;
 
+import static org.jppf.node.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.*;
@@ -189,7 +191,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("received bundle");
     //final TaskBundle bundle = pair.getBundle();
     if (debugEnabled) log.debug(!pair.getBundle().isHandshake() ? "received a bundle with " + pair.getTasks().size()  + " tasks" : "received a handshake bundle");
-    if (!pair.getBundle().isHandshake()) {
+    final TaskBundle bundle = pair.getBundle();
+    if (!bundle.isHandshake() && (bundle.getParameter(NODE_EXCEPTION_PARAM) == null)) {
       currentBundle = pair;
       executionComplete = false;
       executionManager.execute(pair);
@@ -216,7 +219,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("received bundle");
     final TaskBundle bundle = pair.getBundle();
     if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + pair.getTasks().size()  + " tasks" : "received a handshake bundle");
-    if (!bundle.isHandshake()) {
+    if (!bundle.isHandshake() && (bundle.getParameter(NODE_EXCEPTION_PARAM) == null)) {
       executionManager.execute(pair);
     } else {
       checkInitialBundle(bundle);
@@ -433,7 +436,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public List<String> getHandshakeUuidPath() {
     return handshakeUuidPath;
   }
-
 
   /**
    * @return an {@link InetAddress} to bind to, or {@code null} to bind to all interfaces.
