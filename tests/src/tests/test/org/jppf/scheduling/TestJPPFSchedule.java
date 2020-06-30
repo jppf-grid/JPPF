@@ -25,7 +25,7 @@ import java.time.*;
 import java.util.Date;
 
 import org.jppf.scheduling.*;
-import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.BaseTest;
@@ -40,7 +40,7 @@ public class TestJPPFSchedule extends BaseTest {
   /**
    * Max allowed error on measured timeout times.
    */
-  private static final long MAX_ERROR = 16L;
+  private static final long MAX_ERROR = 20L;
   /** */
   private static final String STR_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
   /** */
@@ -157,8 +157,8 @@ public class TestJPPFSchedule extends BaseTest {
     print(false, false, "schedule = %s, measured time: %,d", schedule, actualTime);
     assertCompare(Operator.AT_LEAST, 0L, actualTime);
     assertTrue(executed);
-    final Range<Long> range = new Range<>(excpectedDuration - MAX_ERROR, excpectedDuration + MAX_ERROR);
-    assertTrue(range.isValueInRange(actualTime));
+    assertCompare(Operator.AT_LEAST, excpectedDuration - MAX_ERROR, actualTime);
+    assertCompare(Operator.AT_MOST, excpectedDuration + MAX_ERROR, actualTime);
     assertFalse(handler.hasAction("testKey"));
   }
 
