@@ -142,7 +142,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
    * @param bundle  the dispatched job.
    */
   public void jobDispatched(final ServerTaskBundleNode bundle) {
-    if (bundle == null) throw new IllegalArgumentException("bundle is null");
+    if (bundle == null) throw new IllegalArgumentException("bundle is null for " + this);
     final boolean empty;
     synchronized (dispatchSet) {
       empty = dispatchSet.isEmpty();

@@ -18,7 +18,7 @@
 package org.jppf.server.protocol;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.ExecutorChannel;
@@ -55,7 +55,7 @@ public abstract class AbstractServerJob implements JPPFDistributedJob {
   /**
    * The job status.
    */
-  protected volatile ServerJobStatus status = ServerJobStatus.NEW;
+  protected AtomicReference<ServerJobStatus> status = new AtomicReference<>(ServerJobStatus.NEW);
   /**
    * List of all runnables called on job completion.
    */
@@ -276,33 +276,14 @@ public abstract class AbstractServerJob implements JPPFDistributedJob {
    * @return <code>true</code> if new status was set.
    */
   protected final boolean updateStatus(final ServerJobStatus expect, final ServerJobStatus newStatus) {
-    if (status == expect) {
-      status = newStatus;
-      return true;
-    }
-    else return false;
+    return status.compareAndSet(expect, newStatus);
   }
 
   /**
-   * Get the status of this job.
-   * @return a {@link ServerJobStatus} enum value.
-   */
-  public ServerJobStatus getStatus() {
-    return status;
-  }
-
-  /**
-   * @return <code>true</code> when job is cancelled or finished normally.
-   */
-  public boolean isDone() {
-    return status.compareTo(ServerJobStatus.DONE) >= 0;
-  }
-
-  /**
-   * @return <code>true</code> when job was cancelled.
+   * @return {@code true} when job was cancelled.
    */
   public boolean isCancelled() {
-    return status.compareTo(ServerJobStatus.CANCELLED) >= 0;
+    return status.get() == ServerJobStatus.CANCELLED;
   }
 
   /**
@@ -311,8 +292,9 @@ public abstract class AbstractServerJob implements JPPFDistributedJob {
    * @return whether cancellation was successful.
    */
   public boolean setCancelled(final boolean mayInterruptIfRunning) {
-    if (!isSuspended() && (status.ordinal() > ServerJobStatus.EXECUTING.ordinal())) return false;
-    status = ServerJobStatus.CANCELLED;
+    final ServerJobStatus current = status.get();
+    if (!isSuspended() && (current.ordinal() > ServerJobStatus.EXECUTING.ordinal())) return false;
+    status.set(ServerJobStatus.CANCELLED);
     return true;
   }
 

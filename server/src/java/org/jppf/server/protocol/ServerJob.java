@@ -349,12 +349,12 @@ public class ServerJob extends AbstractServerJobBase {
   private CollectionMap<ServerTaskBundleClient, ServerTask> handleCancelledTasks() {
     if (debugEnabled) log.debug("cancelling tasks for {}", this);
     final CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
-    for (final ServerTask task: tasks.values()) {
+    tasks.forEach((position, task) -> {
       if (!task.isDone() && !task.isReturnedFromNode()) {
         task.cancel();
         clientMap.putValue(task.getBundle(), task);
       }
-    }
+    });
     return clientMap;
   }
 

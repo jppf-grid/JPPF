@@ -158,7 +158,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
       log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
       size = bundlerFactory.getFallbackBundler().getBundleSize();
     }
-    return queue.nextBundle(selectedJob, size, channel);
+    return selectedJob.isCancelled() ? null : queue.nextBundle(selectedJob, size, channel);
   }
 
   /**
