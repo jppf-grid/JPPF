@@ -31,9 +31,7 @@
   <property name="node-android"          value="${basedir}/../node-android"/>
   <property name="server"                value="${basedir}/../server"/>
   <property name="demo"                  value="${basedir}/../demo"/>
-  <property name="dotnet-bridge"         value="${basedir}/../dotnet-bridge"/>
   <property name="jca-client"            value="${basedir}/../jca-client"/>
-  <property name="jmxremote"             value="${basedir}/../jmxremote"/>
   <property name="jmxremote-nio"         value="${basedir}/../jmxremote-nio"/>
   <property name="application.template"  value="${basedir}/../application-template"/>
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
@@ -207,9 +205,6 @@ build.date = ${readable.now}</echo>
   <target name="deploy.nojavadoc"   depends="deploy.base, installer"          description=""/>
   <!-- build the whole JPPF distribution without web installer nor javadoc (makes it twice shorter) -->
   <target name="deploy.base" depends="clean.all, rebuild, runtime, samples.pack, admin.web, j2ee.connector, tests.build, user.guide, doc, cleanup.after" description="deploy without building the javadoc nor the installer"/>
-  <!--
-  <target name="deploy.base" depends="clean.all, rebuild, runtime, samples.pack, admin.web, j2ee.connector, dotnet, build.android, tests.build, user.guide, doc, cleanup.after" description="deploy without building the javadoc nor the installer"/>
-  -->  
   <!-- build the whole JPPF distribution with local web installer -->
   <target name="deploy.local.inst"  depends="deploy.base, javadoc, installer.local" description=""/>
 
@@ -226,8 +221,6 @@ build.date = ${readable.now}</echo>
   <import file="build-tests.xml"/>
   <import file="build-maven.xml"/>
   <import file="build-docker.xml"/>
-  <import file="build-dotnet.xml"/>
-  <import file="build-android.xml"/>
   <import file="build-security.xml"/>
   <import file="build-utils.xml"/>
   
@@ -285,8 +278,6 @@ build.date = ${readable.now}</echo>
       <zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
       <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client" excludes="lib/**/*.*"/>
       <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
-      <zipfileset dir="${dotnet-bridge}" prefix="${zip.prefix}/dotnet-bridge" excludes="**/*.log, csdoc/**/*.*"/>
-      <zipfileset dir="${node-android}" prefix="${zip.prefix}/node-android" excludes="**/build/**/*.*"/>
       <zipfileset dir="${samples-pack}" prefix="${zip.prefix}/samples-pack" excludes="**/*.zip,**/*.log,shared/lib/**/*.*"/>
       <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log,lib/**/*.*"/>
       <zipfileset dir="${stress-tests}" prefix="${zip.prefix}/stress-tests">
