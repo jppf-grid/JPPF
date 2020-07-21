@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN" "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN" "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <!--
     This configuration file was written by the eclipse-cs plugin configuration editor
@@ -11,11 +11,6 @@
 <module name="Checker">
   <property name="severity" value="warning"/>
   <module name="TreeWalker">
-    <property name="tabWidth" value="2"/>
-    <module name="JavadocMethod">
-      <property name="allowUndeclaredRTE" value="true"/>
-      <property name="suppressLoadErrors" value="true"/>
-    </module>
     <module name="JavadocType"/>
     <module name="JavadocVariable"/>
     <module name="AnonInnerLength">
@@ -41,6 +36,7 @@
     <module name="FinalLocalVariable">
       <property name="tokens" value="PARAMETER_DEF,VARIABLE_DEF"/>
     </module>
+    <module name="JavadocMethod"/>
   </module>
   <module name="FileLength">
     <property name="max" value="600"/>
