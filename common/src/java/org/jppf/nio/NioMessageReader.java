@@ -73,7 +73,7 @@ public abstract class NioMessageReader<C extends AbstractNioContext> {
    * @param context the JMX context that reads the data.
    * @throws Exception if any error occurs.
    */
-  protected void doRead(final C context) throws Exception {
+  private void doRead(final C context) throws Exception {
     while (true) {
       final boolean b = context.readMessage();
       if (b) {

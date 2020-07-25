@@ -221,7 +221,7 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
   protected void handleRead(final SelectionKey key) throws Exception {
     @SuppressWarnings("unchecked")
     final C context = (C) key.attachment();
-    messageReader.read(context);
+    if (!context.isClosed()) messageReader.read(context);
   }
 
   /**
