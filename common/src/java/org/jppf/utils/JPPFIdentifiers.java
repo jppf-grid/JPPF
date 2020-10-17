@@ -96,6 +96,22 @@ public final class JPPFIdentifiers {
     serverMap.put(NODE_HEARTBEAT_CHANNEL, "NodeHeartBeatServer");
     serverMap.put(CLIENT_HEARTBEAT_CHANNEL, "ClientHeartBeatServer");
   }
+  /**
+   * Mapping of ids to channel descriptors.
+   */
+  private static final Map<Integer, JPPFChannelDescriptor> decsriptorMap = new HashMap<>();
+  static {
+    decsriptorMap.put(PEER_HEARTBEAT_CHANNEL, JPPFChannelDescriptor.PEER_HEARTBEAT_CHANNEL);
+    decsriptorMap.put(CLIENT_HEARTBEAT_CHANNEL, JPPFChannelDescriptor.CLIENT_HEARTBEAT_CHANNEL);
+    decsriptorMap.put(NODE_HEARTBEAT_CHANNEL, JPPFChannelDescriptor.NODE_HEARTBEAT_CHANNEL);
+    decsriptorMap.put(JMX_REMOTE_CHANNEL, JPPFChannelDescriptor.JMX_REMOTE_CHANNEL);
+    decsriptorMap.put(ACCEPTOR_CHANNEL, JPPFChannelDescriptor.ACCEPTOR_CHANNEL);
+    decsriptorMap.put(CLIENT_JOB_DATA_CHANNEL, JPPFChannelDescriptor.CLIENT_JOB_DATA_CHANNEL);
+    decsriptorMap.put(CLIENT_CLASSLOADER_CHANNEL, JPPFChannelDescriptor.CLIENT_CLASSLOADER_CHANNEL);
+    decsriptorMap.put(NODE_JOB_DATA_CHANNEL, JPPFChannelDescriptor.NODE_JOB_DATA_CHANNEL);
+    decsriptorMap.put(NODE_CLASSLOADER_CHANNEL, JPPFChannelDescriptor.NODE_CLASSLOADER_CHANNEL);
+    decsriptorMap.put(UNKNOWN, JPPFChannelDescriptor.UNKNOWN);
+  }
 
   /**
    * Get an identifier as a string.
@@ -115,5 +131,15 @@ public final class JPPFIdentifiers {
   public static String serverName(final int id) {
     final String s = serverMap.get(id);
     return s == null ? "UNKNOWN" : s;
+  }
+
+  /**
+   * Retrieve the JPPF channel descriptor for the specified channel identifier. 
+   * @param identifier the channel identifier.
+   * @return a corresponding {@code JPPFChannelDescriptor} instance.
+   */
+  public static JPPFChannelDescriptor descriptorFor(final int identifier) {
+    final JPPFChannelDescriptor desc = decsriptorMap.get(identifier);
+    return (desc == null) ? JPPFChannelDescriptor.UNKNOWN : desc;
   }
 }

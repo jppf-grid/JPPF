@@ -224,7 +224,7 @@ public class JPPFJMXConnector implements JMXConnector {
       final Exception e = socketInitializer.getLastException();
       throw (e == null) ? new ConnectException("could not connect to remote JMX server " + address) : e;
     }
-    if (!InterceptorHandler.invokeOnConnect(socketClient.getChannel())) throw new JPPFException("connection denied by interceptor");
+    if (!InterceptorHandler.invokeOnConnect(socketClient.getChannel(), JPPFChannelDescriptor.JMX_REMOTE_CHANNEL)) throw new JPPFException("connection denied by interceptor");
     if (debugEnabled) log.debug("Connected to JMX server {}, sending channel identifier {}", address, JPPFIdentifiers.serverName(JPPFIdentifiers.JMX_REMOTE_CHANNEL));
     socketClient.writeInt(JPPFIdentifiers.JMX_REMOTE_CHANNEL);
     if (debugEnabled) log.debug("Reconnected to JMX server {}, secure={}", address, secure);

@@ -18,6 +18,8 @@
 
 package org.jppf.example.interceptor;
 
+import static org.jppf.example.interceptor.JaasNetworkInterceptor.print;
+
 import java.util.List;
 
 import org.jppf.client.JPPFClient;
@@ -36,19 +38,19 @@ public class NetworkInterceptorDemo {
    */
   public static void main(final String[] args) {
     final String userName = System.getProperty("jppf.user.name");
-    System.out.println("demo: running network interceptor demo with user name = " + userName);
+    print("running network interceptor demo with user name = " + userName);
     // upon creating the client, the interceptor will be invoked
     try (final JPPFClient client = new JPPFClient()) {
       final JPPFJob job = new JPPFJob();
       job.setName("Network Interceptor Demo");
       job.add(new MyTask()).setId("task 1");
-      System.out.println("demo: submitting demo job");
+      print("submitting demo job");
       final List<Task<?>> results = client.submit(job);
-      System.out.printf("demo: ***** results for '%s' *****%n", job.getName());
+      print("***** results for '%s' *****", job.getName());
       for (final Task<?> task : results) {
         if (task.getThrowable() != null) System.out.printf("demo: got exception: %s%n",
           ExceptionUtils.getStackTrace(task.getThrowable()));
-        else System.out.printf("demo: got result: %s%n", task.getResult());
+        else print("got result: %s", task.getResult());
       }
     } catch(final Exception e) {
       e.printStackTrace();

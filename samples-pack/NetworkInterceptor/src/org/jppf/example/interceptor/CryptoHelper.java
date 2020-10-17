@@ -42,7 +42,7 @@ import org.jppf.utils.streams.StreamUtils;
  * generate symetric secret keys and create and use a keystore.
  * @author Laurent Cohen
  */
-final class CryptoHelper {
+public final class CryptoHelper {
   /**
    * The keystore password.
    * This variable will be assigned the password value in clear,
@@ -160,7 +160,7 @@ final class CryptoHelper {
    * @param destination the stream into which the encrypted data is written.
    * @throws Exception if any error occurs while encrypting the data.
    */
-  static void encryptAndWrite(final String message, final OutputStream destination) throws Exception {
+  public static void encryptAndWrite(final String message, final OutputStream destination) throws Exception {
     // create a cipher instance
     final Cipher cipher = Cipher.getInstance(getTransformation());
     // init the cipher in encryption mode
@@ -186,7 +186,7 @@ final class CryptoHelper {
    * @return the next message in decrypted form as a string.
    * @throws Exception if any error occurs while decrypting the data.
    */
-  static String readAndDecrypt(final InputStream source) throws Exception {
+  public static String readAndDecrypt(final InputStream source) throws Exception {
     final DataInputStream dis = new DataInputStream(source);
     // read the length of the encrypted data
     final int len = dis.readInt();

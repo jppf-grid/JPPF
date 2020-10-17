@@ -69,4 +69,28 @@ public class NamedArguments extends AbstractCLIArguments<NamedArguments> {
     }
     return this;
   }
+
+  /**
+   * Add a new argument with an explicit value.
+   * @param name the name of the argument.
+   * @param usage a string describing the argument's usage.
+   * @param aliases an optional set of alternative names for this option.
+   * @return return this object.
+   */
+  public NamedArguments addArg(final String name, final String usage, final String[] aliases) {
+    argDefs.put(name, new CLIArgument(name, false, usage, aliases));
+    return this;
+  }
+
+  /**
+   * Add a new argument as a boollean switch.
+   * @param name the name of the argument.
+   * @param usage a string describing the argument's usage.
+   * @param aliases an optional set of alternative names for this option.
+   * @return return this object.
+   */
+  public NamedArguments addSwitch(final String name, final String usage, final String[] aliases) {
+    argDefs.put(name, new CLIArgument(name, true, usage, aliases));
+    return this;
+  }
 }

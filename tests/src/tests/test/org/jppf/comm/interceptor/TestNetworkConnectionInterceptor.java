@@ -25,7 +25,7 @@ import java.nio.channels.*;
 import java.util.List;
 
 import org.jppf.comm.interceptor.*;
-import org.jppf.utils.ReflectionUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.junit.Test;
 import org.slf4j.*;
@@ -68,7 +68,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       Thread.sleep(250L);
       client = new Socket("localhost", PORT);
       assertTrue(client.isConnected());
-      assertTrue(InterceptorHandler.invokeOnConnect(client));
+      assertTrue(InterceptorHandler.invokeOnConnect(client, JPPFChannelDescriptor.UNKNOWN));
       assertTrue(server.isResult());
       assertEquals(TestInterceptor.CLIENT_MESSAGE, TestInterceptor.clientMessage);
       assertEquals(TestInterceptor.SERVER_MESSAGE, TestInterceptor.serverMessage);
@@ -108,7 +108,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       client.finishConnect();
       assertTrue(client.isConnected());
       client.configureBlocking(true);
-      assertTrue(InterceptorHandler.invokeOnConnect(client));
+      assertTrue(InterceptorHandler.invokeOnConnect(client, JPPFChannelDescriptor.UNKNOWN));
       assertTrue(server.isResult());
       assertEquals(TestInterceptor.CLIENT_MESSAGE, TestInterceptor.clientMessage);
       assertEquals(TestInterceptor.SERVER_MESSAGE, TestInterceptor.serverMessage);
@@ -147,7 +147,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       client.finishConnect();
       assertTrue(client.isConnected());
       client.configureBlocking(true);
-      assertTrue(InterceptorHandler.invokeOnConnect(client));
+      assertTrue(InterceptorHandler.invokeOnConnect(client, JPPFChannelDescriptor.UNKNOWN));
       assertTrue(server.isResult());
       assertEquals(TestInterceptor.CLIENT_MESSAGE, TestInterceptor.clientMessage);
       assertEquals(TestInterceptor.SERVER_MESSAGE, TestInterceptor.serverMessage);
@@ -184,7 +184,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       Thread.sleep(250L);
       client = new Socket("localhost", PORT);
       assertTrue(client.isConnected());
-      assertTrue(InterceptorHandler.invokeOnConnect(client));
+      assertTrue(InterceptorHandler.invokeOnConnect(client, JPPFChannelDescriptor.UNKNOWN));
       assertTrue(server.isResult());
       assertEquals(TestInterceptor.CLIENT_MESSAGE, TestInterceptor.clientMessage);
       assertEquals(TestInterceptor.SERVER_MESSAGE, TestInterceptor.serverMessage);
@@ -233,7 +233,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
         final Socket socket = server.accept();
         logger.debug("accepted socket {}", socket);
         synchronized(this) {
-          result = InterceptorHandler.invokeOnAccept(socket);
+          result = InterceptorHandler.invokeOnAccept(socket, JPPFChannelDescriptor.UNKNOWN);
         }
         logger.debug("result = {}", result);
       } catch (final Exception e) {
@@ -290,7 +290,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
         logger.debug("accepted channel {}", channel);
         channel.configureBlocking(true);
         synchronized(this) {
-          result = InterceptorHandler.invokeOnAccept(channel);
+          result = InterceptorHandler.invokeOnAccept(channel, JPPFChannelDescriptor.UNKNOWN);
         }
         logger.debug("result = {}", result);
       } catch (final Exception e) {

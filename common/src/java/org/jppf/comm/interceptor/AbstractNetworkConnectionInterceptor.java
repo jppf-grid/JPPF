@@ -20,19 +20,33 @@ package org.jppf.comm.interceptor;
 
 import java.nio.channels.SocketChannel;
 
+import org.jppf.utils.JPPFChannelDescriptor;
+import org.slf4j.*;
+
 /**
  * An abstract interceptor implementation which creates or obtains streams from the Socket or SocketChannel
  * passed on to its methods.
  * @author Laurent Cohen
  */
 public abstract class AbstractNetworkConnectionInterceptor implements NetworkConnectionInterceptor {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(AbstractNetworkConnectionInterceptor.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
+
   @Override
-  public boolean onAccept(final SocketChannel acceptedChannel) {
-    return onAccept(acceptedChannel.socket());
+  public boolean onAccept(final SocketChannel acceptedChannel, final JPPFChannelDescriptor descriptor) {
+    if (debugEnabled) log.debug("channel = {}, descriptor = {}", acceptedChannel, descriptor);
+    return onAccept(acceptedChannel.socket(), descriptor);
   }
 
   @Override
-  public boolean onConnect(final SocketChannel connectedChannel) {
-    return onConnect(connectedChannel.socket());
+  public boolean onConnect(final SocketChannel connectedChannel, final JPPFChannelDescriptor descriptor) {
+    if (debugEnabled) log.debug("channel = {}, descriptor = {}", connectedChannel, descriptor);
+    return onConnect(connectedChannel.socket(), descriptor);
   }
 }

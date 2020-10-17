@@ -94,7 +94,7 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
         close();
         return;
       }
-      if (!InterceptorHandler.invokeOnConnect(socketWrapper)) {
+      if (!InterceptorHandler.invokeOnConnect(socketWrapper, JPPFIdentifiers.descriptorFor(channelIdentifier))) {
         log.error("heartbeat client connection denied by interceptor: {}", socketWrapper);
         close();
         return;

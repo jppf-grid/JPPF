@@ -53,7 +53,6 @@ abstract class AbstractCLIArguments<T extends AbstractCLIArguments<?>> extends T
     return (T) this;
   }
 
-
   /**
    * Add a new argument as a boollean switch.
    * @param name the name of the argument.
