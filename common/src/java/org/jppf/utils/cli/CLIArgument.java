@@ -24,6 +24,10 @@ package org.jppf.utils.cli;
  */
 class CLIArgument {
   /**
+   * Constant definition for an empty array of strings.
+   */
+  private static String[] NO_ALIASES = {};
+  /**
    * This argument's name.
    */
   private final String name;
@@ -36,6 +40,10 @@ class CLIArgument {
    * A description of this argument.
    */
   private final String usage;
+  /**
+   * An optional set of alternative names for this option.
+   */
+  private final String[] aliases;
 
   /**
    * Initialize this argument with the specified name and excplicit value flag.
@@ -43,11 +51,13 @@ class CLIArgument {
    * @param switchArg if {@code true} then this argument has a value explicitly specified on the command line,
    * when {@code false} it is a boolean switch set to {@code true} when present or {@code false} when unspecified.
    * @param usage a string describing this argument's usage.
+   * @param aliases an optional set of alternative names for this option.
    */
-  public CLIArgument(final String name, final boolean switchArg, final String usage) {
+  public CLIArgument(final String name, final boolean switchArg, final String usage, final String...aliases) {
     this.name = name;
     this.switchArg = switchArg;
     this.usage = usage == null ? "" : usage;
+    this.aliases = (aliases == null) ? NO_ALIASES : aliases;
   }
 
   /**
@@ -73,5 +83,12 @@ class CLIArgument {
    */
   public String getUsage() {
     return usage;
+  }
+
+  /**
+   * @return the set of alternative names for this option, may be empty.
+   */
+  public String[] getAliases() {
+    return aliases;
   }
 }

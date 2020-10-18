@@ -108,7 +108,7 @@
   <!-- Create the keystore embedded in the jar                                   -->
   <!-- ========================================================================= -->
   
-  <target name="create.keystore">
+  <target name="create.keystore" description="Create a secret key and a keystore to hold it">
     <echo message="generating keystore with password = ${password}"/>
     <java fork="yes" classname="org.jppf.example.interceptor.CryptoHelper" classpathref="project.classpath">
       <arg value="${password}"/>

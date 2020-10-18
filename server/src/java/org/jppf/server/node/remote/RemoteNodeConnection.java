@@ -75,14 +75,13 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper> 
       channel.setPort(connectionInfo.getPort());
       channel.setSerializer(serializer);
       if (debugEnabled) log.debug("end socket client initialization");
-      //if (!NodeRunner.isOffline())
       System.out.println("Attempting connection to the node server at " + connectionInfo.getHost() + ':' + connectionInfo.getPort());
       if (!socketInitializer.initialize(channel)) {
         if (debugEnabled) log.debug("socket initializer failed");
         throw new JPPFNodeReconnectionNotification("the JPPF node job channel could not reconnect to the driver", null, ConnectionReason.JOB_CHANNEL_INIT_ERROR);
       }
-      if (!InterceptorHandler.invokeOnConnect(channel)) throw new JPPFNodeReconnectionNotification("connection denied by interceptor", null, ConnectionReason.JOB_CHANNEL_INIT_ERROR);
-      //if (!NodeRunner.isOffline())
+      if (!InterceptorHandler.invokeOnConnect(channel, JPPFChannelDescriptor.NODE_JOB_DATA_CHANNEL))
+        throw new JPPFNodeReconnectionNotification("connection denied by interceptor", null, ConnectionReason.JOB_CHANNEL_INIT_ERROR);
       System.out.println("Reconnected to the node server");
       if (debugEnabled) log.debug("sending channel identifier");
       channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);

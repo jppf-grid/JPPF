@@ -72,7 +72,8 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
       if (sysoutEnabled) System.out.println(msg);
       log.info(msg);
       if (!socketInitializer.initialize(socketClient)) throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
-      if (!InterceptorHandler.invokeOnConnect(socketClient)) throw new JPPFException('[' + getName() + "] Could not reconnect to the class server due to interceptor failure");
+      if (!InterceptorHandler.invokeOnConnect(socketClient, JPPFChannelDescriptor.CLIENT_CLASSLOADER_CHANNEL))
+        throw new JPPFException('[' + getName() + "] Could not reconnect to the class server due to interceptor failure");
       if (!socketInitializer.isClosed()) {
         msg = "[client: " + getName() + "] Reconnected to the class server";
         if (sysoutEnabled) System.out.println(msg);

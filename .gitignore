@@ -5,3 +5,4 @@
 *.zip
 /.recommenders/
 /logs/
+/**/*.log

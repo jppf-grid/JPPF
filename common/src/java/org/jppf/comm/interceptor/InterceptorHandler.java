@@ -24,7 +24,7 @@ import java.nio.channels.SocketChannel;
 import java.util.*;
 
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.utils.ServiceFinder;
+import org.jppf.utils.*;
 
 /**
  * This class loads, and provides access to, the {@link NetworkConnectionInterceptor}s discovered via SPI.
@@ -74,7 +74,7 @@ public class InterceptorHandler {
   private static List<NetworkConnectionInterceptor> loadInterceptors() {
     final ServiceFinder sf = new ServiceFinder();
     final List<NetworkConnectionInterceptor> result = sf.findProviders(NetworkConnectionInterceptor.class);
-    if (debugEnabled) debugLog("found %d interceptors in the classpath", result.size());
+    if (debugEnabled) debugLog("found %d interceptors in the classpath: %s", result.size(), result);
     return result;
   }
 
@@ -89,13 +89,15 @@ public class InterceptorHandler {
   /**
    * Invoke all interceptors' {@code onConnect()} method with the specified socket.
    * @param connectedSocket the socket to intercept.
+   * @param channelDescriptor provdes information on the connected channel.
    * @return {@code true} if all {@code onConnect()} invocations returned {@code true}, {@code false} otherwise.
    */
-  public static boolean invokeOnConnect(final Socket connectedSocket) {
+  public static boolean invokeOnConnect(final Socket connectedSocket, final JPPFChannelDescriptor channelDescriptor) {
     if (!HAS_INTERCEPTOR) return true;
-    if (debugEnabled) debugLog("invoking onConnect() on %s", connectedSocket);
+    if (debugEnabled) debugLog("invoking onConnect() on %s, channelDescriptor = %s", connectedSocket, channelDescriptor);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
-      if (!interceptor.onConnect(connectedSocket)) return false;
+      if (debugEnabled) debugLog("invoking onConnect() of %s", interceptor);
+      if (!interceptor.onConnect(connectedSocket, channelDescriptor)) return false;
     }
     return true;
   }
@@ -103,13 +105,15 @@ public class InterceptorHandler {
   /**
    * Invoke all interceptors' {@code onConnect()} method with the specified socket channel.
    * @param connectedChannel the socket channel to intercept.
+   * @param channelDescriptor provdes information on the connected channel.
    * @return {@code true} if all {@code onConnect()} invocations returned {@code true}, {@code false} otherwise.
    */
-  public static boolean invokeOnConnect(final SocketChannel connectedChannel) {
+  public static boolean invokeOnConnect(final SocketChannel connectedChannel, final JPPFChannelDescriptor channelDescriptor) {
     if (!HAS_INTERCEPTOR) return true;
-    if (debugEnabled) debugLog("invoking onConnect() on %s", connectedChannel);
+    if (debugEnabled) debugLog("invoking onConnect() on %s, channelDescriptor = %s", connectedChannel, channelDescriptor);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
-      if (!interceptor.onConnect(connectedChannel)) return false;
+      if (debugEnabled) debugLog("invoking onConnect() of %s", interceptor);
+      if (!interceptor.onConnect(connectedChannel, channelDescriptor)) return false;
     }
     return true;
   }
@@ -117,13 +121,15 @@ public class InterceptorHandler {
   /**
    * Invoke all interceptors' {@code onAccept()} method with the specified socket.
    * @param acceptedSocket the socket to intercept.
+   * @param channelDescriptor provdes information on the accepted channel.
    * @return {@code true} if all {@code onAccept()} invocations returned {@code true}, {@code false} otherwise.
    */
-  public static boolean invokeOnAccept(final Socket acceptedSocket) {
+  public static boolean invokeOnAccept(final Socket acceptedSocket, final JPPFChannelDescriptor channelDescriptor) {
     if (!HAS_INTERCEPTOR) return true;
-    if (debugEnabled) debugLog("invoking onAccept() on %s", acceptedSocket);
+    if (debugEnabled) debugLog("invoking onAccept() on %s, channelDescriptor = %s", acceptedSocket, channelDescriptor);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
-      if (!interceptor.onAccept(acceptedSocket)) return false;
+      if (debugEnabled) debugLog("invoking onAccept() of %s", interceptor);
+      if (!interceptor.onAccept(acceptedSocket, channelDescriptor)) return false;
     }
     return true;
   }
@@ -131,13 +137,15 @@ public class InterceptorHandler {
   /**
    * Invoke all interceptors' {@code onAccept()} method with the specified socket channel.
    * @param acceptedChannel the socket channel to intercept.
+   * @param channelDescriptor provdes information on the accepted channel.
    * @return {@code true} if all {@code onAccept()} invocations returned {@code true}, {@code false} otherwise.
    */
-  public static boolean invokeOnAccept(final SocketChannel acceptedChannel) {
+  public static boolean invokeOnAccept(final SocketChannel acceptedChannel, final JPPFChannelDescriptor channelDescriptor) {
     if (!HAS_INTERCEPTOR) return true;
-    if (debugEnabled) debugLog("invoking onAccept() on %s", acceptedChannel);
+    if (debugEnabled) debugLog("invoking onAccept() on %s, channelDescriptor = %s", acceptedChannel, channelDescriptor);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
-      if (!interceptor.onAccept(acceptedChannel)) return false;
+      if (debugEnabled) debugLog("invoking onAccept() of %s", interceptor);
+      if (!interceptor.onAccept(acceptedChannel, channelDescriptor)) return false;
     }
     return true;
   }
@@ -145,21 +153,23 @@ public class InterceptorHandler {
   /**
    * Invoke all interceptors' {@code onConnect()} method with the specified socket wrapper.
    * @param socketWrapper holds the socket to intercept.
+   * @param channelDescriptor provdes information on the connected channel.
    * @return {@code true} if all {@code onConnect()} invocations returned {@code true}, {@code false} otherwise.
    */
-  public static boolean invokeOnConnect(final SocketWrapper socketWrapper) {
+  public static boolean invokeOnConnect(final SocketWrapper socketWrapper, final JPPFChannelDescriptor channelDescriptor) {
     if (socketWrapper == null) return true;
-    return invokeOnConnect(socketWrapper.getSocket());
+    return invokeOnConnect(socketWrapper.getSocket(), channelDescriptor);
   }
 
   /**
    * Invoke all interceptors' {@code onAccept()} method with the specified socket wrapper.
    * @param socketWrapper holds the socket to intercept.
+   * @param channelDescriptor provdes information on the accepted channel.
    * @return {@code true} if all {@code onAccept()} invocations returned {@code true}, {@code false} otherwise.
    */
-  public static boolean invokeOnAccept(final SocketWrapper socketWrapper) {
+  public static boolean invokeOnAccept(final SocketWrapper socketWrapper, final JPPFChannelDescriptor channelDescriptor) {
     if (socketWrapper == null) return true;
-    return invokeOnAccept(socketWrapper.getSocket());
+    return invokeOnAccept(socketWrapper.getSocket(), channelDescriptor);
   }
 
   /**

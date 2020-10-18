@@ -23,14 +23,19 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
+import javax.security.auth.login.Configuration;
+import javax.security.auth.login.LoginContext;
+
 import org.jppf.comm.interceptor.AbstractNetworkConnectionInterceptor;
+import org.jppf.example.interceptor.auth.InterceptorCallbackHandler;
+import org.jppf.example.interceptor.auth.JPPFJaasConfiguration;
 import org.jppf.utils.JPPFChannelDescriptor;
 
 /**
  * This interceptor implementation enforces a simple authentication mechanism.
  * @author Laurent Cohen
  */
-public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnectionInterceptor {
+public class JaasNetworkInterceptor extends AbstractNetworkConnectionInterceptor {
   /**
    * The name of the system property that holds the user name to validate against.
    */
@@ -39,6 +44,20 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
    * Timeout for socket read() opearations.
    */
   private static final int SOCKET_TIMEOUT = 6000;
+  /*
+   * Set the default Jaas configuration to ours, so that we don"'t have to use an external jaas.conf file.
+  */
+  static {
+    print("Initializing Jaas configuration");
+    Configuration.setConfiguration(new JPPFJaasConfiguration());
+  }
+
+  /**
+   * Initialize this interceptor.
+   */
+  public JaasNetworkInterceptor() {
+    print("Initializing the Jaas network interceptor");
+  }
 
   /**
    * Perform the interceptor's job on the specified accepted {@code Socket} or {@code SocketChannel} streams.
@@ -48,7 +67,7 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
    * @return {@code true} to accept the connection {@code false} to deny it.
    */
   @Override
-  public boolean onAccept(final Socket acceptedSocket, final JPPFChannelDescriptor channelDescriptor) {
+  public boolean onAccept(final Socket acceptedSocket, final JPPFChannelDescriptor descriptor) {
     int prevTimeout = -1;
     try {
       // set a timeout on read operations and store the previous setting, if any
@@ -60,7 +79,7 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
       final String userName = CryptoHelper.readAndDecrypt(is);
       final String localUser = System.getProperty(USER_NAME_PROPERTY);
       if (!userName.equals(localUser)) {
-        print("invalid user name '%s' from client side, source is %s", userName);
+        print("invalid user name '%s' from client side, source is %s", userName, acceptedSocket);
         // send invalid user response
         CryptoHelper.encryptAndWrite("invalid user name", os);
       } else {
@@ -91,41 +110,18 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
    * <p>Here we are on the client side of a connection, so we send credentials and obtain the confirmation
    * from the server side that they are valid.
    * @param connectedSocket the channel to read from and write to.
+   * @param descriptor provides information on the connected socket.
    * @return {@code true} to accept the connection {@code false} to deny it.
    */
   @Override
-  public boolean onConnect(final Socket connectedSocket, final JPPFChannelDescriptor channelDescriptor) {
-    int prevTimeout = -1;
+  public boolean onConnect(final Socket connectedSocket, final JPPFChannelDescriptor descriptor) {
     try {
-      // set a timeout on read operations and store the previous setting, if any
-      prevTimeout = connectedSocket.getSoTimeout();
-      connectedSocket.setSoTimeout(SOCKET_TIMEOUT);
-
-      final InputStream is = connectedSocket.getInputStream();
-      final OutputStream os = connectedSocket.getOutputStream();
-      // send the user name to the server
-      CryptoHelper.encryptAndWrite(System.getProperty(USER_NAME_PROPERTY), os);
-      // read the server reponse
-      final String response = CryptoHelper.readAndDecrypt(is);
-      if (!"OK".equals(response)) {
-        print("bad response from server: %s", response);
-      } else {
-        print("successful client authentication");
-        return true;
-      }
-    } catch (@SuppressWarnings("unused") final SocketTimeoutException e) {
-      print("unable to get a response from the server after %,d ms", SOCKET_TIMEOUT);
+      // perform the authentication through JAAS 
+      final LoginContext ctx = new LoginContext("NetworkInterceptorDemo", new InterceptorCallbackHandler(connectedSocket));
+      ctx.login();
+      return true;
     } catch (final Exception e) {
       e.printStackTrace();
-    } finally {
-      if (prevTimeout >= 0) {
-        try {
-          // restore the initial SO_TIMEOUT setting
-          connectedSocket.setSoTimeout(prevTimeout);
-        } catch(final Exception e) {
-          e.printStackTrace();
-        }
-      }
     }
     // the client side process terminates if authentication fails
     print("authentication failed, terminating");
@@ -138,8 +134,8 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
    * @param format the format string.
    * @param params the parameters referenced in the format.
    */
-  private static void print(final String format, final Object...params) {
-    final String message = String.format(format, params);
+  public static void print(final String format, final Object...params) {
+    final String message = String.format("[demo] " + format, params);
     System.out.println(message);
   }
 }

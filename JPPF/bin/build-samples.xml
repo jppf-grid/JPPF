@@ -148,6 +148,10 @@
 
   <!--
     Usage from the command line: ant -Dsamples=<samples_pattern> samples.generate.md
+    Examples:
+      ant -Dsamples="**" samples.generate.md
+      ant -Dsamples="NetworkInterceptor" samples.generate.md
+    The target files must be in samples-pack or in one of its nested directories.
   -->
   <target name="samples.generate.md">
     <sample.md samples="${samples}"/>

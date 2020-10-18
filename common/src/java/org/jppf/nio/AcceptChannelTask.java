@@ -24,7 +24,7 @@ import java.nio.channels.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.io.IO;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -95,7 +95,7 @@ public class AcceptChannelTask implements Runnable {
   private void intercept() throws Exception {
     if (InterceptorHandler.hasInterceptor()) {
       channel.configureBlocking(true);
-      if (!InterceptorHandler.invokeOnAccept(channel)) throw new JPPFException("connection denied by interceptor: " + channel);
+      if (!InterceptorHandler.invokeOnAccept(channel, JPPFIdentifiers.descriptorFor(server.getIdentifier()))) throw new JPPFException("connection denied by interceptor: " + channel);
     }
   }
 }

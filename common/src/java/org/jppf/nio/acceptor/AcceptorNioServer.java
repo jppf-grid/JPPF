@@ -129,7 +129,7 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
       channel.setOption(StandardSocketOptions.SO_SNDBUF, IO.SOCKET_BUFFER_SIZE);
       channel.setOption(StandardSocketOptions.TCP_NODELAY, IO.SOCKET_TCP_NODELAY);
       channel.setOption(StandardSocketOptions.SO_KEEPALIVE, IO.SOCKET_KEEPALIVE);
-      if (!InterceptorHandler.invokeOnAccept(channel)) throw new JPPFException("connection denied by interceptor: " + channel);
+      if (!InterceptorHandler.invokeOnAccept(channel, JPPFChannelDescriptor.ACCEPTOR_CHANNEL)) throw new JPPFException("connection denied by interceptor: " + channel);
       channel.configureBlocking(false);
       accept(serverSocketChannel, channel, null, ssl, false, env);
     } catch (final Exception e) {

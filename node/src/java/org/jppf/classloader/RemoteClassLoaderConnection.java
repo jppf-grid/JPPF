@@ -85,7 +85,8 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
             channel = null;
             throw new JPPFNodeReconnectionNotification("the JPPF class loader could not reconnect to the server", socketInitializer.getLastException(), ConnectionReason.CLASSLOADER_INIT_ERROR);
           }
-          if (!InterceptorHandler.invokeOnConnect(channel)) throw new JPPFNodeReconnectionNotification("connection denied by interceptor", null, ConnectionReason.CLASSLOADER_INIT_ERROR);
+          if (!InterceptorHandler.invokeOnConnect(channel, JPPFChannelDescriptor.NODE_CLASSLOADER_CHANNEL))
+            throw new JPPFNodeReconnectionNotification("connection denied by interceptor", null, ConnectionReason.CLASSLOADER_INIT_ERROR);
           performHandshake();
           System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
         } finally {

@@ -22,11 +22,11 @@ import java.io.*;
 import java.net.Socket;
 
 import org.jppf.comm.interceptor.AbstractNetworkConnectionInterceptor;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- *
+ * Network interceptor implementation for automated tests.
  * @author Laurent Cohen
  */
 public class TestInterceptor extends AbstractNetworkConnectionInterceptor {
@@ -60,7 +60,7 @@ public class TestInterceptor extends AbstractNetworkConnectionInterceptor {
   public static String serverMessage;
 
   @Override
-  public boolean onAccept(final Socket acceptedSocket) {
+  public boolean onAccept(final Socket acceptedSocket, final JPPFChannelDescriptor channelDescriptor) {
     if (!active) return true;
     if (debugEnabled) log.debug("start");
     try {
@@ -86,7 +86,7 @@ public class TestInterceptor extends AbstractNetworkConnectionInterceptor {
   }
 
   @Override
-  public boolean onConnect(final Socket connectedSocket) {
+  public boolean onConnect(final Socket connectedSocket, final JPPFChannelDescriptor channelDescriptor) {
     if (!active) return true;
     if (debugEnabled) log.debug("start");
     try {

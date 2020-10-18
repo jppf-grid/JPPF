@@ -1,1 +1,1 @@
-org.jppf.example.interceptor.DefaultNetworkConnectionInterceptor
+org.jppf.example.interceptor.JaasNetworkInterceptor
