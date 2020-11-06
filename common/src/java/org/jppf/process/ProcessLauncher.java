@@ -45,7 +45,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The fully qualified name of the main class of the subprocess to launch.
    */

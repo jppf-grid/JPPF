@@ -21,11 +21,10 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
-import net.miginfocom.swing.MigLayout;
-
 import org.jppf.ui.options.event.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * Default abstract implementation of the <code>Option</code> interface.
@@ -39,7 +38,7 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The value of this option.
    */

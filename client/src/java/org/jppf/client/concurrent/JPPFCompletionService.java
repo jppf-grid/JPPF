@@ -24,7 +24,6 @@ import java.util.concurrent.*;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -40,7 +39,7 @@ public class JPPFCompletionService<V> implements CompletionService<V> {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The executor to which tasks are submitted.
    */

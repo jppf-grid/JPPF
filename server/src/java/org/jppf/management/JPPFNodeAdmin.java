@@ -47,7 +47,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The latest event that occurred within a task.
    */

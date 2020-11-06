@@ -39,7 +39,6 @@ import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.monitoring.job.JobTreeTableModel;
 import org.jppf.ui.treetable.TreeViewType;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
@@ -57,7 +56,7 @@ public class JobsPage extends AbstractTableTreePage {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether debug log statements are enabled.
    */

@@ -79,14 +79,22 @@ public interface Node extends Runnable {
   /**
    * Determine whether this node can execute .Net tasks.
    * @return {@code true} if this node can execute .Net tasks, {@code false} otherwise.
+   * @deprecated the .Net port is no longer part of JPPF, there is no replacement.
    */
-  boolean isDotnetCapable();
+  @Deprecated
+  default boolean isDotnetCapable() {
+    return false;
+  }
 
   /**
    * Determine whether this node is an Android node.
    * @return {@code true} if this node runs on Android, {@code false} otherwise.
+   * @deprecated the Android port is no longer part of JPPF, there is no replacement.
    */
-  boolean isAndroid();
+  @Deprecated
+  default boolean isAndroid() {
+    return false;
+  }
 
   /**
    * Get the configuration of this node.

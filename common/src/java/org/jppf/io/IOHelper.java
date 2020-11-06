@@ -42,7 +42,7 @@ public final class IOHelper {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether trace-level logging is enabled.
    */

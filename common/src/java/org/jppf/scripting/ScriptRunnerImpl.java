@@ -40,7 +40,7 @@ class ScriptRunnerImpl implements ScriptRunner {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Map of precompiled scripts.
    */

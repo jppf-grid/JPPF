@@ -39,7 +39,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements HeartbeatCo
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Connection to the recovery server.
    */

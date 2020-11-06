@@ -45,7 +45,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String> {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The default prefix for the files in the store.
    */

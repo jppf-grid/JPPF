@@ -19,10 +19,9 @@
 package org.jppf.admin.web.filter;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.utils.AjaxButtonWithIcon;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -37,7 +36,7 @@ public class SaveLink extends AjaxButtonWithIcon {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize.

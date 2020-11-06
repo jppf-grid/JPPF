@@ -40,7 +40,7 @@ public class JPPFJMXServer extends AbstractJMXServer {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * An ordered set of configuration properties to use for looking up the desired management port.
    */

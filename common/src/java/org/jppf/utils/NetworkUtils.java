@@ -38,7 +38,7 @@ public final class NetworkUtils {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Contains a set of all possible loopback addresses.
    * These are all the IPs in the 127.0.0.0-8 range.

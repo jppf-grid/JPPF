@@ -43,7 +43,7 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * 
    */
@@ -54,7 +54,6 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
     final ClassPath classpath = event.getJob().getSLA().getClassPath();
     if (classpath == null) return;
     final Node node = event.getNode();
-    if (node.isAndroid()) return;
     if (log.isTraceEnabled()) log.trace(StringUtils.printClassLoaderHierarchy(event.getTaskClassLoader()));
     AbstractJPPFClassLoader cl = event.getTaskClassLoader();
     if (classpath.isForceClassLoaderReset() || !classpath.isEmpty()) cl = (AbstractJPPFClassLoader) node.resetTaskClassLoader(event.getJob());

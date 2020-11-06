@@ -26,8 +26,7 @@ import javax.management.*;
 import org.jppf.management.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.event.*;
-import org.jppf.server.nio.nodeserver.*;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.server.nio.nodeserver.BaseNodeContext;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
@@ -51,7 +50,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Reference to the MBean which forwards the notifications.
    */

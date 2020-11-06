@@ -41,7 +41,7 @@ public class URLLocation extends AbstractLocation<URL> {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The size of the artifact pointed to by this URL location.
    * We attempt to cache it to avoid looking it up by opening a connection every time.

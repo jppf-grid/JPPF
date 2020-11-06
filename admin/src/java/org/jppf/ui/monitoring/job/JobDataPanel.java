@@ -29,7 +29,6 @@ import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.*;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
@@ -46,7 +45,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The object which monitors and maintains a representation of the jobs hierarchy.
    */

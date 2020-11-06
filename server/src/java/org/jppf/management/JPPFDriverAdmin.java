@@ -47,7 +47,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Base name used for localization lookups.
    */

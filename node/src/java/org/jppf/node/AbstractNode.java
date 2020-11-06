@@ -100,11 +100,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    */
   protected boolean jmxEnabled;
   /**
-   * Determines whether this node can execute .Net tasks.
-   * @exclude
-   */
-  protected final boolean dotnetCapable;
-  /**
    * Handles the firing of node life cycle events and the listeners that subscribe to these events.
    * @exclude
    */
@@ -124,7 +119,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
     this.uuid = uuid;
     this.configuration = configuration;
     jmxEnabled = configuration.get(JPPFProperties.MANAGEMENT_ENABLED);
-    dotnetCapable = configuration.get(JPPFProperties.DOTNET_BRIDGE_INITIALIZED);
   }
 
   /**
@@ -201,11 +195,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
     return null;
   }
 
-  @Override
-  public boolean isAndroid() {
-    return false;
-  }
-
   /**
    * Determine whether this node is currently shutting down.
    * @return an {@link AtomicBoolean} instance whose value is {@code true</code> if the node is shutting down, <code>false} otherwise.
@@ -239,8 +228,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
       @SuppressWarnings("deprecation")
       final int type = NODE
         | (isMasterNode() ? MASTER : (isSlaveNode() ? SLAVE : 0))
-        | (isAndroid() ? ANDROID : 0)
-        | (isDotnetCapable() ? DOTNET : 0)
         | (isLocal() ? LOCAL :0);
       final String host = server.getManagementHost();
       final String ip = (getConfiguration().get(JPPFProperties.RESOLVE_ADDRESSES)) ? NetworkUtils.getHostIP(host).ipAddress() : host;
@@ -263,11 +250,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    */
   protected boolean isJmxEnabled() {
     return jmxEnabled && !isOffline();
-  }
-
-  @Override
-  public boolean isDotnetCapable() {
-    return dotnetCapable;
   }
 
   /**

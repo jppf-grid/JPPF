@@ -35,7 +35,7 @@ public class JPPFDefaultUncaughtExceptionHandler implements UncaughtExceptionHan
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   @Override
   public void uncaughtException(final Thread t, final Throwable e) {

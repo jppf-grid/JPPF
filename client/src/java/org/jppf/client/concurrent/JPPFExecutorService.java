@@ -62,7 +62,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Count of instances of this class, use to name the batch handler thread.
    */

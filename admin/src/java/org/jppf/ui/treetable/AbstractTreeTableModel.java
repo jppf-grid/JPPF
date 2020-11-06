@@ -61,7 +61,6 @@ import java.io.Serializable;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -80,7 +79,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel, Serializ
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The tree root.
    */

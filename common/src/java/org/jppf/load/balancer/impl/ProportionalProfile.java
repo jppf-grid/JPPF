@@ -40,7 +40,7 @@ public class ProportionalProfile extends AbstractLoadBalancingProfile {
   /**
    * Determines whether debugging level is set for logging.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * A default profile with default parameter values.
    */

@@ -46,7 +46,7 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The statsistics to update, if any.
    */

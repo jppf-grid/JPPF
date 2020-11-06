@@ -48,7 +48,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this task queue checker with the specified node server.

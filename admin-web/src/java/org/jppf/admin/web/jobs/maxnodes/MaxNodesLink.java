@@ -26,12 +26,11 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.*;
 import org.jppf.admin.web.jobs.JobsConstants;
-import org.jppf.admin.web.tabletree.*;
+import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.utils.AbstractModalLink;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.job.*;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -47,7 +46,7 @@ public class MaxNodesLink extends AbstractModalLink<MaxNodesForm> {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * @param form .

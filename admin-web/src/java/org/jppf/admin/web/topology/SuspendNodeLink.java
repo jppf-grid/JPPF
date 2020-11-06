@@ -28,7 +28,6 @@ import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.utils.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.*;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
@@ -44,7 +43,7 @@ public class SuspendNodeLink extends AbstractActionLink {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * 

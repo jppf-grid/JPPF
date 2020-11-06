@@ -43,7 +43,7 @@ public class OffloadableNotification extends Notification {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Heap usage, in bytes, beyond which offloading is triggered.
    */

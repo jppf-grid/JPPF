@@ -38,7 +38,7 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize class server delegate with a specified application uuid.

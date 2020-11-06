@@ -36,7 +36,7 @@ public class PlainNioObject extends AbstractNioObject {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Where to read the data from (a socket channel)
    */

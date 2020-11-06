@@ -39,7 +39,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The collector that contains the task.
    */

@@ -39,7 +39,7 @@ public class NodeConnectionEventHandler extends ServiceProviderHandler<NodeConne
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Keeps track of the number of connected nodes.
    */

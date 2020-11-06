@@ -49,7 +49,7 @@ public class GraphTopologyHandler implements TopologyListener {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The underlying graph that keeps track of all drivers and nodes.
    */

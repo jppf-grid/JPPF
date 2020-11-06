@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
@@ -42,7 +41,7 @@ public class JobResults extends ThreadSynchronization implements Serializable {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * A map containing the tasks that have been successfully executed,
    * ordered by ascending position in the submitted list of tasks.

@@ -28,7 +28,7 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.configuration.JPPFProperties;
-import org.slf4j.Logger;
+import org.slf4j.*;
 
 /**
  * Implementation of the <code>JPPFNodeForwardingMBean</code> interface.
@@ -39,11 +39,11 @@ public abstract class AbstractNodeForwarding extends NotificationBroadcasterSupp
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggingUtils.getLogger(AbstractNodeForwarding.class, false);
+  private static final Logger log = LoggerFactory.getLogger(AbstractNodeForwarding.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Used to generate listener IDs.
    */

@@ -21,7 +21,6 @@ package test.org.jppf.test.setup.common;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.event.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -35,7 +34,7 @@ public class CountingJobListener extends JobListenerAdapter {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * The count of 'jobStarted' notifications.

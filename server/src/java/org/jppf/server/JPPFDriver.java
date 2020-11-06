@@ -57,7 +57,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Whether the driver was started via the {@link #main(String[]) main()} method.
    */

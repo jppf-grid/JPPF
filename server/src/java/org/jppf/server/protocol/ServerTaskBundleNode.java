@@ -43,7 +43,7 @@ public class ServerTaskBundleNode {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether trace-level logging is enabled.
    */

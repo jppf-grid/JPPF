@@ -38,7 +38,7 @@ public class OutputRedirectHook implements InitializationHook {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   @Override
   public void initializing(final TypedProperties config) {

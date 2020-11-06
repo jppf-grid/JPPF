@@ -74,6 +74,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * @deprecated the Android node feature is no longer part of JPPF
    * @exclude
    */
+  @Deprecated
   public static final int ANDROID = 0x0010_0000;
   /**
    * Mask for elimination extended type attributes (bits 16-31).
@@ -317,7 +318,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * @exclude
    */
   public boolean isDotnetCapable() {
-    return (type & DOTNET) == DOTNET;
+    return false;
   }
 
   /**
@@ -328,7 +329,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * @exclude
    */
   public boolean isAndroidNode() {
-    return (type & ANDROID) == ANDROID;
+    return false;
   }
 
   /**
@@ -360,8 +361,6 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     if (isMasterNode()) sb.append("|MASTER");
     if (isSlaveNode()) sb.append("|SLAVE");
     if (isLocal()) sb.append("|LOCAL");
-    if (isDotnetCapable()) sb.append("|DOTNET");
-    if (isAndroidNode()) sb.append("|ANDROID");
     return sb.toString();
   }
 

@@ -30,7 +30,6 @@ import org.jppf.node.protocol.graph.TaskGraphInfo;
 import org.jppf.server.nio.nodeserver.LocalNodeMessage;
 import org.jppf.server.nio.nodeserver.async.*;
 import org.jppf.server.node.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -45,7 +44,7 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The I/O channel for this node.
    */

@@ -46,7 +46,7 @@ class BatchHandler extends ThreadSynchronization implements Runnable {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Count of jobs created by this executor service.
    */

@@ -22,7 +22,6 @@ import java.net.SocketTimeoutException;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
@@ -38,7 +37,7 @@ public abstract class AbstractHeartbeatConnection extends ThreadSynchronization 
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
    */

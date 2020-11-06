@@ -25,7 +25,6 @@ import java.util.concurrent.locks.*;
 import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.persistence.PersistentState;
 import org.jppf.node.protocol.JPPFDistributedJob;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -41,7 +40,7 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
   /**
    * Determines whether debugging level is set for logging.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether trace level is set for logging.
    */

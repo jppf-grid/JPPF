@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.utils.*;
-import org.slf4j.Logger;
+import org.slf4j.*;
 
 /**
  * A thread pool based on an ubounded queue which supports a core and maximum number of threads, along with a TTL for non-core threads.
@@ -37,7 +37,7 @@ public class JPPFThreadPool extends AbstractExecutorService {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggingUtils.getLogger(JPPFThreadPool.class, false);
+  private static final Logger log = LoggerFactory.getLogger(JPPFThreadPool.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */

@@ -20,11 +20,10 @@ package org.jppf.admin.web.filter;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.upload.*;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.utils.AjaxButtonWithIcon;
-import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -39,7 +38,7 @@ public class UploadLink extends AjaxButtonWithIcon {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize.

@@ -21,7 +21,6 @@ package org.jppf.admin.web.layout;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.utils.AbstractModalLink;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -36,7 +35,7 @@ public class SelectableLayoutLink extends AbstractModalLink<SelectableLayoutForm
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The selectable layout page to get the items from.
    */

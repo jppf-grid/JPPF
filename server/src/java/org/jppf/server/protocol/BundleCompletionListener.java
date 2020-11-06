@@ -21,7 +21,6 @@ package org.jppf.server.protocol;
 import java.util.List;
 
 import org.jppf.server.submission.SubmissionStatus;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -35,7 +34,7 @@ public class BundleCompletionListener implements ServerTaskBundleClient.Completi
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The job to handle.
    */

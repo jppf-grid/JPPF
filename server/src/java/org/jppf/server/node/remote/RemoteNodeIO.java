@@ -31,7 +31,6 @@ import org.jppf.node.protocol.*;
 import org.jppf.node.protocol.graph.TaskGraphInfo;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.node.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -46,7 +45,7 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
    */

@@ -94,6 +94,7 @@ class JPPFPutField extends PutField {
     objectFields.put(name, val);
   }
 
+  @Deprecated
   @Override
   public void write(final ObjectOutput out) throws IOException {
     if (out != this.out) throw new IOException("not using the right stream");

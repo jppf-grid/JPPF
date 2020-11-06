@@ -51,7 +51,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * A reference to the tasks queue.
    */

@@ -44,7 +44,7 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The channel to the driver to use.
    */

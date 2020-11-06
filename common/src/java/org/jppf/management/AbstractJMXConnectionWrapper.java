@@ -48,7 +48,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Prefix for the name given to the connection thread.
    */

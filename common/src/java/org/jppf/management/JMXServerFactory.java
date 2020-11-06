@@ -36,7 +36,7 @@ public class JMXServerFactory {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Create a JMXServer instance based on the specified parameters.

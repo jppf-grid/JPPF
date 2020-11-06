@@ -19,10 +19,9 @@
 package org.jppf.admin.web.admin;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.util.resource.*;
 import org.jppf.admin.web.utils.AJAXDownload;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -37,7 +36,7 @@ public class DownloadLink extends AbstractAdminLink {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * 
    */
