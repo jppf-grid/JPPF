@@ -30,7 +30,6 @@ import org.jppf.admin.web.utils.AbstractModalLink;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.UuidSelector;
 import org.jppf.ui.monitoring.node.actions.NodeConfigurationAction;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -45,7 +44,7 @@ public class NodeConfigLink extends AbstractModalLink<NodeConfigForm> {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * @param form .

@@ -26,7 +26,6 @@ import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.form.Form;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.utils.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -41,7 +40,7 @@ public class ActionHandler {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    *
    */

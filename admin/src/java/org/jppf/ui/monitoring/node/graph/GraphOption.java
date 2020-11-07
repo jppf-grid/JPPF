@@ -61,7 +61,7 @@ public class GraphOption extends AbstractOption implements ActionHolder, MasterS
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Default stroke for node to driver or peer to driver relationships.
    */

@@ -40,7 +40,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Whether resources should be looked up in the file system if not found in the classpath.
    */

@@ -25,12 +25,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
-import org.jppf.admin.web.tabletree.*;
+import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyConstants;
 import org.jppf.admin.web.utils.AbstractModalLink;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -46,7 +45,7 @@ public class NodeThreadsLink extends AbstractModalLink<NodeThreadsForm> {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * @param form .

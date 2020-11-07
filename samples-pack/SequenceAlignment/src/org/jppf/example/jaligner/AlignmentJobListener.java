@@ -25,7 +25,6 @@ import javax.swing.SwingUtilities;
 import org.jppf.client.event.JobEvent;
 import org.jppf.client.event.JobListenerAdapter;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,7 @@ public class AlignmentJobListener extends JobListenerAdapter {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Total number of expected results.
    */

@@ -30,7 +30,7 @@ import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.BaseNodeContext;
 import org.jppf.utils.*;
-import org.slf4j.Logger;
+import org.slf4j.*;
 
 /**
  * Implementation of the <code>JPPFNodeForwardingMBean</code> interface.
@@ -46,11 +46,11 @@ public class JPPFNodeForwarding extends AbstractNodeForwarding implements JPPFNo
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggingUtils.getLogger(JPPFNodeForwarding.class, false);
+  private static final Logger log = LoggerFactory.getLogger(JPPFNodeForwarding.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this MBean implementation.

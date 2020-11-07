@@ -23,7 +23,6 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +37,7 @@ public abstract class AbstractModalLink<F extends AbstractModalForm> extends Abs
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The modal window opened upon click on the buttom.
    */

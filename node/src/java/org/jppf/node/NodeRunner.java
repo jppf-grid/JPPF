@@ -50,7 +50,7 @@ public class NodeRunner {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The ClassLoader used for loading the classes of the framework.
    */

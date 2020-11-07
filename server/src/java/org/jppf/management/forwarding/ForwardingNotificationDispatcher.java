@@ -44,7 +44,7 @@ class ForwardingNotificationDispatcher {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Constant for an empty array of event listeners.
    */

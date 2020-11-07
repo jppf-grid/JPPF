@@ -42,7 +42,7 @@ public class LoginForm extends Form<String> {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Prefix for the ids of this form and its fields.
    */

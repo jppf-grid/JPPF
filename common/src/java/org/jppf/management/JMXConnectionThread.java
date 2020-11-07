@@ -18,7 +18,6 @@
 
 package org.jppf.management;
 
-import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
@@ -34,7 +33,7 @@ class JMXConnectionThread extends ThreadSynchronization implements Runnable {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The connection that holds this thread.
    */

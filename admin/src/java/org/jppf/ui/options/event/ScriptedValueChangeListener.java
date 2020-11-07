@@ -39,7 +39,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Name of the scripting language to use.
    */

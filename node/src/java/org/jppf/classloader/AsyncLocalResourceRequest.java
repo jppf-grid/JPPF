@@ -18,7 +18,6 @@
 
 package org.jppf.classloader;
 
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -33,7 +32,7 @@ class AsyncLocalResourceRequest extends AbstractResourceRequest {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The channel used by the local node's class loader.
    */

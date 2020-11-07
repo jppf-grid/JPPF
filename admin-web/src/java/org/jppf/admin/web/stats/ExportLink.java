@@ -24,7 +24,6 @@ import org.jppf.admin.web.*;
 import org.jppf.admin.web.utils.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.monitoring.data.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -39,7 +38,7 @@ public class ExportLink extends AjaxButtonWithIcon {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Export to text format.
    */

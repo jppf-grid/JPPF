@@ -39,7 +39,7 @@ public class AcceptChannelTask implements Runnable {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The related nio server.
    */

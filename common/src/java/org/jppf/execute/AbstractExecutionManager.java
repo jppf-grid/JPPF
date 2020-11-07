@@ -45,7 +45,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Timer managing the tasks timeout.
    */

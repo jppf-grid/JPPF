@@ -60,7 +60,7 @@ public class DriverInitializer {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Constant for JPPF automatic connection discovery
    */

@@ -41,7 +41,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The topology manager to which topology change notifications are to be sent.
    */

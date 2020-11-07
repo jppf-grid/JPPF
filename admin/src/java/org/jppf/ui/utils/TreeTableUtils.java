@@ -24,7 +24,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 
@@ -40,7 +39,7 @@ public final class TreeTableUtils {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Find the position at which to insert a driver, using the sorted lexical order of driver names.
@@ -87,8 +86,8 @@ public final class TreeTableUtils {
    */
   @SuppressWarnings("deprecation")
   public static String getNodeIconPath(final JPPFManagementInfo info) {
-    if (info.isMasterNode()) return info.isDotnetCapable() ? AbstractTreeCellRenderer.NODE_MASTER_DOTNET_ICON : AbstractTreeCellRenderer.NODE_MASTER_ICON;
-    return info.isDotnetCapable() ? AbstractTreeCellRenderer.NODE_DOTNET_ICON : AbstractTreeCellRenderer.NODE_ICON;
+    if (info.isMasterNode()) return AbstractTreeCellRenderer.NODE_MASTER_ICON;
+    return AbstractTreeCellRenderer.NODE_ICON;
   }
 
   /**

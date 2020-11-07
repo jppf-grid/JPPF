@@ -63,7 +63,7 @@ abstract class AbstractJPPFDriver {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Used for serialization / deserialization.
    */

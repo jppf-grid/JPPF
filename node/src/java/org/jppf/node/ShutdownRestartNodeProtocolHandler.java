@@ -21,7 +21,6 @@ package org.jppf.node;
 import org.jppf.management.JPPFNodeAdminMBean;
 import org.jppf.process.*;
 import org.jppf.server.node.JPPFNode;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +37,7 @@ public class ShutdownRestartNodeProtocolHandler implements LauncherListenerProto
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The node to send requests to.
    */

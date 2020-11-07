@@ -66,7 +66,7 @@ public class PropertiesLoader {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Loads the properties from the specified reader into the specified Properties object.

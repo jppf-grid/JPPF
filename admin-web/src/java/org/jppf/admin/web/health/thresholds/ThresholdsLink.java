@@ -23,7 +23,6 @@ import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.health.HealthConstants;
 import org.jppf.admin.web.utils.AbstractModalLink;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +37,7 @@ public class ThresholdsLink extends AbstractModalLink<ThresholdsForm> {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * @param form .

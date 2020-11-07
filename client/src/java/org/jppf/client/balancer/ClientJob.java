@@ -45,7 +45,7 @@ public class ClientJob extends AbstractClientJob {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The list of the tasks.
    */

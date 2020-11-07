@@ -44,7 +44,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The node that uses this execution manager.
    */
@@ -106,16 +106,5 @@ public class NodeExecutionManager extends AbstractExecutionManager {
   public void triggerConfigChanged() {
     super.triggerConfigChanged();
     node.getNodeConfigNotifier().sendNotification(node.getUuid(), node.getConfiguration());
-  }
-
-  @Override
-  protected void taskEnded(final NodeTaskWrapper taskWrapper) {
-    // Workaround for the Android issue https://code.google.com/p/android/issues/detail?id=211596
-    final Task<?> task = taskWrapper.getTask();
-    final Throwable t = task.getThrowable();
-    if (node.isAndroid() && (t instanceof ReflectiveOperationException)) {
-      task.setThrowable(new JPPFTaskSerializationException(t));
-    }
-    super.taskEnded(taskWrapper);
   }
 }

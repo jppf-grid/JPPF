@@ -231,7 +231,6 @@ public final class GuiUtils {
     final JPPFManagementInfo info = node.getManagementInfo();
     if (info != null) {
       if (info.isMasterNode()) sb.append("-master");
-      if (info.isDotnetCapable()) sb.append("-dotnet");
       switch(node.getPendingAction()) {
         case SHUTDOWN:
           sb.append("-pending-shutdown");

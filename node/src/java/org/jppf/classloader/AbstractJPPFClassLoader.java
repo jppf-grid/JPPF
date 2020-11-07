@@ -44,7 +44,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines the class loading delegation model to use.
    */

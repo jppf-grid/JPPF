@@ -44,7 +44,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  protected static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  protected static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Panel containing the dialog for entering the number of threads and their priority.
    */

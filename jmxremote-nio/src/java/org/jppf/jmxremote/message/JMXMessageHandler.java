@@ -26,9 +26,9 @@ import java.util.concurrent.atomic.*;
 import org.jppf.JPPFTimeoutException;
 import org.jppf.jmx.*;
 import org.jppf.jmxremote.nio.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.configuration.JPPFProperties;
-import org.slf4j.Logger;
+import org.slf4j.*;
 
 /**
  * Handles requests/responses and notifications with a message-based semantics.
@@ -38,7 +38,7 @@ public class JMXMessageHandler {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggingUtils.getLogger(JMXMessageHandler.class, JMXEnvHelper.isAsyncLoggingEnabled());
+  private static final Logger log = LoggerFactory.getLogger(JMXMessageHandler.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */

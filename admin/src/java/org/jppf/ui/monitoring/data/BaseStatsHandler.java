@@ -41,7 +41,7 @@ public class BaseStatsHandler {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Interval, in milliseconds, between refreshes from the server.
    */

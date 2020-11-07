@@ -42,7 +42,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable, 
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The UDP sockets to broadcast to, each bound to a different network interface.
    */

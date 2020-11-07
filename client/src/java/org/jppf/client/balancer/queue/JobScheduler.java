@@ -44,7 +44,7 @@ public class JobScheduler extends ThreadSynchronization implements Runnable {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether TRACE logging level is enabled.
    */

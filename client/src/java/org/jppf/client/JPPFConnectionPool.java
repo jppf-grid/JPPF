@@ -41,7 +41,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool implements 
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Wether the heartbeat mechanism is enabled for the connection pool.
    */

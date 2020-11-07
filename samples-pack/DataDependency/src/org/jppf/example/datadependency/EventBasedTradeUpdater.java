@@ -21,7 +21,6 @@ package org.jppf.example.datadependency;
 import org.jppf.example.datadependency.simulation.Ticker;
 import org.jppf.example.datadependency.simulation.TickerEvent;
 import org.jppf.utils.DateTimeUtils;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater {
   /**
    * Debug enabled flag.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Default constructor.

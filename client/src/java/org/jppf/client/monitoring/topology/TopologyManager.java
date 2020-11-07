@@ -24,7 +24,6 @@ import java.util.concurrent.*;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.management.NodeSelector;
-import org.jppf.utils.*;
 import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -42,7 +41,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Mapping of driver uuids to the corresponding {@link TopologyDriver} objects.
    */

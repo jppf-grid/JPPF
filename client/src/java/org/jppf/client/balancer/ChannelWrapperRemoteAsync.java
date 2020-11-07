@@ -24,11 +24,11 @@ import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.client.event.*;
+import org.jppf.client.event.ClientConnectionStatusListener;
 import org.jppf.load.balancer.BundlerHelper;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -44,7 +44,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The queue of jobs submitted to this connection.
    */
@@ -130,7 +130,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
     /**
      * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
      */
-    private boolean thisDebugEnabled = LoggingUtils.isDebugEnabled(thisLog);
+    private boolean thisDebugEnabled = thisLog.isDebugEnabled();
 
     @Override
     public void run() {
@@ -188,7 +188,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
     /**
      * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
      */
-    private boolean thisDebugEnabled = LoggingUtils.isDebugEnabled(thisLog);
+    private boolean thisDebugEnabled = thisLog.isDebugEnabled();
 
     @Override
     public void run() {

@@ -18,13 +18,12 @@
 
 package org.jppf.ui.monitoring.data;
 
-import java.util.*;
+import java.util.TimerTask;
 
 import javax.swing.*;
 
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.options.*;
-import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
@@ -39,7 +38,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The new connection that was created.
    */

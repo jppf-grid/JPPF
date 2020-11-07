@@ -36,7 +36,7 @@ public class SaveLink extends AbstractAdminLink {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize.

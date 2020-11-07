@@ -46,7 +46,7 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
    */

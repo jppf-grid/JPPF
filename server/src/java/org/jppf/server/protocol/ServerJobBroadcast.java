@@ -24,7 +24,6 @@ import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.submission.SubmissionStatus;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -41,7 +40,7 @@ public class ServerJobBroadcast extends ServerJob {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Instance of parent broadcast job.
    */

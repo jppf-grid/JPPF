@@ -39,7 +39,7 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Selected rows in the table by driver/node uuid.
    */

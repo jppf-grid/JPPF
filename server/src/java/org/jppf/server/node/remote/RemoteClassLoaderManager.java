@@ -24,7 +24,6 @@ import java.util.concurrent.Callable;
 
 import org.jppf.classloader.*;
 import org.jppf.server.node.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -39,7 +38,7 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager<JPPFRem
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this class loader manager with the specified node.

@@ -23,7 +23,6 @@ import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.serialization.*;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -43,7 +42,7 @@ public abstract class JPPFContainer {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Utility for deserialization and serialization.
    */

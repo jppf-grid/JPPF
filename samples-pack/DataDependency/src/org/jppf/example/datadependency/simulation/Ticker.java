@@ -26,7 +26,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.example.datadependency.model.MarketData;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.Logger;
@@ -44,7 +43,7 @@ public class Ticker extends ThreadSynchronization implements Runnable {
   /**
    * Debug enabled flag.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Market data to use.
    */

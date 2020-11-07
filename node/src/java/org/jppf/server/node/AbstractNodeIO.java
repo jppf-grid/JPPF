@@ -25,7 +25,6 @@ import java.util.*;
 
 import org.jppf.node.protocol.*;
 import org.jppf.node.protocol.graph.*;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
@@ -45,7 +44,7 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The node who owns this TaskIO.
    */

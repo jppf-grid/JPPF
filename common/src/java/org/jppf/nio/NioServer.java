@@ -50,7 +50,7 @@ public abstract class NioServer extends Thread {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * the selector of all socket channels open with providers or nodes.
    */

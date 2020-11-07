@@ -21,7 +21,6 @@ package org.jppf.node;
 import java.security.*;
 
 import org.jppf.server.node.JPPFNode;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -36,7 +35,7 @@ public class ShutdownOrRestart implements Runnable {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * {@code true} if the node is to be restarted, {@code false} to only shut it down.
    */

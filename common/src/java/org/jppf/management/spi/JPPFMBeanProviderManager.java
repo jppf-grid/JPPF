@@ -40,7 +40,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Keeps a list of MBeans registered with the MBean server.
    */

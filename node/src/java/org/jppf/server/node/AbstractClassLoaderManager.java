@@ -24,7 +24,6 @@ import java.util.concurrent.Callable;
 
 import org.jppf.classloader.*;
 import org.jppf.node.protocol.TaskThreadLocals;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -42,7 +41,7 @@ public abstract class AbstractClassLoaderManager<N extends JPPFNode> {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Maximum number of containers kept by this node's cache.
    */

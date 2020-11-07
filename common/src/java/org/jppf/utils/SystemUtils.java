@@ -25,6 +25,8 @@ import java.net.InetAddress;
 import java.security.*;
 import java.util.*;
 
+import javax.management.MBeanServer;
+
 import org.slf4j.*;
 
 /**
@@ -40,7 +42,7 @@ public final class SystemUtils {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Singleton holding the unchanging system properties.
    */
@@ -162,7 +164,7 @@ public final class SystemUtils {
       props.setLong("usedMemory", usedMemory);
       props.setLong("availableMemory", rt.maxMemory() - usedMemory);
       if (ManagementUtils.isManagementAvailable()) {
-        final Object mbeanServer = ManagementUtils.getPlatformServer();
+        final MBeanServer mbeanServer = ManagementUtils.getPlatformServer();
         final String mbeanName = "java.lang:type=Runtime";
         String s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "StartTime"));
         props.setProperty("startTime", s);

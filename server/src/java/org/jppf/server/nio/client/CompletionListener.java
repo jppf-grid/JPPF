@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.jppf.nio.StatelessNioServer;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +37,7 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The client channel.
    */

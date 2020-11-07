@@ -38,7 +38,7 @@ public class NodeDispatchTimeoutAction implements Runnable {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The server handling the node to which the bundle was sent.
    */

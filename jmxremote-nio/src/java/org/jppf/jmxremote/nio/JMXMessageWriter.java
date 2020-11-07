@@ -19,11 +19,10 @@
 package org.jppf.jmxremote.nio;
 
 import org.jppf.io.IOHelper;
-import org.jppf.jmx.*;
+import org.jppf.jmx.JMXHelper;
 import org.jppf.jmxremote.message.JMXRequest;
 import org.jppf.nio.SimpleNioMessage;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.Logger;
+import org.slf4j.*;
 
 /**
  * Writes all messages in the channel's context queue, if any, or keeps writing the current message until the socket send buffer is full.
@@ -33,7 +32,7 @@ public class JMXMessageWriter {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggingUtils.getLogger(JMXMessageWriter.class, JMXEnvHelper.isAsyncLoggingEnabled());
+  private static final Logger log = LoggerFactory.getLogger(JMXMessageWriter.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */

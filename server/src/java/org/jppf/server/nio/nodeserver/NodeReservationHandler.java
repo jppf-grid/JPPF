@@ -43,7 +43,7 @@ public class NodeReservationHandler {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Map of reserved nodes UUIDs to the correspoding job UUIDs.
    */

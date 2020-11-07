@@ -45,7 +45,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements JPPFClientCon
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private final static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private final static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The task execution manager for this wrapper.
    */

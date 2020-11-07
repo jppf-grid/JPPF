@@ -20,7 +20,6 @@ package org.jppf.client;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.discovery.*;
-import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
@@ -38,7 +37,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Contains the set of retrieved connection information objects.
    */

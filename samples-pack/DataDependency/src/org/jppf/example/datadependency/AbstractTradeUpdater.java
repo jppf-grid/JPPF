@@ -46,7 +46,6 @@ import org.jppf.node.policy.Equal;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.Operator;
 import org.jppf.utils.TypedProperties;
 import org.jppf.utils.concurrent.JPPFThreadFactory;
@@ -65,7 +64,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable {
   /**
    * Debug enabled flag.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The JPPF client, handles all communications with the server.
    */

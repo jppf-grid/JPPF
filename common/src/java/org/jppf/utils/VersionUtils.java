@@ -35,7 +35,7 @@ public final class VersionUtils {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The singleton instance holding the version information.
    */

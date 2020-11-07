@@ -42,7 +42,7 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /** */
   private static final NodeSelector masterSelector = new ExecutionPolicySelector(new IsMasterNode());
   /** */

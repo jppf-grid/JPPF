@@ -44,7 +44,7 @@ public final class StatsHandler extends BaseStatsHandler {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Singleton instance of this class.
    */

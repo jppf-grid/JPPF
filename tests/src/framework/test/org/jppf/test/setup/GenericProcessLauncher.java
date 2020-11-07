@@ -43,7 +43,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * System path separator.
    */

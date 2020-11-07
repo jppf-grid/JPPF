@@ -48,7 +48,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Defines how the configuration is to be located.<br>
    * This property is defined in the format "<i>type</i>|<i>path</i>", where <i>type</i> can be one of:<br>

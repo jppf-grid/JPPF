@@ -27,7 +27,6 @@ import org.jppf.nio.NioHelper;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.submission.SubmissionStatus;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
@@ -43,7 +42,7 @@ public abstract class AbstractServerJob implements JPPFDistributedJob {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Count of instances of this class.
    */

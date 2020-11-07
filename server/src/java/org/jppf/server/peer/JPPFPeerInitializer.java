@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.*;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.JPPFDriver;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
@@ -40,7 +39,7 @@ public class JPPFPeerInitializer implements Runnable {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Sequence number for connection uuids.
    */

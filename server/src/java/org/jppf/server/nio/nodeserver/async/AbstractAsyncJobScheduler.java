@@ -30,7 +30,6 @@ import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.*;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.*;
@@ -47,7 +46,7 @@ abstract class AbstractAsyncJobScheduler extends ThreadSynchronization implement
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Whether to allow dispatching to peer drivers without any node attached, defaults to {@code false}.
    */

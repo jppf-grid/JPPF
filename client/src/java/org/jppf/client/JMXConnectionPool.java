@@ -40,7 +40,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The host and IP address of the driver.
    */

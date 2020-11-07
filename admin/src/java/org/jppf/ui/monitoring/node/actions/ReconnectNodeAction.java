@@ -23,7 +23,6 @@ import java.util.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.NodeForwardingMBean;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
@@ -38,7 +37,7 @@ public class ReconnectNodeAction extends AbstractTopologyAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Whether to restart/shutdown immediately or wait until each node are idle.
    */

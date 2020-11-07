@@ -39,7 +39,7 @@ public class SortLink extends AbstractAdminLink {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Whether to perform a sort in ascending ({@code true}) or descending ({@code false}) order.
    */

@@ -28,7 +28,6 @@ import org.jppf.admin.web.topology.systeminfo.SystemInfoLink;
 import org.jppf.admin.web.utils.AbstractModalLink;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -44,7 +43,7 @@ public class DriverStopRestartLink extends AbstractModalLink<DriverStopRestartFo
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * @param form .

@@ -53,7 +53,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Manages the class loaders and how they are used.
    * @exclude
@@ -130,7 +130,6 @@ public abstract class AbstractCommonNode extends AbstractNode {
       bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
       bundle.setParameter(BundleParameter.NODE_PROVISIONING_MASTER, isMasterNode());
       bundle.setParameter(BundleParameter.NODE_PROVISIONING_SLAVE, isSlaveNode());
-      bundle.setParameter(BundleParameter.NODE_DOTNET_CAPABLE, isDotnetCapable());
       if (isSlaveNode()) bundle.setParameter(BundleParameter.NODE_PROVISIONING_MASTER_UUID, getMasterNodeUuid());
     } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
@@ -149,7 +148,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
 
   @Override
   public boolean isOffline() {
-    return isAndroid() || getClassLoader().isOffline();
+    return getClassLoader().isOffline();
   }
 
   /**

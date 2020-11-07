@@ -25,7 +25,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.wicket.model.*;
 import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -39,7 +38,7 @@ public abstract class TableTreeData implements SelectionListener {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The tree table model.
    */
