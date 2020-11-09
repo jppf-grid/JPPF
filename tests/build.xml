@@ -171,6 +171,7 @@
   <target name="run.nogenerate" depends="compile,                      runtests" description=""/>
   <target name="run.junit"      depends="compile, run.junit.tests"               description=""/>
   <target name="run.junit.lite" depends="compile, run.junit.tests.lite"          description=""/>
+  <target name="run.junit.min" depends="compile, run.junit.tests.min"          description=""/>
 
   <!-- Run the tests with a custom JUnit runner -->
   <target name="runtests">
@@ -245,6 +246,33 @@
         <exclude name="**/TestSSL3.java"/>
         <exclude name="**/TestJPPFStatistics.java"/>
         <exclude name="**/Test*Forwarder.java"/>
+      </fileset-elements>
+    </test>
+  </target>
+  
+  <target name="run.junit.tests.min">
+    <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
+    <test>
+      <fileset-elements>
+        <include name="**/TestJPPFClient.java"/>
+        <include name="**/test/org/jppf/comm/interceptor/Test*.java"/>
+        <include name="**/test/org/jppf/jmxremote/Test*.java"/>
+        <include name="**/test/org/jppf/job/estJobSelector.java"/>
+        <include name="**/test/org/jppf/client/TestJPPFClient2.java"/>
+        <include name="**/test/org/jppf/client/TestOperator.java"/>
+        <include name="**/test/org/jppf/job/persistence/TestConcurrentFilePersistence.java"/>
+        <include name="**/test/org/jppf/management/TestEnvironmentProviders.java"/>
+        <include name="**/test/org/jppf/management/TestJMXConnectionWrapper.java"/>
+        <include name="**/test/org/jppf/management/TestJMXServer.java"/>
+        <include name="**/test/org/jppf/management/TestNodeSelector.java"/>
+        <include name="**/test/org/jppf/node/policy/TestExecutionPolicy.java"/>
+        <include name="**/test/org/jppf/node/policy/TestIsInIPv4Subnet.java"/>
+        <include name="**/test/org/jppf/node/policy/TestIsInIPv6Subnet.java"/>
+        <include name="**/test/org/jppf/node/protocol/graph/TestTaskDependencies.java"/>
+        <include name="**/test/org/jppf/scheduling/TestJPPFSchedule.java"/>
+        <include name="**/test/org/jppf/server/protocol/TestLocation.java"/>
+        <include name="**/test/org/jppf/utils/Test*.java"/>
+        <include name="**/test/org/jppf/utils/stats/TestJPPFStatisticsListener.java"/>
       </fileset-elements>
     </test>
   </target>
