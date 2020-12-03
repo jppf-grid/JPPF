@@ -128,7 +128,7 @@ public class AcceptorContext extends AbstractNioContext {
           snapshot = JPPFStatisticsHelper.UNKNOWN_IN_TRAFFIC;
           break;
       }
-      if (snapshot != null) stats.addValue(snapshot, byteCount);
+      stats.addValue(snapshot, byteCount);
     }
   }
 
