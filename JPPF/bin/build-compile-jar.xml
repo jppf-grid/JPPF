@@ -132,7 +132,6 @@ limitations under the License.
     <delete quiet="true">
       <fileset dir="${samples-pack}/shared/lib">
         <include name="jppf-*.jar"/>
-        <exclude name="jppf-jmxremote*.jar"/>
       </fileset>
     </delete>
     <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
