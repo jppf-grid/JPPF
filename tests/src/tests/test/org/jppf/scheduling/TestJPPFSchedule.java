@@ -25,7 +25,7 @@ import java.time.*;
 import java.util.Date;
 
 import org.jppf.scheduling.*;
-import org.jppf.utils.Operator;
+import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.BaseTest;
@@ -36,11 +36,11 @@ import test.org.jppf.test.setup.BaseTest;
  */
 public class TestJPPFSchedule extends BaseTest {
   /** */
-  private static final long BASE_TIMEOUT = 50L;
+  private static final long BASE_TIMEOUT = SystemUtils.isWindows() ? 132L : 100L;
   /**
    * Max allowed error on measured timeout times.
    */
-  private static final long MAX_ERROR = 20L;
+  private static final long MAX_ERROR = SystemUtils.isWindows() ? 32L : 20L;
   /** */
   private static final String STR_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
   /** */
