@@ -270,6 +270,7 @@
         <include name="**/test/org/jppf/node/policy/TestIsInIPv6Subnet.java"/>
         <include name="**/test/org/jppf/node/protocol/graph/TestTaskDependencies.java"/>
         <include name="**/test/org/jppf/scheduling/TestJPPFSchedule.java"/>
+        <include name="**/test/org/jppf/serialization/TestSerialization.java"/>
         <include name="**/test/org/jppf/server/protocol/TestLocation.java"/>
         <include name="**/test/org/jppf/utils/Test*.java"/>
         <include name="**/test/org/jppf/utils/stats/TestJPPFStatisticsListener.java"/>
