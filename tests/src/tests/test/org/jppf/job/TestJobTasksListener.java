@@ -22,12 +22,9 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
-import org.jppf.client.event.*;
-import org.jppf.job.*;
+import org.jppf.job.JobTasksListener;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
@@ -37,7 +34,7 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.test.setup.Setup1D1N;
-import test.org.jppf.test.setup.common.*;
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Test the {@link JobTasksListener} facitlity.
@@ -107,36 +104,23 @@ public class TestJobTasksListener extends Setup1D1N {
   }
 
   /**
-   * Test that we receive notifications of taks results on the server side and that they can be processed for retrieval by the client application,
-   * even when the JPPF client disocnnects before the job has completed.
+   * Test that we receive notifications of taks results on the server side and that they can be processed for retrieval by the client application.
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 10000)
   public void testResultsReceived() throws Exception {
     final int nbTasks = 10;
     configure();
-    final AwaitJobNotificationListener jobQueuedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_QUEUED);
-    final AwaitJobNotificationListener jobEndedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_ENDED);
     final JPPFJob job = new JPPFJob();
     try (JPPFClient client = new JPPFClient()) {
       client.awaitWorkingConnectionPool();
       job.setName(ReflectionUtils.getCurrentMethodName());
       job.getSLA().setCancelUponClientDisconnect(false);
       for (int i=1; i<=nbTasks; i++) job.add(new MyJobTasksListenerTask(String.format("#%02d", i), 100L));
-      final CountDownJobListener jobListener = new CountDownJobListener();
-      job.addJobListener(jobListener);
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> submitting job");
-      client.submitAsync(job);
-      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for all tasks to be dispatched");
-      jobListener.await(); // wait until all tasks have been dispatched to the server
-      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for job to be queued in the driver");
-      jobQueuedJmxListener.await();
-      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> all tasks dispatched, job queued, closing client");
+      client.submit(job);
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> got job results"  );
     }
-    // client is closed, wait until job has completed on the server side
-    BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> awaiting %s notification", jobEndedJmxListener.getExpectedEvent());
-    jobEndedJmxListener.await();
-    BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> got %s notification", jobEndedJmxListener.getExpectedEvent());
     Thread.sleep(200L);
     assertTrue(MyJobTasksListener.RESULTS_FILE.exists());
     final List<Result> results = readResults(MyJobTasksListener.RESULTS_FILE, true);
@@ -157,16 +141,13 @@ public class TestJobTasksListener extends Setup1D1N {
   }
 
   /**
-   * Test that we receive notifications of takss results on the server side and that they can be processed for retrieval by the client application,
-   * even when the JPPF client disocnnects before the job has completed.
+   * Test that we receive notifications of tasks results on the server side and that they can be processed for retrieval by the client application.
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 10000)
   public void testWithDispatchExpiration() throws Exception {
     final int nbTasks = 1, maxExpirations = 2, nbRuns = maxExpirations + 1;
     configure();
-    final AwaitJobNotificationListener jobQueuedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_QUEUED);
-    final AwaitJobNotificationListener jobEndedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_ENDED);
     final JPPFJob job = new JPPFJob();
     try (final JPPFClient client = new JPPFClient()) {
       client.awaitWorkingConnectionPool();
@@ -175,20 +156,10 @@ public class TestJobTasksListener extends Setup1D1N {
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(300L));
       job.getSLA().setMaxDispatchExpirations(maxExpirations);
       for (int i=1; i<=nbTasks; i++) job.add(new MyJobTasksListenerTask(String.format("#%02d", i), 5000L));
-      final CountDownJobListener jobListener = new CountDownJobListener();
-      job.addJobListener(jobListener);
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> submitting job");
-      client.submitAsync(job);
-      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for all tasks to be dispatched");
-      jobListener.await(); // wait until all tasks have been dispatched to the server
-      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for job to be queued in the driver");
-      jobQueuedJmxListener.await();
-      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> all tasks dispatched, job queued, closing client");
+      client.submit(job);
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> got job results"  );
     }
-    // client is closed, wait until job has completed on the server side
-    BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> awaiting %s notification", jobEndedJmxListener.getExpectedEvent());
-    jobEndedJmxListener.await();
-    BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> got %s notification", jobEndedJmxListener.getExpectedEvent());
     Thread.sleep(200L);
     final List<Task<?>> tasks = job.getJobTasks();
     assertTrue(MyJobTasksListener.DISPATCHED_FILE.exists());
@@ -312,33 +283,6 @@ public class TestJobTasksListener extends Setup1D1N {
         .append(", resubmitCount=").append(resubmitCount)
         .append(", maxResubmits=").append(maxResubmits)
         .append(']').toString();
-    }
-  }
-
-  /** */
-  private static class CountDownJobListener extends JobListenerAdapter {
-    /** count of tasks sent to the driver. */
-    private final AtomicInteger sentCount = new AtomicInteger(0);
-    /** */
-    final CountDownLatch cdl = new CountDownLatch(1);
-
-    @Override
-    public void jobDispatched(final JobEvent event) {
-      final int n = sentCount.addAndGet(event.getJobTasks().size());
-      // when all tasks have been sent, processing can continue on the main thread
-      if (n >= event.getJob().getTaskCount()) {
-        final JPPFJob job = event.getJob();
-        print(true, false, "all %d tasks of job '%s' dispatched", job.getTaskCount(), job.getName());
-        cdl.countDown();
-      }
-    }
-
-    /**
-     * Wait until the count down reaches 0.
-     * @throws InterruptedException if the trhead is interrupted while waiting.
-     */
-    public void await() throws InterruptedException {
-      cdl.await();
     }
   }
 }
