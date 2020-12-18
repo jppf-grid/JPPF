@@ -147,48 +147,40 @@ public class GraphTopologyHandler implements TopologyListener {
 
   @Override
   public void driverAdded(final TopologyEvent event) {
-    final Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        final TopologyDriver driver = event.getDriver();
-        synchronized(drivers) {
-          if (!drivers.containsKey(driver.getUuid())) drivers.put(driver.getUuid(), driver);
-          final List<TopologyDriver> list = driversAsNodes.get(driver.getUuid());
-          if (list != null) {
-            for (final TopologyDriver tmpDriver: list) insertPeerVertex(driver, tmpDriver);
-            driversAsNodes.remove(driver.getUuid());
-          }
+    SwingUtilities.invokeLater(() -> {
+      final TopologyDriver driver = event.getDriver();
+      synchronized(drivers) {
+        if (!drivers.containsKey(driver.getUuid())) drivers.put(driver.getUuid(), driver);
+        final List<TopologyDriver> list = driversAsNodes.get(driver.getUuid());
+        if (list != null) {
+          for (final TopologyDriver tmpDriver: list) insertPeerVertex(driver, tmpDriver);
+          driversAsNodes.remove(driver.getUuid());
         }
-        synchronized(collapsedMap) {
-          collapsedMap.put(driver.getUuid(),  CollapsedState.EXPANDED);
-        }
-        insertDriverVertex(driver);
-        graphOption.repaintGraph(graphOption.isAutoLayout());
-        if (debugEnabled) log.debug("added driver " + driver + " to graph");
       }
-    };
-    SwingUtilities.invokeLater(r);
+      synchronized(collapsedMap) {
+        collapsedMap.put(driver.getUuid(),  CollapsedState.EXPANDED);
+      }
+      insertDriverVertex(driver);
+      graphOption.repaintGraph(graphOption.isAutoLayout());
+      if (debugEnabled) log.debug("added driver " + driver + " to graph");
+    });
   }
 
   @Override
   public void driverRemoved(final TopologyEvent event) {
-    final Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        final TopologyDriver driver = event.getDriver();
-        synchronized(drivers) {
-          drivers.remove(driver.getUuid());
-          driversAsNodes.remove(driver.getUuid());
-        }
-        synchronized(collapsedMap) {
-          collapsedMap.remove(driver.getUuid());
-        }
-        removeVertex(driver);
-        graphOption.repaintGraph(graphOption.isAutoLayout());
-        if (debugEnabled) log.debug("removed driver " + driver + " from graph");
+    SwingUtilities.invokeLater(() -> {
+      final TopologyDriver driver = event.getDriver();
+      synchronized(drivers) {
+        drivers.remove(driver.getUuid());
+        driversAsNodes.remove(driver.getUuid());
       }
-    };
-    SwingUtilities.invokeLater(r);
+      synchronized(collapsedMap) {
+        collapsedMap.remove(driver.getUuid());
+      }
+      removeVertex(driver);
+      graphOption.repaintGraph(graphOption.isAutoLayout());
+      if (debugEnabled) log.debug("removed driver " + driver + " from graph");
+    });
   }
 
   @Override
@@ -202,20 +194,16 @@ public class GraphTopologyHandler implements TopologyListener {
 
   @Override
   public void nodeRemoved(final TopologyEvent event) {
-    final Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        final TopologyDriver driver = event.getDriver();
-        final TopologyNode node = event.getNodeOrPeer();
-        removeVertex(node);
-        synchronized(collapsedMap) {
-          collapsedMap.remove(node.getUuid());
-        }
-        graphOption.repaintGraph(graphOption.isAutoLayout());
-        if (debugEnabled) log.debug("removed node " + node + " from driver " + driver);
+    SwingUtilities.invokeLater(() -> {
+      final TopologyDriver driver = event.getDriver();
+      final TopologyNode node = event.getNodeOrPeer();
+      removeVertex(node);
+      synchronized(collapsedMap) {
+        collapsedMap.remove(node.getUuid());
       }
-    };
-    SwingUtilities.invokeLater(r);
+      graphOption.repaintGraph(graphOption.isAutoLayout());
+      if (debugEnabled) log.debug("removed node " + node + " from driver " + driver);
+    });
   }
 
   /**
@@ -224,16 +212,12 @@ public class GraphTopologyHandler implements TopologyListener {
    */
   @Override
   public void nodeUpdated(final TopologyEvent event) {
-    final Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        final TopologyDriver driver = event.getDriver();
-        final TopologyNode node = event.getNodeOrPeer();
-        if (debugEnabled) log.debug("driver=" + driver + ", node=" + node);
-        graphOption.repaintGraph(false);
-      }
-    };
-    SwingUtilities.invokeLater(r);
+    SwingUtilities.invokeLater(() -> {
+      final TopologyDriver driver = event.getDriver();
+      final TopologyNode node = event.getNodeOrPeer();
+      if (debugEnabled) log.debug("driver=" + driver + ", node=" + node);
+      graphOption.repaintGraph(false);
+    });
   }
 
   /**
