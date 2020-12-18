@@ -22,6 +22,8 @@ import java.io.*;
 import java.lang.management.*;
 import java.util.*;
 
+import javax.management.InstanceNotFoundException;
+
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
 import org.slf4j.*;
@@ -97,8 +99,10 @@ public class DeadlockDetector {
           } catch (final Exception e) {
             log.error(e.getMessage(), e);
             cancel();
-            reset();
-            setup(type, interval);
+            if (!(e instanceof InstanceNotFoundException)) {
+              reset();
+              setup(type, interval);
+            }
           }
         }
       };
