@@ -42,7 +42,7 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin {
   /**
    * The object that handles toolbar and menu actions.
    */
-  private ActionHandler actionHandler = null;
+  private ActionHandler actionHandler;
 
   /**
    * Initialize this popup handler with the specified action handler.
