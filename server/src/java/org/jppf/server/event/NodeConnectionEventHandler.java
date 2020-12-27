@@ -69,6 +69,7 @@ public class NodeConnectionEventHandler extends ServiceProviderHandler<NodeConne
     if (info.isPeer()) connectedPeers.incrementAndGet();
     else connectedRealNodes.incrementAndGet();
     final NodeConnectionEvent event = new NodeConnectionEvent(info);
+    if (debugEnabled) log.debug("notifying {} listeners for {}", providers.size(), info);
     for (final NodeConnectionListener listener : providers) listener.nodeConnected(event);
     JPPFNodeConnectionNotifier.getInstance().onNodeConnected(info);
   }

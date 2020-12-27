@@ -18,9 +18,10 @@
 
 package org.jppf.management;
 
-import java.lang.management.ManagementFactory;
 import java.lang.reflect.*;
 import java.util.*;
+
+import javax.management.MBeanServer;
 
 import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.comm.socket.BootstrapObjectSerializer;
@@ -63,14 +64,27 @@ public class JMXMPServer extends AbstractJMXServer {
    * @param id the unique id of the driver or node holding this jmx server.
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
+   * @param mbeanServer the mbean server to use.
    * @exclude
    */
-  public JMXMPServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
-    super(config);
+  public JMXMPServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty, final MBeanServer mbeanServer) {
+    super(config, mbeanServer);
     this.uuid = id;
     this.ssl = ssl;
     if (portProperty == null) this.portProperty = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_SSL_PORT;
     else this.portProperty = portProperty;
+  }
+
+  /**
+   * Initialize this JMX server with the specified uuid.
+   * @param config the configuration to use.
+   * @param id the unique id of the driver or node holding this jmx server.
+   * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
+   * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
+   * @exclude
+   */
+  public JMXMPServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
+    this(config, id, ssl, portProperty, null);
   }
 
   /**
@@ -84,7 +98,6 @@ public class JMXMPServer extends AbstractJMXServer {
     lock.lock();
     try {
       Thread.currentThread().setContextClassLoader(cl);
-      mbeanServer = ManagementFactory.getPlatformMBeanServer();
       final TypedProperties config = JPPFConfiguration.getProperties();
       managementPort = config.get(portProperty);
       if (debugEnabled) log.debug("managementPort={}, portProperties={}", managementPort, Arrays.asList(portProperty));

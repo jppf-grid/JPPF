@@ -58,13 +58,6 @@ public interface JMXServer {
   /**
    * Get a unique identifier for this management server. This id must be unique across JPPF nodes and servers.
    * @return the id as a string.
-   * @deprecated use {@link #getUuid()} instead.
-   */
-  String getId();
-
-  /**
-   * Get a unique identifier for this management server. This id must be unique across JPPF nodes and servers.
-   * @return the id as a string.
    */
   String getUuid();
 

@@ -97,7 +97,7 @@ class ForwardingNotificationDispatcher {
       if (jmx != null) {
         final ForwardingNotificationHandler handler = new ForwardingNotificationHandler(mBeanName);
         try {
-          if (debugEnabled) log.debug("mBeanName={}, handler={}", mBeanName, handler);
+          if (debugEnabled) log.debug("mBeanName={}, nodeUuid={}, threadId={}", mBeanName, nodeUuid, Thread.currentThread().getId());
           jmx.addNotificationListener(mBeanName, handler);
           handlerMap.put(mBeanName, handler);
           return true;

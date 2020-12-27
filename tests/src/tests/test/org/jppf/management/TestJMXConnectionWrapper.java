@@ -33,7 +33,7 @@ public class TestJMXConnectionWrapper extends BaseTest {
    * See bug <a href="http://sourceforge.net/tracker/?func=detail&aid=3539051&group_id=135654&atid=733518">3539051 - JMX: performConnection is blocking connectAndWait</a>
    * @throws Exception if any error occurs
    */
-  @Test(timeout=30000)
+  @Test(timeout = 15_000)
   public void testConnectAnWaitNonReachableServer() throws Exception {
     //make sure the host is on an unreachable network
     final JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("10.1.1.2", 12345, false);
@@ -51,8 +51,12 @@ public class TestJMXConnectionWrapper extends BaseTest {
         }
       };
     }
+    printOut("starting all threads");
     for (int i=0; i<nbThreads; i++) threads[i].start();
+    printOut("wiating for all threads to join");
     for (int i=0; i<nbThreads; i++) threads[i].join();
+    printOut("closing connection");
     jmx.close();
+    printOut("connection closed");
   }
 }

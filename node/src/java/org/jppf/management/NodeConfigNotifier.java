@@ -22,13 +22,23 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
 
+import org.jppf.node.Node;
 import org.jppf.utils.TypedProperties;
+import org.slf4j.*;
 
 /**
  * This MBean notifies any listener of changes to the number of threads of a node.
  * @author Laurent Cohen
  */
 public class NodeConfigNotifier extends NotificationBroadcasterSupport implements NodeConfigNotifierMBean {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(NodeConfigNotifier.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Explicit serialVersionUID.
    */
@@ -39,9 +49,10 @@ public class NodeConfigNotifier extends NotificationBroadcasterSupport implement
   private static final AtomicLong sequence = new AtomicLong(0L);
 
   /**
-   * 
+   * @param node the node holding this MBean.
    */
-  public NodeConfigNotifier() {
+  public NodeConfigNotifier(final Node node) {
+    if (debugEnabled) log.debug("new NodeConfigNotifier for node " + node.getUuid());
   }
   
 

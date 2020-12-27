@@ -22,9 +22,8 @@ import java.util.*;
 
 import javax.management.*;
 
-import org.jppf.management.ObjectNameCache;
+import org.jppf.management.*;
 import org.jppf.utils.*;
-import org.jppf.utils.hooks.*;
 import org.slf4j.*;
 
 /**
@@ -32,11 +31,11 @@ import org.slf4j.*;
  * @param <S> the SPI interface for the mbean provider.
  * @author Laurent Cohen
  */
-public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
+public abstract class AbstractMBeanProviderManager<S extends JPPFMBeanProvider> {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(JPPFMBeanProviderManager.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractMBeanProviderManager.class);
   /**
    * Determines whether debug log statements are enabled.
    */
@@ -44,11 +43,11 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
   /**
    * Keeps a list of MBeans registered with the MBean server.
    */
-  private final List<String> registeredMBeanNames = new Vector<>();
+  protected final List<String> registeredMBeanNames = new Vector<>();
   /**
    * The mbean server with which all mbeans are registered.
    */
-  private MBeanServer server;
+  protected final MBeanServer server;
 
   /**
    * Initialize this mbean provider manager and register the MBeans implementing the specified provider interface.
@@ -58,37 +57,56 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
    * @param server the MBean server on which to register.
    * @throws Exception if the registration failed.
    */
-  public JPPFMBeanProviderManager(final Class<S> clazz, final ClassLoader cl, final Object server, final Object...createParams) throws Exception {
+  public AbstractMBeanProviderManager(final Class<S> clazz, final ClassLoader cl, final Object server, final Object...createParams) throws Exception {
     this.server = (MBeanServer) server;
     final ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     ClassLoader loader = cl == null ? tmp : cl;
     if (loader == null) loader = getClass().getClassLoader();
-    final Hook<S> hook = HookFactory.registerSPIMultipleHook(clazz, null, loader);
+    final List<S> providers = new ServiceFinder().findProviders(clazz, loader);
     try {
-      Thread.currentThread().setContextClassLoader(cl);
-      for (final HookInstance<S> hookInstance: hook.getInstances()) {
-        final S concrete = hookInstance.getInstance();
+      Thread.currentThread().setContextClassLoader(loader);
+      for (final S provider: providers) {
         try {
-          final Object mbean = hookInstance.invoke("createMBean", createParams);
-          if (mbean == null) {
-            log.warn("an MBean implementation of type {} could not be created", (concrete == null) ? "null" : concrete.getClass().getName());
-            continue;
-          }
-          final String infName = (String) hookInstance.invoke("getMBeanInterfaceName");
-          final Class<?> inf = Class.forName(infName, true, loader);
-          final String mbeanName = (String) hookInstance.invoke("getMBeanName");
-          final boolean b = registerProviderMBean(mbean, inf, mbeanName);
-          if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + mbeanName + ']');
-          if (b) registeredMBeanNames.add(mbeanName);
+          processMBeanProvider(provider, loader, createParams);
         } catch (final Exception e) {
           final String message = "error processing MBean provider {} : {}";
-          if (debugEnabled) log.debug(message, concrete, ExceptionUtils.getStackTrace(e));
-          else log.warn(message, concrete, ExceptionUtils.getMessage(e));
+          if (debugEnabled) log.debug(message, provider, ExceptionUtils.getStackTrace(e));
+          else log.warn(message, provider, ExceptionUtils.getMessage(e));
         }
       }
     } finally {
       Thread.currentThread().setContextClassLoader(tmp);
     }
+  }
+
+  /**
+   * 
+   * @param provider the mbean provider to process.
+   * @param params the parmaters to pass to the mbean implemantation.
+   * @return an mbean inmplementation.
+   * @throws Exception if any error occurs
+   */
+  protected abstract Object createMBeanImpl(final S provider, final Object...params) throws Exception;
+
+  /**
+   * 
+   * @param provider the mbean provider to process.
+   * @param cl the class loader to use.
+   * @param params the parmaters to pass to the mbean implemantation.
+   * @throws Exception if any error occurs
+   */
+  private void processMBeanProvider(final S provider, final ClassLoader cl, final Object...params) throws Exception {
+    final Object mbean = createMBeanImpl(provider, params);
+    if (mbean == null) {
+      log.warn("an MBean implementation of type {} could not be created", (provider == null) ? "null" : provider.getClass().getName());
+      return;
+    }
+    final String infName = provider.getMBeanInterfaceName();
+    final Class<?> inf = Class.forName(infName, true, cl);
+    final String mbeanName = provider.getMBeanName();
+    final boolean b = registerProviderMBean(mbean, inf, mbeanName);
+    if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + mbeanName + ']');
+    if (b) registeredMBeanNames.add(mbeanName);
   }
 
   /**
@@ -100,12 +118,17 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
    */
   private boolean registerProviderMBean(final Object impl, final Class<?> intf, final String name) {
     try {
-      if (debugEnabled) log.debug("found MBean provider: [name="+name+", inf="+intf+", impl="+impl.getClass().getName()+ ']');
+      if (debugEnabled) log.debug("found MBean provider: [name={}, inf={}, impl={}]", name, intf, impl.getClass().getName());
       final ObjectName objectName = ObjectNameCache.getObjectName(name);
       if (!server.isRegistered(objectName)) {
         server.registerMBean(impl, objectName);
+        if (debugEnabled) log.debug("registered {} with mbean server {}", name, server);
+        /*
+        else if (name.contains("config.notifier,type=node"))
+          log.info("registered {} with {}, call stack:\n{}", name, JPPFMBeanServerFactory.toString(server), ExceptionUtils.getCallStack());
+        */
         return true;
-      } else log.warn("an instance of MBean [" + name + "] already exists, registration was skipped");
+      } else log.warn("an instance of MBean [{}] already exists, registration was skipped", name);
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }

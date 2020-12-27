@@ -32,7 +32,7 @@ import org.jppf.discovery.*;
 import org.jppf.jmx.JMXHelper;
 import org.jppf.load.balancer.ChannelAwareness;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.*;
+import org.jppf.management.forwarding.ForwardingNotificationListener;
 import org.jppf.management.spi.*;
 import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.server.debug.*;
@@ -118,6 +118,10 @@ public class DriverInitializer {
    * Handles the pools of connections to remote peer drivers.
    */
   private final PeerConnectionPoolHandler peerConnectionPoolHandler;
+  /**
+   * Discovers and registers the driver mbeans.
+   */
+  private DriverMBeanProviderManager mbeanProvider;
 
   /**
    * Instantiate this initializer with the specified driver.
@@ -157,7 +161,7 @@ public class DriverInitializer {
    */
   void registerProviderMBeans() throws Exception {
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-    new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server, driver);
+    mbeanProvider = new DriverMBeanProviderManager(JPPFDriverMBeanProvider.class, null, server, driver);
     registerNodeConfigListener();
   }
 
@@ -341,6 +345,7 @@ public class DriverInitializer {
     try {
       if (debugEnabled) log.debug("stopping JMX server");
       if (jmxServer != null) jmxServer.stop();
+      mbeanProvider.unregisterProviderMBeans();
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -431,7 +436,7 @@ public class DriverInitializer {
   }
 
   /**
-   * Create and initialize the datasources found inthe configurarion.
+   * Create and initialize the datasources found in the configuration.
    */
   void initDatasources() {
     final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();

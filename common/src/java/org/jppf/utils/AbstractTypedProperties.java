@@ -109,7 +109,7 @@ public abstract class AbstractTypedProperties extends Properties {
   }
 
   /**
-   * Populate this propertis object from a string source.
+   * Populate this properties object from a string source.
    * @param <T> the type of object returned by this method.
    * @param source the source to read the properties from.
    * @param delimiter the delimiter between two properties definitions.

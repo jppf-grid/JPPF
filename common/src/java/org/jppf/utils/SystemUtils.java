@@ -119,14 +119,9 @@ public final class SystemUtils {
   private static void addOtherSystemProperties(final TypedProperties props) {
     try {
       // run as privileged so we don't have to set write access on all properties in the security policy file.
-      final Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>() {
-        @Override
-        public Properties run() {
-          final Properties props = new Properties();
-          synchronized(System.getProperties()) {
-            props.putAll(System.getProperties());
-          }
-          return props;
+      final TypedProperties sysProps = AccessController.doPrivileged((PrivilegedAction<TypedProperties>) () -> {
+        synchronized(System.getProperties()) {
+          return new TypedProperties(System.getProperties());
         }
       });
       final Enumeration<?> en = sysProps.propertyNames();

@@ -77,7 +77,7 @@ public class NodeRunner {
    */
   private DriverConnectionInfo currentConnectionInfo;
   /**
-   * 
+   * Detects when the parent process, if any, dies.
    */
   private LauncherListener launcherListener;
   /**
@@ -89,11 +89,11 @@ public class NodeRunner {
    */
   private final TypedProperties configuration;
   /**
-   * 
+   * Indicates if an embedded node was shut down.
    */
   final AtomicBoolean embeddedShutdown = new AtomicBoolean(false);
   /**
-   * 
+   * Inidcates the node was started from the main method of this class.
    */
   boolean startedFromMain;
 
@@ -294,4 +294,6 @@ public class NodeRunner {
   public Node getNode() {
     return node;
   }
+
+  
 }

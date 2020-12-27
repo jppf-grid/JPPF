@@ -18,12 +18,13 @@
 
 package org.jppf.management;
 
-import java.lang.management.ManagementFactory;
 import java.util.*;
+
+import javax.management.MBeanServer;
 
 import org.jppf.jmx.*;
 import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
@@ -52,10 +53,11 @@ public class JPPFJMXServer extends AbstractJMXServer {
    * @param id the unique id of the driver or node holding this jmx server.
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
+   * @param mbeanServer the mbean server to use.
    * @exclude
    */
-  public JPPFJMXServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
-    super(config);
+  public JPPFJMXServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty, final MBeanServer mbeanServer) {
+    super(config, mbeanServer);
     this.uuid = id;
     this.ssl = ssl;
     if (portProperty == null) this.portProperty = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_PORT;
@@ -64,16 +66,27 @@ public class JPPFJMXServer extends AbstractJMXServer {
   }
 
   /**
+   * Initialize this JMX server with the specified uuid.
+   * @param config the configuration to use.
+   * @param id the unique id of the driver or node holding this jmx server.
+   * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
+   * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
+   * @exclude
+   */
+  public JPPFJMXServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
+    this(config, id, ssl, portProperty, null);
+  }
+
+  /**
    * @exclude
    */
   @Override
   public void start(final ClassLoader cl) throws Exception {
-    if (debugEnabled) log.debug("starting remote connector server");
+    if (debugEnabled) log.debug("starting remote connector server with " + JPPFMBeanServerFactory.toString(mbeanServer));
     final ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     lock.lock();
     try {
       Thread.currentThread().setContextClassLoader(cl);
-      mbeanServer = ManagementFactory.getPlatformMBeanServer();
       managementPort = config.get(portProperty);
       if (debugEnabled) log.debug("managementPort={}, portProperties={}", managementPort, Arrays.asList(portProperty));
       final Map<String, Object> env = new HashMap<>();
