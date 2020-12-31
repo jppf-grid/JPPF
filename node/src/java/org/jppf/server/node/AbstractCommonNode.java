@@ -97,7 +97,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
   /**
    * The executor for serialization and deserialization of the tasks.
    */
-  final ExecutorService serializationExecutor;
+  final ThreadPoolExecutor serializationExecutor;
   /**
    * Whether this node was sdtarted from {@code NodeRunner.main()} (standalone) or not (embedded).
    */
@@ -118,7 +118,10 @@ public abstract class AbstractCommonNode extends AbstractNode {
    */
   public AbstractCommonNode(final String uuid, final TypedProperties configuration) {
     super(uuid, configuration);
-    serializationExecutor = Executors.newFixedThreadPool(ThreadManager.computePoolSize(configuration, JPPFProperties.PROCESSING_THREADS), new JPPFThreadFactory("NodeSerializer"));
+    final int poolSize = ThreadManager.computePoolSize(configuration, JPPFProperties.PROCESSING_THREADS);
+    final long ttl = ThreadManager.retrieveTTL(configuration, JPPFProperties.PROCESSING_THREADS_TTL);
+    serializationExecutor = new ThreadPoolExecutor(poolSize, poolSize, ttl, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new JPPFThreadFactory("NodeSerializer"));
+    serializationExecutor.allowCoreThreadTimeOut(true);
   }
 
   /**

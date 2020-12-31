@@ -36,21 +36,37 @@ public class ThreadManagerThreadPool extends AbstractThreadManager {
   /**
    * The thread pool that really processes the tasks
    */
-  private ThreadPoolExecutor threadPool;
+  private final ThreadPoolExecutor threadPool;
   /**
    * The factory used to create thread in the pool.
    */
-  private JPPFThreadFactory threadFactory = null;
+  private final JPPFThreadFactory threadFactory;
 
   /**
-   * Initialized thread manager.
+   * Initialize this thread manager.
+   */
+  public ThreadManagerThreadPool() {
+    this(Runtime.getRuntime().availableProcessors(), Long.MAX_VALUE);
+  }
+
+  /**
+   * Initialize this thread manager.
    * @param poolSize the initial size of the thread pool.
    */
   public ThreadManagerThreadPool(final int poolSize) {
+    this(poolSize, Long.MAX_VALUE);
+  }
+
+  /**
+   * Initialize this thread manager.
+   * @param poolSize the initial size of the thread pool.
+   * @param ttl the time to live of the threads, in seconds.
+   */
+  public ThreadManagerThreadPool(final int poolSize, final long ttl) {
     super();
     threadFactory = new JPPFThreadFactory(THREAD_NAME_PREFIX, isCpuTimeEnabled());
     final LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-    threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory) {
+    threadPool = new ThreadPoolExecutor(poolSize, poolSize, ttl, TimeUnit.SECONDS, queue, threadFactory) {
       @Override
       protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
         final RunnableFuture<T> future = super.newTaskFor(runnable, value);
@@ -58,6 +74,7 @@ public class ThreadManagerThreadPool extends AbstractThreadManager {
         return future;
       }
     };
+    threadPool.allowCoreThreadTimeOut(true);
   }
 
   @Override
