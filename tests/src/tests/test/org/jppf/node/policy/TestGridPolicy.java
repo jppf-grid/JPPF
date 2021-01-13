@@ -234,7 +234,9 @@ public class TestGridPolicy extends Setup1D2N1C {
       // terminate the slave nodes
       BaseTestHelper.printToAll(client, true, true, true, true, false, "stopping slave nodes");
       jmx.getForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
+      print(false, false, "slave nodes shutdown requested");
       ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() == 2, 5000L, 250L, true);
+      print(false, false, "all slave nodes have stopped");
     }
   }
 }
