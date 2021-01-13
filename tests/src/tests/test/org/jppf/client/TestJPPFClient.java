@@ -77,7 +77,7 @@ public class TestJPPFClient extends Setup1D1N {
       }
       ok = true;
     }
-    if (!ok) throw new IllegalStateException("somme JPPF threads are still alive");
+    if (!ok) throw new IllegalStateException("some JPPF threads are still alive");
   }
  
   /**

@@ -117,29 +117,6 @@ public class BaseSetup {
   }
 
   /**
-   * Launches a driver and the specified number of node and start the client.
-   * @param nbNodes the number of nodes to launch.
-   * @return an instance of <code>JPPFClient</code>.
-   * @throws Exception if a process could not be started.
-   */
-  public static JPPFClient setup(final int nbNodes) throws Exception {
-    return setup(1, nbNodes, true, DEFAULT_CONFIG);
-  }
-
-  /**
-   * Launches a driver and node and start the client.
-   * @param nbDrivers the number of drivers to launch.
-   * @param nbNodes the number of nodes to launch.
-   * @param createClient if true then start a client.
-   * @param config the driver and node configuration to use.
-   * @return an instance of <code>JPPFClient</code>.
-   * @throws Exception if a process could not be started.
-   */
-  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final TestConfiguration config) throws Exception {
-    return setup(nbDrivers, nbNodes, createClient, true, config);
-  }
-
-  /**
    * Launches a driver and node and start the client.
    * @param nbDrivers the number of drivers to launch.
    * @param nbNodes the number of nodes to launch.
@@ -172,33 +149,12 @@ public class BaseSetup {
       ThreadUtils.startDaemonThread(nodes[i], nodes[i].getName().trim() + "-Launcher");
     }
     if (createClient) {
-      client = createClient(newClientUuid(), true, config, listeners);
+      client = createClient("client-" + clientUuidSequence.incrementAndGet(), true, config, listeners);
       if (checkDriversAndNodes) checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     } else {
       JPPFConfiguration.reset();
     }
     return client;
-  }
-
-  /**
-   * Create a client with the specified uuid.
-   * @param uuid if null, let the client generate its uuid.
-   * @return a <code>JPPFClient</code> instance.
-   * @throws Exception if any error occurs.
-   */
-  public static JPPFClient createClient(final String uuid) throws Exception {
-    return createClient(uuid, true, DEFAULT_CONFIG);
-  }
-
-  /**
-   * Create a client with the specified uuid.
-   * @param uuid if null, let the client generate its uuid.
-   * @param reset if <code>true</code>, the JPPF ocnfiguration is reloaded.
-   * @return a <code>JPPFClient</code> instance.
-   * @throws Exception if any error occurs.
-   */
-  public static JPPFClient createClient(final String uuid, final boolean reset) throws Exception {
-    return createClient(uuid, reset, DEFAULT_CONFIG);
   }
 
   /**
@@ -244,6 +200,7 @@ public class BaseSetup {
    * Stops the driver and node and close the client.
    */
   private static void close() {
+    //System.out.println("closing test");
     try {
       generateClientThreadDump();
       if ((client != null) && !client.isClosed()) {
@@ -356,19 +313,7 @@ public class BaseSetup {
    * @throws Exception if any error occurs.
    */
   public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes, final boolean printEpilogue) throws Exception {
-    checkDriverAndNodesInitialized(client, nbDrivers, nbNodes, printEpilogue, DEFAULT_GRID_CHECK_TIMEOUT);
-  }
-
-  /**
-   * Check that the driver and all nodes have been started and are accessible.
-   * @param client the JPPF client to use for the checks.
-   * @param nbDrivers the number of drivers that were started.
-   * @param nbNodes the number of nodes that were started.
-   * @param printEpilogue whether to print a message once the initialization is confirmed.
-   * @param timeout the maximlum time in millis during to check for the gridd state.
-   * @throws Exception if any error occurs.
-   */
-  public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes, final boolean printEpilogue, final long timeout) throws Exception {
+    final long timeout = DEFAULT_GRID_CHECK_TIMEOUT;
     if (client == null) throw new IllegalArgumentException("client cannot be null");
     final Map<Integer, JPPFConnectionPool> connectionMap = new HashMap<>();
     boolean allConnected = false;
@@ -508,13 +453,5 @@ public class BaseSetup {
       final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(name);
       if (logger != null) logger.setLevel(level);
     }
-  }
-
-  /**
-   * Generate a client UUID in the form "client-[sequence_number]".
-   * @return a new unique client UUID.
-   */
-  public static String newClientUuid() {
-    return "client-" + clientUuidSequence.incrementAndGet();
   }
 }

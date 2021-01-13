@@ -35,6 +35,6 @@ public class TestResourceLookup extends AbstractResourceLookupTest {
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("classloader");
     config.driver.classpath.add("test-resources/driver1");
-    client = BaseSetup.setup(1, 1, true, config);
+    client = BaseSetup.setup(1, 1, true, true, config);
   }
 }

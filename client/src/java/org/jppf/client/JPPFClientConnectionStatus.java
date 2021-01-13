@@ -62,6 +62,14 @@ public enum JPPFClientConnectionStatus {
    * The list of working statuses.
    */
   private static final List<JPPFClientConnectionStatus> TERMINATED_STATUSES = Collections.unmodifiableList(Arrays.asList(CLOSED, FAILED));
+  /**
+   * The array of working statuses.
+   */
+  private static final JPPFClientConnectionStatus[] WORKING_STATUSES_ARRAY = { ACTIVE, EXECUTING };
+  /**
+   * The array of working statuses.
+   */
+  private static final JPPFClientConnectionStatus[] TERMINATED_STATUSES_ARRAY = { CLOSED, FAILED };
 
   /**
    * Determine whether this status is one of those specified as input.
@@ -97,7 +105,7 @@ public enum JPPFClientConnectionStatus {
    * @return an array of {@link JPPFClientConnectionStatus} enum values.
    */
   public static JPPFClientConnectionStatus[] workingStatuses() {
-    return WORKING_STATUSES.toArray(new JPPFClientConnectionStatus[WORKING_STATUSES.size()]);
+    return WORKING_STATUSES_ARRAY;
   }
 
   /**
@@ -105,6 +113,6 @@ public enum JPPFClientConnectionStatus {
    * @return an array of {@link JPPFClientConnectionStatus} enum values.
    */
   public static JPPFClientConnectionStatus[] terminatedStatuses() {
-    return TERMINATED_STATUSES.toArray(new JPPFClientConnectionStatus[TERMINATED_STATUSES.size()]);
+    return TERMINATED_STATUSES_ARRAY;
   }
 }

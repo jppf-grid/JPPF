@@ -26,7 +26,7 @@ import org.jppf.client.JPPFClient;
 import org.jppf.jmx.JMXHelper;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.configuration.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
@@ -53,6 +53,8 @@ public class BaseTest {
   protected static final int SSL_DRIVER_MANAGEMENT_PORT_BASE = (JMXHelper.JMXMP_PROTOCOL.equals(JMX_REMOTE_PROTOCOL)) ? 12200 : 12100;
   /** */
   protected static final int NODE_MANAGEMENT_PORT_BASE = 12300;
+  /** */
+  protected static final JPPFProperty<Boolean> DEADLOCK_DETECTOR_ENABLED = new BooleanProperty("jppf.deadlock.detector.enabled", false);
   /** */
   private static PrintStream stdOut, stdErr;
   /** */

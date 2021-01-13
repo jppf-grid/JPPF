@@ -454,7 +454,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     client.close();
     // enable only local execution
     JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, true);
-    client = BaseSetup.createClient(null, false);
+    client = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
   }
 
   /**
@@ -464,7 +464,7 @@ public class TestJPPFTask extends Setup1D1N1C {
   private static void reset() throws Exception {
     // reset the client and config
     client.close();
-    client = BaseSetup.createClient(null, true);
+    client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG);
   }
 
   /**

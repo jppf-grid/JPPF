@@ -21,6 +21,7 @@ package org.jppf.utils.concurrent;
 import java.util.concurrent.*;
 
 import org.jppf.JPPFTimeoutException;
+import org.slf4j.*;
 
 /**
  * A set of utility methods to facilitate concurrent and multithreaded programming.
@@ -29,6 +30,15 @@ import org.jppf.JPPFTimeoutException;
  * @exclude
  */
 public final class ConcurrentUtils {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ConcurrentUtils.class);
+  /**
+   * Whetehr trace level is enabled.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
+
   /**
    * Instantiation is not permitted.
    */
@@ -79,7 +89,10 @@ public final class ConcurrentUtils {
     boolean fulfilled = false;
     final long start = System.nanoTime();
     long elapsed = 0L;
+    int attempt = 0;
     while (!(fulfilled = condition.evaluate()) && ((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout)) {
+      ++attempt;
+      if (traceEnabled) log.trace("fulfilled = {} after {} attemps", fulfilled, attempt);
       try {
         Thread.sleep(sleepInterval);
       } catch (@SuppressWarnings("unused") final InterruptedException e) {

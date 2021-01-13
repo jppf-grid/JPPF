@@ -65,7 +65,7 @@ public class TestJobListener extends BaseTest {
   public static void setup() throws Exception {
     final TestConfiguration cfg = BaseSetup.DEFAULT_CONFIG.copy();
     cfg.driver.log4j = "classes/tests/config/log4j-driver.TestJobListener.properties";
-    BaseSetup.setup(1, 1, false, cfg);
+    BaseSetup.setup(1, 1, false, true, cfg);
     jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1);
     assertTrue(jmx.connectAndWait(5000L));
   }
@@ -136,7 +136,7 @@ public class TestJobListener extends BaseTest {
       final String name = ReflectionUtils.getCurrentMethodName();
       configure(true, false, 1);
       print(false, false, "creating client");
-      jppfClient = BaseSetup.createClient(null, false);
+      jppfClient = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
       print(false, false, "got client");
       BaseTestHelper.printToAll(jppfClient, false, false, true, false, false, "start of %s()", name);
       final CountingJobListener listener = new CountingJobListener();
@@ -175,7 +175,7 @@ public class TestJobListener extends BaseTest {
    */
   private List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception {
     print(false, false, ">>> creating client");
-    jppfClient = BaseSetup.createClient(null, false);
+    jppfClient = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
     print(false, false, ">>> creating job");
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);

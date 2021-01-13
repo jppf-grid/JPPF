@@ -62,7 +62,7 @@ public class TestConnectionPool extends Setup1D1N {
   @Test(timeout = 10000)
   public void testSubmitJobMultipleConnections() throws Exception {
     configure(0);
-    client = BaseSetup.createClient(null, false);
+    client = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
     final int nbTasks = 100;
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 0L);
     final List<Task<?>> results = client.submit(job);
@@ -76,7 +76,7 @@ public class TestConnectionPool extends Setup1D1N {
   @Test(timeout = 10000)
   public void testSubmitJobMultipleConnectionsAndLocalExec() throws Exception {
     configure(2);
-    client = BaseSetup.createClient(null, false);
+    client = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
     final int nbTasks = 100;
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 0L);
     final List<Task<?>> results = client.submit(job);
@@ -90,7 +90,7 @@ public class TestConnectionPool extends Setup1D1N {
   @Test(timeout = 10000)
   public void testSubmitJobMultipleRemoteChannels() throws Exception {
     configure(0);
-    client = BaseSetup.createClient(null, false);
+    client = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
     while (client.getAllConnectionsCount() < 2) Thread.sleep(10L);
     final int nbTasks = 100;
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 0L);
@@ -107,7 +107,7 @@ public class TestConnectionPool extends Setup1D1N {
   @Test(timeout = 10000)
   public void testNumberOfPools() throws Exception {
     BaseSetup.resetClientConfig();
-    client = BaseSetup.createClient(null, false);
+    client = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
     BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
     final List<JPPFConnectionPool> pools = client.getConnectionPools();
     assertNotNull(pools);
@@ -121,7 +121,7 @@ public class TestConnectionPool extends Setup1D1N {
   @Test(timeout = 15000)
   public void testSetPoolSizeByAPI() throws Exception {
     print(false, false, "creating client");
-    client = BaseSetup.createClient(null, false);
+    client = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
     for (int i=1; i<=10; i++) {
       print(false, false, "iteration #%d awaiting working pool", i);
       final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();

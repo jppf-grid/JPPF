@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-log4j12-1.7.25.jar"/>
 	<classpathentry kind="lib" path="/samples-pack/KryoSerializer/classes"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry kind="output" path="classes/tests"/>
 </classpath>

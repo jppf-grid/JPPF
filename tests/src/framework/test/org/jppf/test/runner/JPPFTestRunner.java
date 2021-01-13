@@ -109,7 +109,7 @@ public class JPPFTestRunner {
       config.node.log4j = "config/log4j-node.template.properties";
       config.node.classpath.addAll(commonCP);
       config.node.jvmOptions.add("-Djava.util.logging.config.file=config/logging-node1.properties");
-      BaseSetup.setup(1, 1, false, config);
+      BaseSetup.setup(1, 1, false, true, config);
       final HttpURLConnection conn = (HttpURLConnection) webAppUrl.openConnection();
       conn.setDoOutput(true);
       conn.setRequestMethod("GET");

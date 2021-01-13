@@ -221,7 +221,7 @@ public class JPPFClient extends AbstractGenericClient {
   /**
    * Wait until there is at least one connection pool with at least one connection in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} status.
    * This is a shorthand for {@code awaitConnectionPool(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE)}.
-   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in the one of the desird statuses.
+   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in one of the desired statuses.
    * @since 5.0
    */
   public JPPFConnectionPool awaitActiveConnectionPool() {
@@ -232,7 +232,7 @@ public class JPPFClient extends AbstractGenericClient {
    * Wait until there is at least one connection pool with at least one connection in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE}
    * or {@link JPPFClientConnectionStatus#EXECUTING EXECUTING} status.
    * This is a shorthand for {@code awaitConnectionPool(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)}.
-   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in the one of the desird statuses.
+   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in one of the desired statuses.
    * @since 5.0
    */
   public JPPFConnectionPool awaitWorkingConnectionPool() {
@@ -243,7 +243,7 @@ public class JPPFClient extends AbstractGenericClient {
    * Wait until there is at least one connection pool with at least one connection in one of the specified statuses.
    * This is a shorthand for {@code awaitConnectionPool(Long.MAX_VALUE, statuses)}.
    * @param statuses the possible statuses of the connections in the pools to wait for.
-   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in the one of the desird statuses.
+   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in one of the desired statuses.
    * @since 5.0
    */
   public JPPFConnectionPool awaitConnectionPool(final JPPFClientConnectionStatus...statuses) {
@@ -255,7 +255,7 @@ public class JPPFClient extends AbstractGenericClient {
    * or until the specified timeout to expire, whichever happens first.
    * @param timeout the maximum time to wait, in milliseconds. A value of zero means an infinite timeout.
    * @param statuses the possible statuses of the connections in the pools to wait for.
-   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in the one of the desird statuses.
+   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in one of the desired statuses.
    * @since 5.0
    */
   public JPPFConnectionPool awaitConnectionPool(final long timeout, final JPPFClientConnectionStatus...statuses) {

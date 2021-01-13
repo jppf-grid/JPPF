@@ -41,6 +41,7 @@
   <property name="client"             value="${basedir}/../client"/>
   <property name="common"             value="${basedir}/../common"/>
   <property name="jmxremote-nio"      value="${basedir}/../jmxremote-nio"/>
+  <property name="server"               value="${basedir}/../server"/>
   <property name="node"               value="${basedir}/../node"/>
   <property name="samples-pack"       value="${basedir}/../samples-pack"/>
 
@@ -60,6 +61,7 @@
     <pathelement location="${client}/classes"/>
     <pathelement location="${common}/classes"/>
     <pathelement location="${jmxremote-nio}/classes"/>
+    <pathelement location="${server}/classes"/>
     <pathelement location="${node}/classes"/>
     <pathelement location="${lib}/Groovy/groovy-all-1.6.5.jar"/>
     <pathelement location="${lib}/LZ4/lz4-java-1.6.0.jar"/>

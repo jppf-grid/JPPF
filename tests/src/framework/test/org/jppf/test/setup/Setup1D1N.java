@@ -60,7 +60,7 @@ public class Setup1D1N extends BaseTest {
   @BeforeClass
   public static void setup() throws Exception {
     BaseSetup.resetClientConfig();
-    BaseSetup.setup(1, 1, false, BaseSetup.DEFAULT_CONFIG);
+    BaseSetup.setup(1, 1, false, true, BaseSetup.DEFAULT_CONFIG);
     // make sure the driver is initialized
     jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1);
     log.info("initializing {}", jmx);

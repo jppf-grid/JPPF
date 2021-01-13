@@ -57,7 +57,7 @@ public class TestNodeRestart extends BaseTest {
     final TestConfiguration config = BaseSetup.DEFAULT_CONFIG.copy();
     config.driver.log4j = "classes/tests/config/log4j-driver.TestNodeRestart.properties";
     config.node.log4j = "classes/tests/config/log4j-node.TestNodeRestart.properties";
-    client = BaseSetup.setup(1, 1, true, config);
+    client = BaseSetup.setup(1, 1, true, true, config);
   }
 
   /**

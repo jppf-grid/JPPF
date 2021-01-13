@@ -68,7 +68,7 @@ public class TestJPPFJob extends Setup1D1N {
       .set(REMOTE_EXECUTION_ENABLED, false)
       .set(LOCAL_EXECUTION_ENABLED, true)
       .set(LOCAL_EXECUTION_THREADS, 4);
-    try (final JPPFClient client = BaseSetup.createClient(null, false)) {
+    try (final JPPFClient client = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG)) {
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 50L);
       final CountingJobListener listener = new CountingJobListener();
       job.addJobListener(listener);
@@ -86,7 +86,7 @@ public class TestJPPFJob extends Setup1D1N {
    */
   @Test(timeout=10000)
   public void testCancel() throws Exception {
-    try (final JPPFClient client = BaseSetup.createClient(null, true)) {
+    try (final JPPFClient client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG)) {
       BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       final int nbTasks = 10;
@@ -121,7 +121,7 @@ public class TestJPPFJob extends Setup1D1N {
   @Test(timeout=15000)
   public void testCancelWithInterruptFlagFalse() throws Exception {
     final String method = ReflectionUtils.getCurrentMethodName();
-    try (JPPFClient client = BaseSetup.createClient(null, true)) {
+    try (JPPFClient client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG)) {
       BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", method);
       try {
@@ -160,7 +160,7 @@ public class TestJPPFJob extends Setup1D1N {
     final String name  = "tci";
     final int nbTasks = 1;
     final int nbJobs = 10;
-    try (final JPPFClient client = BaseSetup.createClient("c1", true)) {
+    try (final JPPFClient client = BaseSetup.createClient("c1", true, BaseSetup.DEFAULT_CONFIG)) {
       client.awaitWorkingConnectionPool().setMaxJobs(1);
       int totalCancelCount = 0;
       for (int i=1; i<=nbJobs; i++) {
@@ -198,7 +198,7 @@ public class TestJPPFJob extends Setup1D1N {
    */
   @Test(timeout=15000, expected=TimeoutException.class)
   public void testGetWithTimeout() throws Exception {
-    try (final JPPFClient client = BaseSetup.createClient(null, true)) {
+    try (final JPPFClient client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG)) {
       BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       final int nbTasks = 1;
@@ -214,7 +214,7 @@ public class TestJPPFJob extends Setup1D1N {
    */
   @Test(timeout=15000)
   public void testIsCancelledClientSideExpiration() throws Exception {
-    try (final JPPFClient client = BaseSetup.createClient(null, true)) {
+    try (final JPPFClient client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG)) {
       BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       final int nbTasks = 1;

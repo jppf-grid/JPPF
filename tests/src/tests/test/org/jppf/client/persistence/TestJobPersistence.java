@@ -66,7 +66,7 @@ public class TestJobPersistence extends Setup1D1N {
       config.set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")
         .set(JPPFProperties.LOAD_BALANCING_PROFILE, "test")
         .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".test.size", 1);
-      client = BaseSetup.createClient(null, false);
+      client = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
       final int nbTasks = 3;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, SimpleTask.class, duration);
       pm = new DefaultFilePersistenceManager("root", "job_", ".ser");
@@ -82,7 +82,7 @@ public class TestJobPersistence extends Setup1D1N {
       final String uuid = job.getUuid();
       job = null;
 
-      client = BaseSetup.createClient(null);
+      client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG);
       final JPPFJob job2 = pm.loadJob(key);
       assertEquals(uuid, job2.getUuid());
       //int n2 = job2.getResults().size();

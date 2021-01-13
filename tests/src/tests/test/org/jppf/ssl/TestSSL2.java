@@ -36,7 +36,7 @@ public class TestSSL2 extends AbstractNonStandardSetup
   @BeforeClass
   public static void setup() throws Exception
   {
-    client = BaseSetup.setup(1, 1, true, createConfig("ssl2"));
+    client = BaseSetup.setup(1, 1, true, true, createConfig("ssl2"));
   }
 
   /**

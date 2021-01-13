@@ -18,7 +18,7 @@
 
 package org.jppf.utils.concurrent;
 
-import java.io.*;
+import java.io.StringWriter;
 import java.lang.management.*;
 import java.util.*;
 
@@ -71,7 +71,7 @@ public class DeadlockDetector {
   public synchronized static void setup(final String type, final long interval) {
     if (alreadyRun) return;
     alreadyRun = true;
-    log.info("setting up {} deadlock detector", type);
+    log.info("setting up {} deadlock detector with a {} ms interval", type, interval);
     try {
       final String suffix;
       if ("client".equals(type)) {
