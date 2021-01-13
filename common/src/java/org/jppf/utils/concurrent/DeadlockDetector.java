@@ -18,9 +18,11 @@
 
 package org.jppf.utils.concurrent;
 
-import java.io.*;
+import java.io.StringWriter;
 import java.lang.management.*;
 import java.util.*;
+
+import javax.management.InstanceNotFoundException;
 
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
@@ -96,8 +98,10 @@ public class DeadlockDetector {
             }
           } catch (final Exception e) {
             log.error(e.getMessage(), e);
-            cancel();
-            reset();
+            if (!(e instanceof InstanceNotFoundException)) {
+              reset();
+              setup(type, interval);
+            }
             setup(type, interval);
           }
         }
