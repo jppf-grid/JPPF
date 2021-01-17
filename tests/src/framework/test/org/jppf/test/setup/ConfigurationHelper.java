@@ -21,6 +21,7 @@ package test.org.jppf.test.setup;
 import java.io.*;
 import java.util.*;
 
+import org.apache.log4j.Level;
 import org.jppf.scripting.ScriptDefinition;
 import org.jppf.utils.*;
 
@@ -205,5 +206,42 @@ public class ConfigurationHelper {
    */
   public static void cleanup() {
     while (!tempFiles.isEmpty()) tempFiles.remove(0).delete();
+  }
+
+  /**
+   * Set the specified Log4j logger to the specified level.
+   * @param level the level to set.
+   * @param names the names of the log4j loggers to configure.
+   */
+  public static void setLoggerLevel(final Level level, final String...names) {
+    for (final String name: names) {
+      final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(name);
+      if (logger != null) logger.setLevel(level);
+    }
+  }
+
+  /**
+   * 
+   */
+  private static final String LOGGER_PREFIX = "log4j.logger.";
+
+  /**
+   * Set the Log4j loggers as found in the specified log4j proeprties file.
+   * @param path the level to set.
+   * @throw Exception if any error occurs.
+   */
+  public static void setLoggerLevels(final String path) throws Exception {
+    final TypedProperties config = new TypedProperties();
+    try (final Reader reader = new BufferedReader(new FileReader(path))) {
+      config.loadAndResolve(reader);
+    }
+    config.forEach((key, value) -> {
+      if ((key instanceof String) && (value instanceof String) && ((String) key).startsWith(LOGGER_PREFIX)) {
+        final String loggerName = ((String) key).substring(LOGGER_PREFIX.length());
+        final String levelName = (String) value;
+        final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(loggerName);
+        if (logger != null) logger.setLevel(Level.toLevel(levelName));
+      }
+    });
   }
 }

@@ -18,25 +18,25 @@
 
 package test.org.jppf.embedded;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.*;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.NodeRunner;
-import org.jppf.node.protocol.Task;
 import org.jppf.server.JPPFDriver;
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
+import test.org.jppf.client.CommonClientTests;
+import test.org.jppf.management.CommonDriverAdminTests;
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.common.*;
 
 /**
  * Tests for a simple embedded grid.
@@ -46,13 +46,13 @@ public class TestSimpleEmbeddedGrid extends BaseTest {
   /**
    * Number of drivers and nodes.
    */
-  private static final int nbDrivers = 1, nbNodes = 1;
+  private static final int nbDrivers = 1, nbNodes = 2;
   /**
    * The node runners.
    */
   private static NodeRunner[] runners;
   /**
-   * The driver (used via reflection).
+   * The driver.
    */
   private static JPPFDriver driver;
   /** */
@@ -70,6 +70,8 @@ public class TestSimpleEmbeddedGrid extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
+    print("setup with %d drivers and %d nodes", nbDrivers, nbNodes);
+    ConfigurationHelper.setLoggerLevels("classes/tests/config/log4j-embedded-grid.properties");
     final Map<String, Object> bindings = new HashMap<>();
     bindings.put("$nbDrivers", nbDrivers);
     bindings.put("$nbNodes", nbNodes);
@@ -94,13 +96,15 @@ public class TestSimpleEmbeddedGrid extends BaseTest {
       final NodeRunner runner = runners[i];
       new Thread(() -> runner.start(), String.format("[node-%03d]", i + 1)).start();
     }
-    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1)) {
-      print(false, false, ">>> initializing %s", jmx);
-      Assert.assertTrue(jmx.connectAndWait(5000L));
-      print(false, false, ">>> JMX connection established");
-      assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() >= 1, 5000L, 250L, false));
-      print(false, false, ">>> checked JMX connection");
-    }
+    final TypedProperties clientConfig = getClientConfig();
+    clientConfig.remove("jppf.node.uuid");
+    client = new JPPFClient(clientConfig);
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+    print(false, false, ">>> initializing %s", jmx);
+    Assert.assertTrue(jmx.connectAndWait(5000L));
+    print(false, false, ">>> JMX connection established");
+    assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbIdleNodes() >= nbNodes, 5000L, 250L, false));
+    print(false, false, ">>> checked JMX connection");
   }
 
   /**
@@ -128,47 +132,113 @@ public class TestSimpleEmbeddedGrid extends BaseTest {
   }
 
   /**
-   * 
-   * @throws Exception .
-   */
-  //@Test(timeout = 10_000)
-  public void test() throws Exception {
-    client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG);
-    assertNotNull(client.awaitConnectionPool(5000L, JPPFClientConnectionStatus.workingStatuses()));
-  }
-
-  /**
    * Test the submission of a job.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
   public void testSubmit() throws Exception {
+    CommonClientTests.testSubmit(client);
+  }
+
+  /**
+   * Test the cancellation of a job.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=10000)
+  public void testCancelJob() throws Exception {
+    CommonClientTests.testCancelJob(client);
+  }
+
+  /**
+   * Test getting node management information from the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000L)
+  public void testNodesInformation() throws Exception {
+    CommonDriverAdminTests.testNodesInformation(client, nbNodes);
+  }
+
+  /**
+   * Test getting idle nodes information from the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000L)
+  public void testIdleNodesInformation() throws Exception {
+    CommonDriverAdminTests.testIdleNodesInformation(client, nbNodes);
+  }
+
+  /**
+   * Test getting the number of nodes attached to the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000L)
+  public void testNbNodes() throws Exception {
+    CommonDriverAdminTests.testNbNodes(client, nbNodes);
+  }
+
+  /**
+   * Test getting the number of idle nodes from the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000L)
+  public void testNbIdleNodes() throws Exception {
+    CommonDriverAdminTests.testNbIdleNodes(client, nbNodes);
+  }
+
+  /**
+   * Test getting and setting load-balancer information in the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000L)
+  public void testGetLoadBalancerInformation() throws Exception {
+    CommonDriverAdminTests.testGetLoadBalancerInformation(client);
+  }
+
+  /**
+   * Test getting and setting load-balancer information in the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000L)
+  public void testSetLoadBalancerInformation() throws Exception {
+    CommonDriverAdminTests.testSetLoadBalancerInformation(client);
+  }
+
+  /**
+   * Test of matching the nodes against an execution policy.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000L)
+  public void testNodesMatchingExecutionPolicy() throws Exception {
+    CommonDriverAdminTests.testNodesMatchingExecutionPolicy(client, nbNodes);
+  }
+
+  /**
+   * Test activating and deactivating one or more nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000L)
+  public void testToggleActiveState() throws Exception {
+    CommonDriverAdminTests.testToggleActiveState(client, nbNodes);
+  }
+
+  /**
+   * Test activating and deactivating one or more nodes.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000L)
+  public void testGetAndSetActiveState() throws Exception {
+    CommonDriverAdminTests.testGetAndSetActiveState(client, nbNodes);
+  }
+
+  /**
+   * Load a client configuration.
+   * @return a fully resolved client configuration.
+   * @throws Exception if any error occurs.
+   */
+  private static TypedProperties getClientConfig() throws Exception {
     final Map<String, Object> bindings = new HashMap<>();
     bindings.put("$nbDrivers", nbDrivers);
     bindings.put("$nbNodes", nbNodes);
-    final TypedProperties clientConfig = ConfigurationHelper.createConfigFromTemplate(BaseSetup.DEFAULT_CONFIG.clientConfig, bindings);
-    try (final JPPFClient client = new JPPFClient(clientConfig)) {
-      print(false, false, "waiting for working connection");
-      assertNotNull(client.awaitConnectionPool(5000L, JPPFClientConnectionStatus.workingStatuses()));
-      print(false, false, "got working connection");
-      final int nbTasks = 50;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
-      int i = 0;
-      for (final Task<?> task: job.getJobTasks()) task.setId("" + i++);
-      print(false, false, "submitting job");
-      final List<Task<?>> results = client.submit(job);
-      print(false, false, "got job results");
-      assertNotNull(results);
-      assertEquals(nbTasks, results.size());
-      final String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
-      for (i=0; i<nbTasks; i++) {
-        final Task<?> task = results.get(i);
-        final Throwable t = task.getThrowable();
-        assertNull("task " + i +" has an exception " + t, t);
-        assertEquals("result of task " + i + " should be " + msg + " but is " + task.getResult(), msg, task.getResult());
-        assertEquals(job.getJobTasks().get(i).getId(), task.getId());
-        assertEquals(i, task.getPosition());
-      }
-    }
+    return ConfigurationHelper.createConfigFromTemplate(BaseSetup.DEFAULT_CONFIG.clientConfig, bindings);
   }
 }

@@ -71,7 +71,7 @@ public class TestConcurrentFilePersistence extends BaseTest {
    */
   @Before
   public void setup() throws Exception {
-    BaseSetup.setLoggerLevel(Level.DEBUG, "org.jppf.job.persistence");
+    ConfigurationHelper.setLoggerLevel(Level.DEBUG, "org.jppf.job.persistence");
     persistence = new DefaultFilePersistence("persistence");
     job = BaseTestHelper.createJob("testFilePersistence", false, nbTasks, LifeCycleTask.class, 0L);
     header.setUuid(job.getUuid());

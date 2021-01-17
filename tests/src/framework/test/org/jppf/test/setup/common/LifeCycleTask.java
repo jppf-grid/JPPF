@@ -143,7 +143,7 @@ public class LifeCycleTask extends AbstractTask<String> {
     } else if (traceEnabled) log.trace("no user task notification");
     try {
       executedInNode = isInNode();
-      final TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties config = isInNode() ? getNode().getConfiguration() : JPPFConfiguration.getProperties();
       synchronized(config) {
         nodeUuid = config.getString("jppf.node.uuid");
         if (nodeUuid == null) {

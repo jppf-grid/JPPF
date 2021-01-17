@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.*;
 
 import javax.management.remote.JMXServiceURL;
 
-import org.apache.log4j.Level;
 import org.jppf.JPPFTimeoutException;
 import org.jppf.client.*;
 import org.jppf.client.event.ConnectionPoolListener;
@@ -200,7 +199,6 @@ public class BaseSetup {
    * Stops the driver and node and close the client.
    */
   private static void close() {
-    //System.out.println("closing test");
     try {
       generateClientThreadDump();
       if ((client != null) && !client.isClosed()) {
@@ -441,17 +439,5 @@ public class BaseSetup {
    */
   public static JPPFClient getClient() {
     return client;
-  }
-
-  /**
-   * Set the specified Log4j logger to the specified level.
-   * @param level the level to set.
-   * @param names the names of the log4j loggers to configure.
-   */
-  public static void setLoggerLevel(final Level level, final String...names) {
-    for (final String name: names) {
-      final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(name);
-      if (logger != null) logger.setLevel(level);
-    }
   }
 }

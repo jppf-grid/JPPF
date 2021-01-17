@@ -81,8 +81,8 @@ public abstract class AbstractTestStandaloneConnector extends BaseTest {
   @BeforeClass
   public static void beforeClass() throws Exception {
     BaseSetup.setup(0, 0, false, true, BaseSetup.DEFAULT_CONFIG);
-    BaseSetup.setLoggerLevel(org.apache.log4j.Level.DEBUG, "org.jppf.jmxremote", "org.jppf.nio");
-    BaseSetup.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.nio.PlainNioObject", "org.jppf.serialization");
+    ConfigurationHelper.setLoggerLevel(org.apache.log4j.Level.DEBUG, "org.jppf.jmxremote", "org.jppf.nio");
+    ConfigurationHelper.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.nio.PlainNioObject", "org.jppf.serialization");
     url = new JMXServiceURL("service:jmx:jppf://localhost:12001");
     connectorTestName = ObjectNameCache.getObjectName(ConnectorTestMBean.MBEAN_NAME);
     registerMBeans();
@@ -93,7 +93,7 @@ public abstract class AbstractTestStandaloneConnector extends BaseTest {
    */
   @AfterClass
   public static void afterClass() throws Exception {
-    BaseSetup.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.jmxremote", "org.jppf.nio");
+    ConfigurationHelper.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.jmxremote", "org.jppf.nio");
     BaseSetup.cleanup();
   }
 

@@ -57,7 +57,7 @@ public class TestJMXServer extends BaseTest {
   public static void setup() throws Exception {
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     server.registerMBean(new StandardMBean(new MyTest(), MyTestMBean.class), ObjectNameCache.getObjectName(MyTestMBean.MBEAN_NAME));
-    BaseSetup.setLoggerLevel(Level.DEBUG, debugLoggers);
+    ConfigurationHelper.setLoggerLevel(Level.DEBUG, debugLoggers);
   }
 
   /**
@@ -69,7 +69,7 @@ public class TestJMXServer extends BaseTest {
     JPPFConfiguration.remove(JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     server.unregisterMBean(ObjectNameCache.getObjectName(MyTestMBean.MBEAN_NAME));
-    BaseSetup.setLoggerLevel(Level.INFO, debugLoggers);
+    ConfigurationHelper.setLoggerLevel(Level.INFO, debugLoggers);
   }
 
   /**
