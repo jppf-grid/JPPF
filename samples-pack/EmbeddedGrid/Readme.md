@@ -7,9 +7,10 @@ This sample demonstrates how to start and use an embedded JPPF <a href="https://
 <h3>How do I run it?</h3>
 From a command prompt, type the following:
 <ul class="samplesList">
-  <li>On a Linux/Unix/MacOS system: <b>./run.sh</b></li>
-  <li>On a Windows system: <b>run.bat</b></li>
+  <li>On a Linux/Unix/MacOS system: <b>./run.sh &lt;n&gt;</b></li>
+  <li>On a Windows system: <b>run.bat &lt;n&gt;</b></li>
 </ul>
+Where <b><i>n</i></b> is an optional argument specifying the number of embedded nodes that you want in the grid. If unspecified, it defaults to 2 nodes.
 
 <p>The demo produces an output put that looks like this, where messages from the demo itself are prefixed with `>>>`:
 <pre class="samples" style="white-space: pre-wrap">
