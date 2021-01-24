@@ -177,7 +177,7 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
   }
 
   @Override
-  public void addServer(final int portToInit, final boolean ssl, final Map<String, ?> env, final boolean retryOnException) throws Exception {
+  public boolean addServer(final int portToInit, final boolean ssl, final Map<String, ?> env, final boolean retryOnException) throws Exception {
     int port = portToInit;
     if (debugEnabled) log.debug("adding server for port={}, ssl={}", port, ssl);
     if (port >= 0) {
@@ -190,7 +190,7 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
           final Map<String, Object> map = (Map<String, Object>) key.attachment();
           if (env != null) map.putAll(env);
           if (debugEnabled) log.debug("server added for port={}, ssl={}", port, ssl);
-          return;
+          return false;
         }
       }
       final int maxBindRetries = retryOnException ? JPPFConfiguration.getProperties().getInt("jppf.acceptor.bind.maxRetries", 3) : 1;
@@ -224,6 +224,7 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
       }
     }
     if (debugEnabled) log.debug("server added for port={}, ssl={}", port, ssl);
+    return true;
   }
 
   /**
