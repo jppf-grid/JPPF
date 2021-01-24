@@ -54,7 +54,6 @@ public class JPPFJMXServer extends AbstractJMXServer {
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
    * @param mbeanServer the mbean server to use.
-   * @exclude
    */
   public JPPFJMXServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty, final MBeanServer mbeanServer) {
     super(config, mbeanServer);
@@ -65,21 +64,6 @@ public class JPPFJMXServer extends AbstractJMXServer {
     if (debugEnabled) log.debug("initializing with ssl={}, portProperty={}", ssl, this.portProperty);
   }
 
-  /**
-   * Initialize this JMX server with the specified uuid.
-   * @param config the configuration to use.
-   * @param id the unique id of the driver or node holding this jmx server.
-   * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
-   * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
-   * @exclude
-   */
-  public JPPFJMXServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
-    this(config, id, ssl, portProperty, null);
-  }
-
-  /**
-   * @exclude
-   */
   @Override
   public void start(final ClassLoader cl) throws Exception {
     if (debugEnabled) log.debug("starting remote connector server with " + JPPFMBeanServerFactory.toString(mbeanServer));

@@ -19,14 +19,15 @@
 package org.jppf.jmxremote;
 
 import java.io.*;
+import java.net.BindException;
 import java.util.*;
 
 import javax.management.MBeanServer;
 import javax.management.remote.*;
 
 import org.jppf.jmxremote.nio.*;
-import org.jppf.nio.*;
-import org.jppf.utils.*;
+import org.jppf.nio.NioHelper;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -88,7 +89,7 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
       final int port = address.getPort();
       final Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
       final boolean secure = (tls == null) ? false : tls;
-      NioHelper.getAcceptorServer().addServer(port, secure, environment, false);
+      if (!NioHelper.getAcceptorServer().addServer(port, secure, environment, false)) throw new BindException("port " + port + "already in use");
       if (debugEnabled) log.debug("server @{} added listener port {}", address, port);
       for (final JMXNioServer server: JMXNioServerPool.getServers()) server.addConnectionStatusListener(this);
       started = true;

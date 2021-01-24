@@ -163,8 +163,10 @@ public abstract class AbstractJMXServer implements JMXServer {
     while (!found) {
       try {
         url = new JMXServiceURL(protocol,  null, managementPort);
-        connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, mbeanServer);
-        connectorServer.start();
+        synchronized(AbstractJMXServer.class) {
+          connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, mbeanServer);
+          connectorServer.start();
+        }
         found = true;
         managementHost = url.getHost();
         if (forwarder != null) connectorServer.setMBeanServerForwarder(forwarder);
@@ -180,6 +182,6 @@ public abstract class AbstractJMXServer implements JMXServer {
       }
     }
     stopped = false;
-    if (debugEnabled) log.debug("{} started at URL {} after {} tries", getClass().getSimpleName(), url, nbTries);
+    if (debugEnabled) log.debug("{} started at URL {} after {} tries, connector server = {}", getClass().getSimpleName(), url, nbTries, connectorServer);
   }
 }
