@@ -27,16 +27,13 @@ import org.jppf.server.node.JPPFNode;
  * Provider for the default JPPF node management and monitoring features.
  * @author Laurent Cohen
  */
-public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
-{
+public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider {
   /**
    * Return the fully qualified name of the management interface defined by this provider.
    * @return the fully qualified interface name as a string.
-   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanInterfaceName()
    */
   @Override
-  public String getMBeanInterfaceName()
-  {
+  public String getMBeanInterfaceName() {
     return JPPFNodeAdminMBean.class.getName();
   }
 
@@ -45,11 +42,9 @@ public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
    * The class of this MBean must implement the interface defined by {@link #getMBeanInterfaceName() getMBeanInterfaceName()}.
    * @param node - the JPPF node that is managed or monitored by the MBean.
    * @return an <code>Object</code> that is an implementation of the MBean interface.
-   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
    */
   @Override
-  public Object createMBean(final Node node)
-  {
+  public Object createMBean(final Node node) {
     return new JPPFNodeAdmin((JPPFNode) node);
   }
 
@@ -58,11 +53,9 @@ public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
    * This is the name under which the MBean will be registered with the MBean server.
    * It must be a valid object name, as specified in the documentation for {@link javax.management.ObjectName ObjectName}.
    * @return the MBean name for this MBean provider.
-   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanName()
    */
   @Override
-  public String getMBeanName()
-  {
+  public String getMBeanName() {
     return JPPFNodeAdminMBean.MBEAN_NAME;
   }
 }
