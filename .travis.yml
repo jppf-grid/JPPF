@@ -17,7 +17,7 @@ before_script:
 
 script:
   - ant build
-  - ant docker
+#  - ant docker
   - ant test.min
 
 jdk:

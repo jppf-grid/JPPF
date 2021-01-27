@@ -50,7 +50,7 @@ public class Setup1D2N1C extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    client = BaseSetup.setup(2);
+    client = BaseSetup.setup(1, 2, true, true, BaseSetup.DEFAULT_CONFIG);
   }
 
   /**

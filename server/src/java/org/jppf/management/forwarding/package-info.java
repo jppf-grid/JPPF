@@ -28,7 +28,7 @@
  * </ul>
  * 
  * <h2>Forwarding management requests</h2>
- * <p>The request forwarding mechanism is based on a built-in driver MBean: {@link org.jppf.management.forwarding.JPPFNodeForwardingMBean}, which provides methods to invoke methods, or get or set attributes on remote node MBeans.
+ * <p>The request forwarding mechanism is based on a built-in driver MBean: {@link org.jppf.management.forwarding.NodeForwardingMBean}, which provides methods to invoke methods, or get or set attributes on remote node MBeans.
  * Each of its methods requires a {@link org.jppf.management.NodeSelector} argument and an MBean name, to determine to which nodes, and which MBean in these nodes, the request will be performed.
  * The return value is always a map of node UUIDs to the corresponding value returned by the request (if any) to the corresponding node.
  * If an exception is raised when performing the request on a specific node, then that exception is returned in the map.
@@ -39,8 +39,8 @@
  * AbstractJPPFClientConnection conn = (AbstractJPPFClientConnection) client.getClientConnection();
  * JMXDriverConnectionWrapper driverJmx = conn.getJmxConnection();
  * 
- * JPPFNodeForwardingMBean proxy =
- *   driverJmx.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+ * NodeForwardingMBean proxy =
+ *   driverJmx.getProxy(NodeForwardingMBean.MBEAN_NAME, NodeForwardingMBean.class);
  * 
  * // this selector selects all nodes attached to the driver
  * NodeSelector selector = new NodeSelector.AllNodes();
@@ -50,17 +50,18 @@
  * 
  * // invoke the state() method on the remote 'JPPFNodeAdminMBean' node MBeans.
  * // note that the MBean name does not need to be stated explicitely.
- * Map&lt;String, Object&gt; results = proxy.state(selector);
+ * ResultsMapélt;String, JPPFNodeState&gt; results = proxy.state(selector);
  * // this is an exact equivalent, explicitely stating the target MBean on the remote nodes:
  * String targetMBeanName = JPPFNodeAdminMBean.MBEAN_NAME;
- * Map&lt;String, Object&gt; results2 = proxy.forwardInvoke(selector, targetMBeanName, "state");
+ * ResultsMapélt;String, JPPFNodeState&gt; results2 = proxy.forwardInvoke(selector, targetMBeanName, "state");
  * 
  * // handling the results
- * for (Map.Entry&lt;String, Object&gt; entry: results) {
- *   if (entry.getValue() instanceof Exception) {
+ * for (Map.Entry&lt;String, InvocationResult&lt;JPPFNodeState&gt;&gt; entry : results.entrySet()) {
+ *   InvocationResult&lt;JPPFNodeState&gt; res = entry.getValue();
+ *   if (res.isException()) {
  *     // handle the exception ...
  *   } else {
- *     JPPFNodeState state = (JPPFNodeState) entry.getValue();
+ *     JPPFNodeState state = res.result();
  *     // handle the result ...
  *   }
  * }
@@ -114,4 +115,3 @@
  * <p>Found in: <b>jppf-common.jar, jppf-server.jar</b>
  */
 package org.jppf.management.forwarding;
-

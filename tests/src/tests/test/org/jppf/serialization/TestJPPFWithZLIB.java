@@ -39,7 +39,7 @@ public class TestJPPFWithZLIB extends AbstractTestSerialization {
     allowsNonSerializable = true;
     System.out.println("main class loader = " + TestJPPFWithZLIB.class.getClassLoader());
     //JPPFSerialization.Factory.reset();
-    client = BaseSetup.setup(1, 1, true, createConfig("serialization/jppf_zlib"));
+    client = BaseSetup.setup(1, 1, true, true, createConfig("serialization/jppf_zlib"));
     printOut("----- serialization class = %s -----", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
   }
 }

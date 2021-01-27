@@ -47,7 +47,7 @@ public class TestXStreamWithZLIB extends AbstractTestSerialization {
     commonCP.add("lib/xmlpull.jar");
     config.driver.classpath.addAll(commonCP);
     config.node.classpath.addAll(commonCP);
-    client = BaseSetup.setup(1, 1, true, config);
+    client = BaseSetup.setup(1, 1, true, true, config);
     printOut("----- serialization class = %s -----", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
   }
 }

@@ -91,7 +91,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     final TestConfiguration cfg = createConfig("job_reservation");
     cfg.driver.log4j = "classes/tests/config/job_reservation/log4j-driver.properties";
     cfg.node.log4j = "classes/tests/config/job_reservation/log4j-node.properties";
-    client = BaseSetup.setup(1, 3, true, cfg);
+    client = BaseSetup.setup(1, 3, true, true, cfg);
     jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     jmx.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, myNodeListener);
   }

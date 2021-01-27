@@ -107,6 +107,18 @@ public class ManagementUtils {
   }
 
   /**
+   * Determine whether the MBean with the specified is already registered.
+   * @param mbeanName the name of the MBean to check.
+   * @param server the MBean server to check.
+   * @return {@code true} if the MBean is registered, {@code false} otherwise.
+   * @throws Exception if any error occurs.
+   */
+  public static boolean isMBeanRegistered(final String mbeanName, final MBeanServer server) throws Exception {
+    if (!isManagementAvailable()) return false;
+    return server.isRegistered(ObjectNameCache.getObjectName(mbeanName));
+  }
+
+  /**
    * Whether CPU time measurement is enabled/supported.
    * @return {@code true} if time measurement is enabled, {@code false} otherwise.
    */

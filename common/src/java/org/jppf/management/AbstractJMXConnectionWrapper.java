@@ -246,7 +246,8 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
       mbeanConnection.set(jmxc.getMBeanServerConnection());
       try {
         setHost(InetAddress.getByName(host).getHostName());
-      } catch (@SuppressWarnings("unused") final UnknownHostException e) {
+      } catch (final UnknownHostException e) {
+        if (debugEnabled) log.debug("unable to set host", e);
       }
     }
     connected.set(true);

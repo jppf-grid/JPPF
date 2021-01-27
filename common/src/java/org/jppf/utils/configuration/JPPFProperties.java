@@ -147,6 +147,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> LOCAL_NODE_ENABLED = new BooleanProperty("jppf.local.node.enabled", false);
   /** Number of processing threads in the node. */
   public static final JPPFProperty<Integer> PROCESSING_THREADS = new IntProperty("jppf.processing.threads", Runtime.getRuntime().availableProcessors(), "processing.threads");
+  /** Number of processing threads in the node. */
+  public static final JPPFProperty<Long> PROCESSING_THREADS_TTL = new LongProperty("jppf.processing.threads.ttl", -1L);
   /** @exclude . */
   public static final JPPFProperty<Integer> PEER_PROCESSING_THREADS = new IntProperty("jppf.peer.processing.threads", Runtime.getRuntime().availableProcessors());
   /** JMX client connection timeout in millis. 0 or less means no timeout. */
@@ -172,7 +174,7 @@ public class JPPFProperties {
   /** Whether the node runs in offline mode . */
   public static final JPPFProperty<Boolean> NODE_OFFLINE = new BooleanProperty("jppf.node.offline", false);
   /** Whether the node is an Android node. */
-  public static final JPPFProperty<Boolean> NODE_ANDROID = new BooleanProperty("jppf.node.android", false);
+  public static final JPPFProperty<Boolean> NODE_ANDROID = new BooleanProperty("jppf.node.android", false).setDeprecated(true);
   /** Whether the node is .Net-enabled. */
   public static final JPPFProperty<Boolean> DOTNET_BRIDGE_INITIALIZED = new BooleanProperty("jppf.dotnet.bridge.initialized", false).setDeprecated(true);
   /** Whether the node is a master node. */

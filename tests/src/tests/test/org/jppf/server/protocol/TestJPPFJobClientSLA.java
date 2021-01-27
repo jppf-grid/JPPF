@@ -396,7 +396,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       .set(REMOTE_EXECUTION_ENABLED, remoteEnabled)
       .set(LOCAL_EXECUTION_ENABLED, localEnabled)
       .set(LOCAL_EXECUTION_THREADS, Runtime.getRuntime().availableProcessors());
-    jppfClient = BaseSetup.createClient(null, false);
+    jppfClient = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
   }
 
   /**

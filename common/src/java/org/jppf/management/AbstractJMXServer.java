@@ -18,6 +18,7 @@
 
 package org.jppf.management;
 
+import java.lang.management.ManagementFactory;
 import java.net.BindException;
 import java.util.Map;
 import java.util.concurrent.locks.*;
@@ -51,7 +52,7 @@ public abstract class AbstractJMXServer implements JMXServer {
   /**
    * The mbean server.
    */
-  protected MBeanServer mbeanServer;
+  protected final MBeanServer mbeanServer;
   /**
    * The JMX connector server.
    */
@@ -88,9 +89,11 @@ public abstract class AbstractJMXServer implements JMXServer {
   /**
    * 
    * @param config the configuration to use.
+   * @param mbeanServer the mbean server to use.
    */
-  protected AbstractJMXServer(final TypedProperties config) {
+  protected AbstractJMXServer(final TypedProperties config, final MBeanServer mbeanServer) {
     this.config = config;
+    this.mbeanServer = (mbeanServer == null) ? ManagementFactory.getPlatformMBeanServer() : mbeanServer;
   }
 
   @Override
@@ -111,14 +114,6 @@ public abstract class AbstractJMXServer implements JMXServer {
   @Override
   public boolean isStopped() {
     return stopped;
-  }
-
-  /**
-   * @deprecated use {@link #getUuid()} instead.
-   */
-  @Override
-  public String getId() {
-    return getUuid();
   }
 
   @Override
@@ -168,8 +163,10 @@ public abstract class AbstractJMXServer implements JMXServer {
     while (!found) {
       try {
         url = new JMXServiceURL(protocol,  null, managementPort);
-        connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, mbeanServer);
-        connectorServer.start();
+        synchronized(AbstractJMXServer.class) {
+          connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, mbeanServer);
+          connectorServer.start();
+        }
         found = true;
         managementHost = url.getHost();
         if (forwarder != null) connectorServer.setMBeanServerForwarder(forwarder);
@@ -185,6 +182,6 @@ public abstract class AbstractJMXServer implements JMXServer {
       }
     }
     stopped = false;
-    if (debugEnabled) log.debug("{} started at URL {} after {} tries", getClass().getSimpleName(), url, nbTries);
+    if (debugEnabled) log.debug("{} started at URL {} after {} tries, connector server = {}", getClass().getSimpleName(), url, nbTries, connectorServer);
   }
 }

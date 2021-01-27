@@ -21,7 +21,7 @@ package org.jppf.management;
 import java.io.Serializable;
 
 /**
- * Marker interface for selecting nodes when using the {@link org.jppf.management.forwarding.JPPFNodeForwardingMBean JPPFNodeForwardingMBean} methods.
+ * Marker interface for selecting nodes when using the {@link org.jppf.management.forwarding.NodeForwardingMBean NodeForwardingMBean} methods.
  * @author Laurent Cohen
  */
 public interface NodeSelector extends Serializable {

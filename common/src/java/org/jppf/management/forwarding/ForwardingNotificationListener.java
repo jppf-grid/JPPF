@@ -22,7 +22,7 @@ import javax.management.*;
 
 /**
  * Convenience interface to use in place of {@link NotificationListener} when regstering a notification listener
- * that receives notifications from a {@link JPPFNodeForwardingMBean}.
+ * that receives notifications from a {@link NodeForwardingMBean}.
  * @author Laurent Cohen
  */
 @FunctionalInterface

@@ -66,7 +66,7 @@ public class TestJobDependencies extends BaseTest {
   public static void setup() throws Exception {
     final TestConfiguration cfg = BaseSetup.DEFAULT_CONFIG.copy();
     cfg.driver.log4j = "classes/tests/config/log4j-driver.TestJobDependencies.properties";
-    client = BaseSetup.setup(1, 2, true, cfg);
+    client = BaseSetup.setup(1, 2, true, true, cfg);
     dependencyManager = BaseSetup.getJMXConnection().getJobDependencyManager();
   }
 

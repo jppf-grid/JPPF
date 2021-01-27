@@ -32,7 +32,7 @@ import org.jppf.discovery.*;
 import org.jppf.jmx.JMXHelper;
 import org.jppf.load.balancer.ChannelAwareness;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.*;
+import org.jppf.management.forwarding.ForwardingNotificationListener;
 import org.jppf.management.spi.*;
 import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.server.debug.*;
@@ -68,35 +68,35 @@ public class DriverInitializer {
   /**
    * The instance of the driver.
    */
-  private JPPFDriver driver = null;
+  private JPPFDriver driver;
   /**
    * The thread that performs the peer servers discovery.
    */
-  private PeerDiscoveryThread peerDiscoveryThread = null;
+  private PeerDiscoveryThread peerDiscoveryThread;
   /**
    * The thread that broadcasts the server connection information using UDP multicast.
    */
-  private JPPFBroadcaster broadcaster = null;
+  private JPPFBroadcaster broadcaster;
   /**
    * The JPPF configuration.
    */
-  private TypedProperties config = null;
+  private TypedProperties config;
   /**
    * Represents the connection information for this driver.
    */
-  private JPPFConnectionInformation connectionInfo = null;
+  private JPPFConnectionInformation connectionInfo;
   /**
    * The jmx server used to manage and monitor this driver.
    */
-  private JMXServer jmxServer = null;
+  private JMXServer jmxServer;
   /**
    * The jmx server used to manage and monitor this driver over a secure connection.
    */
-  private JMXServer sslJmxServer = null;
+  private JMXServer sslJmxServer;
   /**
    * The object that collects debug information.
    */
-  private ServerDebug serverDebug = null;
+  private ServerDebug serverDebug;
   /**
    * Handles listeners to node connection events.
    */
@@ -118,6 +118,10 @@ public class DriverInitializer {
    * Handles the pools of connections to remote peer drivers.
    */
   private final PeerConnectionPoolHandler peerConnectionPoolHandler;
+  /**
+   * Discovers and registers the driver mbeans.
+   */
+  private DriverMBeanProviderManager mbeanProvider;
 
   /**
    * Instantiate this initializer with the specified driver.
@@ -157,7 +161,7 @@ public class DriverInitializer {
    */
   void registerProviderMBeans() throws Exception {
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-    new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server, driver);
+    mbeanProvider = new DriverMBeanProviderManager(JPPFDriverMBeanProvider.class, null, server, driver);
     registerNodeConfigListener();
   }
 
@@ -317,7 +321,9 @@ public class DriverInitializer {
         else jmxProp = ssl ? MANAGEMENT_SSL_PORT : MANAGEMENT_PORT;
         final int port = driver.getConfiguration().get(jmxProp);
         if (port < 0) return null;
-        server = JMXServerFactory.createServer(driver.configuration, driver.getUuid(), ssl, jmxProp);
+        final Map<String, Object> env = new HashMap<>();
+        env.put(JMXHelper.STANDALONE_CONNECTOR_KEY, false);
+        server = JMXServerFactory.createServer(driver.configuration, driver.getUuid(), ssl, jmxProp, null, env);
         server.start(getClass().getClassLoader());
         final String msg = String.format("%smanagement initialized and listening on port %s", tmp, server.getManagementPort());
         System.out.println(msg);
@@ -341,6 +347,7 @@ public class DriverInitializer {
     try {
       if (debugEnabled) log.debug("stopping JMX server");
       if (jmxServer != null) jmxServer.stop();
+      mbeanProvider.unregisterProviderMBeans();
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -431,7 +438,7 @@ public class DriverInitializer {
   }
 
   /**
-   * Create and initialize the datasources found inthe configurarion.
+   * Create and initialize the datasources found in the configuration.
    */
   void initDatasources() {
     final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();

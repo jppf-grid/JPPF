@@ -1,6 +1,6 @@
 org.jppf.server.spi.JPPFDefaultDriverMBeanProvider                  # Driver-level management
 org.jppf.server.job.management.DriverJobManagementMBeanProvider     # Job-level management
-org.jppf.server.spi.JPPFNodeForwardingMBeanProvider                 # Nodes management via the driver. Deprecated: use org.jppf.server.spi.NodeForwardingMBeanProvider instaead
+#org.jppf.server.spi.JPPFNodeForwardingMBeanProvider                 # Nodes management via the driver. Deprecated: use org.jppf.server.spi.NodeForwardingMBeanProvider instaead
 org.jppf.server.spi.NodeForwardingMBeanProvider                     # Nodes management via the driver
 org.jppf.management.diagnostics.spi.DriverDiagnosticsMBeanProvider  # driver JVM diagnostics
 org.jppf.management.spi.PeerDriverMBeanProvider                     # notifications of peer drivers attributes

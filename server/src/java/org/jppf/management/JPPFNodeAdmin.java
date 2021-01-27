@@ -55,7 +55,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   /**
    * The node whose state is monitored.
    */
-  transient JPPFNode node = null;
+  transient JPPFNode node;
 
   /**
    * Initialize this node management bean with the specified node.

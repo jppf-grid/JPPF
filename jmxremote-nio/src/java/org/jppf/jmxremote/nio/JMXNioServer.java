@@ -152,6 +152,7 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
       // server-side connection
       if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
       final NioServer acceptor = NioHelper.getServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
+      if (acceptor == null) return;
       @SuppressWarnings("unchecked")
       final Map<String, ?> env = (Map<String, ?>) serverSocketChannel.keyFor(acceptor.getSelector()).attachment();
       final InetSocketAddress saddr = (InetSocketAddress) serverSocketChannel.getLocalAddress();

@@ -27,7 +27,6 @@ import org.jppf.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.execute.async.ExecutionManagerListener;
 import org.jppf.management.*;
-import org.jppf.management.spi.*;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
@@ -65,7 +64,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * The mbean which sends notifications of configuration changes.
    */
-  private final NodeConfigNotifier configNotifier = new NodeConfigNotifier();
+  private final NodeConfigNotifier configNotifier = new NodeConfigNotifier(this);
   /**
    * Asynchronously receives new jobs.
    */
@@ -303,17 +302,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     } catch (final Throwable e) {
       log.error(e.getMessage(), e);
     }
-    try {
-      if (ManagementUtils.isManagementAvailable() && !ManagementUtils.isMBeanRegistered(JPPFNodeAdminMBean.MBEAN_NAME)) {
-        final ClassLoader cl = getClass().getClassLoader();
-        if (providerManager == null) providerManager = new JPPFMBeanProviderManager<>(JPPFNodeMBeanProvider.class, cl, ManagementUtils.getPlatformServer(), this);
-      }
-    } catch (final Exception e) {
-      log.error("Error registering the MBeans", e);
-    }
     if (isJmxEnabled()) {
       try {
-        getJmxServer();
+        getJmxServer(true);
       } catch(final Exception e) {
         jmxEnabled = false;
         System.out.println("JMX initialization failure - management is disabled for this node\nsee the log file for details");

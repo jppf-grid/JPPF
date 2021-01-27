@@ -52,7 +52,7 @@ public class TestLocalJPPFClassLoader extends AbstractClassLoaderTest {
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("classloader");
     config.driver.jppf = "classes/tests/config/classloader/driver_local_node.properties";
-    client = BaseSetup.setup(1, 0, true, config);
+    client = BaseSetup.setup(1, 0, true, true, config);
     try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11101, false)) {
       assertTrue(jmx.connectAndWait(5_000L));
       assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() >= 1, 5_000L, 500L, false));

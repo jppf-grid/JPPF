@@ -77,7 +77,7 @@ public class TestJPPFClient extends Setup1D1N {
       }
       ok = true;
     }
-    if (!ok) throw new IllegalStateException("somme JPPF threads are still alive");
+    if (!ok) throw new IllegalStateException("some JPPF threads are still alive");
   }
  
   /**
@@ -113,26 +113,7 @@ public class TestJPPFClient extends Setup1D1N {
    */
   @Test(timeout=10000)
   public void testSubmit() throws Exception {
-    try (final JPPFClient client = new JPPFClient()) {
-      final int nbTasks = 50;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 0L);
-      int i = 0;
-      for (final Task<?> task: job.getJobTasks()) task.setId("" + i++);
-      print(false, false, "submitting job");
-      final List<Task<?>> results = client.submit(job);
-      print(false, false, "got job results");
-      assertNotNull(results);
-      assertEquals(nbTasks, results.size());
-      final String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
-      for (i=0; i<nbTasks; i++) {
-        final Task<?> task = results.get(i);
-        final Throwable t = task.getThrowable();
-        assertNull("task " + i +" has an exception " + t, t);
-        assertEquals("result of task " + i + " should be " + msg + " but is " + task.getResult(), msg, task.getResult());
-        assertEquals(job.getJobTasks().get(i).getId(), task.getId());
-        assertEquals(i, task.getPosition());
-      }
-    }
+    CommonClientTests.testSubmit(JPPFConfiguration.getProperties());
   }
 
   /**
@@ -141,38 +122,7 @@ public class TestJPPFClient extends Setup1D1N {
    */
   @Test(timeout=10000)
   public void testCancelJob() throws Exception {
-    final String name = ReflectionUtils.getCurrentMethodName();
-    try (final JPPFClient client = new JPPFClient()) {
-      final int nbTasks = 10;
-      //final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
-      final AwaitTaskNotificationListener listener = new AwaitTaskNotificationListener(client, "start notif");
-      final JPPFJob job = BaseTestHelper.createJob(name + "-1", false, nbTasks, LifeCycleTask.class, 5000L, true, "start notif");
-      print(false, false, "submitting job 1");
-      client.submitAsync(job);
-      print(false, false, "awaiting JOB_DISPATCHED notification");
-      listener.await();
-      print(false, false, "cancelling job 1");
-      client.cancelJob(job.getUuid());
-      print(false, false, "awaiting job 1 results");
-      List<Task<?>> results = job.awaitResults();
-      print(false, false, "got job 1 results");
-      assertNotNull(results);
-      assertEquals(nbTasks, results.size());
-      int count = 0;
-      for (final Task<?> task: results) {
-        if (task.getResult() == null) count++;
-      }
-      assertTrue(count > 0);
-      final JPPFJob job2 = BaseTestHelper.createJob(name + "-2", false, nbTasks, LifeCycleTask.class, 1L);
-      print(false, false, "submitting job 2");
-      results = client.submit(job2);
-      print(false, false, "got job 2 results");
-      assertNotNull(results);
-      assertEquals(nbTasks, results.size());
-      for (final Task<?> task: results) {
-        assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
-      }
-    }
+    CommonClientTests.testCancelJob(JPPFConfiguration.getProperties());
   }
 
   /**
@@ -385,7 +335,7 @@ public class TestJPPFClient extends Setup1D1N {
       .set(LOAD_BALANCING_ALGORITHM, "manual")
       .set(LOAD_BALANCING_PROFILE, "test")
       .setInt(LOAD_BALANCING_PROFILE.getName() + ".test.size", 1);
-    try (final MyClient client = new MyClient(config))  {
+    try (final MyClient client = new MyClient(config)) {
       final int nbJobs = 5;
       final int nbTasks = 3;
       for (int i = 1; i<=nbJobs; i++) {

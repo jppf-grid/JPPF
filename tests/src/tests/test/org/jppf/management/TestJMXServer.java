@@ -45,8 +45,6 @@ public class TestJMXServer extends BaseTest {
   /** */
   private static final String[] PARAMS = {"param1", "param2", "param3"};
   /** */
-  private final static int PORT = 4444;
-  /** */
   private final static String[] debugLoggers = { "org.jppf.management", "org.jppf.utils.ReflectionHelper", "org.jppf.jmxremote.JPPFJMXConnectorServer" };
 
   /**
@@ -57,7 +55,7 @@ public class TestJMXServer extends BaseTest {
   public static void setup() throws Exception {
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     server.registerMBean(new StandardMBean(new MyTest(), MyTestMBean.class), ObjectNameCache.getObjectName(MyTestMBean.MBEAN_NAME));
-    BaseSetup.setLoggerLevel(Level.DEBUG, debugLoggers);
+    ConfigurationHelper.setLoggerLevel(Level.DEBUG, debugLoggers);
   }
 
   /**
@@ -69,7 +67,7 @@ public class TestJMXServer extends BaseTest {
     JPPFConfiguration.remove(JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     server.unregisterMBean(ObjectNameCache.getObjectName(MyTestMBean.MBEAN_NAME));
-    BaseSetup.setLoggerLevel(Level.INFO, debugLoggers);
+    ConfigurationHelper.setLoggerLevel(Level.INFO, debugLoggers);
   }
 
   /**
@@ -78,9 +76,10 @@ public class TestJMXServer extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testNoMBeanForwarder() throws Exception {
+    final int port = 4444;
     JMXServer server = null;
     try {
-      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT)
+      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port)
         .set(JPPFProperties.JMX_REMOTE_PROTOCOL, JMXHelper.JPPF_JMX_PROTOCOL)
         .remove(JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
       server = JMXServerFactory.createServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
@@ -104,10 +103,11 @@ public class TestJMXServer extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testMBeanForwarderWithStringArrayConstructor() throws Exception {
+    final int port = 4445;
     JMXServer server = null;
     JMXConnectionWrapper client = null;
     try {
-      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT)
+      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port)
         .set(JPPFProperties.MANAGEMENT_SERVER_FORWARDER, CollectionUtils.concatArrays(new String[] {Forwarder1.class.getName()}, PARAMS));
       server = JMXServerFactory.createServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
@@ -116,7 +116,7 @@ public class TestJMXServer extends BaseTest {
       final Forwarder1 forwarder = (Forwarder1) mbsf;
       final String[] params = forwarder.getParameters();
       assertTrue(Arrays.equals(PARAMS, params));
-      client = new JMXConnectionWrapper("localhost", PORT, false);
+      client = new JMXConnectionWrapper("localhost", port, false);
       assertTrue(client.connectAndWait(5000L));
       final MyTestMBean mbean = client.getProxy(MyTestMBean.MBEAN_NAME, MyTestMBean.class);
       assertNotNull(mbean);
@@ -161,10 +161,11 @@ public class TestJMXServer extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testMBeanForwarderWithSetParameters() throws Exception {
+    final int port = 4446;
     JMXServer server = null;
     JMXConnectionWrapper client = null;
     try {
-      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT)
+      JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port)
         .set(JPPFProperties.MANAGEMENT_SERVER_FORWARDER, CollectionUtils.concatArrays(new String[] {Forwarder2.class.getName()}, PARAMS));
       server = JMXServerFactory.createServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
@@ -173,7 +174,7 @@ public class TestJMXServer extends BaseTest {
       final Forwarder2 forwarder = (Forwarder2) mbsf;
       final String[] params = forwarder.getParameters();
       assertTrue(Arrays.equals(PARAMS, params));
-      client = new JMXConnectionWrapper("localhost", PORT, false);
+      client = new JMXConnectionWrapper("localhost", port, false);
       assertTrue(client.connectAndWait(5000L));
       final MyTestMBean mbean = client.getProxy(MyTestMBean.MBEAN_NAME, MyTestMBean.class);
       assertNotNull(mbean);

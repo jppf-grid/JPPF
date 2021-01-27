@@ -48,7 +48,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
    */
   @BeforeClass
   public static void setup() throws Exception {
-    client = BaseSetup.setup(1, 1, true, createConfig("provisioning"));
+    client = BaseSetup.setup(1, 1, true, true, createConfig("provisioning"));
   }
 
   /**

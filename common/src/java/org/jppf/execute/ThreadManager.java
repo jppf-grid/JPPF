@@ -111,10 +111,10 @@ public interface ThreadManager {
       }
     }
     if (result == null) {
-      log.info("Using default thread manager");
-      return new ThreadManagerThreadPool(poolSize);
+      final long ttl = retrieveTTL(config, JPPFProperties.PROCESSING_THREADS_TTL);
+      log.info("Using default thread manager with poolSize = {} and ttl = {}", poolSize, (ttl == Long.MAX_VALUE) ? "Long.MAX_VALUE" : ttl);
+      return new ThreadManagerThreadPool(poolSize, ttl);
     }
-    //config.set(JPPFProperties.PROCESSING_THREADS, result.getPoolSize());
     log.info("Node running {} processing thread{}", poolSize, poolSize > 1 ? "s" : "");
     final boolean cpuTimeEnabled = result.isCpuTimeEnabled();
     config.setBoolean("cpuTimeSupported", cpuTimeEnabled);
@@ -124,14 +124,24 @@ public interface ThreadManager {
 
   /**
    * Compute a pool size based on the specified configuration and size property.
-   * @param config the config to read the rpoerty from.
+   * @param config the config to read the property from.
    * @param nbThreadsProperty the property that configures the pool size.
    * @return the computed size.
    */
   static int computePoolSize(final TypedProperties config, JPPFProperty<Integer> nbThreadsProperty) {
-    int poolSize = config.get(nbThreadsProperty);
-    if (poolSize <= 0) poolSize = Runtime.getRuntime().availableProcessors();
-    return poolSize;
+    final int poolSize = config.get(nbThreadsProperty);
+    return (poolSize <= 0) ? Runtime.getRuntime().availableProcessors() : poolSize;
+  }
+
+  /**
+   * Compute a thread TTL based on the specified configuration and ttl property.
+   * @param config the config to read the property from.
+   * @param ttlProperty the property that configures the time to live of the threads.
+   * @return the computed size.
+   */
+  static long retrieveTTL(final TypedProperties config, JPPFProperty<Long> ttlProperty) {
+    final long ttl = config.get(ttlProperty);
+    return (ttl <= 0) ? Long.MAX_VALUE : ttl;
   }
 
   /**

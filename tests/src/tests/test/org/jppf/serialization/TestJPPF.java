@@ -39,7 +39,7 @@ public class TestJPPF extends AbstractTestSerialization {
     allowsNonSerializable = true;
     System.out.println("main class loader = " + TestJPPF.class.getClassLoader());
     //JPPFSerialization.Factory.reset();
-    client = BaseSetup.setup(1, 1, true, createConfig("serialization/jppf"));
+    client = BaseSetup.setup(1, 1, true, true, createConfig("serialization/jppf"));
     printOut("----- serialization class = %s -----", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
   }
 }

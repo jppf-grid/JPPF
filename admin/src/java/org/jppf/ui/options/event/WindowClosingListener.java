@@ -19,6 +19,7 @@
 package org.jppf.ui.options.event;
 
 import java.awt.event.*;
+import java.util.concurrent.*;
 
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.OptionElement;
@@ -30,19 +31,24 @@ import org.jppf.ui.options.xml.OptionsPageBuilder;
  * @author Laurent Cohen
  */
 public class WindowClosingListener extends WindowAdapter {
-  /**
-   * Process the closing of the main frame.
-   * @param event the event we're interested in.
-   */
   @Override
   public void windowClosing(final WindowEvent event) {
-    if (StatsHandler.hasInstance()) StatsHandler.getInstance().getClientHandler().close();
-    final OptionElement elt = OptionsHandler.getTopPage();
-    if (elt != null) {
-      final OptionsPageBuilder builder = new OptionsPageBuilder();
-      builder.triggerFinalEvents(elt);
+    final CountDownLatch cdl = new CountDownLatch(1);
+    new Thread(() -> {
+      if (StatsHandler.hasInstance()) StatsHandler.getInstance().getClientHandler().close();
+      final OptionElement elt = OptionsHandler.getTopPage();
+      if (elt != null) {
+        final OptionsPageBuilder builder = new OptionsPageBuilder();
+        builder.triggerFinalEvents(elt);
+      }
+      OptionsHandler.savePreferences();
+      cdl.countDown();
+    }).start();
+    try {
+      cdl.await(3000L, TimeUnit.MILLISECONDS);
+    } catch (final InterruptedException e) {
+      e.printStackTrace();
     }
-    OptionsHandler.savePreferences();
     System.exit(0);
   }
 }

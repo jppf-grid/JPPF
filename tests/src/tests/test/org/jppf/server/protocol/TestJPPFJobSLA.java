@@ -203,7 +203,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
       throw e;
     } finally {
       f.delete();
-      client = BaseSetup.createClient(null);
+      client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG);
     }
   }
 

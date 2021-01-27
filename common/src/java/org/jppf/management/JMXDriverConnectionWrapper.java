@@ -350,9 +350,10 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * <br/>Additionally, each result may be <code>null</code>, in particular if the invoked method has a <code>void</code> return type.
    * @throws Exception if the invocation failed.
    * @deprecated use {@link #getForwarder()}{@link NodeForwardingMBean#forwardInvoke(NodeSelector, String, String, Object[], String[]) .forwardInvoke(selector, name, methodName, params, signature)} instead.
+   * Thsis method always returns {@code null}.
    */
   public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
-    return getNodeForwarder().forwardInvoke(selector, name, methodName, params, signature);
+    return null;
   }
 
   /**
@@ -365,9 +366,10 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * <br/>Additionally, each result may be <code>null</code>, in particular if the invoked method has a <code>void</code> return type.
    * @throws Exception if the invocation failed.
    * @deprecated use {@link #getForwarder()}{@link NodeForwardingMBean#forwardInvoke(NodeSelector, String, String) .forwardInvoke(selector, name, methodName)} instead.
+   * Thsis method always returns {@code null}.
    */
   public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName) throws Exception {
-    return getNodeForwarder().forwardInvoke(selector, name, methodName);
+    return null;
   }
 
   /**
@@ -378,9 +380,10 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @return a mapping of node uuids to the result of getting the MBean attribute on the corresponding node. Each result may be an exception.
    * @throws Exception if the invocation failed.
    * @deprecated use {@link #getForwarder()}{@link NodeForwardingMBean#forwardGetAttribute(NodeSelector, String, String) .forwardGetAttribute(selector, name, attribute)} instead.
+   * Thsis method always returns {@code null}.
    */
   public Map<String, Object> forwardGetAttribute(final NodeSelector selector, final String name, final String attribute) throws Exception {
-    return getNodeForwarder().forwardGetAttribute(selector, name, attribute);
+    return null;
   }
 
   /**
@@ -393,9 +396,10 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * This map may be empty if no exception was raised.
    * @throws Exception if the invocation failed.
    * @deprecated use {@link #getForwarder()}{@link NodeForwardingMBean#forwardSetAttribute(NodeSelector, String, String, Object) .forwardSetAttribute(selector, name, attribute, value)} instead.
+   * Thsis method always returns {@code null}.
    */
   public Map<String, Object> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
-    return getNodeForwarder().forwardSetAttribute(selector, name, attribute, value);
+    return null;
   }
 
   /**
@@ -415,10 +419,10 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @return an instance of {@link JPPFNodeForwardingMBean}.
    * @throws Exception if a proxy could not be created for any reason.
    * @since 4.2
-   * @deprecated use {@link #getForwarder()} instead.
+   * @deprecated use {@link #getForwarder()} instead. Thsis method always returns {@code null}.
    */
   public JPPFNodeForwardingMBean getNodeForwarder() throws Exception {
-    return getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+    return null;
   }
 
   /**

@@ -54,7 +54,7 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    client = BaseSetup.setup(1);
+    client = BaseSetup.setup(1, 1, true, true, BaseSetup.DEFAULT_CONFIG);
     driverJmx = BaseSetup.getJMXConnection(client);
     final Collection<JPPFManagementInfo> coll = driverJmx.nodesInformation();
     final JPPFManagementInfo info = coll.iterator().next();

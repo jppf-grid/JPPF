@@ -41,6 +41,10 @@ public class JMXHelper {
    */
   public static final String LOCAL_PROTOCOL = "local";
   /**
+   * Whether the JMX connector is standalone, that is, not within a driver.
+   */
+  public static final String STANDALONE_CONNECTOR_KEY = "jppf.jmx.standalone.connector";
+  /**
    * The maximum number of notifications in a JMX connection queue.
    */
   public static final int DEFAULT_MAX_NOTIFICATIONS_QUEUE_SIZE = 2_000;

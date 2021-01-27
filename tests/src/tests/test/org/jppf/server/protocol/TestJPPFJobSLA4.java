@@ -52,7 +52,7 @@ public class TestJPPFJobSLA4 extends BaseTest {
   public static void setup() throws Exception {
     final TestConfiguration config = BaseSetup.createDefaultConfiguration();
     config.driver.jppf = "classes/tests/config/driver.TestJPPFJobSLA4.properties";
-    client = BaseSetup.setup(1, 2, true, config);
+    client = BaseSetup.setup(1, 2, true, true, config);
   }
 
   /**

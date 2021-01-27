@@ -46,6 +46,6 @@ public class TestRemoteJPPFClassLoader extends AbstractClassLoaderTest {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("classloader");
-    client = BaseSetup.setup(1, 1, true, config);
+    client = BaseSetup.setup(1, 1, true, true, config);
   }
 }

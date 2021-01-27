@@ -745,12 +745,14 @@ code { font-size: 10pt }
 <!-- Page HEADER -->
 <xsl:template name="pageHeader">
     <h1><xsl:value-of select="$TITLE"/></h1>
+    <!--
     <table width="100%">
     <tr>
         <td align="left"></td>
         <td align="right">Designed for use with <a href="http://www.junit.org/">JUnit</a> and <a href="http://ant.apache.org/">Ant</a>.</td>
     </tr>
     </table>
+    -->
     <hr size="1"/>
 </xsl:template>
 

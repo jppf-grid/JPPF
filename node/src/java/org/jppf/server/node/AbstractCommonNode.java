@@ -25,12 +25,14 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
+import javax.management.MBeanServer;
+
 import org.jppf.JPPFReconnectionNotification;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.execute.ThreadManager;
 import org.jppf.execute.async.AsyncExecutionManager;
 import org.jppf.management.*;
-import org.jppf.management.spi.JPPFMBeanProviderManager;
+import org.jppf.management.spi.*;
 import org.jppf.nio.*;
 import org.jppf.node.*;
 import org.jppf.node.protocol.*;
@@ -95,7 +97,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
   /**
    * The executor for serialization and deserialization of the tasks.
    */
-  final ExecutorService serializationExecutor;
+  final ThreadPoolExecutor serializationExecutor;
   /**
    * Whether this node was sdtarted from {@code NodeRunner.main()} (standalone) or not (embedded).
    */
@@ -107,7 +109,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
   /**
    * Manager for the MBean defined through the service provider interface.
    */
-  JPPFMBeanProviderManager<?> providerManager;
+  NodeMBeanProviderManager providerManager;
 
   /**
    * Initialize this node.
@@ -116,7 +118,10 @@ public abstract class AbstractCommonNode extends AbstractNode {
    */
   public AbstractCommonNode(final String uuid, final TypedProperties configuration) {
     super(uuid, configuration);
-    serializationExecutor = Executors.newFixedThreadPool(ThreadManager.computePoolSize(configuration, JPPFProperties.PROCESSING_THREADS), new JPPFThreadFactory("NodeSerializer"));
+    final int poolSize = ThreadManager.computePoolSize(configuration, JPPFProperties.PROCESSING_THREADS);
+    final long ttl = ThreadManager.retrieveTTL(configuration, JPPFProperties.PROCESSING_THREADS_TTL);
+    serializationExecutor = new ThreadPoolExecutor(poolSize, poolSize, ttl, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new JPPFThreadFactory("NodeSerializer"));
+    serializationExecutor.allowCoreThreadTimeOut(true);
   }
 
   /**
@@ -327,18 +332,46 @@ public abstract class AbstractCommonNode extends AbstractNode {
    */
   @Override
   public JMXServer getJmxServer() throws Exception {
+    return getJmxServer(true);
+  }
+
+  /**
+   * 
+   * @param register whether to register the MBeans.
+   * @return the JMX server.
+   * @throws Exception if any error occurs.
+   */
+  JMXServer getJmxServer(final boolean register) throws Exception {
     synchronized(this) {
       if ((jmxServer == null) || jmxServer.isStopped()) {
+        log.info("creating the JMX server for " + getUuid());
         if (debugEnabled) log.debug("starting JMX server");
         final boolean ssl = configuration.get(JPPFProperties.SSL_ENABLED);
         JPPFProperty<Integer> jmxProp = null;
         jmxProp = MANAGEMENT_PORT_NODE;
-        jmxServer = JMXServerFactory.createServer(configuration, uuid, ssl, jmxProp);
+        final MBeanServer mbeanServer = JPPFMBeanServerFactory.getMBeanServer();
+        if (register) registerMBeans(mbeanServer);
+        jmxServer = JMXServerFactory.createServer(configuration, uuid, ssl, jmxProp, mbeanServer);
         jmxServer.start(getClass().getClassLoader());
         System.out.println("JPPF Node management initialized on port " + jmxServer.getManagementPort());
       }
     }
     return jmxServer;
+  }
+
+  /**
+   * Register the MBeans for this node.
+   * @param mbeanServer the MBean server to use.
+   */
+  private void registerMBeans(final MBeanServer mbeanServer) {
+    try {
+      if (ManagementUtils.isManagementAvailable() && !ManagementUtils.isMBeanRegistered(JPPFNodeAdminMBean.MBEAN_NAME, mbeanServer)) {
+        final ClassLoader cl = getClass().getClassLoader();
+        if (providerManager == null) providerManager = new NodeMBeanProviderManager(JPPFNodeMBeanProvider.class, cl, mbeanServer, this);
+      }
+    } catch (final Exception e) {
+      log.error("Error registering the MBeans for node " + getUuid(), e);
+    }
   }
 
   /**
@@ -390,9 +423,14 @@ public abstract class AbstractCommonNode extends AbstractNode {
     if (stopJmx) {
       try {
         if (providerManager != null) providerManager.unregisterProviderMBeans();
-        if (jmxServer != null) jmxServer.stop();
+        if (jmxServer != null) {
+          jmxServer.stop();
+          JPPFMBeanServerFactory.releaseMBeanServer(jmxServer.getMBeanServer());
+        }
         final NioServer acceptor = NioHelper.removeServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
-        if (acceptor != null) acceptor.shutdown();
+        if (acceptor != null) {
+          if (jmxServer != null) acceptor.removeServer(jmxServer.getManagementPort());
+        }
       } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }

@@ -21,16 +21,8 @@ package test.org.jppf.management;
 import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 import static org.junit.Assert.*;
 
-import java.io.InputStream;
-import java.util.*;
-
-import org.jppf.client.JPPFJob;
-import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
-import org.jppf.node.policy.*;
-import org.jppf.node.protocol.Task;
-import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.ReflectionUtils;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.junit.Test;
 
@@ -98,20 +90,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testNodesInformation() throws Exception {
-    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    assertNotNull(driver);
-    final Collection<JPPFManagementInfo> coll = driver.nodesInformation();
-    assertNotNull(coll);
-    assertEquals(2, coll.size());
-    for (final JPPFManagementInfo info : coll) {
-      assertNotNull(info.getHost());
-      assertTrue(info.getPort() > 0);
-      assertFalse(info.isSecure());
-      assertTrue(info.isNode());
-      assertFalse(info.isDriver());
-      assertFalse(info.isPeer());
-      assertNotNull(info.getUuid());
-    }
+    CommonDriverAdminTests.testNodesInformation(client, BaseSetup.nbNodes());
   }
 
   /**
@@ -120,20 +99,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testIdleNodesInformation() throws Exception {
-    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    assertNotNull(driver);
-    Thread.sleep(500L);
-    Collection<JPPFManagementInfo> coll = driver.idleNodesInformation();
-    assertNotNull(coll);
-    assertEquals(2, coll.size());
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, 2000L);
-    client.submitAsync(job);
-    Thread.sleep(500L);
-    coll = driver.idleNodesInformation();
-    assertEquals(1, coll.size());
-    job.awaitResults();
-    while (driver.nbIdleNodes() < 2)
-      Thread.sleep(100L);
+    CommonDriverAdminTests.testIdleNodesInformation(client, BaseSetup.nbNodes());
   }
 
   /**
@@ -142,10 +108,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testNbNodes() throws Exception {
-    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    assertNotNull(driver);
-    final int n = driver.nbNodes();
-    assertEquals(2, n);
+    CommonDriverAdminTests.testNbNodes(client, BaseSetup.nbNodes());
   }
 
   /**
@@ -154,20 +117,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testNbIdleNodes() throws Exception {
-    final int nbNodes = 2;
-    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    assertNotNull(driver);
-    Thread.sleep(500L);
-    int n = driver.nbIdleNodes();
-    assertEquals(nbNodes, n);
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, 1, LifeCycleTask.class, 2000L);
-    client.submitAsync(job);
-    Thread.sleep(1000L);
-    n = driver.nbIdleNodes();
-    assertEquals(nbNodes - 1, n);
-    job.awaitResults();
-    while (driver.nbIdleNodes() < 2)
-      Thread.sleep(100L);
+    CommonDriverAdminTests.testNbIdleNodes(client, BaseSetup.nbNodes());
   }
 
   /**
@@ -176,30 +126,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testGetLoadBalancerInformation() throws Exception {
-    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    assertNotNull(driver);
-    final InputStream is = getClass().getClassLoader().getResourceAsStream("config/driver.template.properties");
-    assertNotNull(is);
-    final TypedProperties driverConfig = new TypedProperties();
-    driverConfig.load(is);
-    final LoadBalancingInformation lbi = driver.loadBalancerInformation();
-    assertTrue(lbi.getAlgorithmNames().contains(driverConfig.get(JPPFProperties.LOAD_BALANCING_ALGORITHM)));
-    assertEquals(driverConfig.get(JPPFProperties.LOAD_BALANCING_ALGORITHM), lbi.getAlgorithm());
-    final TypedProperties params = lbi.getParameters();
-    assertNotNull(params);
-    final String profile = driverConfig.get(JPPFProperties.LOAD_BALANCING_PROFILE);
-    final String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + "." + profile + '.';
-    for (final Map.Entry<Object, Object> entry : driverConfig.entrySet()) {
-      if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;
-      final String name = (String) entry.getKey();
-      if (!name.startsWith(prefix)) continue;
-      final String key = name.substring(prefix.length());
-      final String value = (String) entry.getValue();
-      assertTrue("information does not contain '" + key + '\'', params.containsKey(key));
-      final String infoValue = params.getString(key);
-      assertNotNull(infoValue);
-      assertEquals("value of '" + key + "' should be '" + value + "' but is '" + infoValue + "'", value, infoValue);
-    }
+    CommonDriverAdminTests.testGetLoadBalancerInformation(client);
   }
 
   /**
@@ -208,35 +135,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testSetLoadBalancerInformation() throws Exception {
-    LoadBalancingInformation oldLbi = null;
-    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    try {
-      assertNotNull(driver);
-      oldLbi = driver.loadBalancerInformation();
-      final TypedProperties newConfig = new TypedProperties();
-      newConfig.setInt("size", 5)
-        .setInt("minSamplesToAnalyse", 100)
-        .setInt("minSamplesToCheckConvergence", 50)
-        .setDouble("maxDeviation", 0.2d)
-        .setInt("maxGuessToStable", 50)
-        .setDouble("decreaseRatio", 0.2d);
-      driver.changeLoadBalancerSettings("autotuned", newConfig);
-      final LoadBalancingInformation lbi = driver.loadBalancerInformation();
-      assertEquals(lbi.getAlgorithm(), "autotuned");
-      final TypedProperties params = lbi.getParameters();
-      assertNotNull(params);
-      for (final Map.Entry<Object, Object> entry : newConfig.entrySet()) {
-        if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;
-        final String name = (String) entry.getKey();
-        final String value = (String) entry.getValue();
-        assertTrue("information does not contain '" + name + '\'', params.containsKey(name));
-        final String infoValue = params.getString(name);
-        assertNotNull(infoValue);
-        assertEquals("value of '" + name + "' should be '" + value + "' but is '" + infoValue + "'", value, infoValue);
-      }
-    } finally {
-      if (oldLbi != null) driver.changeLoadBalancerSettings(oldLbi.getAlgorithm(), oldLbi.getParameters());
-    }
+    CommonDriverAdminTests.testSetLoadBalancerInformation(client);
   }
 
   /**
@@ -245,12 +144,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testNodesMatchingExecutionPolicy() throws Exception {
-    final int nbNodes = 2;
-    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    int n = driver.nbNodes(new ExecutionPolicySelector(new Contains("jppf.node.uuid", false, "n")));
-    assertEquals(nbNodes, n);
-    n = driver.nbNodes(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")));
-    assertEquals(1, n);
+    CommonDriverAdminTests.testNodesMatchingExecutionPolicy(client, BaseSetup.nbNodes());
   }
 
   /**
@@ -259,41 +153,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testToggleActiveState() throws Exception {
-    final int nbTasks = 10;
-    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    final String[] nodeUuids = new String[2];
-    assertNotNull(driver);
-    try {
-      final Collection<JPPFManagementInfo> nodesList = driver.nodesInformation();
-      assertEquals(2, nodesList.size());
-      int i = 0;
-      for (final JPPFManagementInfo info : nodesList) nodeUuids[i++] = info.getUuid();
-      // recheck that the job is executed on all nodes
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-1", false, nbTasks, LifeCycleTask.class, 0L);
-      final Set<String> executedOnUuids = new HashSet<>();
-      List<Task<?>> results = client.submit(job);
-      for (final Task<?> t : results) {
-        final LifeCycleTask task = (LifeCycleTask) t;
-        if (!executedOnUuids.contains(task.getNodeUuid())) executedOnUuids.add(task.getNodeUuid());
-      }
-      assertEquals(2, executedOnUuids.size());
-      for (String uuid: nodeUuids) assertTrue(executedOnUuids.contains(uuid));
-      // deactivate one node and make sure the job is only executed on the other node
-      executedOnUuids.clear();
-      final NodeSelector selector = new UuidSelector(nodeUuids[1]);
-      driver.toggleActiveState(selector);
-      job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-2", false, nbTasks, LifeCycleTask.class, 0L);
-      results = client.submit(job);
-      for (final Task<?> t : results) {
-        final LifeCycleTask task = (LifeCycleTask) t;
-        if (!executedOnUuids.contains(task.getNodeUuid())) executedOnUuids.add(task.getNodeUuid());
-      }
-      assertTrue(executedOnUuids.contains(nodeUuids[0]));
-      assertFalse(executedOnUuids.contains(nodeUuids[1]));
-      assertEquals(1, executedOnUuids.size());
-    } finally {
-      driver.setActiveState(null, true);
-    }
+    CommonDriverAdminTests.testToggleActiveState(client, BaseSetup.nbNodes());
   }
 
   /**
@@ -302,76 +162,6 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testGetAndSetActiveState() throws Exception {
-    final int nbTasks = 10;
-    print(false, false, ">>> checking driver JMX connection");
-    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    String[] nodeUuids = null;
-    assertNotNull(driver);
-    try {
-      print(false, false, ">>> checking number of nodes = 2");
-      final Set<String> executedOnUuids = new HashSet<>();
-      final Collection<JPPFManagementInfo> nodesList = driver.nodesInformation();
-      assertEquals(2, nodesList.size());
-      nodeUuids = new String[nodesList.size()];
-      int i = 0;
-      for (final JPPFManagementInfo info : nodesList) nodeUuids[i++] = info.getUuid();
-      // deactivate one node and make sure the job is only executed on the other node
-      final NodeSelector selector = new UuidSelector(nodeUuids[0]);
-      print(false, false, ">>> setting active state of node %s to false", nodeUuids[0]);
-      driver.setActiveState(selector, false);
-      waitForNodeInState(driver, nodeUuids[0], false);
-      final Map<String, Boolean> map = driver.getActiveState(null);
-      assertEquals(nodeUuids.length, map.size());
-      assertTrue(map.containsKey(nodeUuids[0]));
-      assertFalse(map.get(nodeUuids[0]));
-      assertTrue(map.containsKey(nodeUuids[1]));
-      assertTrue(map.get(nodeUuids[1]));
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-1", false, nbTasks, LifeCycleTask.class, 0L);
-      print(false, false, ">>> executing job %s", job.getName());
-      List<Task<?>> results = client.submit(job);
-      print(false, false, ">>> checking results for job %s", job.getName());
-      for (final Task<?> t : results) {
-        final LifeCycleTask task = (LifeCycleTask) t;
-        if (!executedOnUuids.contains(task.getNodeUuid())) executedOnUuids.add(task.getNodeUuid());
-      }
-      print(false, false, ">>> executedOnUuids = %s", executedOnUuids);
-      assertTrue(executedOnUuids.contains(nodeUuids[1]));
-      assertFalse(executedOnUuids.contains(nodeUuids[0]));
-      assertEquals(1, executedOnUuids.size());
-      // re-activate the node and check that the job is executed on all nodes
-      executedOnUuids.clear();
-      print(false, false, ">>> setting active state of node %s to true", nodeUuids[0]);
-      driver.setActiveState(selector, true);
-      waitForNodeInState(driver, nodeUuids[0], true);
-      job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-2", false, nbTasks, LifeCycleTask.class, 0L);
-      print(false, false, ">>> executing job %s", job.getName());
-      results = client.submit(job);
-      print(false, false, ">>> checking results for job %s", job.getName());
-      for (final Task<?> t : results) {
-        final LifeCycleTask task = (LifeCycleTask) t;
-        if (!executedOnUuids.contains(task.getNodeUuid())) executedOnUuids.add(task.getNodeUuid());
-      }
-      assertEquals(nodeUuids.length, executedOnUuids.size());
-      for (String uuid: nodeUuids) assertTrue(executedOnUuids.contains(uuid));
-    } finally {
-       driver.setActiveState(null, true);
-    }
-  }
-
-  /**
-   * 
-   * @param driver .
-   * @param nodeUuid .
-   * @param active .
-   * @throws Exception .
-   */
-  private static void waitForNodeInState(final JMXDriverConnectionWrapper driver, final String nodeUuid, final boolean active) throws Exception {
-    final NodeSelector selector = new UuidSelector(nodeUuid);
-    while (true) {
-      final Map<String, Boolean> map = driver.getActiveState(selector);
-      final Boolean result = map.get(nodeUuid);
-      if ((result != null) && (result.booleanValue() == active)) break;
-      Thread.sleep(100L);
-    }
+    CommonDriverAdminTests.testGetAndSetActiveState(client, BaseSetup.nbNodes());
   }
 }

@@ -270,7 +270,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       jmx.restartShutdown(250L, 1L);
     }
     Thread.sleep(500L);
-    client = BaseSetup.createClient(null);
+    client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG);
     try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {
       print(false, false, "got 2nd jmx connection");
       final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);

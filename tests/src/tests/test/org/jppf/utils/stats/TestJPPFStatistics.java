@@ -123,7 +123,7 @@ public class TestJPPFStatistics extends Setup1D1N1C {
       client.close();
     } finally {
       print(false, false, "restarting client");
-      client = BaseSetup.createClient(null);
+      client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG);
     }
     print(false, false, "getting jmx connection (2)");
     jmx = BaseSetup.getJMXConnection();
@@ -156,7 +156,7 @@ public class TestJPPFStatistics extends Setup1D1N1C {
       client.close();
     } finally {
       print(false, false, "restarting client");
-      client = BaseSetup.createClient(null);
+      client = BaseSetup.createClient(null, true, BaseSetup.DEFAULT_CONFIG);
     }
     print(false, false, "getting jmx connection (2)");
     final long elapsed = (System.nanoTime() - start) / 1_000_000L;

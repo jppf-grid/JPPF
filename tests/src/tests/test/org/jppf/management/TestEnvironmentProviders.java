@@ -51,7 +51,6 @@ public class TestEnvironmentProviders extends BaseTest {
     try {
       TestClientEnvironmentProvider.active = true;
       JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port).set(JPPFProperties.JMX_REMOTE_PROTOCOL, JMXHelper.JPPF_JMX_PROTOCOL);
-      //server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server = JMXServerFactory.createServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       client = new JMXConnectionWrapper("localhost", port, false);
@@ -93,7 +92,7 @@ public class TestEnvironmentProviders extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testServerProvider() throws Exception {
-    final int port = 4444;
+    final int port = 4445;
     JMXServer server = null;
     JMXConnectionWrapper client = null;
     try {

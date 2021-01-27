@@ -18,12 +18,13 @@
 
 package org.jppf.management;
 
-import java.lang.management.ManagementFactory;
 import java.util.*;
+
+import javax.management.MBeanServer;
 
 import org.jppf.jmx.*;
 import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
@@ -45,6 +46,10 @@ public class JPPFJMXServer extends AbstractJMXServer {
    * An ordered set of configuration properties to use for looking up the desired management port.
    */
   private final JPPFProperty<Integer> portProperty;
+  /**
+   * Environment properties to pass to the JMX connector server.
+   */
+  private final Map<String, Object> mandatoryEnv;
 
   /**
    * Initialize this JMX server with the specified uuid.
@@ -52,31 +57,30 @@ public class JPPFJMXServer extends AbstractJMXServer {
    * @param id the unique id of the driver or node holding this jmx server.
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
-   * @exclude
+   * @param mbeanServer the mbean server to use.
+   * @param mandatoryEnv environment properties to pass to the JMX connector server.
    */
-  public JPPFJMXServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
-    super(config);
+  public JPPFJMXServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty, final MBeanServer mbeanServer, final Map<String, Object> mandatoryEnv) {
+    super(config, mbeanServer);
     this.uuid = id;
     this.ssl = ssl;
     if (portProperty == null) this.portProperty = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_PORT;
     else this.portProperty = portProperty;
-    if (debugEnabled) log.debug("initializing with ssl={}, portProperty={}", ssl, this.portProperty);
+    this.mandatoryEnv = mandatoryEnv;
+    if (debugEnabled) log.debug("initializing with ssl={}, portProperty={}, mandatoryEnv={}", ssl, this.portProperty, mandatoryEnv);
   }
 
-  /**
-   * @exclude
-   */
   @Override
   public void start(final ClassLoader cl) throws Exception {
-    if (debugEnabled) log.debug("starting remote connector server");
+    if (debugEnabled) log.debug("starting remote connector server with " + JPPFMBeanServerFactory.toString(mbeanServer));
     final ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     lock.lock();
     try {
       Thread.currentThread().setContextClassLoader(cl);
-      mbeanServer = ManagementFactory.getPlatformMBeanServer();
       managementPort = config.get(portProperty);
       if (debugEnabled) log.debug("managementPort={}, portProperties={}", managementPort, Arrays.asList(portProperty));
       final Map<String, Object> env = new HashMap<>();
+      if (mandatoryEnv != null) env.putAll(mandatoryEnv);
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       if (ssl) SSLHelper.configureJMXProperties(JMXHelper.JPPF_JMX_PROTOCOL, env);
