@@ -21,10 +21,12 @@ package org.jppf.jmxremote;
 import java.io.*;
 import java.net.BindException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.MBeanServer;
 import javax.management.remote.*;
 
+import org.jppf.jmx.JMXHelper;
 import org.jppf.jmxremote.nio.*;
 import org.jppf.nio.NioHelper;
 import org.jppf.utils.ExceptionUtils;
@@ -68,6 +70,14 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
    * An optional mbean server forwarder that can be set onto this connector.
    */
   private MBeanServerForwarder forwarder;
+  /**
+   * 
+   */
+  private final boolean standalone;
+  /**
+   * 
+   */
+  private static final AtomicInteger instanceCount = new AtomicInteger(0);
 
   /**
    * Initalize this connector server with the specified  service URL, environemnt and MBean server.
@@ -79,7 +89,13 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
     super(mbeanServer);
     if (environment != null) this.environment.putAll(environment);
     this.environment.put(CONNECTOR_SERVER_KEY, this);
+    if (!this.environment.containsKey(JMXHelper.STANDALONE_CONNECTOR_KEY)) standalone = true;
+    else {
+      final Object o = this.environment.get(JMXHelper.STANDALONE_CONNECTOR_KEY);
+      standalone = (o instanceof Boolean) ? (Boolean) o : true;
+    }
     this.address = serviceURL;
+    if (debugEnabled) log.debug("created {}standalone server @{}, instance #{}", standalone ? "" : "non-", serviceURL, instanceCount.incrementAndGet());
   }
 
   @Override
@@ -89,7 +105,9 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
       final int port = address.getPort();
       final Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
       final boolean secure = (tls == null) ? false : tls;
-      if (!NioHelper.getAcceptorServer().addServer(port, secure, environment, false)) throw new BindException("port " + port + "already in use");
+      if (!NioHelper.getAcceptorServer().addServer(port, secure, environment, false)) {
+        if (standalone) throw new BindException("port " + port + " already in use");
+      }
       if (debugEnabled) log.debug("server @{} added listener port {}", address, port);
       for (final JMXNioServer server: JMXNioServerPool.getServers()) server.addConnectionStatusListener(this);
       started = true;
@@ -103,6 +121,7 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
 
   @Override
   public void stop() throws IOException {
+    if (debugEnabled) log.debug("stopping server at {}", address);
     try {
       if (!started) return;
       started = false;
@@ -113,6 +132,8 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
       } finally {
         for (final JMXNioServer server: JMXNioServerPool.getServers()) server.removeConnectionStatusListener(this);
       }
+      if (debugEnabled) log.debug("stopping acceptor for port {}", address.getPort());
+      if (standalone) NioHelper.getAcceptorServer().removeServer(address.getPort());
     } catch (final IOException e) {
       throw e;
     } catch (final Exception e) {

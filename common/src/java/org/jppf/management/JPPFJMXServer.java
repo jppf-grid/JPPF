@@ -46,6 +46,10 @@ public class JPPFJMXServer extends AbstractJMXServer {
    * An ordered set of configuration properties to use for looking up the desired management port.
    */
   private final JPPFProperty<Integer> portProperty;
+  /**
+   * Environment properties to pass to the JMX connector server.
+   */
+  private final Map<String, Object> mandatoryEnv;
 
   /**
    * Initialize this JMX server with the specified uuid.
@@ -54,14 +58,16 @@ public class JPPFJMXServer extends AbstractJMXServer {
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
    * @param mbeanServer the mbean server to use.
+   * @param mandatoryEnv environment properties to pass to the JMX connector server.
    */
-  public JPPFJMXServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty, final MBeanServer mbeanServer) {
+  public JPPFJMXServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty, final MBeanServer mbeanServer, final Map<String, Object> mandatoryEnv) {
     super(config, mbeanServer);
     this.uuid = id;
     this.ssl = ssl;
     if (portProperty == null) this.portProperty = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_PORT;
     else this.portProperty = portProperty;
-    if (debugEnabled) log.debug("initializing with ssl={}, portProperty={}", ssl, this.portProperty);
+    this.mandatoryEnv = mandatoryEnv;
+    if (debugEnabled) log.debug("initializing with ssl={}, portProperty={}, mandatoryEnv={}", ssl, this.portProperty, mandatoryEnv);
   }
 
   @Override
@@ -74,6 +80,7 @@ public class JPPFJMXServer extends AbstractJMXServer {
       managementPort = config.get(portProperty);
       if (debugEnabled) log.debug("managementPort={}, portProperties={}", managementPort, Arrays.asList(portProperty));
       final Map<String, Object> env = new HashMap<>();
+      if (mandatoryEnv != null) env.putAll(mandatoryEnv);
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       if (ssl) SSLHelper.configureJMXProperties(JMXHelper.JPPF_JMX_PROTOCOL, env);
