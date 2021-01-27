@@ -357,6 +357,7 @@
     <h1>
       <xsl:value-of select="$TITLE"/>
     </h1>
+    <!--
     <table width="100%">
       <tr>
         <td align="left"></td>
@@ -369,6 +370,7 @@
         </td>
       </tr>
     </table>
+    -->
     <hr size="1"/>
   </xsl:template>
 
