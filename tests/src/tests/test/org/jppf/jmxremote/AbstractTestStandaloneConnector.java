@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.management.ManagementFactory;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.*;
 import javax.management.remote.*;
@@ -56,7 +57,28 @@ public abstract class AbstractTestStandaloneConnector extends BaseTest {
   /**
    * The clientr-side JMX connector.
    */
-  JMXConnector clientConnector; 
+  JMXConnector clientConnector;
+  /**
+   * 
+   */
+  private static final String[] DEBUG_LOGGERS = { "org.jppf.jmxremote", "org.jppf.nio" };
+  /**
+   * 
+   */
+  private static final String[] INFO_LOGGERS = { "org.jppf.nio.PlainNioObject", "org.jppf.serialization" };
+  /**
+   * 
+   */
+  final static AtomicInteger portCounter = new AtomicInteger(12000);
+
+  /**
+   * Performs cleanup after each test.
+   * @throws Exception if any error occurs.
+   */
+  @Before
+  public void baseBeforeInstance() throws Exception {
+    url = new JMXServiceURL("service:jmx:jppf://localhost:" + portCounter.incrementAndGet());
+  }
 
   /**
    * Performs cleanup after each test.
@@ -80,10 +102,8 @@ public abstract class AbstractTestStandaloneConnector extends BaseTest {
    */
   @BeforeClass
   public static void beforeClass() throws Exception {
-    BaseSetup.setup(0, 0, false, true, BaseSetup.DEFAULT_CONFIG);
-    ConfigurationHelper.setLoggerLevel(org.apache.log4j.Level.DEBUG, "org.jppf.jmxremote", "org.jppf.nio");
-    ConfigurationHelper.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.nio.PlainNioObject", "org.jppf.serialization");
-    url = new JMXServiceURL("service:jmx:jppf://localhost:12001");
+    ConfigurationHelper.setLoggerLevel(org.apache.log4j.Level.DEBUG, DEBUG_LOGGERS);
+    ConfigurationHelper.setLoggerLevel(org.apache.log4j.Level.INFO, INFO_LOGGERS);
     connectorTestName = ObjectNameCache.getObjectName(ConnectorTestMBean.MBEAN_NAME);
     registerMBeans();
   }
@@ -94,7 +114,6 @@ public abstract class AbstractTestStandaloneConnector extends BaseTest {
   @AfterClass
   public static void afterClass() throws Exception {
     ConfigurationHelper.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.jmxremote", "org.jppf.nio");
-    BaseSetup.cleanup();
   }
 
   /**

@@ -27,6 +27,8 @@ import javax.management.remote.*;
 
 import org.jppf.jmxremote.JPPFJMXConnectorServer;
 import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
 
 /**
@@ -44,7 +46,7 @@ public class TestStandaloneConnectorAuth extends AbstractTestStandaloneConnector
     final Map<String, Object> env = new HashMap<>();
     env.put(JMXConnectorServer.AUTHENTICATOR, new MyAuthenticator());
     env.put(JPPFJMXConnectorServer.AUTHORIZATION_CHECKER, MyAuthChecker.class);
-    server = createConnectorServer(env);
+    assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> (server = createConnectorServer(env)) != null, 5000L, 250L, true));
     registerMBeans();
   }
 
