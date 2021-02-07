@@ -35,6 +35,7 @@ import org.jppf.server.nio.classloader.node.*;
 import org.jppf.server.nio.client.AsyncClientNioServer;
 import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
 import org.jppf.server.nio.nodeserver.async.*;
+import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
@@ -109,7 +110,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
 
     startServer(acceptorServer);
 
-    if (configuration.get(JPPFProperties.LOCAL_NODE_ENABLED)) initLocalNode();
+    if (configuration.get(JPPFProperties.LOCAL_NODE_ENABLED)) initLocalNodes();
     initializer.initBroadcaster();
     initializer.initPeers();
     taskQueue.getPersistenceHandler().loadPersistedJobs();
@@ -269,6 +270,11 @@ public class JPPFDriver extends AbstractJPPFDriver {
    */
   void shutdownNow() {
     log.info("Shutting down JPPF driver");
+    if (!localNodes.isEmpty()) {
+      if (debugEnabled) log.debug("Shutting down local nodes");
+      for (JPPFNode node: localNodes) node.shutdown(false);
+      localNodes.clear();
+    }
     if (debugEnabled) log.debug("closing acceptor");
     if (acceptorServer != null) acceptorServer.shutdown();
     if (debugEnabled) log.debug("closing node heartbeat server");
@@ -300,12 +306,28 @@ public class JPPFDriver extends AbstractJPPFDriver {
    * Initialize the local node.
    * @throws Exception if any error occurs.
    */
+  private void initLocalNodes() throws Exception {
+    int nbNodes = configuration.get(JPPFProperties.LOCAL_NODES);
+    if (nbNodes < 0) nbNodes = 0;
+    if (debugEnabled) log.debug("starting {} local nodes", nbNodes);
+    if (nbNodes > 0) {
+      for (int i=0; i<nbNodes; i++) initLocalNode();
+    }
+  }
+
+  /**
+   * Initialize the local node.
+   * @throws Exception if any error occurs.
+   */
   private void initLocalNode() throws Exception {
     AbstractClassLoaderConnection<?> classLoaderConnection = null;
-    final String uuid = configuration.getString("jppf.node.uuid", JPPFUuid.normalUUID());
-    final TypedProperties configuration = new TypedProperties(this.configuration);
-    final boolean secure = configuration.get(JPPFProperties.SSL_ENABLED);
-    configuration.set(JPPFProperties.MANAGEMENT_PORT_NODE, configuration.get(secure ? JPPFProperties.SERVER_SSL_PORT : JPPFProperties.SERVER_PORT));
+    final TypedProperties nodeConfig = new TypedProperties(configuration);
+    final int n = localNodes.size() + 1;
+    String uuid = nodeConfig.getString("jppf.node.uuid", null);
+    if (uuid == null) uuid = JPPFUuid.normalUUID();
+    else uuid += "-" + n;
+    final boolean secure = nodeConfig.get(JPPFProperties.SSL_ENABLED);
+    nodeConfig.set(JPPFProperties.MANAGEMENT_PORT_NODE, nodeConfig.get(secure ? JPPFProperties.SERVER_SSL_PORT : JPPFProperties.SERVER_PORT));
     final AsyncNodeClassContext context = new AsyncNodeClassContext(asyncNodeClassServer, null);
     context.setLocal(true);
     classLoaderConnection = new AsyncLocalClassLoaderConnection(uuid, context);
@@ -313,8 +335,9 @@ public class JPPFDriver extends AbstractJPPFDriver {
 
     final AsyncNodeContext ctx = new AsyncNodeContext(asyncNodeNioServer, null, true);
     ctx.setNodeInfo(getSystemInformation(), false);
-    localNode = new JPPFLocalNode(configuration, new AsyncLocalNodeConnection(ctx), classLoaderConnection);
-    ThreadUtils.startDaemonThread(localNode, "Local node");
+    final JPPFNode localNode = new JPPFLocalNode(configuration, new AsyncLocalNodeConnection(ctx), classLoaderConnection);
+    localNodes.add(localNode);
+    ThreadUtils.startDaemonThread(localNode, "Local node " + n);
     asyncNodeNioServer.getMessageHandler().sendHandshakeBundle(ctx, asyncNodeNioServer.getHandshakeBundle());
     getStatistics().addValue(JPPFStatisticsHelper.NODES, 1);
   }

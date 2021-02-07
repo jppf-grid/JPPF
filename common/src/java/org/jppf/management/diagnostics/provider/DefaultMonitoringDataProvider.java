@@ -115,7 +115,7 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
 
   @Override
   public void init() {
-    oshi = new Oshi().init();
+    oshi = Oshi.instance.init();
     if (debugEnabled) log.debug("Starting CPU time collector thread");
     cpuTimeCollector = CPUTimeCollector.getInstance();
   }

@@ -33,7 +33,7 @@ import oshi.software.os.*;
  * <a href="https://github.com/oshi/oshi">Oshi</a> API.
  * @author Laurent Cohen
  */
-public class Oshi {
+public final class Oshi {
   /**
    * Entry point to Oshi API.
    */
@@ -78,11 +78,27 @@ public class Oshi {
    * 
    */
   boolean swapMonitoringEnabled = true;
+  /**
+   * Singleton instance.
+   */
+  static final Oshi instance = new Oshi();
+  /**
+   * Whether initialization was done;
+   */
+  private boolean initialized;
+  /**
+   * The last computed values.
+   */
+  private TypedProperties lastValues = new TypedProperties();
+  /**
+   * The tiem at which the last values were computed.
+   */
+  private long lastTimestamp;
 
   /**
    * 
    */
-  public Oshi() {
+  private Oshi() {
   }
 
 
@@ -90,50 +106,57 @@ public class Oshi {
    * Initialize the Oshi API.
    * @return this object, for method call chaining.
    */
-  Oshi init() {
-    swapMonitoringEnabled = SystemUtils.getSystemProperties().getBoolean("jppf.monitoring.data.swap.enabled", true);
-    final SystemInfo si = getSystemInfo();
-    this.currentPlatform = si.getCurrentPlatformEnum();
-    hal = si.getHardware();
-    os = si.getOperatingSystem();
-    sensors = hal.getSensors();
-    memory = hal.getMemory();
-    process = os.getProcess(os.getProcessId());
-    processor = hal.getProcessor();
-    osName = os.getFamily() + " " + os.getVersion().getVersion();
+  synchronized Oshi init() {
+    if (!initialized) {
+      initialized = true;
+      swapMonitoringEnabled = SystemUtils.getSystemProperties().getBoolean("jppf.monitoring.data.swap.enabled", true);
+      final SystemInfo si = getSystemInfo();
+      this.currentPlatform = si.getCurrentPlatformEnum();
+      hal = si.getHardware();
+      os = si.getOperatingSystem();
+      sensors = hal.getSensors();
+      memory = hal.getMemory();
+      process = os.getProcess(os.getProcessId());
+      processor = hal.getProcessor();
+      osName = os.getFamily() + " " + os.getVersion().getVersion();
+    }
     return this;
   }
 
   /**
    * @return the values.
    */
-  TypedProperties getValues() {
-    final TypedProperties props = new TypedProperties();
-    props.setString(OS_NAME, osName);
-    double temp = -1d;
-    if (temperatureAvailable.get()) {
-      temp = sensors.getCpuTemperature();
-      if (temp <= 0d) {
-        temperatureAvailable.set(false);
-        temp = -1d;
+  synchronized TypedProperties getValues() {
+    final long currentTime = System.currentTimeMillis();
+    if ((lastTimestamp <= 0L) || (currentTime - lastTimestamp > 1000L)) {
+      lastTimestamp = currentTime;
+      lastValues = new TypedProperties();
+      lastValues.setString(OS_NAME, osName);
+      double temp = -1d;
+      if (temperatureAvailable.get()) {
+        temp = sensors.getCpuTemperature();
+        if (temp <= 0d) {
+          temperatureAvailable.set(false);
+          temp = -1d;
+        }
       }
+      lastValues.setDouble(CPU_TEMPERATURE, temp);
+      final double total = memory.getTotal();
+      final double available = memory.getAvailable();
+      lastValues.setDouble(RAM_USAGE_MB, (total - available) / MB);
+      lastValues.setDouble(RAM_USAGE_RATIO, 100d * (total - available) / total);
+      if (swapMonitoringEnabled) {
+        // swap info retieval is the one that consumes the most cpu.
+        final double swapTotal = memory.getSwapTotal();
+        final double swapUsed = memory.getSwapUsed();
+        lastValues.setDouble(SWAP_USAGE_MB, swapUsed / MB);
+        lastValues.setDouble(SWAP_USAGE_RATIO, 100d * swapUsed / swapTotal);
+      }
+      lastValues.setDouble(PROCESS_RESIDENT_SET_SIZE, (double) process.getResidentSetSize() / MB);
+      lastValues.setDouble(PROCESS_VIRTUAL_SIZE, (double) process.getVirtualSize() / MB);
+      lastValues.setDouble(SYSTEM_CPU_LOAD, 100d * processor.getSystemCpuLoadBetweenTicks());
     }
-    props.setDouble(CPU_TEMPERATURE, temp);
-    final double total = memory.getTotal();
-    final double available = memory.getAvailable();
-    props.setDouble(RAM_USAGE_MB, (total - available) / MB);
-    props.setDouble(RAM_USAGE_RATIO, 100d * (total - available) / total);
-    if (swapMonitoringEnabled) {
-      // swap info retieval is the one that consumes the most cpu.
-      final double swapTotal = memory.getSwapTotal();
-      final double swapUsed = memory.getSwapUsed();
-      props.setDouble(SWAP_USAGE_MB, swapUsed / MB);
-      props.setDouble(SWAP_USAGE_RATIO, 100d * swapUsed / swapTotal);
-    }
-    props.setDouble(PROCESS_RESIDENT_SET_SIZE, (double) process.getResidentSetSize() / MB);
-    props.setDouble(PROCESS_VIRTUAL_SIZE, (double) process.getVirtualSize() / MB);
-    props.setDouble(SYSTEM_CPU_LOAD, 100d * processor.getSystemCpuLoadBetweenTicks());
-    return props;
+    return lastValues;
   }
 
   /**
