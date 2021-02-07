@@ -90,7 +90,7 @@ class JVMHealthRefreshHandler extends AbstractRefreshHandler {
         if (node == null) continue;
         if (entry.getValue().isException()) {
           node.setStatus(TopologyNodeStatus.DOWN);
-          if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage(entry.getValue().exception()));
+          if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getStackTrace(entry.getValue().exception()));
         } else if (entry.getValue().result() != null) {
           final HealthSnapshot health = entry.getValue().result();
           if (!health.equals(node.getHealthSnapshot())) {
