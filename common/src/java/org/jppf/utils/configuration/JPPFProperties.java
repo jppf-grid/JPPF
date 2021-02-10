@@ -144,7 +144,9 @@ public class JPPFProperties {
   /** Priority assigned to the client local executor. */
   public static final JPPFProperty<Integer> LOCAL_EXECUTION_PRIORITY = new IntProperty("jppf.local.execution.priority", 0);
   /** Whether to enable a node to run in the same JVM as the driver. */
-  public static final JPPFProperty<Boolean> LOCAL_NODE_ENABLED = new BooleanProperty("jppf.local.node.enabled", false);
+  public static final JPPFProperty<Boolean> LOCAL_NODE_ENABLED = new BooleanProperty("jppf.local.node.enabled", true).setDeprecated(true);
+  /** Whether to enable a node to run in the same JVM as the driver. */
+  public static final JPPFProperty<Integer> LOCAL_NODES = new IntProperty("jppf.local.nodes", 0);
   /** Number of processing threads in the node. */
   public static final JPPFProperty<Integer> PROCESSING_THREADS = new IntProperty("jppf.processing.threads", Runtime.getRuntime().availableProcessors(), "processing.threads");
   /** Number of processing threads in the node. */

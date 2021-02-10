@@ -51,7 +51,8 @@ public class NodeRenderer extends AbstractTreeCellRenderer {
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = getBackgroundSelectionColor();
         Color foreground = sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND;
-        final Font f = getFont();
+        Font f = getFont();
+        if (f == null) f = tree.getFont();
         Font font = getPlainFont(f);
         if (data.isDriver()) {
           final TopologyDriver driver = (TopologyDriver) data;

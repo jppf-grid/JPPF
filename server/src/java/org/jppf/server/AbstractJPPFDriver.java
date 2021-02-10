@@ -71,7 +71,7 @@ abstract class AbstractJPPFDriver {
   /**
    * Reference to the local node if it is enabled.
    */
-  JPPFNode localNode;
+  final List<JPPFNode> localNodes = new ArrayList<>();
   /**
    * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by multiple threads.
    */
