@@ -93,7 +93,7 @@
   <!-- Compile                                                                   -->
   <!-- ========================================================================= -->
 
-  <target name="compile" depends="clean, init, compile.1, compile.2"/>
+  <target name="compile" depends="clean, init, compile.2, compile.1"/>
 
   <target name="compile.1">
     <javac srcdir="" destdir="${classes.dir}" source="1.8" target="1.8"
@@ -134,7 +134,7 @@
   <target name="jar.1" depends="compile.1">
     <delete file="${basedir}/dynamicLibs/ClientLib1.jar" quiet="true"/>
     <jar jarfile="${basedir}/dynamicLibs/ClientLib1.jar" index="true">
-      <fileset dir="${classes1.dir}" includes="**/extendedclassloading/clientlib1/*.*"/>
+      <fileset dir="${classes.dir}" includes="**/extendedclassloading/clientlib1/*.*"/>
     </jar>
     <echo message="*** The file dynamicLibs/ClientLib1.jar is now deployed ***"/>
   </target>
