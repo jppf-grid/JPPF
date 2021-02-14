@@ -94,21 +94,17 @@ public class TestConcurrentFilePersistence extends BaseTest {
    */
   @Test
   public void testConcurrentDeletion() throws Exception {
-    final BaseThread[] threads = new BaseThread[2 * nbThreads];
+    final BaseThread[] deleteThreads = new BaseThread[nbThreads];
     final List<PersistenceInfo> list = new ArrayList<>();
     list.add(headerInfo);
     list.add(dpInfo);
     list.addAll(taskInfos);
     persistence.store(list);
 
-    for (int i=0; i<nbThreads; i++) {
-      final List<PersistenceInfo> storeList = resultInfos.subList(i * taskPerThread, (i + 1) * taskPerThread);
-      threads[i] = new StoreThread("DeleteThread-" + i, storeList);
-    }
-    for (int i=0; i<nbThreads; i++) threads[nbThreads + i] = new DeleteThread("StoreThread-" + i, job.getUuid());
-    for (final BaseThread thread: threads) thread.start();
-    for (final BaseThread thread: threads) thread.join();
-    for (final BaseThread thread: threads) {
+    for (int i=0; i<nbThreads; i++) deleteThreads[i] = new DeleteThread("DeleteThread-" + i, job.getUuid());
+    for (final BaseThread thread: deleteThreads) thread.start();
+    for (final BaseThread thread: deleteThreads) thread.join();
+    for (final BaseThread thread: deleteThreads) {
       if (thread.exception != null) fail(String.format("thread '%s' failed with %s", thread.getName(), ExceptionUtils.getMessage(thread.exception)));
     }
   }
