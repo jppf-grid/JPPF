@@ -152,7 +152,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testNumberOfNodes() throws Exception {
-    BaseSetup.checkDriverAndNodesInitialized(client, 1, 2);
+    BaseSetup.checkDriverAndNodesInitialized(client, 1, 2, false);
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
     final NodeSelector node1Selector = new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1"));
     assertEquals(BaseSetup.nbNodes(), (int) jmx.nbNodes());
@@ -168,7 +168,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testNodesInformation() throws Exception {
-    BaseSetup.checkDriverAndNodesInitialized(client, 1, 2);
+    BaseSetup.checkDriverAndNodesInitialized(client, 1, 2, false);
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
     final NodeSelector node1Selector = new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1"));
     checkNodesInfo(jmx.nodesInformation(), "n1", "n2");

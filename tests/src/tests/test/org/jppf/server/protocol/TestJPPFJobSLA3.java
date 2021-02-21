@@ -44,7 +44,7 @@ public class TestJPPFJobSLA3 extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    final TestConfiguration config = BaseSetup.createDefaultConfiguration();
+    final TestConfiguration config = TestConfiguration.newDefault();
     final List<String> cp = new ArrayList<>();
     cp.add("../common/classes");
     cp.add("../server/classes");

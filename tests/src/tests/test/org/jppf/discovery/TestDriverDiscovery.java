@@ -93,7 +93,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
    */
   @AfterClass
   public static void teardown() throws Exception {
-    BaseSetup.generateDriverThreadDump(JMX);
+    BaseTestHelper.generateDriverThreadDump(JMX);
     for (int i=0; i<JMX.length; i++) {
       if (JMX[i] != null) JMX[i].close();
     }

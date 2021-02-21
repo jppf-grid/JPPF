@@ -180,7 +180,7 @@ public class GeneticAlgorithm implements AutoCloseable {
     }
     */
     for (final Chromosome c: pop) c.computeFitness();
-}
+  }
 
   /**
    * Perform the crossover operation for the specified population.
@@ -192,30 +192,23 @@ public class GeneticAlgorithm implements AutoCloseable {
     final Chromosome[] newPop = new Chromosome[populationSize];
     for (int i=0; i <nbToKeep; i++) newPop[i] = population[i];
     final CompletionService<Runnable> cs = new ExecutorCompletionService<>(executor);
-    int totalSUbmitted = 0;
+    int totalSubmitted = 0;
     for  (int count=nbToKeep; count<populationSize; count++) {
       final int n1 = random.nextInt(pop.length);
       if (random.nextDouble() < crossoverProbability) {
         final int cnt = count;
-        totalSUbmitted++;
-        final Runnable r = new Runnable() {
-          @Override
-          public void run() {
-            int n2;
-            while ((n2 = random.nextInt(pop.length)) == n1);
-            //int pos = (pop[n1].getSize() / 2) + (pop[n1].getSize() % 2);
-            final int pos = 1 + random.nextInt(pop[n1].getSize() - 1);
-            newPop[cnt] = pop[n1].crossover(pop[n2], pos);
-          }
+        totalSubmitted++;
+        final Runnable r = () -> {
+          int n2;
+          while ((n2 = random.nextInt(pop.length)) == n1);
+          //int pos = (pop[n1].getSize() / 2) + (pop[n1].getSize() % 2);
+          final int pos = 1 + random.nextInt(pop[n1].getSize() - 1);
+          newPop[cnt] = pop[n1].crossover(pop[n2], pos);
         };
         cs.submit(r, null);
       } else newPop[count] = pop[n1];
     }
-    try {
-      for (int i=0; i<totalSUbmitted; i++) cs.take();
-    } catch(final Exception e) {
-      log.error(e.getMessage(), e);
-    }
+    takeAll(cs, totalSubmitted);
     return newPop;
   }
 
@@ -230,20 +223,24 @@ public class GeneticAlgorithm implements AutoCloseable {
     final CompletionService<Runnable> cs = new ExecutorCompletionService<>(executor);
     for (int i=0; i<nbSelect; i++) {
       final int n = i;
-      cs.submit(new Runnable() {
-        @Override
-        public void run() {
-          newPop[n] = pop[n].mutate();
-        }
-      }, null);
+      cs.submit(() -> newPop[n] = pop[n].mutate(), null);
     }
-    try {
-      for (int i=0; i<nbSelect; i++) cs.take();
-    } catch(final Exception e) {
-      e.printStackTrace();
-    }
+    takeAll(cs, nbSelect);
     System.arraycopy(pop, nbSelect, newPop, nbSelect, pop.length - nbSelect);
     return newPop;
+  }
+
+  /**
+   * Await the completion of all the tasks submitted with the specified {@link CompletionService}.
+   * @param cs the {@link CompletionService} with which the tasks were submitted.
+   * @param nbSubmitted the number of submitted tasks.
+   */
+  private static void takeAll(final CompletionService<Runnable> cs, final int nbSubmitted) {
+    try {
+      for (int i=0; i<nbSubmitted; i++) cs.take();
+    } catch(final Exception e) {
+      log.error(e.getMessage(), e);
+    }
   }
 
   /**

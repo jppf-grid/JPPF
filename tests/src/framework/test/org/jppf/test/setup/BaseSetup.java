@@ -26,15 +26,13 @@ import javax.management.remote.JMXServiceURL;
 import org.jppf.JPPFTimeoutException;
 import org.jppf.client.*;
 import org.jppf.client.event.ConnectionPoolListener;
-import org.jppf.management.*;
-import org.jppf.management.diagnostics.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
-import org.slf4j.*;
 
-import test.org.jppf.test.setup.common.TestUtils;
+import test.org.jppf.test.setup.common.*;
 
 
 /**
@@ -42,10 +40,6 @@ import test.org.jppf.test.setup.common.TestUtils;
  * @author Laurent Cohen
  */
 public class BaseSetup {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(BaseSetup.class);
   /** */
   private static final AtomicBoolean detectorStarted = new AtomicBoolean(false);
   /**
@@ -59,7 +53,7 @@ public class BaseSetup {
   /**
    * The default configuratin used when none is specified.
    */
-  public static final TestConfiguration DEFAULT_CONFIG = createDefaultConfiguration();
+  public static final TestConfiguration DEFAULT_CONFIG = TestConfiguration.newDefault();
   static {
     TestConfigSource.setClientConfig(DEFAULT_CONFIG.clientConfig);
     JPPFConfiguration.reset();
@@ -68,19 +62,19 @@ public class BaseSetup {
   /**
    * The jppf client to use.
    */
-  protected static JPPFClient client;
+  private static JPPFClient client;
   /**
    * The node to lunch for the test.
    */
-  protected static NodeProcessLauncher[] nodes;
+  private static NodeProcessLauncher[] nodes;
   /**
    * The node to lunch for the test.
    */
-  protected static DriverProcessLauncher[] drivers;
+  private static DriverProcessLauncher[] drivers;
   /**
    * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
    */
-  protected static Thread shutdownHook;
+  private static Thread shutdownHook;
   /**
    * Sequence number to build client uuids.
    */
@@ -149,7 +143,7 @@ public class BaseSetup {
     }
     if (createClient) {
       client = createClient("client-" + clientUuidSequence.incrementAndGet(), true, config, listeners);
-      if (checkDriversAndNodes) checkDriverAndNodesInitialized(nbDrivers, nbNodes);
+      if (checkDriversAndNodes) checkDriverAndNodesInitialized(client, nbDrivers, nbNodes, false);
     } else {
       JPPFConfiguration.reset();
     }
@@ -200,9 +194,9 @@ public class BaseSetup {
    */
   private static void close() {
     try {
-      generateClientThreadDump();
+      BaseTestHelper.generateClientThreadDump();
       if ((client != null) && !client.isClosed()) {
-        generateDriverThreadDump(client);
+        BaseTestHelper.generateDriverThreadDump(client);
         client.close();
         client = null;
       }
@@ -211,95 +205,6 @@ public class BaseSetup {
     } catch (final Exception e) {
       e.printStackTrace();
     }
-  }
-
-  /**
-   * Generates a thread dump of the local JVM.
-   * @throws Exception if any error occurs.
-   */
-  public static void generateClientThreadDump() throws Exception {
-    try (final Diagnostics diag = new Diagnostics("client")) {
-      final String text = TextThreadDumpWriter.printToString(diag.threadDump(), "client thread dump");
-      FileUtils.writeTextFile("client_thread_dump.log", text);
-    }
-  }
-
-  /**
-   * Generates a thread dump for each of the drivers the specified client is connected to.
-   * @param client the JPPF client.
-   * @throws Exception if any error occurs.
-   */
-  public static void generateDriverThreadDump(final JPPFClient client) throws Exception {
-    if (client == null) return;
-    final List<JPPFConnectionPool> pools = client.awaitWorkingConnectionPools(1000L);
-    final JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[pools.size()];
-    for (int i=0; i<pools.size(); i++) jmxArray[i] = pools.get(i).awaitWorkingJMXConnection();
-    generateDriverThreadDump(jmxArray);
-  }
-
-  /**
-   * Generates a thread dump for each of the specified drivers, and for each of the nodes connected to them.
-   * @param jmxConnections JMX connections to the drivers.
-   * @throws Exception if any error occurs.
-   */
-  public static void generateDriverThreadDump(final JMXDriverConnectionWrapper... jmxConnections) throws Exception {
-    for (final JMXDriverConnectionWrapper jmx: jmxConnections) {
-      if ((jmx != null) && jmx.isConnected()) {
-        try {
-          final DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
-          final String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
-          FileUtils.writeTextFile("driver_thread_dump_" + jmx.getPort() + ".log", text);
-        } catch (final Exception e) {
-          log.error("failed to generate driver thread dump for {} : {}", jmx, ExceptionUtils.getStackTrace(e));
-        }
-        try {
-          final String dump = (String) jmx.invoke("org.jppf:name=debug,type=driver", "all");
-          FileUtils.writeTextFile("server_debug_" + jmx.getPort() + ".log", dump);
-        } catch (@SuppressWarnings("unused") final Exception e) {
-          log.error("failed to get debug dump for {} : {}", jmx, ExceptionUtils.getStackTrace(e));
-        }
-      }
-      try {
-        final Collection<JPPFManagementInfo> infos = jmx.nodesInformation();
-        final Map<String, JPPFManagementInfo> infoMap = new HashMap<>(infos.size());
-        for (final JPPFManagementInfo info: infos) infoMap.put(info.getUuid(), info);
-        final ResultsMap<String, ThreadDump> dumpsMap = jmx.getForwarder().threadDump(NodeSelector.ALL_NODES);
-        for (final Map.Entry<String, InvocationResult<ThreadDump>> entry: dumpsMap.entrySet()) {
-          final String uuid = entry.getKey();
-          if (entry.getValue().isException()) {
-            log.error("error getting thread dump for node {}", uuid, entry.getValue());
-          } else {
-            final ThreadDump dump = entry.getValue().result();
-            final JPPFManagementInfo info = infoMap.get(uuid);
-            final String text = TextThreadDumpWriter.printToString(dump, "node thread dump for " + (info == null ? uuid : info.getHost() + ":" + info.getPort()));
-            FileUtils.writeTextFile("node_thread_dump_" + (info == null ? uuid : info.getPort()) + ".log", text);
-          }
-        }
-      } catch (final Exception e) {
-        log.error("failed to generate the node thread dumps for driver {}", jmx, e);
-      }
-    }
-  }
-
-  /**
-   * Check that the driver and all nodes have been started and are accessible.
-   * @param nbDrivers the number of drivers that were started.
-   * @param nbNodes the number of nodes that were started.
-   * @throws Exception if any error occurs.
-   */
-  public static void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception {
-    checkDriverAndNodesInitialized(client, nbDrivers, nbNodes, false);
-  }
-
-  /**
-   * Check that the driver and all nodes have been started and are accessible.
-   * @param client the JPPF client to use for the checks.
-   * @param nbDrivers the number of drivers that were started.
-   * @param nbNodes the number of nodes that were started.
-   * @throws Exception if any error occurs.
-   */
-  public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes) throws Exception {
-    checkDriverAndNodesInitialized(client, nbDrivers, nbNodes, false);
   }
 
   /**
@@ -394,43 +299,6 @@ public class BaseSetup {
    */
   public static int nbNodes() {
     return nodes == null ? 0 : nodes.length;
-  }
-
-  /**
-   * Create the default configuratin used when none is specified.
-   * @return a {@link TestConfiguration} instance.
-   */
-  public static TestConfiguration createDefaultConfiguration() {
-    final TestConfiguration config = new TestConfiguration();
-    final List<String> commonCP = new ArrayList<>();
-    final String dir = "classes/tests/config";
-    commonCP.add("classes/addons");
-    commonCP.add(dir);
-    commonCP.add("../node/classes");
-    commonCP.add("../common/classes");
-    commonCP.add("../jmxremote-nio/classes");
-    commonCP.add("../JPPF/lib/slf4j/slf4j-api-" + SLF4J_VERSION + ".jar");
-    commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-" + SLF4J_VERSION + ".jar");
-    commonCP.add("../JPPF/lib/log4j/*");
-    commonCP.add("../JPPF/lib/LZ4/*");
-    commonCP.add("../JPPF/lib/ApacheCommons/*");
-    commonCP.add("../JPPF/lib/JNA/*");
-    commonCP.add("../JPPF/lib/oshi/*");
-    commonCP.add("lib/xstream.jar");
-    commonCP.add("lib/xpp3_min.jar");
-    commonCP.add("lib/xmlpull.jar");
-
-    final List<String> driverCP = new ArrayList<>(commonCP);
-    driverCP.add("../server/classes");
-    driverCP.add("../JPPF/lib/Groovy/*");
-    config.driver.jppf = dir + "/driver.template.properties";
-    config.driver.log4j = dir + "/log4j-driver.template.properties";
-    config.driver.classpath = driverCP;
-    config.node.jppf = dir + "/node.template.properties";
-    config.node.log4j = dir + "/log4j-node.template.properties";
-    config.node.classpath = commonCP;
-    config.clientConfig = dir + "/client.properties";
-    return config;
   }
 
   /**

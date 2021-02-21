@@ -99,7 +99,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public static void tearAbstractJobPersistenceTest() throws Exception {
     try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1, false)) {
       jmx.connectAndWait(5_000L);
-      if (jmx.isConnected()) BaseSetup.generateDriverThreadDump(jmx);
+      if (jmx.isConnected()) BaseTestHelper.generateDriverThreadDump(jmx);
     }
   }
 
