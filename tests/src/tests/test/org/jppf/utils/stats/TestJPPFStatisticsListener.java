@@ -70,7 +70,7 @@ public class TestJPPFStatisticsListener extends BaseTest {
     final int expectedCount = LABELS.length - 1;
     final int excludedIndex = rand.nextInt(LABELS.length);
     final String excludedLabel = LABELS[excludedIndex];
-    printOut("testFilteredListener() excludedIndex=%d; excludedLabel=%s", excludedIndex, excludedLabel);
+    print(false, false, "testFilteredListener() excludedIndex=%d; excludedLabel=%s", excludedIndex, excludedLabel);
     final JPPFStatistics.Filter filter = new Filter() {
       @Override
       public boolean accept(final JPPFSnapshot snapshot) {

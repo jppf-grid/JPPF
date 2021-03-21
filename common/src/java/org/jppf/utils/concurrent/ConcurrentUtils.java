@@ -18,9 +18,11 @@
 
 package org.jppf.utils.concurrent;
 
+import java.util.List;
 import java.util.concurrent.*;
 
 import org.jppf.JPPFTimeoutException;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -169,7 +171,19 @@ public final class ConcurrentUtils {
    * @return a new {@link ThreadPoolExecutor} instance.
    */
   public static ThreadPoolExecutor newDirectHandoffExecutor(final int coreThreads, final long ttl, final String threadNamePrefix) {
-    final ThreadPoolExecutor executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory(threadNamePrefix));
+    final ThreadPoolExecutor executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory(threadNamePrefix)) {
+      @Override
+      public void shutdown() {
+        log.warn("shuttting down global executor, call stack:\n{}", ExceptionUtils.getCallStack());
+        super.shutdown();
+      }
+
+      @Override
+      public List<Runnable> shutdownNow() {
+        log.warn("shuttting down global executor, call stack:\n{}", ExceptionUtils.getCallStack());
+        return super.shutdownNow();
+      }
+    };
     executor.allowCoreThreadTimeOut(false);
     executor.prestartAllCoreThreads();
     return executor;

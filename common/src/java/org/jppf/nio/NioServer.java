@@ -26,11 +26,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.*;
 
+import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.SynchronizedBoolean;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
-
 
 /**
  * Generic server for non-blocking asynchronous socket channel based communications.<br>
@@ -60,14 +60,6 @@ public abstract class NioServer extends Thread {
    */
   protected final AtomicBoolean stopped = new AtomicBoolean(false);
   /**
-   * The ports this server is listening to.
-   */
-  protected int[] ports = {};
-  /**
-   * The SSL ports this server is listening to.
-   */
-  protected int[] sslPorts = {};
-  /**
    * Timeout for the select() operations. A value of 0 means no timeout, i.e. the {@code Selector.select()} method will be invoked without parameters.
    */
   protected long selectTimeout;
@@ -83,10 +75,6 @@ public abstract class NioServer extends Thread {
    * The channel identifier for channels handled by this server.
    */
   protected final int identifier;
-  /**
-   * List of opened server socket channels.
-   */
-  protected final Map<Integer, ServerSocketChannel> servers = new HashMap<>();
   /**
    * Whether the selector is currently selecting.
    */
@@ -132,31 +120,13 @@ public abstract class NioServer extends Thread {
   protected NioServer(final String name, final int identifier, final boolean useSSL, final Object attachment, final TypedProperties configuration) throws Exception {
     super(name);
     setDaemon(true);
-    if (debugEnabled) log.debug("starting {} with identifier={} and useSSL={}", getClass().getSimpleName(), JPPFIdentifiers.serverName(identifier), useSSL);
-    log.info("initializing {}({})", getClass().getSimpleName(), getName());
+    if (debugEnabled) log.debug("starting {} with identifier={} and useSSL={}, name={}", getClass().getSimpleName(), JPPFIdentifiers.serverName(identifier), useSSL, getName());
     this.identifier = identifier;
     this.attachment = attachment;
     selector = Selector.open();
     sync = new SelectorSynchronizerLock(selector);
     this.configuration = configuration;
-    if (useSSL) createSSLContext();
-    init();
-  }
-
-  /**
-   * Initialize this server with a specified list of port numbers and name.
-   * @param ports the list of ports this server accepts connections from.
-   * @param sslPorts the list of SSL ports this server accepts connections from.
-   * @param identifier the channel identifier for channels handled by this server.
-   * @param configuration the JPPF configuration to use.
-   * @throws Exception if the underlying server socket can't be opened.
-   */
-  public NioServer(final int[] ports, final int[] sslPorts, final int identifier, final TypedProperties configuration) throws Exception {
-    this(identifier, false, null, configuration);
-    if (debugEnabled) log.debug("starting {} with ports={} and sslPorts={}", getClass().getSimpleName(), Arrays.toString(ports), Arrays.toString(sslPorts));
-    this.ports = ports;
-    this.sslPorts = sslPorts;
-    this.configuration = configuration;
+    if (useSSL && (identifier != JPPFIdentifiers.ACCEPTOR_CHANNEL)) createSSLContext();
     init();
   }
 
@@ -164,23 +134,11 @@ public abstract class NioServer extends Thread {
    * Initialize the underlying server sockets.
    * @throws Exception if any error occurs while initializing the server sockets.
    */
-  protected void init() throws Exception {
-    if ((ports != null) && (ports.length != 0)) init(ports, false);
-    if ((sslPorts != null) && (sslPorts.length != 0)) init(sslPorts, true);
-  }
-
-  /**
-   * Initialize the underlying server sockets for the specified array of ports.
-   * @param portsToInit the array of ports to initiialize.
-   * @param ssl {@code true} if the server sockets should be initialized with SSL enabled, {@code false} otherwise.
-   * @throws Exception if any error occurs while initializing the server sockets.
-   */
-  private void init(final int[] portsToInit, final boolean ssl) throws Exception {
-    for (int i=0; i<portsToInit.length; i++) addServer(portsToInit[i], ssl, null, true);
-  }
+  protected abstract void init() throws Exception;
 
   /**
    * Initialize the underlying server sockets for the spcified array of ports.
+   * This implementation throws a {@link JPPFUnsupportedOperationException}, it should be overriden by subclasses for a different outcome.
    * @param portToInit the array of ports to initiialize.
    * @param ssl {@code true} if the server sockets should be initialized with SSL enabled, {@code false} otherwise.
    * @param env optional map of parameters to associate with the server socket channel.
@@ -189,15 +147,17 @@ public abstract class NioServer extends Thread {
    * @throws Exception if any error occurs while initializing the server sockets.
    */
   public boolean addServer(final int portToInit, final boolean ssl, final Map<String, ?> env, final boolean retryOnException) throws Exception {
-    return false;
+    throw new JPPFUnsupportedOperationException("cannot initialize a server on port " + portToInit + " (ssl = " + ssl + ") here");
   }
 
   /**
    * Remove the server identified by the local port it is listneing to.
+   * This implementation throws a {@link JPPFUnsupportedOperationException}, it should be overriden by subclasses for a different outcome.
    * @param port the port the sever is listening to.
-   * @throws IOException if any error occurs closing the specified server socket channel.
+   * @throws Exception if any error occurs closing the specified server socket channel.
    */
-  public void removeServer(final int port) throws IOException {
+  public void removeServer(final int port) throws Exception {
+    throw new JPPFUnsupportedOperationException("cannot a server on port " + port + " here");
   }
 
   /**
@@ -256,7 +216,7 @@ public abstract class NioServer extends Thread {
     }
     if (channel == null) return;
     final Runnable task = new AcceptChannelTask(this, serverSocketChannel, channel, ssl);
-    NioHelper.getGlobalexecutor().execute(task);
+    GlobalExecutor.getGlobalexecutor().execute(task);
   }
 
   /**
@@ -286,7 +246,7 @@ public abstract class NioServer extends Thread {
    */
   public void end() {
     if (stopped.compareAndSet(false, true)) {
-      if (debugEnabled) log.debug("closing server {}", this);
+      if (debugEnabled) log.debug("ending server {}", this);
       wakeUpSelectorIfNeeded();
       removeAllConnections();
     }
@@ -296,6 +256,7 @@ public abstract class NioServer extends Thread {
    * Close and remove all connections accepted by this server.
    */
   public void removeAllConnections() {
+    if (debugEnabled) log.debug("removing all connections of {}", this);
     if (!isStopped()) return;
     sync.wakeUpAndSetOrIncrement();
     try {
@@ -304,16 +265,6 @@ public abstract class NioServer extends Thread {
       log.error(e.getMessage(), e);
     } finally {
       sync.decrement();
-    }
-    synchronized(servers) {
-      for (Map.Entry<Integer, ServerSocketChannel> entry: servers.entrySet()) {
-        try {
-          entry.getValue().close();
-        } catch (final Exception e) {
-          log.error(e.getMessage(), e);
-        }
-      }
-      servers.clear();
     }
   }
 
@@ -331,22 +282,6 @@ public abstract class NioServer extends Thread {
    */
   protected boolean isStopped() {
     return stopped.get();
-  }
-
-  /**
-   * Get the ports this server is listening to.
-   * @return an array of int values.
-   */
-  public int[] getPorts() {
-    return ports;
-  }
-
-  /**
-   * Get the SSL ports this server is listening to.
-   * @return an array of int values.
-   */
-  public int[] getSSLPorts() {
-    return sslPorts;
   }
 
   /**

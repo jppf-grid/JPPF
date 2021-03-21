@@ -18,8 +18,6 @@
 
 package org.jppf.classloader;
 
-import static org.jppf.utils.StringUtils.build;
-
 import java.io.IOException;
 
 import org.jppf.JPPFNodeReconnectionNotification;
@@ -80,15 +78,20 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
         try {
           if (debugEnabled) log.debug("initializing connection");
           initChannel();
-          System.out.println("Attempting connection to the class server at " + channel.getHost() + ':' + channel.getPort());
+          String message = "Attempting connection to the class server at " + channel.getHost() + ':' + channel.getPort();
+          System.out.println(message);
+          log.info(message);
           if (!socketInitializer.initialize(channel)) {
             channel = null;
             throw new JPPFNodeReconnectionNotification("the JPPF class loader could not reconnect to the server", socketInitializer.getLastException(), ConnectionReason.CLASSLOADER_INIT_ERROR);
           }
+          if (debugEnabled) log.debug("channel initialized: {}", channel);
           if (!InterceptorHandler.invokeOnConnect(channel, JPPFChannelDescriptor.NODE_CLASSLOADER_CHANNEL))
             throw new JPPFNodeReconnectionNotification("connection denied by interceptor", null, ConnectionReason.CLASSLOADER_INIT_ERROR);
           performHandshake();
-          System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
+          message = getClass().getSimpleName() + ": Reconnected to the class server";
+          System.out.println(message);
+          log.info(message);
         } finally {
           initializing.set(false);
         }
@@ -121,9 +124,11 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
       if (debugEnabled) log.debug("sending channel identifier");
       channel.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
       channel.flush();
+      if (debugEnabled) log.debug("channel identifier sent successfully");
       if (sslEnabled) createSSLConnection();
       final ResourceRequestRunner rr = new RemoteResourceRequest(getSerializer(), channel);
       performCommonHandshake(rr);
+      if (debugEnabled) log.debug("performed common handshake successfully");
     } catch (final IOException e) {
       throw new JPPFNodeReconnectionNotification("Error during driver handshake", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
     } catch (final Exception e) {
@@ -140,10 +145,12 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
     channel = new BootstrapSocketClient();
     channel.setHost(connectionInfo.getHost());
     channel.setPort(connectionInfo.getPort());
+    if (debugEnabled) log.debug("initialized socket connection: {}", channel);
   }
 
   @Override
   public void close() {
+    if (debugEnabled) log.debug("closing {}", this);
     lock.lock();
     try {
       if (requestHandler != null) {
@@ -161,6 +168,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
         channel = null;
       }
     } finally {
+      initializing.set(false);
       lock.unlock();
     }
   }

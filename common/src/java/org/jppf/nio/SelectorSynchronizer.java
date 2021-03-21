@@ -74,8 +74,8 @@ public interface SelectorSynchronizer {
   void decrement();
 
   /**
-   * Compare the value with the expected value, and run run an action and incrment the value if the comparison succeeds,
-   * or set the value to the update value if it does not succeed..
+   * Compare the value with the expected value, and run an action and increment the value if the comparison succeeds,
+   * or set the value to the update value if it does not succeed.
    */
   void wakeUpAndSetOrIncrement();
 }

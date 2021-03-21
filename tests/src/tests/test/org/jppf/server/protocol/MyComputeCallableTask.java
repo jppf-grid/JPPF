@@ -52,21 +52,21 @@ public class MyComputeCallableTask extends AbstractTask<Object> {
   @SuppressWarnings("unchecked")
   public void run() {
     try {
-      TestJPPFTask.printOut("this task's class loader = %s", getClass().getClassLoader());
+      TestJPPFTask.print(false, false, "this task's class loader = %s", getClass().getClassLoader());
       if (callableClassName != null) {
         final Class<?> clazz = Class.forName(callableClassName);
         final JPPFCallable<String> callable = (JPPFCallable<String>) clazz.newInstance();
         final String s = compute(callable);
-        TestJPPFTask.printOut("result of MyCallable.call() = %s", s);
+        TestJPPFTask.print(false, false, "result of MyCallable.call() = %s", s);
         setResult(s);
       } else {
         final boolean b = isInNode();
-        TestJPPFTask.printOut("isInNode() = %b", b);
+        TestJPPFTask.print(false, false, "isInNode() = %b", b);
         setResult(b);
       }
       nodeUuid = isInNode() ? getNode().getConfiguration().getString("jppf.node.uuid") : JPPFConfiguration.getProperties().getString("jppf.node.uuid");
       if (isInNode()) uuidFromNode = getNode().getUuid();
-      TestJPPFTask.printOut("this task's nodeUuid = %s, uuidFromNode = %s", nodeUuid, uuidFromNode);
+      TestJPPFTask.print(false, false, "this task's nodeUuid = %s, uuidFromNode = %s", nodeUuid, uuidFromNode);
     } catch (final Exception e) {
       setThrowable(e);
     }

@@ -44,7 +44,7 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager<JPPFLocalNode> 
       @Override
       public AbstractJPPFClassLoader run() {
         final AbstractClassLoaderConnection<?> connection = node.getClassLoaderConnection();
-        return new JPPFLocalClassLoader(connection, this.getClass().getClassLoader());
+        return new JPPFLocalClassLoader(connection, this.getClass().getClassLoader(), null, node.getHookFactory());
       }
     };
     return AccessController.doPrivileged(pa);
@@ -64,7 +64,7 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager<JPPFLocalNode> 
           @Override
           public AbstractJPPFClassLoader run() {
             final AbstractJPPFClassLoader parent = getClassLoader();
-            return new JPPFLocalClassLoader(parent.getConnection(), parent, uuidPath);
+            return new JPPFLocalClassLoader(parent.getConnection(), parent, uuidPath, node.getHookFactory());
           }
         };
         return AccessController.doPrivileged(pa);

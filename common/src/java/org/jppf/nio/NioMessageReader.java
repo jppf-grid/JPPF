@@ -20,7 +20,8 @@ package org.jppf.nio;
 
 import java.util.concurrent.ExecutorService;
 
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.concurrent.GlobalExecutor;
 import org.slf4j.*;
 
 /**
@@ -89,7 +90,7 @@ public abstract class NioMessageReader<C extends AbstractNioContext> {
    * @return the exeuctor to use to handle messages.
    */
   protected ExecutorService getExecutor() {
-    return NioHelper.getGlobalexecutor();
+    return GlobalExecutor.getGlobalexecutor();
   }
 
   /**

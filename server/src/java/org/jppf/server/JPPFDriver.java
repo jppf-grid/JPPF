@@ -24,10 +24,10 @@ import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.discovery.PeerDriverDiscovery;
 import org.jppf.job.JobTasksListenerManager;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.*;
 import org.jppf.nio.NioHelper;
 import org.jppf.nio.acceptor.AcceptorNioServer;
-import org.jppf.node.protocol.JPPFDistributedJob;
+import org.jppf.node.protocol.*;
 import org.jppf.process.LauncherListener;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.classloader.client.AsyncClientClassNioServer;
@@ -39,8 +39,9 @@ import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ThreadUtils;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.hooks.HookFactory;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -74,9 +75,9 @@ public class JPPFDriver extends AbstractJPPFDriver {
     initializer.initDatasources();
     jobManager = new JPPFJobManager(this);
     taskQueue = new JPPFPriorityQueue(this, jobManager);
-    if (debugEnabled) {
-      log.debug("JPPF Driver system properties: {}", SystemUtils.printSystemProperties());
-      log.debug("JPPF Driver configuration:\n{}", configuration.asString());
+    if (log.isTraceEnabled()) {
+      log.trace("JPPF Driver system properties: {}", SystemUtils.printSystemProperties());
+      log.trace("JPPF Driver configuration:\n{}", configuration.asString());
     }
   }
 
@@ -88,27 +89,43 @@ public class JPPFDriver extends AbstractJPPFDriver {
   public JPPFDriver start() throws Exception {
     if (debugEnabled) log.debug("starting JPPF driver");
     final JPPFConnectionInformation info = initializer.getConnectionInformation();
-    initializer.handleDebugActions();
 
+    nioHelper = new NioHelper();
+    final int[] serverPorts = extractValidPorts(info.serverPorts);
     final int[] sslPorts = extractValidPorts(info.sslServerPorts);
+    for (final int[] ports: new int[][] { serverPorts, sslPorts }) {
+      if ((ports != null) && (ports.length > 0)) {
+        for (final int port: ports) NioHelper.putNioHelper(port, nioHelper);
+      }
+    }
     final boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
     if (debugEnabled) log.debug("starting nio servers");
     if (configuration.get(JPPFProperties.RECOVERY_ENABLED)) {
-      nodeHeartbeatServer = initHeartbeatServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL);
-      clientHeartbeatServer = initHeartbeatServer(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, useSSL);
+      nodeHeartbeatServer = getOrCreateServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, () -> new HeartbeatNioServer(this, JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL));
+      clientHeartbeatServer = getOrCreateServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, () -> new HeartbeatNioServer(this, JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, useSSL));
     }
-    NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, asyncClientClassServer = startServer(new AsyncClientClassNioServer(this, JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, useSSL)));
-    NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, asyncNodeClassServer = startServer(new AsyncNodeClassNioServer(this, JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, useSSL)));
-    NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, asyncClientNioServer = startServer(new AsyncClientNioServer(this, JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL)));
-    NioHelper.putServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, asyncNodeNioServer = startServer(new AsyncNodeNioServer(this, JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, useSSL)));
-    NioHelper.putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptorServer = new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts, statistics, configuration));
-    jobManager.loadTaskReturnListeners();
+    asyncClientClassServer = getOrCreateServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, () -> new AsyncClientClassNioServer(this, JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, useSSL));
+    asyncNodeClassServer = getOrCreateServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, () -> new AsyncNodeClassNioServer(this, JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, useSSL));
+    asyncClientNioServer  = getOrCreateServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, () -> new AsyncClientNioServer(this, JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL));
+    asyncNodeNioServer = getOrCreateServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, () -> new AsyncNodeNioServer(this, JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, useSSL));
+
     if (isManagementEnabled(configuration)) initializer.registerProviderMBeans();
+
+    final boolean startAcceptor;
+    synchronized(NioHelper.class) {
+      startAcceptor = nioHelper.getAcceptorServer(false) == null;
+      if (startAcceptor) {
+        NioHelper.setAcceptorServer(acceptorServer = new AcceptorNioServer(serverPorts, sslPorts, statistics, configuration));
+      }
+    }
+    jobManager.loadTaskReturnListeners();
     initializer.initJmxServer();
+    initializer.handleDebugActions();
     initializer.initStartups();
     initializer.getNodeConnectionEventHandler().loadListeners();
 
-    startServer(acceptorServer);
+    if (startAcceptor) startServer(acceptorServer);
+    initializer.registerNodeConfigListener();
 
     if (configuration.get(JPPFProperties.LOCAL_NODE_ENABLED)) initLocalNodes();
     initializer.initBroadcaster();
@@ -149,9 +166,9 @@ public class JPPFDriver extends AbstractJPPFDriver {
    * @exclude
    */
   public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay) {
-    if (shutdownSchduled.compareAndSet(false, true)) {
+    if (shutdownScheduled.compareAndSet(false, true)) {
       log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
-      final Timer timer = new Timer();
+      final Timer timer = new Timer("JPPF driver shutdown timer");
       final ShutdownRestartTask task = new ShutdownRestartTask(restart, restartDelay, this);
       timer.schedule(task, (shutdownDelay <= 0L) ? 0L : shutdownDelay);
     } else {
@@ -193,19 +210,6 @@ public class JPPFDriver extends AbstractJPPFDriver {
       log.error(e.getMessage(), e);
       if (JPPFConfiguration.get(JPPFProperties.SERVER_EXIT_ON_SHUTDOWN)) System.exit(1);
     }
-  }
-
-  /**
-   * Start a heartbeat server with the specified channel identifier.
-   * @param identifier the channel identifier for the server connections.
-   * @param useSSL whether to use SSL connectivity.
-   * @return the created server.
-   * @throws Exception if any error occurs.
-   */
-  private HeartbeatNioServer initHeartbeatServer(final int identifier, final boolean useSSL) throws Exception {
-    final HeartbeatNioServer server = startServer(new HeartbeatNioServer(this, identifier, useSSL));
-    NioHelper.putServer(identifier, server);
-    return server;
   }
 
   /**
@@ -275,22 +279,38 @@ public class JPPFDriver extends AbstractJPPFDriver {
       for (JPPFNode node: localNodes) node.shutdown(false);
       localNodes.clear();
     }
+    hookFactory.reset();
     if (debugEnabled) log.debug("closing acceptor");
-    if (acceptorServer != null) acceptorServer.shutdown();
-    if (debugEnabled) log.debug("closing node heartbeat server");
-    if (nodeHeartbeatServer != null) nodeHeartbeatServer.shutdown();
-    if (debugEnabled) log.debug("client heartbeat server");
-    if (clientHeartbeatServer != null) clientHeartbeatServer.shutdown();
-    if (debugEnabled) log.debug("closing client class server");
-    if (asyncClientClassServer != null) asyncClientClassServer.shutdown();
-    if (debugEnabled) log.debug("closing node class server");
-    if (asyncNodeClassServer != null) asyncNodeClassServer.shutdown();
-    if (debugEnabled) log.debug("closing node job server");
-    if (asyncNodeNioServer != null) asyncNodeNioServer.shutdown();
-    if (debugEnabled) log.debug("closing client job server");
-    if (asyncClientNioServer != null) asyncClientNioServer.shutdown();
-    if (debugEnabled) log.debug("closing global executor");
-    if (startedfromMain) NioHelper.shutdown(true);
+    if (acceptorServer != null) {
+      if (startedfromMain) acceptorServer.end();
+      else {
+        for (final Integer port: nioHelper.getPorts()) NioHelper.removeNioHelper(port);
+      }
+    }
+    if (nodeHeartbeatServer != null) {
+      if (debugEnabled) log.debug("closing node heartbeat server");
+      nodeHeartbeatServer.shutdown();
+    }
+    if (clientHeartbeatServer != null) {
+      if (debugEnabled) log.debug("client heartbeat server");
+      clientHeartbeatServer.shutdown();
+    }
+    if (asyncClientClassServer != null) {
+      if (debugEnabled) log.debug("closing client class server");
+      asyncClientClassServer.shutdown();
+    }
+    if (asyncNodeClassServer != null) {
+      if (debugEnabled) log.debug("closing node class server");
+      asyncNodeClassServer.shutdown();
+    }
+    if (asyncNodeNioServer != null) {
+      if (debugEnabled) log.debug("closing node job server");
+      asyncNodeNioServer.shutdown();
+    }
+    if (asyncClientNioServer != null) {
+      if (debugEnabled) log.debug("closing client job server");
+      asyncClientNioServer.shutdown();
+    }
     if (debugEnabled) log.debug("closing broadcaster");
     initializer.stopBroadcaster();
     if (debugEnabled) log.debug("stopping peer discovery");
@@ -299,6 +319,8 @@ public class JPPFDriver extends AbstractJPPFDriver {
     initializer.stopJmxServer();
     if (debugEnabled) log.debug("closing job manager");
     jobManager.close();
+    //if (debugEnabled) log.debug("closing global executor");
+    //if (startedfromMain) GlobalExecutor.shutdown(true);
     if (debugEnabled) log.debug("shutdown complete");
   }
 
@@ -335,7 +357,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
 
     final AsyncNodeContext ctx = new AsyncNodeContext(asyncNodeNioServer, null, true);
     ctx.setNodeInfo(getSystemInformation(), false);
-    final JPPFNode localNode = new JPPFLocalNode(configuration, new AsyncLocalNodeConnection(ctx), classLoaderConnection);
+    final JPPFNode localNode = new JPPFLocalNode(configuration, new AsyncLocalNodeConnection(ctx), classLoaderConnection, HookFactory.newInstance());
     localNodes.add(localNode);
     ThreadUtils.startDaemonThread(localNode, "Local node " + n);
     asyncNodeNioServer.getMessageHandler().sendHandshakeBundle(ctx, asyncNodeNioServer.getHandshakeBundle());

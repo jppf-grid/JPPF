@@ -37,6 +37,7 @@ import org.jppf.serialization.*;
 import org.jppf.ssl.SSLConfigurationException;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -95,9 +96,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Default constructor.
    * @param uuid this node's uuid.
    * @param configuration the configuration of this node.
+   * @param hookFactory used to create and invoke hook instances.
    */
-  public JPPFNode(final String uuid, final TypedProperties configuration) {
-    super(uuid, configuration);
+  public JPPFNode(final String uuid, final TypedProperties configuration, final HookFactory hookFactory) {
+    super(uuid, configuration, hookFactory);
     if (debugEnabled) log.debug("creating execution manager");
     executionManager = new AsyncNodeExecutionManager(this);
     executionManager.addExecutionManagerListener(this);

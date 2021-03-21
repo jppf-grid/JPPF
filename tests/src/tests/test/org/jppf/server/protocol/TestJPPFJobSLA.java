@@ -66,8 +66,8 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     final String driverState = (String) jmx.invoke("org.jppf:name=debug,type=driver", "dumpQueueDetails");
     if ((driverState !=  null) && !driverState.trim().isEmpty()) {
-      printOut("-------------------- driver state --------------------");
-      printOut(driverState);
+      print(false, false, "-------------------- driver state --------------------");
+      print(false, false, driverState);
     }
   }
 
@@ -185,7 +185,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   @Test(timeout=10000)
   public void testCancelJobUponClientDisconnect() throws Exception {
-    printOut("%s() configuration: %s", ReflectionUtils.getCurrentMethodName(), JPPFConfiguration.getProperties());
+    print(false, false, "%s() configuration: %s", ReflectionUtils.getCurrentMethodName(), JPPFConfiguration.getProperties());
     final String fileName = "testCancelJobUponClientDisconnect";
     final File f = new File(fileName + ".tmp");
     f.deleteOnExit();
@@ -425,7 +425,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
         String name = filePath;
         if (appendNodeSuffix) name = name + JPPFConfiguration.getProperties().getString("jppf.node.uuid");
         name = name + ".tmp";
-        printOut("creating file '%s'", name);
+        print(false, false, "creating file '%s'", name);
         final File f = new File(name);
         Thread.sleep(2000L);
         final Writer writer = new FileWriter(f);

@@ -428,7 +428,7 @@ public class TestJPPFTask extends Setup1D1N1C {
 
     @Override
     public String call() throws Exception {
-      printOut("result of MyCallable.call() = %s", callableResult);
+      print(false, false, "result of MyCallable.call() = %s", callableResult);
       return callableResult;
     }
   }

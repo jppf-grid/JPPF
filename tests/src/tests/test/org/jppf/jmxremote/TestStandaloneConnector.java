@@ -29,10 +29,9 @@ import javax.management.remote.*;
 
 import org.jppf.jmxremote.JPPFMBeanServerConnection;
 import org.jppf.management.*;
-import org.jppf.nio.NioHelper;
 import org.jppf.utils.StringUtils;
 import org.jppf.utils.collections.*;
-import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
 
@@ -84,7 +83,7 @@ public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
    * Test getting and setting MBean attributes.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10000)
+  @Test(timeout = 10000)
   public void testAttributes() throws Exception {
     final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
     print(false, true, ">>> testing string attribute");
@@ -107,7 +106,7 @@ public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
    * Test MBean domains.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10000)
+  @Test(timeout = 10000)
   public void testDomains() throws Exception {
     final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
     assertTrue(mbsc.isInstanceOf(connectorTestName, ConnectorTestMBean.class.getName()));
@@ -122,7 +121,7 @@ public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
    * Test adding and removing notification listeners, receiving notifications.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10000)
+  @Test(timeout = 10000)
   public void testNotifications() throws Exception {
     final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
     print(false, false, ">>> testing notifications");
@@ -174,7 +173,7 @@ public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
    * Test MBean registration and unregistration.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10000)
+  @Test(timeout = 10000)
   public void testRegistration() throws Exception {
     final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
     print(false, false, "***** testing registration *****");
@@ -188,7 +187,7 @@ public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
    * Test connector client connection status notifications.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10000)
+  @Test(timeout = 10000)
   public void testClientConnectionNotifications() throws Exception {
     final MyClientConnectionListener listener = new MyClientConnectionListener();
     print(false, false, ">>> closing connector client before testing");
@@ -236,11 +235,11 @@ public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
    * Test connector client connection status notifications.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10_000)
+  @Test(timeout = 10_000)
   public void testWithJMXConnectionWrapper() throws Exception {
     for (int i=1; i<=10; i++) {
       print(false, false, ">>> creating connector client #%d", i);
-      try (final JMXConnectionWrapper jmx = new JMXConnectionWrapper("localhost", 12001, false)) {
+      try (final JMXConnectionWrapper jmx = new JMXConnectionWrapper("localhost", portCounter.get(), false)) {
         final MyJMXWrapperListener listener = new MyJMXWrapperListener();
         jmx.addJMXConnectionWrapperListener(listener);
         jmx.connect();
@@ -264,7 +263,7 @@ public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
     final long[] ids = mxbean.getAllThreadIds();
     final ThreadInfo[] allInfo = mxbean.getThreadInfo(ids);
     int count = 0;
-    final String prefix = NioHelper.NIO_THREAD_NAME_PREFIX + "-";
+    final String prefix = GlobalExecutor.NIO_THREAD_NAME_PREFIX + "-";
     for (final ThreadInfo ti: allInfo) {
       if (ti == null) continue;
       final String name = ti.getThreadName();

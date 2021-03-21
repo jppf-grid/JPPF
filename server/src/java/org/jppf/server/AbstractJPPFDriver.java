@@ -22,10 +22,10 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.createServerStatistics;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.JPPFInitializer;
+import org.jppf.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.*;
-import org.jppf.nio.NioServer;
+import org.jppf.nio.*;
 import org.jppf.nio.acceptor.AcceptorNioServer;
 import org.jppf.node.initialization.OutputRedirectHook;
 import org.jppf.serialization.ObjectSerializer;
@@ -39,6 +39,7 @@ import org.jppf.server.node.JPPFNode;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.hooks.HookFactory;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
@@ -107,7 +108,7 @@ abstract class AbstractJPPFDriver {
   /**
    * Determines whether this server has scheduled a shutdown.
    */
-  final AtomicBoolean shutdownSchduled = new AtomicBoolean(false);
+  final AtomicBoolean shutdownScheduled = new AtomicBoolean(false);
   /**
    * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
    */
@@ -144,6 +145,14 @@ abstract class AbstractJPPFDriver {
    * Whether JPPF debug mode is enabled.
    */
   final boolean jppfDebugEnabled;
+  /**
+   * 
+   */
+  NioHelper nioHelper;
+  /**
+   * To create and invoke hook instances.
+   */
+  final HookFactory hookFactory = HookFactory.newInstance();
 
   /**
    * Initialize this JPPFDriver.
@@ -239,6 +248,53 @@ abstract class AbstractJPPFDriver {
   /**
    * Start server, register it to recovery server if requested and print initialization message.
    * @param <T> the type of the server to start.
+   * @param identifier the nio identifier of the server.
+   * @param creator a function that creates the server.
+   * @return the started nioServer.
+   * @exclude
+   */
+  @SuppressWarnings("unchecked")
+  <T extends NioServer> T getOrCreateServer(final int identifier, final NioServerCreator<T> creator) {
+    return getOrCreateServer(identifier, true, creator);
+  }
+
+  /**
+   * Start server, register it to recovery server if requested and print initialization message.
+   * @param <T> the type of the server to start.
+   * @param identifier the nio identifier of the server.
+   * @param start whether to start a newly created server.
+   * @param creator a function that creates the server.
+   * @return the started nioServer.
+   * @exclude
+   */
+  @SuppressWarnings("unchecked")
+  <T extends NioServer> T getOrCreateServer(final int identifier, final boolean start, final NioServerCreator<T> creator) {
+    T server = null;
+    try {
+      server = (T) nioHelper.getServer(identifier);
+      if (server == null) {
+        final String name = JPPFIdentifiers.serverName(identifier);
+        if (debugEnabled) log.debug("starting nio server {}", name);
+        nioHelper.putServer(identifier, server = creator.create());
+        if (start) server.start();
+        if (server instanceof AcceptorNioServer) {
+          final AcceptorNioServer acceptor = (AcceptorNioServer) server;
+          printInitializedMessage(acceptor.getPorts(), acceptor.getSSLPorts(), acceptor.getName());
+        } else {
+          printInitializedMessage(null, null, server.getName());
+        }
+      }
+    } catch(final RuntimeException e) {
+      throw e;
+    } catch(final Exception e) {
+      throw new JPPFRuntimeException(e);
+    }
+    return server;
+  }
+
+  /**
+   * Start server, register it to recovery server if requested and print initialization message.
+   * @param <T> the type of the server to start.
    * @param nioServer the nio server to start.
    * @return started nioServer
    */
@@ -246,7 +302,12 @@ abstract class AbstractJPPFDriver {
     if (nioServer == null) throw new IllegalArgumentException("nioServer is null");
     if (debugEnabled) log.debug("starting nio server {}", nioServer);
     nioServer.start();
-    printInitializedMessage(nioServer.getPorts(), nioServer.getSSLPorts(), nioServer.getName());
+    if (nioServer instanceof AcceptorNioServer) {
+      final AcceptorNioServer acceptor = (AcceptorNioServer) nioServer;
+      printInitializedMessage(acceptor.getPorts(), acceptor.getSSLPorts(), acceptor.getName());
+    } else {
+      printInitializedMessage(null, null, nioServer.getName());
+    }
     return nioServer;
   }
 
@@ -331,5 +392,26 @@ abstract class AbstractJPPFDriver {
    */
   public boolean isJppfDebugEnabled() {
     return jppfDebugEnabled;
+  }
+
+  /**
+   * Get the factory that creates and invoke hook instances for this node.
+   * @return a {@link HookFactory} instance.
+   * @exclude
+   */
+  public HookFactory getHookFactory() {
+    return hookFactory;
+  }
+
+  /**
+   * @param <N> the type of server to create.
+   */
+  @FunctionalInterface
+  static interface NioServerCreator<N extends NioServer> {
+    /**
+     * Create the nio server.
+     * @return a server.
+     */
+    N create() throws Exception;
   }
 }

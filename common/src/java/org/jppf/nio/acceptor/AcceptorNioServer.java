@@ -51,18 +51,18 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
    * The statsistics to update, if any.
    */
   private final JPPFStatistics stats;
-
   /**
-   * Initialize this server with the specified port numbers.
-   * @param ports the ports this socket server is listening to.
-   * @param sslPorts the SSL ports this socket server is listening to.
-   * @param configuration the JPPF configuration to use.
-   * @throws Exception if the underlying server socket can't be opened.
+   * The ports this server is listening to.
    */
-  public AcceptorNioServer(final int[] ports, final int[] sslPorts, final TypedProperties configuration) throws Exception {
-    this(ports, sslPorts, null, configuration);
-    if (debugEnabled) log.debug("{} initialized", getClass().getSimpleName());
-  }
+  protected int[] ports = {};
+  /**
+   * The SSL ports this server is listening to.
+   */
+  protected int[] sslPorts = {};
+  /**
+   * List of opened server socket channels.
+   */
+  protected final Map<Integer, ServerSocketChannel> servers = new HashMap<>();
 
   /**
    * Initialize this server with the specified port numbers.
@@ -73,10 +73,32 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
    * @throws Exception if the underlying server socket can't be opened.
    */
   public AcceptorNioServer(final int[] ports, final int[] sslPorts, final JPPFStatistics stats, final TypedProperties configuration) throws Exception {
-    super(ports, sslPorts, JPPFIdentifiers.ACCEPTOR_CHANNEL, configuration);
+    super(JPPFIdentifiers.ACCEPTOR_CHANNEL, true, configuration);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     this.stats = stats;
-    if (debugEnabled) log.debug("{} initialized", getClass().getSimpleName());
+    if (debugEnabled) log.debug("{} initialized", this);
+    //if (debugEnabled) log.debug("{} initialized, call stack:\n{}", this, ExceptionUtils.getCallStack());
+  }
+
+  /**
+   * Initialize the underlying server sockets.
+   * @throws Exception if any error occurs while initializing the server sockets.
+   */
+  @Override
+  protected void init() throws Exception {
+    if ((ports != null) && (ports.length != 0)) init(ports, false);
+    if ((sslPorts != null) && (sslPorts.length != 0)) init(sslPorts, true);
+    super.init();
+  }
+
+  /**
+   * Initialize the underlying server sockets for the specified array of ports.
+   * @param portsToInit the array of ports to initiialize.
+   * @param ssl {@code true} if the server sockets should be initialized with SSL enabled, {@code false} otherwise.
+   * @throws Exception if any error occurs while initializing the server sockets.
+   */
+  private void init(final int[] portsToInit, final boolean ssl) throws Exception {
+    for (int i=0; i<portsToInit.length; i++) addServer(portsToInit[i], ssl, null, true);
   }
 
   @Override
@@ -111,6 +133,7 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
   @Override
   protected void doAccept(final SelectionKey key) {
     final ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
+    if (this.isStopped() || !serverSocketChannel.isOpen()) return;
     @SuppressWarnings("unchecked")
     final Map<String, ?> env = (Map<String, ?>) key.attachment();
     final boolean ssl = (Boolean) env.get("jppf.ssl");
@@ -177,41 +200,42 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public boolean addServer(final int portToInit, final boolean ssl, final Map<String, ?> env, final boolean retryOnException) throws Exception {
     int port = portToInit;
     if (debugEnabled) log.debug("adding server for port={}, ssl={}", port, ssl);
     if (port >= 0) {
+      ServerSocketChannel server = null;
+      Map<String, Object> map = null;
       synchronized(servers) {
-        final ServerSocketChannel server = servers.get(port);
+        server = servers.get(port);
         if (server != null) {
           if (debugEnabled) log.debug("port {} already used, not creating nio server", port);
           final SelectionKey key = server.keyFor(selector);
-          @SuppressWarnings("unchecked")
-          final Map<String, Object> map = (Map<String, Object>) key.attachment();
+          map = (Map<String, Object>) key.attachment();
           if (env != null) map.putAll(env);
           if (debugEnabled) log.debug("server added for port={}, ssl={}", port, ssl);
           return false;
         }
-      }
-      final int maxBindRetries = retryOnException ? JPPFConfiguration.getProperties().getInt("jppf.acceptor.bind.maxRetries", 3) : 1;
-      final long retryDelay = JPPFConfiguration.getProperties().getLong("jppf.acceptor.bind.retryDelay", 3000L);
-      final ServerSocketChannel server = ServerSocketChannel.open().setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
-      final InetAddress bindAddress = NetworkUtils.getInetAddress("jppf.bind.");
-      if (debugEnabled) log.debug("bind address: {}", bindAddress);
-      final InetSocketAddress addr = (bindAddress == null) ? new InetSocketAddress(port) : new InetSocketAddress(bindAddress, port);
-      if (debugEnabled) log.debug("binding server socket channel to address {}", addr);
-      RetryUtils.runWithRetry(maxBindRetries, retryDelay, () ->  server.bind(addr));
-      if (debugEnabled) log.debug("server socket channel bound to address {}", addr);
-      // If the user specified port zero, the operating system should dynamically allocate a port number.
-      // we store the actual assigned port number so that it can be broadcast.
-      if (port == 0) port = server.socket().getLocalPort();
-      server.configureBlocking(false);
-      final Map<String, Object> map = new HashMap<>();
-      map.put("jppf.ssl", ssl);
-      if (env != null) map.putAll(env);
-      if (debugEnabled) log.debug("adding server {} on port {}", server, port);
-      synchronized(servers) {
+        final int maxBindTries = retryOnException ? JPPFConfiguration.getProperties().getInt("jppf.acceptor.bind.maxRetries", 3) : 1;
+        final long retryDelay = JPPFConfiguration.getProperties().getLong("jppf.acceptor.bind.retryDelay", 3000L);
+        server = ServerSocketChannel.open().setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
+        final InetAddress bindAddress = NetworkUtils.getInetAddress("jppf.bind.");
+        if (debugEnabled) log.debug("bind address: {}", bindAddress);
+        final InetSocketAddress addr = (bindAddress == null) ? new InetSocketAddress(port) : new InetSocketAddress(bindAddress, port);
+        if (debugEnabled) log.debug("binding server socket channel to address {}", addr);
+        final ServerSocketChannel socketServer = server;
+        RetryUtils.runWithRetry(maxBindTries, retryDelay, () ->  socketServer.bind(addr));
+        if (debugEnabled) log.debug("server socket channel bound to address {}", addr);
+        // If the user specified port zero, the operating system should dynamically allocate a port number.
+        // we store the actual assigned port number so that it can be broadcast.
+        if (port == 0) port = server.socket().getLocalPort();
+        server.configureBlocking(false);
+        map = new HashMap<>();
+        map.put("jppf.ssl", ssl);
+        if (env != null) map.putAll(env);
         servers.put(port, server);
+        if (debugEnabled) log.debug("added server {} on port {}, servers = {}, this = {}", server, port, servers, this);
       }
       if (debugEnabled) log.debug("about to register server {} with selector", server);
       sync.wakeUpAndSetOrIncrement();
@@ -234,13 +258,34 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
    */
   @Override
   public void removeServer(final int port) throws IOException {
-    if (debugEnabled) log.debug("removing server on port={}", port);
+    if (debugEnabled) log.debug("removing server on port {}", port);
     final ServerSocketChannel server;
     synchronized(servers) {
       server = servers.remove(port);
     }
-    if (debugEnabled) log.debug("removed server={} on port={}", server, port);
+    if (debugEnabled) log.debug("removed server {} on port {}", server, port);
     if (server != null) server.close();
+    if (debugEnabled) log.debug("closed server {} on port {}", server, port);
+  }
+
+  @Override
+  public void removeAllConnections() {
+  }
+
+  /**
+   * Get the ports this server is listening to.
+   * @return an array of int values.
+   */
+  public int[] getPorts() {
+    return ports;
+  }
+
+  /**
+   * Get the SSL ports this server is listening to.
+   * @return an array of int values.
+   */
+  public int[] getSSLPorts() {
+    return sslPorts;
   }
 
   /**
@@ -258,5 +303,51 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
   protected void initNioHandlers() {
     super.initNioHandlers();
     writeHandler = null;
+  }
+
+  @Override
+  public void end() {
+    if (!stopped.compareAndSet(false, true)) return;
+    sync.wakeUpAndSetOrIncrement();
+    if (debugEnabled) {
+      synchronized(servers) {
+        log.debug("ending {}, servers = {}", this, servers);
+      }
+    }
+    Set<SelectionKey> keys = null;
+    try {
+      try {
+        keys = new HashSet<>(selector.keys());
+        selector.close();
+      } catch (final Exception e) {
+        log.error("error closing  selector", e);
+      }
+      if (keys != null) {
+        if (debugEnabled) log.debug("cancelling {} keys", keys.size());
+        for (final SelectionKey key: keys) {
+          try {
+            if (key.isValid()) key.cancel();
+            final SelectableChannel channel = key.channel();
+            if (channel.isOpen()) channel.close();
+          } catch (final Exception e) {
+            log.error("error closing  channel {}", key, e);
+          }
+        }
+      }
+    } finally {
+      sync.decrement();
+    }
+    synchronized(servers) {
+      if (debugEnabled) log.debug("ending {}, servers = {}", this, servers);
+      servers.forEach((port, server) -> {
+        try {
+          if (debugEnabled) log.debug("closing server bound to port {} : {}", port, server);
+          if (server.isOpen()) server.close();
+        } catch (final Exception e) {
+          if (debugEnabled) log.debug("error closing server {} on port {}", server, port, e);
+        }
+      });
+      servers.clear();
+    }
   }
 }

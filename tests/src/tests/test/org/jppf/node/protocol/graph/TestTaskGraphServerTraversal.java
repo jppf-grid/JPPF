@@ -121,7 +121,7 @@ public class TestTaskGraphServerTraversal extends Setup1D2N1C {
       assertNotNull(result);
       assertEquals(tasks.length, result.size());
       for (final Task<?> task: result) {
-        print(false, "checking %s", task);
+        print(false, false, "checking %s", task);
         assertTrue(task instanceof MyTask);
         final MyTask myTask = (MyTask) task;
         assertNull(myTask.getThrowable());

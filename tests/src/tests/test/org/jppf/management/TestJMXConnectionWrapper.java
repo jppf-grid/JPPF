@@ -47,16 +47,16 @@ public class TestJMXConnectionWrapper extends BaseTest {
           final long start = System.nanoTime();
           jmx.connectAndWait(duration);
           final long elapsed = (System.nanoTime() - start) / 1_000_000L;
-          printOut("[%s] connectAndWait() actually waited %,d ms", getName(), elapsed);
+          print(false, false, "[%s] connectAndWait() actually waited %,d ms", getName(), elapsed);
         }
       };
     }
-    printOut("starting all threads");
+    print(false, false, "starting all threads");
     for (int i=0; i<nbThreads; i++) threads[i].start();
-    printOut("wiating for all threads to join");
+    print(false, false, "wiating for all threads to join");
     for (int i=0; i<nbThreads; i++) threads[i].join();
-    printOut("closing connection");
+    print(false, false, "closing connection");
     jmx.close();
-    printOut("connection closed");
+    print(false, false, "connection closed");
   }
 }

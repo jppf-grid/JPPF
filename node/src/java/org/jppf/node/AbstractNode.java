@@ -31,6 +31,7 @@ import org.jppf.server.node.NodeIO;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -109,15 +110,22 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * @exclude
    */
   protected JMXServer jmxServer;
+  /**
+   * To create and invoke hook instances.
+   * @exclude
+   */
+  protected final HookFactory hookFactory;
 
   /**
    * Initialize this node.
    * @param uuid this node's uuid.
    * @param configuration the configuration of this node.
+   * @param hookFactory used to create and invoke hook instances.
    */
-  public AbstractNode(final String uuid, final TypedProperties configuration) {
+  public AbstractNode(final String uuid, final TypedProperties configuration, final HookFactory hookFactory) {
     this.uuid = uuid;
     this.configuration = configuration;
+    this.hookFactory = hookFactory;
     jmxEnabled = configuration.get(JPPFProperties.MANAGEMENT_ENABLED);
   }
 
@@ -282,5 +290,14 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    */
   public NodeIO getNodeIO() {
     return nodeIO;
+  }
+
+  /**
+   * Get the factory that creates and invoke hook instances for this node.
+   * @return a {@link HookFactory} instance.
+   * @exclude
+   */
+  public HookFactory getHookFactory() {
+    return hookFactory;
   }
 }

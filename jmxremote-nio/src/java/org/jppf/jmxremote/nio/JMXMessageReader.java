@@ -77,7 +77,7 @@ class JMXMessageReader {
    * @throws Exception if any error occurs.
    */
   private static void doRead(final JMXContext context) throws Exception {
-    final ExecutorService executor = NioHelper.getGlobalexecutor();
+    final ExecutorService executor = GlobalExecutor.getGlobalexecutor();
     while (true) {
       boolean b = false;
       try {

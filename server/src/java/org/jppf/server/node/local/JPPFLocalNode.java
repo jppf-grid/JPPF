@@ -21,6 +21,7 @@ package org.jppf.server.node.local;
 import org.jppf.classloader.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
+import org.jppf.utils.hooks.HookFactory;
 
 /**
  * Local (in-VM) node implementation.
@@ -37,9 +38,10 @@ public class JPPFLocalNode extends JPPFNode {
    * @param configuration the configuration of this node.
    * @param nodeConnection wraps the connection to the driver's job server.
    * @param classLoaderConnection wraps the connection to the driver's class server.
+   * @param hookFactory used to create and invoke hook instances.
    */
-  public JPPFLocalNode(final TypedProperties configuration, final AsyncLocalNodeConnection nodeConnection, final AbstractClassLoaderConnection<?> classLoaderConnection) {
-    super(uuidFromConfig(configuration), configuration);
+  public JPPFLocalNode(final TypedProperties configuration, final AsyncLocalNodeConnection nodeConnection, final AbstractClassLoaderConnection<?> classLoaderConnection, final HookFactory hookFactory) {
+    super(uuidFromConfig(configuration), configuration, hookFactory);
     this.nodeConnection = nodeConnection;
     this.classLoaderConnection = classLoaderConnection;
     classLoaderManager = new LocalClassLoaderManager(this);

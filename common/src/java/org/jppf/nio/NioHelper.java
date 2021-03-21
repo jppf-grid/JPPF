@@ -20,12 +20,9 @@ package org.jppf.nio;
 
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.*;
 
 import org.jppf.nio.acceptor.AcceptorNioServer;
-import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ConcurrentUtils;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
 /**
@@ -42,30 +39,98 @@ public class NioHelper {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Prefix for the NIO thread names.
-   */
-  public static final String NIO_THREAD_NAME_PREFIX = JPPFConfiguration.getProperties().getString("jppf.nio.thread.name.prefix", "JPPF");
-  /**
    * Mapping of NIO servers to their identifier.
    */
-  private static final Map<Integer, NioServer> identifiedServers = new HashMap<>();
+  private final Map<Integer, NioServer> identifiedServers = new HashMap<>();
   /**
-   * Global thread pool used by all NIO servers.
+   * 
    */
-  private static final ExecutorService globalExecutor = createExecutorFromConfig(NIO_THREAD_NAME_PREFIX);
+  private final List<Integer> ports = new ArrayList<>();
   /**
    * 
    */
   private static Method getJMXServerMethod;
+  /**
+   * 
+   */
+  private static final Map<Integer, NioHelper> portToHelperMap = new HashMap<>();
+  /**
+   * 
+   */
+  private static AcceptorNioServer acceptor;
+
+  /**
+   * Get the {@link NioHelper} instance mapped to the specified port.
+   * @param port the port number to lookup.
+   * @return the {@link NioHelper} the port is mapped to, or {@code null} if the port is not mapped.
+   */
+  public static NioHelper getNioHelper(final int port) {
+    synchronized(portToHelperMap) {
+      return portToHelperMap.get(port);
+    }
+  }
+
+  /**
+   * Map a new port to the specified {@link NioHelper} instance.
+   * @param port the port number to map.
+   * @param nioHelper the {@link NioHelper} to map the port to.
+   */
+  public static void putNioHelper(final int port, final NioHelper nioHelper) {
+    synchronized(portToHelperMap) {
+      portToHelperMap.putIfAbsent(port, nioHelper);
+      nioHelper.addPort(port);
+    }
+  }
+
+  /**
+   * Remove a port mùapping.
+   * @param port the port number to remove.
+   */
+  public static void removeNioHelper(final int port) {
+    synchronized(portToHelperMap) {
+      final NioHelper nioHelper = portToHelperMap.remove(port);
+      if (nioHelper != null) nioHelper.removePort(port);
+    }
+  }
 
   /**
    * Map the specified server tot he specified identifier.
    * @param identifier the JPPF identifier to mao to.
    * @param server the server to map.
    */
-  public static void putServer(final int identifier, final NioServer server) {
+  public void putServer(final int identifier, final NioServer server) {
     synchronized(identifiedServers) {
       identifiedServers.put(identifier, server);
+    }
+  }
+
+  /**
+   * Add the specified port to the list of ports.
+   * @param port the port to add.
+   */
+  public void addPort(final int port) {
+    synchronized(identifiedServers) {
+      ports.add(port);
+    }
+  }
+
+  /**
+   * Remove the specified port from the list of ports.
+   * @param port the port to remove.
+   */
+  public void removePort(final int port) {
+    synchronized(identifiedServers) {
+      ports.remove((Integer) port);
+    }
+  }
+
+  /**
+   * Get the list of ports.
+   * @return a copy of the list of ports.
+   */
+  public List<Integer> getPorts() {
+    synchronized(identifiedServers) {
+      return new ArrayList<>(ports);
     }
   }
 
@@ -74,7 +139,7 @@ public class NioHelper {
    * @param identifier the JPPF identifier to mao to.
    * @return the server that was removed, or {@code null} if there was no server for the specified identifier.
    */
-  public static NioServer removeServer(final int identifier) {
+  public NioServer removeServer(final int identifier) {
     synchronized(identifiedServers) {
       return identifiedServers.remove(identifier);
     }
@@ -86,7 +151,7 @@ public class NioHelper {
    * @return a {@link NioServer} instance.
    * @throws Exception if any error occurs.
    */
-  public static NioServer getServer(final int identifier) throws Exception {
+  public NioServer getServer(final int identifier) throws Exception {
     synchronized(identifiedServers) {
       if (identifier == JPPFIdentifiers.JMX_REMOTE_CHANNEL) {
         if (getJMXServerMethod == null) initializeJMXServerPool();
@@ -98,69 +163,30 @@ public class NioHelper {
 
   /**
    * Get the acceptor server.
+   * @param create whether to create a new acceptor if none exists.
    * @return a {@link AcceptorNioServer} instance.
    * @throws Exception if any error occurs.
    */
-  public static AcceptorNioServer getAcceptorServer() throws Exception {
-    synchronized(identifiedServers) {
-      NioServer acceptor = identifiedServers.get(JPPFIdentifiers.ACCEPTOR_CHANNEL);
-      if (acceptor == null) {
-        if (debugEnabled) log.debug("starting acceptor");
-        acceptor = new AcceptorNioServer(null, null, null);
-        putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptor);
-        acceptor.start();
-        if (debugEnabled) log.debug("acceptor started");
-      }
-      return (AcceptorNioServer) acceptor;
+  public synchronized static AcceptorNioServer getAcceptorServer(final boolean create) throws Exception {
+    if ((acceptor == null) && create) {
+      if (debugEnabled) log.debug("starting acceptor");
+      acceptor = new AcceptorNioServer(null, null, null, null);
+      acceptor.start();
+      if (debugEnabled) log.debug("acceptor started");
     }
+    return acceptor;
   }
 
   /**
-   * Initialize the executor for this transition manager.
-   * @param prefix name of the thread group and prefix for the thread names.
-   * @return an {@link ExecutorService} object.
-   * @since 5.0
+   * Get the acceptor server.
+   * @param acceptorServer the acceptor server to set.
+   * @throws Exception if any error occurs.
    */
-  public static ExecutorService createExecutorFromConfig(final String prefix) {
-    final int core = NioConstants.THREAD_POOL_SIZE;
-    final String poolType = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_POOL_TYPE);
-    ThreadPoolExecutor tpe = null;
-    ExecutorService executor = null;
-    if ("dynamic".equals(poolType)) {
-      final int queueSize = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_QUEUE_SIZE);
-      final long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
-      executor = tpe = ConcurrentUtils.newBoundedQueueExecutor(core, queueSize, ttl, prefix);
-      if (debugEnabled) log.debug(String.format(Locale.US, "dynamic globalExecutor: core=%,d; queueSize=%,d; ttl=%,d; maxSize=%,d", core, queueSize, ttl, tpe.getMaximumPoolSize()));
-    } else if ("sync".equals(poolType)) {
-      final long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
-      executor = tpe = ConcurrentUtils.newDirectHandoffExecutor(core, ttl, prefix);
-      if (debugEnabled) log.debug(String.format(Locale.US, "sync globalExecutor: core=%,d; ttl=%,d; maxSize=%,d", core, ttl, tpe.getMaximumPoolSize()));
-    } else if ("jppf".equals(poolType)) {
-      final long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
-      //executor = ConcurrentUtils.newJPPFThreadPool(core, Integer.MAX_VALUE, ttl, prefix);
-      executor = ConcurrentUtils.newJPPFDirectHandoffExecutor(core, Integer.MAX_VALUE, ttl, prefix);
-      if (debugEnabled) log.debug(String.format(Locale.US, "sync globalExecutor: core=%,d; ttl=%,d; maxSize=%,d", core, ttl, Integer.MAX_VALUE));
-    } else {
-      executor = tpe = ConcurrentUtils.newFixedExecutor(core, prefix);
-      if (debugEnabled) log.debug(String.format(Locale.US, "fixed globalExecutor: core=%,d; maxSize=%,d", core, tpe.getMaximumPoolSize()));
+  public synchronized static void setAcceptorServer(final AcceptorNioServer acceptorServer) throws Exception {
+    if (acceptor == null) {
+      if (debugEnabled) log.debug("setting acceptor");
+      acceptor = acceptorServer;
     }
-    return executor;
-  }
-
-  /**
-   * @return the global thread pool used by all NIO servers.
-   */
-  public static ExecutorService getGlobalexecutor() {
-    return globalExecutor;
-  }
-
-  /**
-   * Shutdown the global executor for all transition managers.
-   * @param now if {@code true} then call {@code shutdownNow()} on the executor, otherwise, call {@code shutdown()}.
-   */
-  public static void shutdown(final boolean now) {
-    if (now) globalExecutor.shutdownNow();
-    else globalExecutor.shutdown();
   }
 
   /**
