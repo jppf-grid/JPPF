@@ -27,7 +27,6 @@ import org.jppf.node.protocol.*;
 import org.jppf.node.protocol.graph.*;
 import org.jppf.utils.collections.CollectionMap;
 import org.jppf.utils.configuration.JPPFProperties;
-import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -56,7 +55,7 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
    */
   public AbstractNodeIO(final N node) {
     this.node = node;
-    HookFactory.registerConfigSingleHook(JPPFProperties.SERIALIZATION_EXCEPTION_HOOK, SerializationExceptionHook.class, new DefaultSerializationExceptionHook(), getClass().getClassLoader());
+    node.getHookFactory().registerConfigSingleHook(JPPFProperties.SERIALIZATION_EXCEPTION_HOOK, SerializationExceptionHook.class, new DefaultSerializationExceptionHook(), getClass().getClassLoader());
   }
 
   @Override

@@ -25,7 +25,7 @@ import java.util.concurrent.*;
 import org.jppf.nio.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
-import org.jppf.utils.concurrent.JPPFThreadFactory;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**
@@ -54,7 +54,7 @@ public class AsyncNodeMessageReader extends NioMessageReader<AsyncNodeContext> {
   public AsyncNodeMessageReader(final AsyncNodeNioServer server) {
     super(server);
     final int n = server.getConfiguration().getInt("jppf.node.reader.max.threads", Runtime.getRuntime().availableProcessors());
-    this.executor = (n > 0) ? Executors.newFixedThreadPool(n, new JPPFThreadFactory("NodeReader")) : NioHelper.getGlobalexecutor();
+    this.executor = (n > 0) ? Executors.newFixedThreadPool(n, new JPPFThreadFactory("NodeReader")) : GlobalExecutor.getGlobalexecutor();
   }
 
   @Override

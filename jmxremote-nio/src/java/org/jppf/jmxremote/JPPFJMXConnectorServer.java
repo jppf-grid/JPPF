@@ -105,9 +105,10 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
       final int port = address.getPort();
       final Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
       final boolean secure = (tls == null) ? false : tls;
-      if (!NioHelper.getAcceptorServer().addServer(port, secure, environment, false)) {
+      if (!NioHelper.getAcceptorServer(true).addServer(port, secure, environment, false)) {
         if (standalone) throw new BindException("port " + port + " already in use");
       }
+      if (standalone) NioHelper.putNioHelper(port, new NioHelper());
       if (debugEnabled) log.debug("server @{} added listener port {}", address, port);
       for (final JMXNioServer server: JMXNioServerPool.getServers()) server.addConnectionStatusListener(this);
       started = true;
@@ -125,15 +126,17 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
     try {
       if (!started) return;
       started = false;
+      final int port = address.getPort();
       try {
-        for (final JMXNioServer server: JMXNioServerPool.getServers()) {
-          server.removeAllConnections(address.getPort());
-        }
+        Arrays.stream(JMXNioServerPool.getServers()).forEach(server -> server.removeAllConnections(port));
       } finally {
         for (final JMXNioServer server: JMXNioServerPool.getServers()) server.removeConnectionStatusListener(this);
       }
-      if (debugEnabled) log.debug("stopping acceptor for port {}", address.getPort());
-      if (standalone) NioHelper.getAcceptorServer().removeServer(address.getPort());
+      if (debugEnabled) log.debug("stopping acceptor for port {}", port);
+      if (standalone) {
+        NioHelper.removeNioHelper(port);
+        NioHelper.getAcceptorServer(false).removeServer(port);
+      }
     } catch (final IOException e) {
       throw e;
     } catch (final Exception e) {

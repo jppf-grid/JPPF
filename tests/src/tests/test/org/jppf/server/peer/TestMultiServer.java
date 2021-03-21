@@ -200,7 +200,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
         assertNotNull(t.getResult());
         assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
       }
-      BaseTest.printOut("%s : map = %s", name , CollectionUtils.prettyPrint(map));
+      BaseTest.print(false, false, "%s : map = %s", name , CollectionUtils.prettyPrint(map));
       assertEquals(nbNodes, map.keySet().size());
     } finally {
       if (lbi != null) client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
@@ -245,7 +245,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
       assertNotNull(t.getResult());
       assertEquals("executed " + t.getId(), t.getResult());
     }
-    printOut("%s : map = %s", name , CollectionUtils.prettyPrint(map));
+    print(false, false, "%s : map = %s", name , CollectionUtils.prettyPrint(map));
     assertEquals(nbNodes, map.keySet().size());
     for (int i=0; i<nbNodes; i++) {
       final String key = "n" + (i+1);

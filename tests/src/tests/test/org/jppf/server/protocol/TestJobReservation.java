@@ -105,7 +105,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @Before
   public void showIdleNodes() throws Exception {
-    BaseTest.print(false, "nb idle nodes = %d", jmx.nbIdleNodes());
+    BaseTest.print(false, false, "nb idle nodes = %d", jmx.nbIdleNodes());
     RetryUtils.runWithRetryTimeout(5000L, 500L, () -> {
       final int n;
       if ((n = jmx.nbIdleNodes()) != BaseSetup.nbNodes()) throw new IllegalStateException(String.format("expected <%d> nodes but got <%d>", BaseSetup.nbNodes(), n));
@@ -369,7 +369,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
           if (n == null) map.put(uuid, n = new AtomicInteger(0));
           n.incrementAndGet();
           total.incrementAndGet();
-          print(false, "got notification from node %s, timestamp = [%s], current count = %d, total = %d", uuid, BaseTest.getFormattedTimestamp(notif.getTimeStamp()), n.get(), total.get());
+          print(false, false, "got notification from node %s, timestamp = [%s], current count = %d, total = %d", uuid, BaseTest.getFormattedTimestamp(notif.getTimeStamp()), n.get(), total.get());
         }
       }
     }
@@ -378,7 +378,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
      * Reset the state of this listener.
      */
     public synchronized void reset() {
-      BaseTest.print(false, "resetting node connection listener");
+      BaseTest.print(false, false, "resetting node connection listener");
       map.clear();
       total.set(0);
     }

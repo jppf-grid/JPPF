@@ -66,22 +66,22 @@ public class TestJPPFClient2 extends BaseTest {
    * @throws Exception if any error occurs
    */
   @Test(timeout=10000)
-  public void testAllQUeuedJobs() throws Exception {
+  public void testAllQueuedJobs() throws Exception {
     final int nbJobs = 6;
     final List<JPPFJob> jobs = createJobs(nbJobs, ReflectionUtils.getCurrentMethodName());
     for (final JPPFJob job: jobs) client.submitAsync(job);
     for (int i=0; i<nbJobs; i++) {
-      final List<JPPFJob> queued = client.getQueuedJobs();
-      assertNotNull(queued);
-      assertEquals(nbJobs - i, queued.size());
-      for (int j=i; j < nbJobs; j++) assertTrue(String.format("i = %d, j = %d", i, j), queued.contains(jobs.get(j)));
+      final List<JPPFJob> Queued = client.getQueuedJobs();
+      assertNotNull(Queued);
+      assertEquals(nbJobs - i, Queued.size());
+      for (int j=i; j < nbJobs; j++) assertTrue(String.format("i = %d, j = %d", i, j), Queued.contains(jobs.get(j)));
       final JPPFJob job = jobs.get(i);
       job.cancel();
       job.awaitResults();
     }
-    final List<JPPFJob> queued = client.getQueuedJobs();
-    assertNotNull(queued);
-    assertEquals(0, queued.size());
+    final List<JPPFJob> Queued = client.getQueuedJobs();
+    assertNotNull(Queued);
+    assertEquals(0, Queued.size());
   }
 
   /**
@@ -89,22 +89,22 @@ public class TestJPPFClient2 extends BaseTest {
    * @throws Exception if any error occurs
    */
   @Test(timeout=10000)
-  public void testQUeuedJobsWithSelector() throws Exception {
+  public void testQueuedJobsWithSelector() throws Exception {
     final int nbJobs = 6;
     final List<JPPFJob> jobs = createJobs(nbJobs, ReflectionUtils.getCurrentMethodName());
     for (final JPPFJob job: jobs) client.submitAsync(job);
     for (int i=0; i<nbJobs; i++) {
-      final List<JPPFJob> queued = client.getQueuedJobs(CUSTOM_JOB_SELECTOR);
-      assertNotNull(queued);
-      assertEquals(String.format("i = %d", i), (i % 2) + (nbJobs - i) / 2, queued.size());
-      for (final JPPFJob job: queued) assertEquals(String.format("job %s", job.getName()), 1, ((Integer) job.getMetadata().getParameter("test")) % 2);
+      final List<JPPFJob> Queued = client.getQueuedJobs(CUSTOM_JOB_SELECTOR);
+      assertNotNull(Queued);
+      assertEquals(String.format("i = %d", i), (i % 2) + (nbJobs - i) / 2, Queued.size());
+      for (final JPPFJob job: Queued) assertEquals(String.format("job %s", job.getName()), 1, ((Integer) job.getMetadata().getParameter("test")) % 2);
       final JPPFJob job = jobs.get(i);
       job.cancel();
       job.awaitResults();
     }
-    final List<JPPFJob> queued = client.getQueuedJobs();
-    assertNotNull(queued);
-    assertEquals(0, queued.size());
+    final List<JPPFJob> Queued = client.getQueuedJobs();
+    assertNotNull(Queued);
+    assertEquals(0, Queued.size());
   }
 
   /**
@@ -112,7 +112,7 @@ public class TestJPPFClient2 extends BaseTest {
    * @throws Exception if any error occurs
    */
   @Test(timeout=10000)
-  public void testAllQUeuedJobsCount() throws Exception {
+  public void testAllQueuedJobsCount() throws Exception {
     final int nbJobs = 6;
     final List<JPPFJob> jobs = createJobs(nbJobs, ReflectionUtils.getCurrentMethodName());
     for (final JPPFJob job: jobs) client.submitAsync(job);
@@ -131,7 +131,7 @@ public class TestJPPFClient2 extends BaseTest {
    * @throws Exception if any error occurs
    */
   @Test(timeout=10000)
-  public void testQUeuedJobsCountWithSelector() throws Exception {
+  public void testQueuedJobsCountWithSelector() throws Exception {
     final int nbJobs = 6;
     final List<JPPFJob> jobs = createJobs(nbJobs, ReflectionUtils.getCurrentMethodName());
     for (final JPPFJob job: jobs) client.submitAsync(job);

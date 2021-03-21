@@ -109,6 +109,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * Whether the client should print connection events to stdout.
    */
   private boolean sysoutEnabled;
+  /**
+   * To create and invoke hook instances.
+   */
+  final HookFactory hookFactory = HookFactory.newInstance();
 
   /**
    * Initialize this client with a specified application UUID.
@@ -146,7 +150,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     this.bundlerFactory = new JPPFBundlerFactory(JPPFBundlerFactory.Defaults.CLIENT, config);
     this.loadBalancerPersistenceManager = new LoadBalancerPersistenceManager(this.bundlerFactory);
     try {
-      HookFactory.registerSPIMultipleHook(JPPFClientStartupSPI.class, null, null).invoke("run");
+      hookFactory.registerSPIMultipleHook(JPPFClientStartupSPI.class, null, null).invoke("run");
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -299,7 +303,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         receiverThread = null;
       }
       if (debugEnabled) log.debug("unregistering startup classes");
-      HookFactory.unregister(JPPFClientStartupSPI.class);
+      hookFactory.reset();
       if (jobManager != null) {
         if (reset) {
           if (debugEnabled) log.debug("resetting job manager");

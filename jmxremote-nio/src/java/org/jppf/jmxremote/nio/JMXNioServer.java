@@ -105,7 +105,7 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
     serverNotificationHandler = new ServerNotificationHandler(this);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     registerMBean();
-    final AcceptorNioServer acceptor = (AcceptorNioServer) NioHelper.getServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
+    final AcceptorNioServer acceptor = NioHelper.getAcceptorServer(false);
     this.stats = (acceptor != null) ? acceptor.getStats() : null;
     if (debugEnabled) log.debug("initialized {}, stats = {}", this, (stats == null ? "null" : stats.getClass().getSimpleName() + "@" + Integer.toHexString(System.identityHashCode(stats))));
   }
@@ -150,11 +150,12 @@ public final class JMXNioServer extends StatelessNioServer<JMXContext> implement
     final boolean peer, final Object... params) {
     try {
       // server-side connection
-      if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
-      final NioServer acceptor = NioHelper.getServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
+      if (debugEnabled) log.debug("accepting socketChannel = {}, peer = {}, params = {}", channel, peer, Arrays.toString(params));
+      final NioServer acceptor = NioHelper.getAcceptorServer(false);
       if (acceptor == null) return;
+      final SelectionKey key = serverSocketChannel.keyFor(acceptor.getSelector());
       @SuppressWarnings("unchecked")
-      final Map<String, ?> env = (Map<String, ?>) serverSocketChannel.keyFor(acceptor.getSelector()).attachment();
+      final Map<String, ?> env = (Map<String, ?>) key.attachment();
       final InetSocketAddress saddr = (InetSocketAddress) serverSocketChannel.getLocalAddress();
       final int port = saddr.getPort();
       final InetAddress addr = saddr.getAddress();

@@ -81,10 +81,6 @@ public class NodeRunner {
    */
   private LauncherListener launcherListener;
   /**
-   * Whether this is anAndroid node.
-   */
-  private boolean android;
-  /**
    * The configuration of the node.
    */
   private final TypedProperties configuration;
@@ -112,7 +108,6 @@ public class NodeRunner {
     this.uuid = this.configuration.getString("jppf.node.uuid", JPPFUuid.normalUUID());
     if (debugEnabled && this.configuration.get(JPPFProperties.DEBUG_ENABLED)) log.debug("starting node with configuration:\n{}", configuration);
     this.offline = this.configuration.get(JPPFProperties.NODE_OFFLINE);
-    this.android = this.configuration.get(JPPFProperties.NODE_ANDROID);
   }
 
   /**
@@ -151,14 +146,11 @@ public class NodeRunner {
    */
   public void start(final String...args) {
     try {
-      if (!android) new JmxMessageNotifier(); // initialize the jmx logger
+      new JmxMessageNotifier(); // initialize the jmx logger
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
       if (debugEnabled) log.debug("launching the JPPF node");
       VersionUtils.logVersionInformation("node", uuid);
       if (debugEnabled) log.debug("registering hooks");
-      HookFactory.registerSPIMultipleHook(InitializationHook.class, null, null);
-      HookFactory.registerConfigSingleHook(JPPFProperties.SERVER_CONNECTION_STRATEGY, DriverConnectionStrategy.class, new JPPFDefaultConnectionStrategy(configuration), null,
-        new Class<?>[] { TypedProperties.class}, configuration);
       if ((args != null) && (args.length > 0) && !"noLauncher".equals(args[0])) {
         if (debugEnabled) log.debug("setting up connection with parent process on port {}", args[0]);
         final int port = Integer.parseInt(args[0]);
@@ -172,8 +164,12 @@ public class NodeRunner {
       if (debugEnabled) log.debug("node startup main loop");
       ConnectionContext context = new ConnectionContext("Initial connection", null, ConnectionReason.INITIAL_CONNECTION_REQUEST);
       while (true) {
+        final HookFactory hookFactory = HookFactory.newInstance();
         node = null;
         try {
+          hookFactory.registerSPIMultipleHook(InitializationHook.class, null, null);
+          hookFactory.registerConfigSingleHook(JPPFProperties.SERVER_CONNECTION_STRATEGY, DriverConnectionStrategy.class, new JPPFDefaultConnectionStrategy(configuration), null,
+            new Class<?>[] { TypedProperties.class}, configuration);
           if (debugEnabled) log.debug("initializing configuration");
           if (initialConfig == null) initialConfig = new TypedProperties(configuration);
           else {
@@ -181,7 +177,7 @@ public class NodeRunner {
             else configuration.remove("jppf.node.overrides.set");
           }
           if (debugEnabled) log.debug("creating node");
-          node = createNode(context);
+          node = createNode(context, hookFactory);
           if (launcherListener != null) launcherListener.setActionHandler(new ShutdownRestartNodeProtocolHandler(node));
           if (debugEnabled) log.debug("running node");
           node.run();
@@ -199,6 +195,7 @@ public class NodeRunner {
             if (debugEnabled) log.debug("exiting: node={}, shuttingDown={}, embeddedShutdown", node, (node == null) ? "n/a" :node.getShuttingDown().get(), embeddedShutdown.get());
             break;
           }
+          hookFactory.reset();
         }
       }
     } catch(final Throwable e) {
@@ -211,22 +208,23 @@ public class NodeRunner {
   /**
    * Start the node.
    * @param connectionContext provides context information on the new connection request to the driver.
+   * @param hookFactory the factory used to invoke already registered hooks.
    * @return the node that was started, as a {@code JPPFNode} instance.
    * @throws Exception if the node failed to run or couldn't connect to the server.
    */
-  private JPPFNode createNode(final ConnectionContext connectionContext) throws Exception {
+  private JPPFNode createNode(final ConnectionContext connectionContext, final HookFactory hookFactory) throws Exception {
     if (debugEnabled) log.debug("creating node with connectionContext = {}, configuration=\n{}", connectionContext, configuration);
-    HookFactory.invokeHook(InitializationHook.class, "initializing", initialConfig);
+    hookFactory.invokeHook(InitializationHook.class, "initializing", initialConfig);
     SystemUtils.printPidAndUuid("node", uuid);
-    currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
+    currentConnectionInfo = (DriverConnectionInfo) hookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
     //String className = "org.jppf.server.node.remote.JPPFRemoteNode";
     final String className = configuration.get(JPPFProperties.NODE_CLASS);
-    final AbstractJPPFClassLoader loader = getJPPFClassLoader();
+    final AbstractJPPFClassLoader loader = getJPPFClassLoader(hookFactory);
     if (debugEnabled) log.debug("got node class loader {}", loader);
     final Class<?> clazz = loader.loadClass(className);
-    final Constructor<?> c = clazz.getConstructor(String.class, TypedProperties.class, DriverConnectionInfo.class);
+    final Constructor<?> c = clazz.getConstructor(String.class, TypedProperties.class, DriverConnectionInfo.class, HookFactory.class);
     if (debugEnabled) log.debug("instantiating {}", className);
-    final JPPFNode node = (JPPFNode) c.newInstance(uuid, configuration, currentConnectionInfo);
+    final JPPFNode node = (JPPFNode) c.newInstance(uuid, configuration, currentConnectionInfo, hookFactory);
     node.setJPPFClassLoader(loader);
     node.setStartedFromMain(startedFromMain);
     if (debugEnabled) log.debug("Created new node instance: {}, config =\n{}", node, node.getConfiguration());
@@ -247,13 +245,15 @@ public class NodeRunner {
 
   /**
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
+   * @param hookFactory the factory used to invoke already registered hooks.
    * @return a {@code AbstractJPPFClassLoader} used for loading the classes of the framework.
    * @exclude
    */
-  public AbstractJPPFClassLoader getJPPFClassLoader() {
+  private AbstractJPPFClassLoader getJPPFClassLoader(final HookFactory hookFactory) {
     synchronized(JPPFClassLoader.class) {
       if (classLoader == null) {
-        final PrivilegedAction<JPPFClassLoader> action = () -> new JPPFClassLoader(offline ? null : new RemoteClassLoaderConnection(uuid, currentConnectionInfo), NodeRunner.class.getClassLoader());
+        final PrivilegedAction<JPPFClassLoader> action =
+          () -> new JPPFClassLoader(offline ? null : new RemoteClassLoaderConnection(uuid, currentConnectionInfo), NodeRunner.class.getClassLoader(), null, hookFactory);
         classLoader = AccessController.doPrivileged(action);
         if (debugEnabled) log.debug("created new class loader {}", classLoader);
         Thread.currentThread().setContextClassLoader(classLoader);
@@ -294,6 +294,4 @@ public class NodeRunner {
   public Node getNode() {
     return node;
   }
-
-  
 }

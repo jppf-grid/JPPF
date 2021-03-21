@@ -92,7 +92,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final String xml = FileUtils.readTextFile(RESOURCES_DIR + "/ValidTrueGridPolicy.xml");
     final String name = ReflectionUtils.getCurrentClassAndMethod();
     final ExecutionPolicy p = PolicyParser.parsePolicy(xml);
-    printOut("%s() grid policy:%n%s%n", name, p);
+    print(false, false, "%s() grid policy:%n%s%n", name, p);
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
@@ -116,7 +116,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final String xml = FileUtils.readTextFile(RESOURCES_DIR + "/GridPolicyWithExpression.xml");
     final String name = ReflectionUtils.getCurrentClassAndMethod();
     final ExecutionPolicy p = PolicyParser.parsePolicy(xml);
-    printOut("%s() grid policy:%n%s%n", name, p);
+    print(false, false, "%s() grid policy:%n%s%n", name, p);
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
@@ -161,7 +161,7 @@ public class TestGridPolicy extends Setup1D2N1C {
     final String name = ReflectionUtils.getCurrentClassAndMethod();
     // more than 1 node with at least 1 processing thread
     final ExecutionPolicy p = new NodesMatching(Operator.MORE_THAN, 1, new AtLeast(JPPFProperties.PROCESSING_THREADS.getName(), 1));
-    printOut("%s() grid policy:%n%s%n", name, p);
+    print(false, false, "%s() grid policy:%n%s%n", name, p);
     final JPPFJob job = BaseTestHelper.createJob(name, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck

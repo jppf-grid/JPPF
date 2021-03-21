@@ -24,6 +24,7 @@ import org.jppf.server.node.*;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -54,9 +55,10 @@ public abstract class AbstractRemoteNode extends JPPFNode implements HeartbeatCo
    * @param uuid this node's uuid.
    * @param configuration the configuration of this node.
    * @param connectionInfo the server connection information.
+   * @param hookFactory used to create and invoke hook instances.
    */
-  public AbstractRemoteNode(final String uuid, final TypedProperties configuration, final DriverConnectionInfo connectionInfo) {
-    super(uuid, configuration);
+  public AbstractRemoteNode(final String uuid, final TypedProperties configuration, final DriverConnectionInfo connectionInfo, final HookFactory hookFactory) {
+    super(uuid, configuration, hookFactory);
     this.connectionInfo = connectionInfo;
     initClassLoaderManager();
   }

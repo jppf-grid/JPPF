@@ -69,7 +69,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
     final NodeForwardingMBean forwarder = jmx.getForwarder();
     // cancel currently executing jobs in all nodes
     forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "cancel");
-    print(false, "nb idle nodes = %d", jmx.nbIdleNodes());
+    print(false, false, "nb idle nodes = %d", jmx.nbIdleNodes());
     ConcurrentUtils.awaitCondition((ConcurrentUtils.ConditionFalseOnException) () -> jmx.nbIdleNodes() == 2, 5000L, 500L, true);
   }
 

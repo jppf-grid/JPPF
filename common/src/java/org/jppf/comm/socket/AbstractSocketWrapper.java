@@ -43,24 +43,24 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
   /**
    * The underlying socket wrapped by this SocketClient.
    */
-  protected Socket socket = null;
+  protected Socket socket;
   /**
    * A timestamp that should reflect the system millisecond counter at the
    * last known good usage of the underlying socket.
    */
-  private long socketTimestamp = 0L;
+  private long socketTimestamp;
   /**
    * A reference to the underlying socket's output stream.
    */
-  protected DataOutputStream dos = null;
+  protected DataOutputStream dos;
   /**
    * A buffered stream built on top of to the underlying socket's input stream.
    */
-  protected DataInputStream dis = null;
+  protected DataInputStream dis;
   /**
    * The host the socket connects to.
    */
-  protected String host = null;
+  protected String host;
   /**
    * The port number on the host the socket connects to.
    */
@@ -68,11 +68,11 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
   /**
    * Flag indicating the opened state of the underlying socket.
    */
-  protected boolean opened = false;
+  protected boolean opened;
   /**
    * Used to serialize or deserialize an object into or from an array of bytes.
    */
-  protected ObjectSerializer serializer = null;
+  protected ObjectSerializer serializer;
 
   /**
    * Default constructor is visible to subclasses only.
@@ -89,10 +89,23 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
    * @throws IOException if there is an issue with the socket streams.
    */
   public AbstractSocketWrapper(final String host, final int port, final ObjectSerializer serializer) throws ConnectException, IOException {
+    this(host, port, serializer, true);
+  }
+
+  /**
+   * Initialize this socket client and connect it to the specified host on the specified port.
+   * @param host the remote host this socket client connects to.
+   * @param port the remote port on the host this socket client connects to.
+   * @param serializer the object serializer used by this socket client.
+   * @param doOpen whether to actually open the conenction.
+   * @throws ConnectException if the connection fails.
+   * @throws IOException if there is an issue with the socket streams.
+   */
+  public AbstractSocketWrapper(final String host, final int port, final ObjectSerializer serializer, final boolean doOpen) throws ConnectException, IOException {
     this.host = host;
     this.port = port;
     this.serializer = serializer;
-    open();
+    if (doOpen) open();
   }
 
   /**

@@ -201,6 +201,11 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
         try {
           awaitStatus();
           final TaskBundle bundle = connection.receiveHeader(null, null);
+          if (bundle == null) {
+            thisLog.debug("received null header");
+            continue;
+            //throw new IllegalStateException("received null header");
+          }
           if (thisDebugEnabled) thisLog.debug("received bundle {}", bundle);
           final long bundleId = bundle.getParameter(BundleParameter.CLIENT_BUNDLE_ID);
           final RemoteResponse response = responseMap.remove(bundleId);

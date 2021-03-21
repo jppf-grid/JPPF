@@ -23,7 +23,6 @@ import java.util.concurrent.Callable;
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.ExceptionUtils;
-import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -97,7 +96,9 @@ public class ObjectDeserializationTask implements Callable<ObjectDeserialization
       final String desc = (index == 0 ? "data provider" : "task at index " + index) + " could not be deserialized";
       if (traceEnabled) log.debug("{} : {}", desc, ExceptionUtils.getStackTrace(t));
       else log.error("{} : {}", desc, ExceptionUtils.getMessage(t));
-      if (index > 0) object = HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", desc, t);
+      if (index > 0) {
+        object = cont.getClassLoader().getHookFactory().invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", desc, t);
+      }
     } finally {
       Thread.currentThread().setContextClassLoader(cl);
     }

@@ -62,19 +62,11 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * Initialize this class loader with a parent class loader.
    * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
-   */
-  public AbstractJPPFClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent) {
-    super(connection, parent, null);
-  }
-
-  /**
-   * Initialize this class loader with a parent class loader.
-   * @param connection the connection to the driver.
-   * @param parent a ClassLoader instance.
    * @param uuidPath unique identifier for the submitting application.
+   * @param hookFactory a {@link HookFactory} instance.
    */
-  public AbstractJPPFClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent, final List<String> uuidPath) {
-    super(connection, parent, uuidPath);
+  public AbstractJPPFClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent, final List<String> uuidPath, final HookFactory hookFactory) {
+    super(connection, parent, uuidPath, hookFactory);
   }
 
   /**
@@ -469,7 +461,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   protected void fireEvent(final Class<?> c, final String name, final boolean foundInURLClassPath) {
     final boolean found = c != null;
     final ClassLoaderEvent event = found ? new ClassLoaderEvent(this, c, foundInURLClassPath) : new ClassLoaderEvent(this, name);
-    HookFactory.invokeHook(ClassLoaderListener.class, found ? "classLoaded" : "classNotFound", event);
+    hookFactory.invokeHook(ClassLoaderListener.class, found ? "classLoaded" : "classNotFound", event);
   }
 
   /**

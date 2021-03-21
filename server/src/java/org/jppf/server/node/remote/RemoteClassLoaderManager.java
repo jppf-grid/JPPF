@@ -64,7 +64,7 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager<JPPFRem
     return () -> {
       final PrivilegedAction<AbstractJPPFClassLoader> pa = () -> {
         final AbstractJPPFClassLoader parent = getClassLoader();
-        return new JPPFClassLoader(parent.getConnection(), parent, uuidPath);
+        return new JPPFClassLoader(parent.getConnection(), parent, uuidPath, node.getHookFactory());
       };
       return AccessController.doPrivileged(pa);
     };

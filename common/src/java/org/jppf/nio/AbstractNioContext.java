@@ -195,7 +195,7 @@ public abstract class AbstractNioContext implements NioContext {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append(", uuid=").append(uuid);
+    sb.append("uuid=").append(uuid);
     sb.append(", connectionUuid=").append(connectionUuid);
     sb.append(", peer=").append(peer);
     sb.append(", ssl=").append(ssl);

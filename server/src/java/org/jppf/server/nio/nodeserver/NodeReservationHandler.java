@@ -22,12 +22,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jppf.management.JMXNodeConnectionWrapper;
-import org.jppf.nio.NioHelper;
 import org.jppf.node.protocol.JPPFNodeConfigSpec;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.ServerJob;
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 import org.jppf.utils.collections.*;
+import org.jppf.utils.concurrent.GlobalExecutor;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -102,7 +102,7 @@ public class NodeReservationHandler {
       pendingMap.put(node.getUuid(), job.getUuid());
       jobPendingMap.putValue(job.getUuid(), node.getUuid());
     }
-    NioHelper.getGlobalexecutor().execute(new NodeReservationTask(job, node));
+    GlobalExecutor.getGlobalexecutor().execute(new NodeReservationTask(job, node));
   }
 
   /**

@@ -24,20 +24,21 @@ import java.nio.ByteBuffer;
 import org.jppf.comm.socket.SocketWrapper;
 
 /**
- * Input source backed by a {@link org.jppf.comm.socket.SocketWrapper SocketWrapper}.
+ * Input source backed by a {@link SocketWrapper}.
  * @author Laurent Cohen
  */
 public class SocketWrapperInputSource implements InputSource {
   /**
-   * The backing <code>SocketWrapper</code>.
+   * The backing {@code SocketWrapper}.
    */
-  private SocketWrapper socketWrapper = null;
+  private final SocketWrapper socketWrapper;
 
   /**
-   * Initialize this input source with the specified <code>SocketWrapper</code>.
-   * @param socketWrapper the backing <code>SocketWrapper</code>.
+   * Initialize this input source with the specified {@code SocketWrapper}.
+   * @param socketWrapper the backing {@code SocketWrapper}.
    */
   public SocketWrapperInputSource(final SocketWrapper socketWrapper) {
+    if (socketWrapper == null) throw new IllegalArgumentException("input SocketWrapper cannot be null");
     this.socketWrapper = socketWrapper;
   }
 
