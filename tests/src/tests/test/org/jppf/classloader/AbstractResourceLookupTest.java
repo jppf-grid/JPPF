@@ -47,7 +47,7 @@ public abstract class AbstractResourceLookupTest extends AbstractNonStandardSetu
   @Test(timeout=TEST_TIMEOUT)
   public void testResourcesLookup() throws Exception {
     final URL url = getClass().getClassLoader().getResource("client-resource-1.txt");
-    printOut("local url = %s", url);
+    print(false, false, "local url = %s", url);
     final String name = ReflectionUtils.getCurrentMethodName();
     final List<Task<?>> results = client.submit(BaseTestHelper.createJob(name, false, 1, MyTask.class));
     assertNotNull(results);

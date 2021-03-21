@@ -82,7 +82,7 @@ class SocketInitializerImpl extends ThreadSynchronization implements SocketIniti
 
   @Override
   public boolean initialize(final SocketWrapper socketWrapper) {
-    boolean successful = false;
+    boolean success = false;
     if (isClosed()) return false;
     name = getClass().getSimpleName() + '[' + socketWrapper.getHost() + ':' + socketWrapper.getPort() + ']';
     if (debugEnabled) log.debug("initializing connection {}", name);
@@ -100,11 +100,11 @@ class SocketInitializerImpl extends ThreadSynchronization implements SocketIniti
     if (period <= 0L) period = 1000L;
     if (delay > 0L) goToSleep(delay);
     final long start = System.nanoTime();
-    while (((System.nanoTime() - start) / 1_000_000L < maxDuration) && !successful && !isClosed()) {
+    while (((System.nanoTime() - start) / 1_000_000L < maxDuration) && !success && !isClosed()) {
       try {
         if (traceEnabled) log.trace("{} opening the socket connection", name);
         socketWrapper.open();
-        successful = true;
+        success = true;
         if (traceEnabled) log.trace("{} socket connection successfully opened", name);
       } catch(final Exception e) {
         if (traceEnabled) log.trace("{} socket connection open failed: {}", name, ExceptionUtils.getMessage(e));
@@ -112,7 +112,7 @@ class SocketInitializerImpl extends ThreadSynchronization implements SocketIniti
         if (!isClosed()) goToSleep(period);
       }
     }
-    return successful;
+    return success;
   }
 
   @Override

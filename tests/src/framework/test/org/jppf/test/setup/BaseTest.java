@@ -73,7 +73,7 @@ public class BaseTest {
   public final TestWatcher instanceWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
-      print("***** start of method %s() *****", description.getMethodName());
+      print(false, true, "***** start of method %s() *****", description.getMethodName());
     }
   };
   /**
@@ -95,34 +95,6 @@ public class BaseTest {
     final String[] logPaths = new String[logFiles.length];
     for (int i=0; i<logFiles.length; i++) logPaths[i] = logFiles[i].getPath();
     ZipUtils.zipFile(outZip.getPath(), logPaths);
-  }
-
-  /**
-   * Print a formatted message to the shell output only.
-   * @param format the format.
-   * @param params the parameter values.
-   */
-  public static void printOut(final String format, final Object...params) {
-    print(true, false, format, params);
-  }
-
-  /**
-   * Print a formatted message to the shell output and to the log file.
-   * @param format the format.
-   * @param params the parameter values.
-   */
-  public static void print(final String format, final Object...params) {
-    print(false, true, format, params);
-  }
-
-  /**
-   * Print a formatted message to the shell output and to the log file.
-   * @param decorate whether to add decorations around the message.
-   * @param format the format.
-   * @param params the parameter values.
-   */
-  public static void print(final boolean decorate, final String format, final Object...params) {
-    print(false, decorate, format, params);
   }
 
   /**
@@ -248,14 +220,14 @@ public class BaseTest {
         System.setOut(new TestPrintStream("std_out.log"));
         System.setErr(new TestPrintStream("std_err.log"));
       } catch (final Exception e) {
-        print("Error redirecting std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
+        print(false, true, "Error redirecting std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
       }
-      print("***** start of class %s *****", description.getClassName());
+      print(false, true, "***** start of class %s *****", description.getClassName());
     }
 
     @Override
     protected void finished(final Description description) {
-      print("***** finished class %s *****", description.getClassName());
+      print(false, true, "***** finished class %s *****", description.getClassName());
       try {
         // redirect System.out and System.err back to their original destination
         if ((stdOut != null) && (stdOut != System.out)) {
@@ -269,7 +241,7 @@ public class BaseTest {
           tmp.close();
         }
       } catch (final Exception e) {
-        print("Error restoring std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
+        print(false, true, "Error restoring std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
       }
       final File dir = new File(System.getProperty("user.dir"));
       final File slavesDir = new File(dir, "slave_nodes");
@@ -284,7 +256,7 @@ public class BaseTest {
                 try {
                   StreamUtils.copyFile(logFile, new File(dir, path));
                 } catch (final IOException e) {
-                  print("Error copying '%s' to '%s': %s", ExceptionUtils.getStackTrace(e));
+                  print(false, true, "Error copying '%s' to '%s': %s", ExceptionUtils.getStackTrace(e));
                 }
               }
             }

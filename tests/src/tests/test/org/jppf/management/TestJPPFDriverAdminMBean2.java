@@ -71,24 +71,24 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
     final long duration = 1L;
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     final String jobNamePrefix = ReflectionUtils.getCurrentMethodName();
-    print(false, false, "submitting job 1");
+    print(false, false, ">>> submitting job 1");
     List<Task<?>> results = client.submit(BaseTestHelper.createJob(jobNamePrefix + "-1", false, nbTasks, LifeCycleTask.class, duration));
-    print(false, false, "checking job 1 results");
+    print(false, false, ">>> checking job 1 results");
     checkResults(results, nbTasks);
-    print(false, false, "awaiting working connection pool");
+    print(false, false, ">>> awaiting working connection pool");
     final JPPFClientConnection conn = client.awaitWorkingConnectionPool().awaitWorkingConnection();
     final MyClientListener clientListener = new MyClientListener();
     conn.addClientConnectionStatusListener(clientListener);
     try {
-      BaseTestHelper.printToAll(client, true, true, true, false, "restarting driver");
+      BaseTestHelper.printToAll(client, true, true, true, false, ">>> restarting driver");
       restartDriver(driver, 100L, 1000L);
-      print(false, false, "waiting for 0 connection");
+      print(false, false, ">>> waiting for 0 connection");
       while (!client.findConnectionPools(JPPFClientConnectionStatus.workingStatuses()).isEmpty()) Thread.sleep(10L);
-      print(false, false, "waiting for 1 connection");
+      print(false, false, ">>> waiting for 1 connection");
       while (client.awaitWorkingConnectionPool() == null) Thread.sleep(10L);
-      print(false, false, "submitting job 2");
+      print(false, false, ">>> submitting job 2");
       results = client.submit(BaseTestHelper.createJob(jobNamePrefix + "-2", false, nbTasks, LifeCycleTask.class, duration));
-      BaseTestHelper.printToAll(client, true, true, true, false, "checking job 2 results");
+      BaseTestHelper.printToAll(client, true, true, true, false, ">>> checking job 2 results");
       checkResults(results, nbTasks);
     } finally {
       conn.removeClientConnectionStatusListener(clientListener);
@@ -103,7 +103,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
    * @throws Exception if any error occurs.
    */
   private static void restartDriver(final JMXDriverConnectionWrapper driver, final long shutdownDelay, final long restartDelay) throws Exception {
-    BaseTestHelper.printToAll(client, true, true, true, false, "restarting driver %s:%d with shutdownDelay=%,d ms, restartDelay=%,d ms",
+    BaseTestHelper.printToAll(client, true, true, true, false, ">>> restarting driver %s:%d with shutdownDelay=%,d ms, restartDelay=%,d ms",
       driver.getHost(), driver.getPort(), shutdownDelay, restartDelay);
     driver.restartShutdown(shutdownDelay, restartDelay);
   }
@@ -130,7 +130,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
   private class MyClientListener implements ClientConnectionStatusListener {
     @Override
     public void statusChanged(final ClientConnectionStatusEvent event) {
-      print(false, false, "connection status changing from %s to %s", event.getOldStatus(), event.getClientConnection().getStatus());
+      print(false, false, ">>> connection status changing from %s to %s", event.getOldStatus(), event.getClientConnection().getStatus());
     }
   }
 }

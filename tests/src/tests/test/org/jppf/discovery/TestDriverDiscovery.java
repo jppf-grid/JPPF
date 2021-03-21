@@ -204,7 +204,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
   
     /** */
     public ClientDiscovery() {
-      BaseTest.printOut("in %s() contructor", getClass().getSimpleName());
+      BaseTest.print(false, false, "in %s() contructor", getClass().getSimpleName());
     }
   
     @Override
@@ -213,7 +213,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
       for (int i=0; i<2; i++) {
         final int port = 11101 + i;
         final ClientConnectionPoolInfo info = new ClientConnectionPoolInfo("ClientDiscovery_" + port, false, "localhost", port, 2 - i, 1, 1);
-        BaseTest.printOut("%s 'discovering' %s", className, info);
+        BaseTest.print(false, false, "%s 'discovering' %s", className, info);
         newConnection(info);
       }
     }

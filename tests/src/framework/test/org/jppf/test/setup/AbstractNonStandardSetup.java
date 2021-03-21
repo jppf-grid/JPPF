@@ -138,7 +138,7 @@ public class AbstractNonStandardSetup extends BaseTest {
       assertNotNull(t.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
     }
-    printOut("%s : map = %s", name , CollectionUtils.prettyPrint(map));
+    print(false, false, "%s : map = %s", name , CollectionUtils.prettyPrint(map));
     assertEquals(nbNodes, map.keySet().size());
     for (int i=0; i<nbNodes; i++) {
       final String key = nodePrefix + (i+1);

@@ -20,9 +20,10 @@ package org.jppf.nio;
 
 import java.nio.channels.*;
 import java.util.*;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.GlobalExecutor;
 import org.slf4j.*;
 
 /**
@@ -74,21 +75,8 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
     super(name, identifier, useSSL, null, configuration);
   }
 
-  /**
-   * Initialize this server with a specified list of port numbers and name.
-   * @param ports the list of ports this server accepts connections from.
-   * @param sslPorts the list of SSL ports this server accepts connections from.
-   * @param identifier the channel identifier for channels handled by this server.
-   * @param configuration the JPPF configuration to use.
-   * @throws Exception if the underlying server socket can't be opened.
-   */
-  public StatelessNioServer(final int[] ports, final int[] sslPorts, final int identifier, final TypedProperties configuration) throws Exception {
-    super(ports, sslPorts, identifier, configuration);
-  }
-
   @Override
-  protected final void init() throws Exception {
-    super.init();
+  protected void init() throws Exception {
     initNioHandlers();
     initReaderAndWriter();
   }
@@ -125,10 +113,14 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
         } finally {
           sync.setToZeroIfNegative();
         }
-        if (n > 0) go(selector.selectedKeys());
+        try {
+          if (n > 0) go(selector.selectedKeys());
+        } catch (final RejectedExecutionException t) {
+          log.error("error in selector loop for {} : ", getClass().getSimpleName(), t);
+        }
       }
     } catch (final Throwable t) {
-      log.error("error in selector loop for {} : {}", getClass().getSimpleName(), ExceptionUtils.getStackTrace(t));
+      log.error("error in selector loop for {} : ", getClass().getSimpleName(), t);
     } finally {
       end();
     }
@@ -165,7 +157,7 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
    * @throws Exception if any error occurs.
    */
   protected Future<?> doOperation(final Set<SelectionKey> selectedKeys, final KeysetHandler<C> handler) throws Exception {
-    return NioHelper.getGlobalexecutor().submit(() -> handler.handle(this, selectedKeys));
+    return GlobalExecutor.getGlobalexecutor().submit(() -> handler.handle(this, selectedKeys));
   }
 
   /**
@@ -199,7 +191,7 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
         } catch (final Exception e) {
           key.cancel();
           if (log2.isDebugEnabled()) log2.debug("error on {}", StatelessNioServer.toString(key), e);
-          NioHelper.getGlobalexecutor().execute(() -> server.handleSelectionException(key, e));
+          GlobalExecutor.getGlobalexecutor().execute(() -> server.handleSelectionException(key, e));
         }
       }
     }
@@ -389,5 +381,10 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
       .append(", channel=").append(key.channel())
       .append(", attachment=").append(key.attachment())
       .append(']').toString();
+  }
+
+  @Override
+  public String toString() {
+    return super.toString() + " -> " + SystemUtils.getSystemIdentityName(this);
   }
 }

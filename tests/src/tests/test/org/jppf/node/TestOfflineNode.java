@@ -66,7 +66,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
         break;
       }
     }
-    print(false, "setup node classpath: %s", cp);
+    print(false, false, "setup node classpath: %s", cp);
     cp.add("../server/classes");
     testConfig.driver.log4j = "classes/tests/config/offline_node/log4j-driver.properties";
     testConfig.node.log4j = "classes/tests/config/offline_node/log4j-node.properties";

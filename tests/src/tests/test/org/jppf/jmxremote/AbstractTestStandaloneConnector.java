@@ -61,14 +61,6 @@ public abstract class AbstractTestStandaloneConnector extends BaseTest {
   /**
    * 
    */
-  private static final String[] DEBUG_LOGGERS = { "org.jppf.jmxremote", "org.jppf.nio" };
-  /**
-   * 
-   */
-  private static final String[] INFO_LOGGERS = { "org.jppf.nio.PlainNioObject", "org.jppf.serialization" };
-  /**
-   * 
-   */
   final static AtomicInteger portCounter = new AtomicInteger(12000);
 
   /**
@@ -102,8 +94,7 @@ public abstract class AbstractTestStandaloneConnector extends BaseTest {
    */
   @BeforeClass
   public static void beforeClass() throws Exception {
-    ConfigurationHelper.setLoggerLevel(org.apache.log4j.Level.DEBUG, DEBUG_LOGGERS);
-    ConfigurationHelper.setLoggerLevel(org.apache.log4j.Level.INFO, INFO_LOGGERS);
+    ConfigurationHelper.setLoggerLevels("classes/tests/config/log4j-jmx-connector.properties");
     connectorTestName = ObjectNameCache.getObjectName(ConnectorTestMBean.MBEAN_NAME);
     registerMBeans();
   }

@@ -46,7 +46,7 @@ import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ThreadUtils;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
@@ -470,7 +470,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
     if (newStatus == ExecutorStatus.ACTIVE) jobScheduler.addIdleChannel(nodeContext);
     else {
       jobScheduler.removeIdleChannelAsync(nodeContext);
-      if (newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) NioHelper.getGlobalexecutor().execute(() -> queue.getBroadcastManager().cancelBroadcastJobs(nodeContext.getUuid()));
+      if (newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) GlobalExecutor.getGlobalexecutor().execute(() -> queue.getBroadcastManager().cancelBroadcastJobs(nodeContext.getUuid()));
     }
     queue.updateWorkingConnections(oldStatus, newStatus);
   }

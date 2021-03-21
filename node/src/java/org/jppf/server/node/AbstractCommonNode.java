@@ -115,9 +115,10 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * Initialize this node.
    * @param uuid this node's uuid.
    * @param configuration the configuration of this node.
+   * @param hookFactory used to create and invoke hook instances.
    */
-  public AbstractCommonNode(final String uuid, final TypedProperties configuration) {
-    super(uuid, configuration);
+  public AbstractCommonNode(final String uuid, final TypedProperties configuration, final HookFactory hookFactory) {
+    super(uuid, configuration, hookFactory);
     final int poolSize = ThreadManager.computePoolSize(configuration, JPPFProperties.PROCESSING_THREADS);
     final long ttl = ThreadManager.retrieveTTL(configuration, JPPFProperties.PROCESSING_THREADS_TTL);
     serializationExecutor = new ThreadPoolExecutor(poolSize, poolSize, ttl, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new JPPFThreadFactory("NodeSerializer"));
@@ -296,7 +297,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * 
    */
   void initStartups() {
-    final Hook<JPPFNodeStartupSPI> hook = HookFactory.registerSPIMultipleHook(JPPFNodeStartupSPI.class, null, null);
+    final Hook<JPPFNodeStartupSPI> hook = hookFactory.registerSPIMultipleHook(JPPFNodeStartupSPI.class, null, null);
     for (final HookInstance<JPPFNodeStartupSPI> hookInstance: hook.getInstances()) {
       final JPPFNodeStartupSPI instance = hookInstance.getInstance();
       final Method m = ReflectionUtils.getSetter(instance.getClass(), "setNode");
@@ -417,8 +418,10 @@ public abstract class AbstractCommonNode extends AbstractNode {
    */
   void reset(final boolean stopJmx) {
     if (debugEnabled) log.debug("resetting with stopJmx=" + stopJmx);
-    lifeCycleEventHandler.fireNodeEnding();
-    lifeCycleEventHandler.removeAllProviders();
+    if (lifeCycleEventHandler != null) {
+      lifeCycleEventHandler.fireNodeEnding();
+      lifeCycleEventHandler.removeAllProviders();
+    }
     setNodeAdmin(null);
     if (stopJmx) {
       try {
@@ -427,7 +430,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
           jmxServer.stop();
           JPPFMBeanServerFactory.releaseMBeanServer(jmxServer.getMBeanServer());
         }
-        final NioServer acceptor = NioHelper.removeServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
+        final NioServer acceptor = NioHelper.getAcceptorServer(false);
         if (acceptor != null) {
           if (jmxServer != null) acceptor.removeServer(jmxServer.getManagementPort());
         }

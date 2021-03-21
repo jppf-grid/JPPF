@@ -88,9 +88,9 @@ public class TestDefaultPolicies extends Setup1D2N {
   @Test(timeout = TEST_TIMEOUT)
   public void testDefaultServerPolicyFromInlineScript() throws Exception {
     TypedProperties config = JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, false).set(JOB_SLA_DEFAULT_POLICY, "inline | " + SERVER_SCRIPT);
-    print(false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
+    print(false, false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
     config = new TypedProperties().fromString(config.asString());
-    print(false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
+    print(false, false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
     try (final JPPFClient client = new JPPFClient(config)) {
       client.awaitActiveConnectionPool();
       assertNotNull(client.getDefaultPolicy());
@@ -106,9 +106,9 @@ public class TestDefaultPolicies extends Setup1D2N {
   public void testDefaultServerPolicyFromInlineXML() throws Exception {
     // source type is ommitted, it should default to "inline"
     TypedProperties config = JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, false).set(JOB_SLA_DEFAULT_POLICY, SERVER_XML);
-    print(false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
+    print(false, false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
     config = new TypedProperties().fromString(config.asString());
-    print(false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
+    print(false, false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
     try (final JPPFClient client = new JPPFClient(config)) {
       client.awaitActiveConnectionPool();
       assertNotNull(client.getDefaultPolicy());
@@ -123,9 +123,9 @@ public class TestDefaultPolicies extends Setup1D2N {
   @Test(timeout = TEST_TIMEOUT)
   public void testDefaultClientPolicyFromInlineScript() throws Exception {
     TypedProperties config = JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(JOB_CLIENT_SLA_DEFAULT_POLICY, "inline | " + CLIENT_SCRIPT);
-    print(false, "default client policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
+    print(false, false, "default client policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
     config = new TypedProperties().fromString(config.asString());
-    print(false, "default client policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
+    print(false, false, "default client policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
     try (final JPPFClient client = new JPPFClient(config)) {
       client.awaitActiveConnectionPool();
       assertNotNull(client.getDefaultClientPolicy());
@@ -140,9 +140,9 @@ public class TestDefaultPolicies extends Setup1D2N {
   @Test(timeout = TEST_TIMEOUT)
   public void testDefaultClientPolicyFromInlineXML() throws Exception {
     TypedProperties config = JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(JOB_CLIENT_SLA_DEFAULT_POLICY, "inline | " + CLIENT_XML);
-    print(false, "default client policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
+    print(false, false, "default client policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
     config = new TypedProperties().fromString(config.asString());
-    print(false, "default client policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
+    print(false, false, "default client policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
     try (final JPPFClient client = new JPPFClient(config)) {
       client.awaitActiveConnectionPool();
       assertNotNull(client.getDefaultClientPolicy());
@@ -157,9 +157,9 @@ public class TestDefaultPolicies extends Setup1D2N {
   @Test(timeout = TEST_TIMEOUT)
   public void testDefaultServerPolicyFromXMLResource() throws Exception {
     TypedProperties config = JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, false).set(JOB_SLA_DEFAULT_POLICY, "file | " + PACKAGE_PATH + "/server_xml_policy.xml");
-    print(false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
+    print(false, false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
     config = new TypedProperties().fromString(config.asString());
-    print(false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
+    print(false, false, "default server policy property = %s", config.get(JOB_SLA_DEFAULT_POLICY));
     try (final JPPFClient client = new JPPFClient(config)) {
       client.awaitActiveConnectionPool();
       assertNotNull(client.getDefaultPolicy());
@@ -174,9 +174,9 @@ public class TestDefaultPolicies extends Setup1D2N {
   @Test(timeout = TEST_TIMEOUT)
   public void testDefaultClientPolicyFromXMLResource() throws Exception {
     TypedProperties config = JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(JOB_CLIENT_SLA_DEFAULT_POLICY, "file | " + PACKAGE_PATH + "/client_xml_policy.xml");
-    print(false, "default server policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
+    print(false, false, "default server policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
     config = new TypedProperties().fromString(config.asString());
-    print(false, "default server policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
+    print(false, false, "default server policy property = %s", config.get(JOB_CLIENT_SLA_DEFAULT_POLICY));
     try (final JPPFClient client = new JPPFClient(config)) {
       client.awaitActiveConnectionPool();
       assertNotNull(client.getDefaultClientPolicy());

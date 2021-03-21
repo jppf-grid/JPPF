@@ -90,7 +90,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
   public void connect() {
     if (isConnected()) return;
     if (local) {
-      mbeanConnection.set(ManagementFactory.getPlatformMBeanServer());
+      mbeanConnection.compareAndSet(null, ManagementFactory.getPlatformMBeanServer());
       connected.set(true);
       fireConnected();
     } else {

@@ -21,6 +21,7 @@ package org.jppf.utils;
 import java.io.*;
 import java.util.*;
 
+import org.jppf.JPPFRuntimeException;
 import org.jppf.utils.configuration.*;
 
 /**
@@ -121,6 +122,7 @@ public abstract class AbstractTypedProperties extends Properties {
     try (final Reader reader = new StringReader((delimiter == null) ? source : source.replace(delimiter, "\n"))) {
       loadAndResolve(reader);
     } catch (@SuppressWarnings("unused") final Exception e) {
+      throw new JPPFRuntimeException(e);
     }
     return (T) this;
   }

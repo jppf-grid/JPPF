@@ -18,6 +18,7 @@
 
 package org.jppf.management;
 
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
@@ -60,7 +61,16 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * Initialize a local connection to the MBean server.
    */
   public JMXDriverConnectionWrapper() {
+    this(ManagementFactory.getPlatformMBeanServer());
+  }
+
+  /**
+   * Initialize a local connection to the MBean server.
+   * @param mbeanServer a connection to the mbean server to use.
+   */
+  public JMXDriverConnectionWrapper(final MBeanServerConnection mbeanServer) {
     local = true;
+    this.mbeanConnection.set(mbeanServer);
   }
 
   /**

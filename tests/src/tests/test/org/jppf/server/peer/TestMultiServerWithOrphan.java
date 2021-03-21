@@ -46,9 +46,9 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
    */
   @BeforeClass()
   public static void setup() throws Exception {
-    printOut("checking topology");
+    print(false, false, "checking topology");
     client = BaseSetup.setup(2, 1, true, true, createConfig("p2p_orphan"));
-    printOut("topology checked OK");
+    print(false, false, "topology checked OK");
   }
 
   /**

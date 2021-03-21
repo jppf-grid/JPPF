@@ -220,7 +220,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
       try {
         final TaskExecutionNotification notif = (TaskExecutionNotification) notification;
         notifs.add(notif.getTaskInformation());
-        printOut("got task notification for task %s", notif.getTaskInformation().getId());
+        print(false, false, "got task notification for task %s", notif.getTaskInformation().getId());
         if (notif.getUserData() != null) userObjects.add(notif.getUserData());
       } catch (final Exception e) {
         if (exception == null) exception = e;

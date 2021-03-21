@@ -112,7 +112,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
     if (debugEnabled) log.debug("closing " + name);
     try {
       if (socketInitializer != null) socketInitializer.close();
-      //socketInitializer = null;
+      socketInitializer = null;
       if (socketClient != null) socketClient.close();
       socketClient = null;
     } catch (final Exception e) {

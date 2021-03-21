@@ -285,14 +285,14 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @throws Exception if an error is raised while reading the results from the server.
    */
   public TaskBundle receiveHeader(final ObjectSerializer ser, final ClassLoader cl) throws Exception {
-    TaskBundle bundle = null;
     final ObjectSerializer actualSerializer = (ser == null) ? defaultSerializer : ser;
     final ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();
     try {
       final ClassLoader loader = (cl == null) ? getClass().getClassLoader() : cl;
       Thread.currentThread().setContextClassLoader(loader);
       final SocketWrapper socketClient = taskServerConnection.getSocketClient();
-      bundle = (TaskBundle) IOHelper.unwrappedData(socketClient, actualSerializer);
+      if (socketClient == null) return null;
+      final TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(socketClient, actualSerializer);
       return bundle;
     } finally {
       Thread.currentThread().setContextClassLoader(ctxCl);

@@ -46,6 +46,6 @@ public class TestKryoWithZLIB extends AbstractTestSerialization {
     config.driver.classpath.addAll(commonCP);
     config.node.classpath.addAll(commonCP);
     client = BaseSetup.setup(1, 1, true, true, config);
-    printOut("----- serialization class = %s -----", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
+    print(false, false, "----- serialization class = %s -----", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
   }
 }

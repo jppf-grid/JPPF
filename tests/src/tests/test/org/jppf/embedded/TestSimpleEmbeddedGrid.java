@@ -70,7 +70,7 @@ public class TestSimpleEmbeddedGrid extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    print("setup with %d drivers and %d nodes", nbDrivers, nbNodes);
+    print(false, true, "setup with %d drivers and %d nodes", nbDrivers, nbNodes);
     ConfigurationHelper.setLoggerLevels("classes/tests/config/log4j-embedded-grid.properties");
     final Map<String, Object> bindings = new HashMap<>();
     bindings.put("$nbDrivers", nbDrivers);

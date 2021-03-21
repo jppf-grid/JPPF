@@ -46,7 +46,7 @@ public class TestFileDataLocation extends Setup1D1N1C {
    */
   @Test(timeout = 20000)
   public void testSubmitLargeDataProvider() throws Exception {
-    printOut("******************** TestFileDataLocation.testSubmitLargeDataProvider() ********************");
+    print(false, false, "******************** TestFileDataLocation.testSubmitLargeDataProvider() ********************");
     final int size = 128 * 1024 * 1024;
     final int nbTasks = 3;
     try {
@@ -69,7 +69,7 @@ public class TestFileDataLocation extends Setup1D1N1C {
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     assertNotNull(driver);
     final JPPFSystemInformation info = driver.systemInformation();
-    printOut("runtime driver info: %s", info.getRuntime());
+    print(false, false, "runtime driver info: %s", info.getRuntime());
     oldLbi = driver.loadBalancerInformation();
     final TypedProperties newConfig = new TypedProperties();
     newConfig.setProperty("size", "1");

@@ -83,7 +83,7 @@ public class TestSerialization extends AbstractNonStandardSetup {
    */
   public TestSerialization(final String serializationClass, final boolean allowsNonSerializable) throws Exception {
     this.allowsNonSerializable = allowsNonSerializable;
-    print(">>> testing with serializationClass = %s, allowNonSerializable = %b", serializationClass, allowsNonSerializable);
+    print(false, true, ">>> testing with serializationClass = %s, allowNonSerializable = %b", serializationClass, allowsNonSerializable);
     JPPFConfiguration.set(JPPFProperties.OBJECT_SERIALIZATION_CLASS, serializationClass);
     JPPFSerialization.Factory.reset();
   }

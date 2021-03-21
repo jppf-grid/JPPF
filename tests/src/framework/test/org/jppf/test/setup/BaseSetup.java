@@ -128,7 +128,7 @@ public class BaseSetup {
    */
   public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final boolean checkDriversAndNodes,
     final TestConfiguration config, final ConnectionPoolListener... listeners) throws Exception {
-    BaseTest.printOut("performing setup with %d drivers, %d nodes %s", nbDrivers, nbNodes, (createClient ? " and 1 client" : ""));
+    BaseTest.print(false, false, "performing setup with %d drivers, %d nodes %s", nbDrivers, nbNodes, (createClient ? " and 1 client" : ""));
     TestConfigSource.setClientConfig(config.clientConfig);
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     createShutdownHook();

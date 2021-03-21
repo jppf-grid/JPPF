@@ -19,6 +19,7 @@ package org.jppf.classloader;
 
 import java.util.List;
 
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -35,20 +36,11 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader {
    * Initialize this class loader with a parent class loader.
    * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
-   */
-  public JPPFLocalClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent) {
-    super(connection, parent);
-    init();
-  }
-
-  /**
-   * Initialize this class loader with a parent class loader.
-   * @param connection the connection to the driver.
-   * @param parent a ClassLoader instance.
    * @param uuidPath unique identifier for the submitting application.
+   * @param hookFactory a {@link HookFactory} instance.
    */
-  public JPPFLocalClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent, final List<String> uuidPath) {
-    super(connection, parent, uuidPath);
+  public JPPFLocalClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent, final List<String> uuidPath, final HookFactory hookFactory) {
+    super(connection, parent, uuidPath, hookFactory);
   }
 
   /**

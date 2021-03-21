@@ -23,7 +23,6 @@ import java.util.concurrent.Callable;
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -59,6 +58,10 @@ public class ObjectSerializationTask implements Callable<DataLocation> {
    * The task bundle the data to deserialize is a part of.
    */
   private final TaskBundle bundle;
+  /**
+   * Container used to serialize the object.
+   */
+  private final JPPFContainer cont;
 
   /**
    * Initialize this task with the specified data buffer.
@@ -73,6 +76,7 @@ public class ObjectSerializationTask implements Callable<DataLocation> {
     this.contextCL = cont.getClassLoader();
     this.submitOrder = submitOrder;
     this.bundle = bundle;
+    this.cont = cont;
   }
 
   @Override
@@ -90,7 +94,7 @@ public class ObjectSerializationTask implements Callable<DataLocation> {
     } catch(final Throwable t) {
       log.error(t.getMessage(), t);
       try {
-        final JPPFExceptionResult result = (JPPFExceptionResult) HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", object, t);
+        final JPPFExceptionResult result = (JPPFExceptionResult) cont.getClassLoader().getHookFactory().invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", object, t);
         result.setPosition(p);
         dl = IOHelper.serializeData(result, ser);
       } catch(final Exception e2) {

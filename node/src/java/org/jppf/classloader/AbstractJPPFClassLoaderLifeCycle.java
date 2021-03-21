@@ -97,21 +97,29 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    * @exclude
    */
   protected final AtomicBoolean remoteClassLoadingDisabled = new AtomicBoolean(false);
+  /**
+   * To create and invoke hook instances.
+   * @exclude
+   */
+  protected final HookFactory hookFactory;
 
   /**
    * Initialize this class loader with a parent class loader.
    * @param parent a ClassLoader instance.
    * @param connection the connection to the driver.
    * @param uuidPath unique identifier for the submitting application.
+   * @param hookFactory a {@link HookFactory} instance.
    * @exclude
    */
-  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoaderConnection<?> connection, final ClassLoader parent, final List<String> uuidPath) {
+  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoaderConnection<?> connection, final ClassLoader parent, final List<String> uuidPath, final HookFactory hookFactory) {
     super(StringUtils.ZERO_URL, parent);
     this.connection = connection;
     this.dynamic = parent instanceof AbstractJPPFClassLoaderLifeCycle;
     this.offline = dynamic ? ((AbstractJPPFClassLoaderLifeCycle) parent).isOffline() : connection == null;
     if (uuidPath != null) this.uuidPath = uuidPath;
-    HookFactory.registerSPIMultipleHook(ClassLoaderListener.class, null, null);
+    this.hookFactory = hookFactory;
+    hookFactory.registerSPIMultipleHook(ClassLoaderListener.class, null, null);
+    if (debugEnabled) log.debug("iinitalized {} with connection={}", this, connection);
   }
 
   /**
@@ -384,5 +392,14 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
   private static ResourceCache createResourceCache() {
     final boolean enabled = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_ENABLED);
     return new ResourceCache(enabled);
+  }
+
+  /**
+   * Get the factory that creates and invoke hook instances for this node.
+   * @return a {@link HookFactory} instance.
+   * @exclude
+   */
+  public HookFactory getHookFactory() {
+    return hookFactory;
   }
 }
