@@ -55,22 +55,33 @@ public class TestUtils {
     if (log != null) log.info(formatted);
   }
 
- /**
-  * Add a specified prefix and timestamp to the specified string.
-  * @param prefix the prefix to add, may be {@code null}.
-  * @param sdf the format for the time stamp.
-  * @param formatted the string to add to.
-  * @return a new string with the specified prefix and timestamp added to the begining.
-  */
- public static String prefixWithTimestamp(final String prefix, final SimpleDateFormat sdf, final String formatted) {
-   final StringBuilder sb = new StringBuilder();
-   if ((prefix != null) && !"".equals(prefix)) sb.append('[').append(prefix).append(']').append(' ');
-   if (sdf != null) {
-     synchronized(sdf) {
-       sb.append('[').append(sdf.format(new Date())).append(']').append(' ');
-     }
-   }
-   sb.append(formatted);
-   return sb.toString();
- }
+  /**
+   * Add a specified prefix and timestamp to the specified string.
+   * @param prefix the prefix to add, may be {@code null}.
+   * @param sdf the format for the time stamp.
+   * @param formatted the string to add to.
+   * @return a new string with the specified prefix and timestamp added to the begining.
+   */
+  public static String prefixWithTimestamp(final String prefix, final SimpleDateFormat sdf, final String formatted) {
+    final StringBuilder sb = new StringBuilder();
+    if ((prefix != null) && !"".equals(prefix)) sb.append('[').append(prefix).append(']').append(' ');
+    if (sdf != null) {
+      synchronized (sdf) {
+        sb.append('[').append(sdf.format(new Date())).append(']').append(' ');
+      }
+    }
+    sb.append(formatted);
+    return sb.toString();
+  }
+
+  /**
+   * Get the value of an environment variable.
+   * @param varName the name of the environment variable to lookup.
+   * @param defaultValue the value to return if the variable is not defined.
+   * @return the value of the environment variable, or {@code defaultValue} if the variable is not defined.
+   */
+  public static String getEnv(final String varName, final String defaultValue) {
+    final String value = System.getenv(varName);
+    return (value == null) ? defaultValue : value;
+  }
 }

@@ -54,7 +54,7 @@ public class BaseTest {
   /** */
   protected static final int NODE_MANAGEMENT_PORT_BASE = 12300;
   /** */
-  protected static final JPPFProperty<Boolean> DEADLOCK_DETECTOR_ENABLED = new BooleanProperty("jppf.deadlock.detector.enabled", false);
+  public static final JPPFProperty<Boolean> DEADLOCK_DETECTOR_ENABLED = new BooleanProperty("jppf.deadlock.detector.enabled", false);
   /** */
   private static PrintStream stdOut, stdErr;
   /** */

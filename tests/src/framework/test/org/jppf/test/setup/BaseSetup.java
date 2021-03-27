@@ -18,6 +18,7 @@
 
 package test.org.jppf.test.setup;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
@@ -27,10 +28,13 @@ import org.jppf.JPPFTimeoutException;
 import org.jppf.client.*;
 import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.node.NodeRunner;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
+import org.junit.Assert;
 
 import test.org.jppf.test.setup.common.*;
 
@@ -79,6 +83,18 @@ public class BaseSetup {
    * Sequence number to build client uuids.
    */
   private static final AtomicInteger clientUuidSequence = new AtomicInteger(0);
+  /**
+   * Whether to run the tests with an embedded grid, where applicable.
+   */
+  private static final boolean testWithEmbeddedGrid = Boolean.valueOf(TestUtils.getEnv("JPPF_TEST_EMBEDDED_GRID", "false"));
+  /**
+   * The node runners.
+   */
+  private static NodeRunner[] embeddedNodes;
+  /**
+   * The drivers.
+   */
+  private static JPPFDriver[] embeddedDrivers;
 
   /**
    * Get a proxy ot the job management MBean.
@@ -129,17 +145,39 @@ public class BaseSetup {
     final Map<String, Object> bindings = new HashMap<>();
     bindings.put("$nbDrivers", nbDrivers);
     bindings.put("$nbNodes", nbNodes);
-    drivers = new DriverProcessLauncher[nbDrivers];
-    for (int i=0; i<nbDrivers; i++) {
-      drivers[i] = new DriverProcessLauncher(i + 1, config.driver, new HashMap<>(bindings));
-      BaseTest.print(true, false, "starting %s", drivers[i].getName());
-      ThreadUtils.startDaemonThread(drivers[i], drivers[i].getName().trim() + "-Launcher");
-    }
-    nodes = new NodeProcessLauncher[nbNodes];
-    for (int i=0; i<nbNodes; i++) {
-      nodes[i] = new NodeProcessLauncher(i + 1, config.node, new HashMap<>(bindings));
-      BaseTest.print(true, false, "starting %s", nodes[i].getName());
-      ThreadUtils.startDaemonThread(nodes[i], nodes[i].getName().trim() + "-Launcher");
+    if (testWithEmbeddedGrid) {
+      embeddedDrivers = new JPPFDriver[nbDrivers];
+      for (int i=0; i<nbDrivers; i++) {
+        BaseTest.print(false, false, ">>> starting the JPPF driver " + (i + 1));
+        bindings.put("$n", i + 1);
+        final String path = config.driver.jppf;
+        final TypedProperties driverConfig = ConfigurationHelper.createConfigFromTemplate(path, bindings).set(BaseTest.DEADLOCK_DETECTOR_ENABLED, false);
+        embeddedDrivers[i] = new JPPFDriver(driverConfig).start();
+      }
+      embeddedNodes = new NodeRunner[nbNodes];
+      final String path = config.node.jppf;
+      Assert.assertTrue(new File(path).exists());
+      for (int i=0; i<nbNodes; i++) {
+        BaseTest.print(false, false, ">>> starting the JPPF node " +  (i + 1));
+        bindings.put("$n", i + 1);
+        final TypedProperties nodeConfig = ConfigurationHelper.createConfigFromTemplate(path, bindings).set(BaseTest.DEADLOCK_DETECTOR_ENABLED, false);
+        embeddedNodes[i] = new NodeRunner(nodeConfig);
+        final NodeRunner runner = embeddedNodes[i];
+        new Thread(() -> runner.start(), String.format("[node-%03d]", i + 1)).start();
+      }
+    } else {
+      drivers = new DriverProcessLauncher[nbDrivers];
+      for (int i=0; i<nbDrivers; i++) {
+        drivers[i] = new DriverProcessLauncher(i + 1, config.driver, new HashMap<>(bindings));
+        BaseTest.print(true, false, "starting %s", drivers[i].getName());
+        ThreadUtils.startDaemonThread(drivers[i], drivers[i].getName().trim() + "-Launcher");
+      }
+      nodes = new NodeProcessLauncher[nbNodes];
+      for (int i=0; i<nbNodes; i++) {
+        nodes[i] = new NodeProcessLauncher(i + 1, config.node, new HashMap<>(bindings));
+        BaseTest.print(true, false, "starting %s", nodes[i].getName());
+        ThreadUtils.startDaemonThread(nodes[i], nodes[i].getName().trim() + "-Launcher");
+      }
     }
     if (createClient) {
       client = createClient("client-" + clientUuidSequence.incrementAndGet(), true, config, listeners);
@@ -200,11 +238,100 @@ public class BaseSetup {
         client.close();
         client = null;
       }
-      stopProcesses();
+      if (isTestWithEmbeddedGrid()) stopEmbeddedGrid();
+      else stopProcesses();
       ConfigurationHelper.cleanup();
     } catch (final Exception e) {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * Stop driver and node processes.
+   */
+  protected static void stopProcesses() {
+    try {
+      if (nodes != null) {
+        for (final NodeProcessLauncher n: nodes) {
+          BaseTest.print(true, false, "stopping %s", n.getName());
+          n.stopProcess();
+        }
+      }
+      if (drivers != null) {
+        for (final DriverProcessLauncher d: drivers) {
+          BaseTest.print(true, false, "stopping %s", d.getName());
+          d.stopProcess();
+        }
+      }
+    } catch(final Throwable t) {
+      t.printStackTrace();
+    }
+  }
+
+  /**
+   * Stop driver and node processes.
+   */
+  protected static void stopEmbeddedGrid() {
+    try {
+      if (embeddedNodes != null) {
+        int i = 0;
+        for (final NodeRunner runner: embeddedNodes) {
+          BaseTest.print(false, false, "<<< stoping the JPPF node " + (++i));
+          runner.shutdown();
+        }
+      }
+      if (embeddedDrivers != null) {
+        int i = 0;
+        for (final JPPFDriver driver: embeddedDrivers) {
+          BaseTest.print(false, false, "<<< shutting down driver" + (++i));
+          driver.shutdown();
+        }
+      }
+    } catch(final Throwable t) {
+      t.printStackTrace();
+    }
+  }
+
+  /**
+   * Create the shutdown hook.
+   */
+  protected static void createShutdownHook() {
+    shutdownHook = new Thread(() -> close());
+    Runtime.getRuntime().addShutdownHook(shutdownHook);
+  }
+
+  /**
+   * Get the number of drivers in the test setup.
+   * @return the number of drivers as an int.
+   */
+  public static int nbDrivers() {
+    if (isTestWithEmbeddedGrid()) return (embeddedDrivers == null) ? 0: embeddedDrivers.length;
+    return (drivers == null) ? 0 : drivers.length;
+  }
+
+  /**
+   * Get the number of nodes in the test setup.
+   * @return the number of nodes as an int.
+   */
+  public static int nbNodes() {
+    if (isTestWithEmbeddedGrid()) return (embeddedNodes == null) ? 0: embeddedNodes.length;
+    return (nodes == null) ? 0 : nodes.length;
+  }
+
+  /**
+   * Get the jppf client to use.
+   * @return a {@link JPPFClient} instance.
+   */
+  public static JPPFClient getClient() {
+    return client;
+  }
+
+  /**
+   * Determine whether to run the tests with an embedded grid, where applicable.
+   * @return {@code true} if the tests should be run with an embedded grid, {@code false} otherwise.
+   */
+  public static boolean isTestWithEmbeddedGrid() {
+    return testWithEmbeddedGrid;
   }
 
   /**
@@ -253,59 +380,5 @@ public class BaseSetup {
     }
     if (sum < nbNodes) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d ms", timeout));
     if (printEpilogue) TestUtils.printf("%d drivers and %d nodes successfully initialized", nbDrivers, nbNodes);
-  }
-
-  /**
-   * Stop driver and node processes.
-   */
-  protected static void stopProcesses() {
-    try {
-      if (nodes != null) {
-        for (final NodeProcessLauncher n: nodes) {
-          BaseTest.print(true, false, "stopping %s", n.getName());
-          n.stopProcess();
-        }
-      }
-      if (drivers != null) {
-        for (final DriverProcessLauncher d: drivers) {
-          BaseTest.print(true, false, "stopping %s", d.getName());
-          d.stopProcess();
-        }
-      }
-    } catch(final Throwable t) {
-      t.printStackTrace();
-    }
-  }
-
-  /**
-   * Create the shutdown hook.
-   */
-  protected static void createShutdownHook() {
-    shutdownHook = new Thread(() -> close());
-    Runtime.getRuntime().addShutdownHook(shutdownHook);
-  }
-
-  /**
-   * Get the number of drivers in the test setup.
-   * @return the number of drivers as an int.
-   */
-  public static int nbDrivers() {
-    return drivers == null ? 0 : drivers.length;
-  }
-
-  /**
-   * Get the number of nodes in the test setup.
-   * @return the number of nodes as an int.
-   */
-  public static int nbNodes() {
-    return nodes == null ? 0 : nodes.length;
-  }
-
-  /**
-   * Get the jppf client to use.
-   * @return a {@link JPPFClient} instance.
-   */
-  public static JPPFClient getClient() {
-    return client;
   }
 }
