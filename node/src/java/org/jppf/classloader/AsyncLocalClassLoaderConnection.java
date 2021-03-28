@@ -21,6 +21,7 @@ package org.jppf.classloader;
 import static org.jppf.utils.StringUtils.build;
 
 import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.slf4j.*;
 
 /**
  * 
@@ -28,6 +29,14 @@ import org.jppf.utils.concurrent.ThreadSynchronization;
  * @exclude
  */
 public class AsyncLocalClassLoaderConnection extends AbstractClassLoaderConnection<AsyncLocalNodeClassloaderContext> {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(AsyncLocalClassLoaderConnection.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Object used to synchronize threads when reading/writing the node message.
    */
@@ -53,9 +62,11 @@ public class AsyncLocalClassLoaderConnection extends AbstractClassLoaderConnecti
     try {
       if (initializing.compareAndSet(false, true)) {
         try {
+          if (debugEnabled) log.debug("initializing {}", this);
           final ResourceRequestRunner rr = new AsyncLocalResourceRequest(channel);
           performCommonHandshake(rr);
           System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
+          if (debugEnabled) log.debug("{} initialized", this);
         } catch (final Exception e) {
           throw new RuntimeException(e);
         } finally {
@@ -94,5 +105,13 @@ public class AsyncLocalClassLoaderConnection extends AbstractClassLoaderConnecti
    */
   public ThreadSynchronization getServerLock() {
     return serverLock;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("uuid = ").append(uuid)
+      .append(", channel = ").append(channel)
+      .append(']').toString();
   }
 }

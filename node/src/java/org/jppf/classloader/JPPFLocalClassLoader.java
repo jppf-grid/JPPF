@@ -41,6 +41,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader {
    */
   public JPPFLocalClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent, final List<String> uuidPath, final HookFactory hookFactory) {
     super(connection, parent, uuidPath, hookFactory);
+    init();
   }
 
   /**

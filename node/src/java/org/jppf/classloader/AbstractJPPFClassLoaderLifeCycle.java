@@ -119,7 +119,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
     if (uuidPath != null) this.uuidPath = uuidPath;
     this.hookFactory = hookFactory;
     hookFactory.registerSPIMultipleHook(ClassLoaderListener.class, null, null);
-    if (debugEnabled) log.debug("iinitalized {} with connection={}", this, connection);
+    if (debugEnabled) log.debug("initalized {} with connection={}", this, connection);
   }
 
   /**
@@ -128,6 +128,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    */
   protected void init() {
     if (!isOffline()) {
+      if (debugEnabled) log.debug("initializing class loader connection for {}", this);
       try {
         connection.init();
       } catch (final Exception e) {
