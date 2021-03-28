@@ -38,6 +38,13 @@ import test.org.jppf.test.setup.common.*;
  */
 public class TestLocalNode extends AbstractNonStandardSetup {
   /**
+   * Default constructor.
+   */
+  public TestLocalNode() {
+    nbNodes = 1;
+  }
+
+  /**
    * Launches 1 drivers with a local node and start the client.
    * @throws Exception if a process could not be started.
    */
@@ -45,12 +52,12 @@ public class TestLocalNode extends AbstractNonStandardSetup {
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("localnode");
     config.driver.log4j = "classes/tests/config/localnode/log4j-driver.properties";
-    config.node.log4j = "classes/tests/config/localnode/log4j-node.properties";
+    config.node.log4j   = "classes/tests/config/localnode/log4j-node.properties";
     client = BaseSetup.setup(1, 0, true, false, config);
     try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1, false)) {
       assertTrue(jmx.connectAndWait(5_000L));
-      print(false, false, "before wait for interruptible condition");
-      assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() > 0, 10_000L, 100L, true));
+      print(false, false, "before interruptible wait for condition");
+      assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() > 0, 5_000L, 100L, true));
     }
   }
 

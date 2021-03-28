@@ -51,6 +51,15 @@ public class AbstractNonStandardSetup extends BaseTest {
   protected static final NodeSelector PEER_SELECTOR = new ExecutionPolicySelector(PEER_POLICY);
   /** */
   protected static TestConfiguration testConfig;
+  /** */
+  protected int nbNodes;
+
+  /**
+   * Default constructor.
+   */
+  public AbstractNonStandardSetup() {
+    nbNodes = -1;
+  }
 
   /**
    * Create the drivers and nodes configuration.
@@ -255,23 +264,10 @@ public class AbstractNonStandardSetup extends BaseTest {
   protected void testForwardingMBean() throws Exception {
     final JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
     final NodeForwardingMBean nodeForwarder = driverJmx.getForwarder();
-    boolean ready = false;
-    long elapsed = 0L;
-    final long start = System.nanoTime();
-    while (!ready) {
-      elapsed = DateTimeUtils.elapsedFrom(start);
-      assertTrue((elapsed < 20_000L));
-      try {
-        final ResultsMap<String, JPPFNodeState> result = nodeForwarder.state(NodeSelector.ALL_NODES);
-        assertNotNull(result);
-        assertEquals(getNbNodes(), result.size());
-        for (final Map.Entry<String, InvocationResult<JPPFNodeState>> entry: result.entrySet()) assertNotNull(entry.getValue().result());
-        ready = true;
-      } catch (@SuppressWarnings("unused") final Exception|AssertionError e) {
-        Thread.sleep(100L);
-      }
-    }
-    assertTrue(ready);
+    assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> {
+      final ResultsMap<String, JPPFNodeState> result = nodeForwarder.state(NodeSelector.ALL_NODES);
+      return (result != null) && (result.size() == getNbNodes());
+    }, 5_000L, 100L, false));
   }
 
   /**
@@ -419,6 +415,6 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @return the number of nodes in the topology.
    */
   protected int getNbNodes() {
-    return BaseSetup.nbNodes();
+    return (nbNodes >= 0) ? nbNodes : BaseSetup.nbNodes();
   }
 }
