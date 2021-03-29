@@ -18,9 +18,7 @@
 
 package test.org.jppf.server.peer;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
-import static org.junit.Assume.assumeThat;
 import static test.org.jppf.test.setup.common.TaskDependenciesHelper.createLayeredTasks;
 
 import java.util.*;
@@ -29,7 +27,7 @@ import org.jppf.client.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
@@ -218,8 +216,8 @@ public class TestMultiServer extends AbstractNonStandardSetup {
   @Test(timeout = 15_000L)
   public void testTaskGraph() throws Exception {
     final LoadBalancingInformation lbi = BaseSetup.getJMXConnection(client).loadBalancerInformation();
-    assumeThat(lbi.getAlgorithm(), is("manual"));
-    assumeThat(lbi.getParameters().getInt("size"), is(5));
+    assertEquals("manual", lbi.getAlgorithm());
+    assertEquals(5, lbi.getParameters().getInt("size"));
     print(false, false, "driver load balancing config: %s", lbi);
     final int tasksPerNode = 5;
     final int nbNodes = getNbNodes();

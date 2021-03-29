@@ -40,7 +40,8 @@
     <get.maven.lib g="org.lz4"              a="lz4-java"           v="1.6.0"                dest="${lib.dir}"/>
     <get.maven.lib g="org.slf4j"            a="slf4j-api"          v="${slf4j.version}"     dest="${lib.dir}"/>
     <get.maven.lib g="org.slf4j"            a="slf4j-log4j12"      v="${slf4j.version}"     dest="${lib.dir}"/>
-    <get.maven.lib g="junit"                a="junit"              v="4.10"                 dest="${lib.dir}"/>
+    <get.maven.lib g="junit"                a="junit"              v="4.13.2"               dest="${lib.dir}"/>
+    <get.maven.lib g="org.hamcrest"         a="hamcrest-core"      v="1.3"                  dest="${lib}/JUnit"/>
     <get.maven.lib g="commons-logging"      a="commons-logging"    v="1.1.1"                dest="${lib.dir}"/>
   </target>
   
