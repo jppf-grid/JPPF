@@ -39,6 +39,7 @@ public class TestXStreamWithLZ4 extends AbstractTestSerialization {
   @BeforeClass
   public static void setup() throws Exception {
     allowsNonSerializable = true;
+    resetSerialization();
     System.out.println("main class loader = " + TestXStreamWithLZ4.class.getClassLoader());
     final TestConfiguration config = createConfig("serialization/xstream_lz4");
     final List<String> commonCP = new ArrayList<>();

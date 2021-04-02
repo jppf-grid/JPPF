@@ -39,6 +39,7 @@ public class TestXStream extends AbstractTestSerialization {
   @BeforeClass
   public static void setup() throws Exception {
     allowsNonSerializable = false;
+    resetSerialization();
     System.out.println("main class loader = " + TestXStream.class.getClassLoader());
     final TestConfiguration config = createConfig("serialization/xstream");
     final List<String> commonCP = new ArrayList<>();

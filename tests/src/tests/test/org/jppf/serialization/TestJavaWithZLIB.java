@@ -37,6 +37,7 @@ public class TestJavaWithZLIB extends AbstractTestSerialization {
   @BeforeClass
   public static void setup() throws Exception {
     allowsNonSerializable = false;
+    resetSerialization();
     System.out.println("main class loader = " + TestJavaWithZLIB.class.getClassLoader());
     //JPPFSerialization.Factory.reset();
     client = BaseSetup.setup(1, 1, true, true, createConfig("serialization/java_zlib"));
