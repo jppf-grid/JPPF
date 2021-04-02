@@ -23,11 +23,17 @@ import java.util.concurrent.locks.*;
 
 import javax.management.*;
 
+import org.slf4j.*;
+
 /**
  * Utility methods to obain and release {@link MBeanServer} instances for embedded nodes. 
  * @author Laurent Cohen
  */
 public final class JPPFMBeanServerFactory {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(JPPFMBeanServerFactory.class);
   /**
    * Whether the platform mbean server is available, that is, whether no other node uses it.
    */
@@ -70,6 +76,8 @@ public final class JPPFMBeanServerFactory {
     try {
       if (server == ManagementFactory.getPlatformMBeanServer()) defaultMBeanServerAvailable = true;
       else MBeanServerFactory.releaseMBeanServer(server);
+    } catch(final Exception e) {
+      log.error("error releasing {}", server, e);
     } finally {
       lock.unlock();
     }

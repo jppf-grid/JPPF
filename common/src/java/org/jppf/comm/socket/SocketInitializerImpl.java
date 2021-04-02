@@ -25,7 +25,7 @@ import org.slf4j.*;
 /**
  * Instances of this class attempt to connect a {@link org.jppf.comm.socket.SocketWrapper SocketWrapper} to a remote server.
  * The connection attempts are performed until a configurable amount of time has passed, and at a configurable time interval.
- * When no attempt succeeded, a <code>JPPFError</code> is thrown, and the application should normally exit.
+ * When no attempt succeeded, a {@link JPPFError} is thrown, and the application should normally exit.
  * @author Laurent Cohen
  */
 class SocketInitializerImpl extends ThreadSynchronization implements SocketInitializer {
@@ -90,7 +90,8 @@ class SocketInitializerImpl extends ThreadSynchronization implements SocketIniti
       try {
         if (debugEnabled) log.debug("{} about to close socket wrapper", name);
         socketWrapper.close();
-      } catch(@SuppressWarnings("unused") final Exception e) {
+      } catch(final Exception e) {
+        if (log.isTraceEnabled()) log.trace("error closing " + socketWrapper, e);
       }
     }
     final long delay = 1000L * config.get(JPPFProperties.RECONNECT_INITIAL_DELAY);

@@ -17,6 +17,7 @@
  */
 package org.jppf.server;
 
+import java.io.IOException;
 import java.util.Timer;
 
 import org.jppf.JPPFException;
@@ -24,10 +25,10 @@ import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.discovery.PeerDriverDiscovery;
 import org.jppf.job.JobTasksListenerManager;
-import org.jppf.management.*;
-import org.jppf.nio.NioHelper;
+import org.jppf.management.JPPFSystemInformation;
+import org.jppf.nio.*;
 import org.jppf.nio.acceptor.AcceptorNioServer;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.process.LauncherListener;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.classloader.client.AsyncClientClassNioServer;
@@ -39,7 +40,7 @@ import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.jppf.utils.stats.*;
@@ -71,14 +72,6 @@ public class JPPFDriver extends AbstractJPPFDriver {
    */
   public JPPFDriver(final TypedProperties configuration) {
     super(configuration);
-    initializer = new DriverInitializer(this, configuration);
-    initializer.initDatasources();
-    jobManager = new JPPFJobManager(this);
-    taskQueue = new JPPFPriorityQueue(this, jobManager);
-    if (log.isTraceEnabled()) {
-      log.trace("JPPF Driver system properties: {}", SystemUtils.printSystemProperties());
-      log.trace("JPPF Driver configuration:\n{}", configuration.asString());
-    }
   }
 
   /**
@@ -88,6 +81,19 @@ public class JPPFDriver extends AbstractJPPFDriver {
    */
   public JPPFDriver start() throws Exception {
     if (debugEnabled) log.debug("starting JPPF driver");
+    shutdownScheduled.set(false);
+    shuttingDown.set(false);
+    systemInformation = new JPPFSystemInformation(configuration, uuid, false, true, statistics);
+    statistics.addListener(new StatsSystemInformationUpdater(systemInformation));
+    initializer = new DriverInitializer(this, configuration);
+    initializer.initDatasources();
+    jobManager = new JPPFJobManager(this);
+    taskQueue = new JPPFPriorityQueue(this, jobManager);
+    if (log.isTraceEnabled()) {
+      log.trace("JPPF Driver system properties: {}", SystemUtils.printSystemProperties());
+      log.trace("JPPF Driver configuration:\n{}", configuration.asString());
+    }
+
     final JPPFConnectionInformation info = initializer.getConnectionInformation();
 
     nioHelper = new NioHelper();
@@ -279,49 +285,55 @@ public class JPPFDriver extends AbstractJPPFDriver {
       for (JPPFNode node: localNodes) node.shutdown(false);
       localNodes.clear();
     }
+    if (debugEnabled) log.debug("resetting hook factory");
     hookFactory.reset();
     if (debugEnabled) log.debug("closing acceptor");
     if (acceptorServer != null) {
       if (startedfromMain) acceptorServer.end();
       else {
-        for (final Integer port: nioHelper.getPorts()) NioHelper.removeNioHelper(port);
+        for (final Integer port: nioHelper.getPorts()) {
+          NioHelper.removeNioHelper(port);
+          nioHelper.removePort(port);
+          try {
+            acceptorServer.removeServer(port);
+          } catch (final IOException e) {
+            log.error("error closing acceptor server on port {}", port, e); 
+          }
+        }
       }
     }
-    if (nodeHeartbeatServer != null) {
-      if (debugEnabled) log.debug("closing node heartbeat server");
-      nodeHeartbeatServer.shutdown();
-    }
-    if (clientHeartbeatServer != null) {
-      if (debugEnabled) log.debug("client heartbeat server");
-      clientHeartbeatServer.shutdown();
-    }
-    if (asyncClientClassServer != null) {
-      if (debugEnabled) log.debug("closing client class server");
-      asyncClientClassServer.shutdown();
-    }
-    if (asyncNodeClassServer != null) {
-      if (debugEnabled) log.debug("closing node class server");
-      asyncNodeClassServer.shutdown();
-    }
-    if (asyncNodeNioServer != null) {
-      if (debugEnabled) log.debug("closing node job server");
-      asyncNodeNioServer.shutdown();
-    }
-    if (asyncClientNioServer != null) {
-      if (debugEnabled) log.debug("closing client job server");
-      asyncClientNioServer.shutdown();
-    }
+    closeServer(asyncClientClassServer, "client class server");
+    closeServer(asyncClientNioServer, "client job server");
+    closeServer(asyncNodeNioServer, "node job server");
+    closeServer(asyncNodeClassServer, "node class server");
+    closeServer(clientHeartbeatServer, "client heartbeat server");
+    closeServer(nodeHeartbeatServer, "node heartbeat server");
+    if (debugEnabled) log.debug("closing job queue");
+    taskQueue.close();
     if (debugEnabled) log.debug("closing broadcaster");
     initializer.stopBroadcaster();
     if (debugEnabled) log.debug("stopping peer discovery");
     initializer.stopPeerDiscoveryThread();
-    if (debugEnabled) log.debug("closing JMX server");
-    initializer.stopJmxServer();
     if (debugEnabled) log.debug("closing job manager");
     jobManager.close();
-    //if (debugEnabled) log.debug("closing global executor");
-    //if (startedfromMain) GlobalExecutor.shutdown(true);
+    if (debugEnabled) log.debug("resetting statistics");
+    statistics.clearListeners();
+    statistics.reset();
+    if (debugEnabled) log.debug("closing JMX server");
+    initializer.stopJmxServer();
     if (debugEnabled) log.debug("shutdown complete");
+  }
+
+  /**
+   * shutdwon the specified nio server, logging its specified name.
+   * @param server the nio server to close.
+   * @param serverName the name of the server.
+   */
+  private static void closeServer(final NioServer server, final String serverName) {
+    if (server != null) {
+      if (debugEnabled) log.debug("closing {}", serverName);
+      server.shutdown();
+    }
   }
 
   /**

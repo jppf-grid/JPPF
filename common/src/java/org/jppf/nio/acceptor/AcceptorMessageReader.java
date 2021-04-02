@@ -66,7 +66,7 @@ class AcceptorMessageReader {
         if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), context);
         final int port = context.getServerSocketChannel().socket().getLocalPort();
         final NioHelper nioHelper = NioHelper.getNioHelper(port);
-        final NioServer server = nioHelper.getServer(id);
+        final NioServer server = (nioHelper == null) ? null : nioHelper.getServer(id);
         if (server == null) {
           final String name = JPPFIdentifiers.asString(id);
           if ((name == null) || "UNKNOWN".equalsIgnoreCase(name))

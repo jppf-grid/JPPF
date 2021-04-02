@@ -20,6 +20,7 @@ package org.jppf.utils.stats;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 import org.jppf.utils.concurrent.JPPFThreadFactory;
 
@@ -308,6 +309,20 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    */
   public void removeListener(final JPPFStatisticsListener listener, final Filter filter ) {
     if (listener != null) listeners.remove(new ListenerInfo(listener, filter));
+  }
+
+  /**
+   * @return the set of listeners registered with this statistics snapshot.
+   */
+  public Set<JPPFStatisticsListener> getListeners() {
+    return listeners.stream().map(info -> info.listener).collect(Collectors.toSet());
+  }
+
+  /**
+   * Clear the listeners registered with this statistics snapshot.
+   */
+  public void clearListeners() {
+    listeners.clear();
   }
 
   /**

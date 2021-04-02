@@ -321,7 +321,7 @@ public abstract class StatelessNioServer<C extends AbstractNioContext> extends N
     Set<SelectionKey> keys = null;
     sync.wakeUpAndSetOrIncrement();
     try {
-      keys  = new HashSet<>(selector.keys());
+      if ((selector != null) && selector.isOpen()) keys  = new HashSet<>(selector.keys());
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     } finally {

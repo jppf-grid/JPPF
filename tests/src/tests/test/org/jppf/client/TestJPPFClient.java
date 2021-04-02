@@ -38,6 +38,7 @@ import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.junit.*;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.Setup1D1N;
 import test.org.jppf.test.setup.common.*;
 
@@ -198,6 +199,7 @@ public class TestJPPFClient extends Setup1D1N {
    * @throws Exception if any error occurs
    */
   @Test(timeout=10000)
+  @IgnoreForEmbeddedGrid
   public void testRemoteExecutionContextClassLoader() throws Exception {
     JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_ENABLED, false);
     try (final JPPFClient client = new JPPFClient()) {

@@ -257,12 +257,24 @@ public abstract class NioServer extends Thread {
    */
   public void removeAllConnections() {
     if (debugEnabled) log.debug("removing all connections of {}", this);
-    if (!isStopped()) return;
+    //if (!isStopped()) return;
     sync.wakeUpAndSetOrIncrement();
     try {
-      selector.close();
+      if ((selector != null) && selector.isOpen()) {
+        final Set<SelectionKey> keys = new HashSet<>(selector.keys());
+        for (final SelectionKey key: keys) {
+          if (debugEnabled) log.debug("closing {}", toString(key));
+          try {
+            final SelectableChannel channel = key.channel();
+            if ((channel != null) && channel.isOpen()) channel.close();
+          } catch (final Exception e) {
+            log.error("error closing {}", toString(key), e);
+          }
+        }
+        selector.close();
+      }
     } catch (final Exception e) {
-      log.error(e.getMessage(), e);
+      log.error("error while removing all connections from {}", this, e);
     } finally {
       sync.decrement();
     }
@@ -328,5 +340,13 @@ public abstract class NioServer extends Thread {
    */
   public void setConfiguration(final TypedProperties configuration) {
     this.configuration = configuration;
+  }
+
+  public static String toString(final SelectionKey key) {
+    if (key == null) return "null";
+    return new StringBuilder("SelectionKey[")
+      .append("channel=").append(key.channel())
+      .append(", attachment=").append(key.attachment())
+      .append('[').toString();
   }
 }

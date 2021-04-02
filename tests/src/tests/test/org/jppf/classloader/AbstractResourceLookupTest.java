@@ -27,6 +27,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.Test;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.AbstractNonStandardSetup;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
@@ -34,6 +35,7 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * Unit tests for the disabling of resources lookup in the file system.
  * @author Laurent Cohen
  */
+@IgnoreForEmbeddedGrid
 public abstract class AbstractResourceLookupTest extends AbstractNonStandardSetup {
   /**
    * Test timeout.

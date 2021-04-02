@@ -17,6 +17,8 @@
  */
 package org.jppf.client;
 
+import java.io.IOException;
+
 import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.utils.*;
@@ -61,10 +63,12 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
    */
   @Override
   public final void init() throws Exception {
-      if (owner.isClosed()) {
-        log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
-        return;
-      }
+    if (owner.isClosed()) {
+      log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
+      return;
+    }
+    boolean done = false;
+    while (!done) {
       handshakeDone = false;
       if (socketClient == null) initSocketClient();
       final boolean sysoutEnabled = owner.getConnectionPool().getClient().isSysoutEnabled();
@@ -79,7 +83,13 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
         if (sysoutEnabled) System.out.println(msg);
         log.info(msg);
       }
-      if (!handshakeDone) handshake();
+      try {
+        if (!handshakeDone) handshake();
+        done = true;
+      } catch (final IOException e) {
+        log.error("handshake error", e);
+      }
+    }
   }
 
   /**

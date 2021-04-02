@@ -150,7 +150,8 @@ public abstract class NioMessageReader<C extends AbstractNioContext> {
       } catch(final Exception|Error e) {
         try {
           if (debugEnabled) log.debug("error on channel {} :\n{}", context, ExceptionUtils.getStackTrace(e));
-          else log.warn("error on channel {} : {}", context, ExceptionUtils.getMessage(e));
+          //else log.warn("error on channel {} : {}", context, ExceptionUtils.getMessage(e));
+          else log.warn("error on channel {}", context, e);
         } catch (final Exception e2) {
           if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e2));
           else log.warn("error on channel: {}", ExceptionUtils.getMessage(e2));

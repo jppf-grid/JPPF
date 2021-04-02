@@ -19,6 +19,7 @@
 package org.jppf.execute;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
@@ -33,6 +34,10 @@ public class ThreadManagerThreadPool extends AbstractThreadManager {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(ThreadManagerThreadPool.class);
+  /**
+   * Instance count for this class.
+   */
+  private static final AtomicInteger instanceCount = new AtomicInteger(0);
   /**
    * The thread pool that really processes the tasks
    */
@@ -64,7 +69,7 @@ public class ThreadManagerThreadPool extends AbstractThreadManager {
    */
   public ThreadManagerThreadPool(final int poolSize, final long ttl) {
     super();
-    threadFactory = new JPPFThreadFactory(THREAD_NAME_PREFIX, isCpuTimeEnabled());
+    threadFactory = new JPPFThreadFactory(String.format("%s-%03d", THREAD_NAME_PREFIX, instanceCount.incrementAndGet()), isCpuTimeEnabled());
     final LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     threadPool = new ThreadPoolExecutor(poolSize, poolSize, ttl, TimeUnit.SECONDS, queue, threadFactory) {
       @Override

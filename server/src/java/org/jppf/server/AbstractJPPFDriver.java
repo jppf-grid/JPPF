@@ -114,25 +114,33 @@ abstract class AbstractJPPFDriver {
    */
   final AtomicBoolean shuttingDown = new AtomicBoolean(false);
   /**
+   * Uuid for this driver.
+   */
+  final String uuid;
+  /**
+   * Configuration for this driver.
+   */
+  final TypedProperties configuration;
+  /**
+   * Whether JPPF debug mode is enabled.
+   */
+  final boolean jppfDebugEnabled;
+  /**
+   * To create and invoke hook instances.
+   */
+  final HookFactory hookFactory = HookFactory.newInstance();
+  /**
    * Holds the statistics monitors.
    */
-  final JPPFStatistics statistics;
+  JPPFStatistics statistics;
   /**
    * Manages and monitors the jobs throughout their processing within this driver.
    */
   JPPFJobManager jobManager;
   /**
-   * Uuid for this driver.
-   */
-  final String uuid;
-  /**
    * Performs initialization of the driver's components.
    */
   DriverInitializer initializer;
-  /**
-   * Configuration for this driver.
-   */
-  final TypedProperties configuration;
   /**
    * System ibnformation for this driver.
    */
@@ -142,17 +150,9 @@ abstract class AbstractJPPFDriver {
    */
   PeerDriver peerDriver;
   /**
-   * Whether JPPF debug mode is enabled.
-   */
-  final boolean jppfDebugEnabled;
-  /**
    * 
    */
   NioHelper nioHelper;
-  /**
-   * To create and invoke hook instances.
-   */
-  final HookFactory hookFactory = HookFactory.newInstance();
 
   /**
    * Initialize this JPPFDriver.
@@ -164,13 +164,11 @@ abstract class AbstractJPPFDriver {
     this.uuid = (s = configuration.getString("jppf.driver.uuid", null)) == null ? JPPFUuid.normalUUID() : s;
     new JmxMessageNotifier(); // initialize the jmx logger
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
-    new OutputRedirectHook().initializing(configuration);
     VersionUtils.logVersionInformation("driver", uuid);
     SystemUtils.printPidAndUuid("driver", uuid);
-    statistics = createServerStatistics();
-    systemInformation = new JPPFSystemInformation(configuration, uuid, false, true, statistics);
-    statistics.addListener(new StatsSystemInformationUpdater(systemInformation));
+    new OutputRedirectHook().initializing(configuration);
     jppfDebugEnabled = configuration.get(JPPFProperties.DEBUG_ENABLED);
+    statistics = createServerStatistics();
   }
 
   /**

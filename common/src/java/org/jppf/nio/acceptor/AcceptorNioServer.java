@@ -114,8 +114,9 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
   protected void handleSelectionException(final SelectionKey key, final Exception e) {
     boolean logError = true;
     final SelectableChannel channel = key.channel();
+    AcceptorContext context = null;
     if (!(channel instanceof ServerSocketChannel)) {
-      final AcceptorContext context = (AcceptorContext) key.attachment();
+      context = (AcceptorContext) key.attachment();
       if (e instanceof CancelledKeyException) {
         if (!context.isClosed()) {
           context.setClosed(true);
@@ -127,7 +128,14 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
         } else logError = false;
       }
     }
-    if (logError) log.error(e.getMessage(), e);
+    if (logError) {
+      log.error("error on context {}", context, e);
+      if (debugEnabled) {
+        synchronized(servers) {
+          log.debug("servers: {}", servers);
+        }
+      }
+    }
   }
 
   @Override
