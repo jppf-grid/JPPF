@@ -95,6 +95,7 @@ public abstract class AbstractTypedProperties extends Properties {
     } catch(final Exception e) {
       return String.format("error converting properties to string: %s", e);
     }
+    if (result.endsWith("\n")) result = result.substring(0, result.length() - 1);
     return (delimiter == null) ? result : result.replace("\n", delimiter);
   }
 

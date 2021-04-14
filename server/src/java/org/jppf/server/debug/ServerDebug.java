@@ -264,8 +264,13 @@ public class ServerDebug implements ServerDebugMBean {
   @Override
   public Object executeScript(final String language, final String script) throws JPPFScriptingException {
     try {
-      final Map<String, Object> bindings = new HashMap<String, Object>() {{ put("serverDebug", ServerDebug.this); }};
-      if (log.isTraceEnabled()) log.trace("request to execute {} script with binding={}:\n{}", language, bindings, script);
+      final Map<String, Object> bindings = new HashMap<>();
+      bindings.put("serverDebug", ServerDebug.this);
+      if (log.isDebugEnabled()) log.debug("request to execute {} script with bindings = {} for driver = {}", language, bindings, driver.getUuid());
+      else if (log.isTraceEnabled()) {
+        final String s = script.endsWith("\n") ? script.substring(0, script.length() - 1) : script;
+        log.trace("request to execute {} script with bindings = {} for driver = {}:\n{}", language, bindings, driver.getUuid(), s);
+      }
       final Object result = new ScriptDefinition(language, script, bindings).evaluate();
       if (log.isTraceEnabled()) log.trace("script execution result: {}", result);
       return result;

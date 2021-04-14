@@ -18,38 +18,52 @@
 
 package test.org.jppf.test.setup.common;
 
-import org.jppf.management.JMXNodeConnectionWrapper;
+import java.util.*;
+
+import org.jppf.management.*;
+import org.jppf.node.Node;
 import org.jppf.test.addons.mbeans.NodeTestMBean;
-import org.jppf.utils.ExceptionUtils;
 
 /**
- * This is a test of a node startup class.
+ * This is a helper class to ease the use of {@link NodeTestMBean}.
  * @author Laurent Cohen
  */
 public class TaskNotifier {
   /**
-   * The proxy to the mbean that sends the actual notifications.
+   * Mapping of node uuids to corresponding test mbean instance.
    */
-  private static NodeTestMBean mbean = null;
-  static {
-    try (JMXNodeConnectionWrapper jmxWrapper = new JMXNodeConnectionWrapper()) {
-      jmxWrapper.connect();
-      if (!jmxWrapper.isConnected()) {
-        System.out.println("Error: could not connect to the local MBean server");
-      } else mbean = jmxWrapper.getProxy(NodeTestMBean.MBEAN_NAME, NodeTestMBean.class);
-    } catch (final Exception e) {
-      System.out.println("Error: " + ExceptionUtils.getMessage(e));
-    }
-  }
+  private static final Map<String, NodeTestMBean> mbeanMap = new HashMap<>();
 
   /**
    * Send a notification message to all registered listeners.
+   * @param node the node where the mbean is registered.
    * @param message the message to send to all registered listeners.
    * @throws Exception if any error occurs.
    */
-  public static void addNotification(final Object message) throws Exception {
-    if (mbean == null) return;
+  public static void addNotification(final Node node, final Object message) throws Exception {
+    final NodeTestMBean mbean = getMBeanFor(node);
     mbean.sendUserObject(message);
     System.out.println("sent object: " + message);
+  }
+
+  /**
+   * Retrieve the test mbean for the specified node.
+   * @param node the JPPF node for which to retrieve an MBean.
+   * @return the retireved mbean.
+   * @throws Exception if any error occurs.
+   */
+  private static NodeTestMBean getMBeanFor(final Node node) throws Exception {
+    NodeTestMBean mbean = null;
+    synchronized(mbeanMap) {
+      mbean = mbeanMap.get(node.getUuid());
+      if (mbean == null) {
+        final JPPFManagementInfo info = node.getManagementInfo();
+        final JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
+        if (!jmx.connectAndWait(5000L)) throw new IllegalStateException("could not conenct to node jmx " + jmx);
+        mbean = jmx.getProxy(NodeTestMBean.MBEAN_NAME, NodeTestMBean.class);
+        mbeanMap.put(node.getUuid(), mbean);
+      }
+    }
+    return mbean;
   }
 }

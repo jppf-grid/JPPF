@@ -18,6 +18,7 @@
 
 package test.org.jppf.test.setup.common;
 
+import org.jppf.node.Node;
 import org.jppf.node.protocol.AbstractTask;
 import org.jppf.test.addons.mbeans.UserObject;
 import org.jppf.utils.ExceptionUtils;
@@ -88,10 +89,11 @@ public class NotifyingTask extends AbstractTask<String> {
   @Override
   public void run() {
     try {
-      if (notifyStart) TaskNotifier.addNotification(new UserObject(getNode().getUuid(), START_PREFIX + getId()));
+      final Node node =getNode();
+      if (notifyStart) TaskNotifier.addNotification(node, new UserObject(node.getUuid(), START_PREFIX + getId()));
       if (debugEnabled) log.debug("sent start notification from {}", this);
       Thread.sleep(duration);
-      if (notifyEnd) TaskNotifier.addNotification(new UserObject(getNode().getUuid(), END_PREFIX + getId()));
+      if (notifyEnd) TaskNotifier.addNotification(node, new UserObject(node.getUuid(), END_PREFIX + getId()));
       if (debugEnabled) log.debug("sent end notification from {}", this);
       setResult(SUCCESS);
       //System.out.println("task " + getId() + " successful");

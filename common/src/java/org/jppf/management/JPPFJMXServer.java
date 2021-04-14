@@ -83,7 +83,7 @@ public class JPPFJMXServer extends AbstractJMXServer {
       if (mandatoryEnv != null) env.putAll(mandatoryEnv);
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
-      if (ssl) SSLHelper.configureJMXProperties(JMXHelper.JPPF_JMX_PROTOCOL, env);
+      if (ssl) new SSLHelper(config).configureJMXProperties(JMXHelper.JPPF_JMX_PROTOCOL, env);
       int queueSize = config.get(JPPFProperties.JMX_NOTIF_QUEUE_SIZE);
       if (queueSize <= 0) queueSize = JPPFProperties.JMX_NOTIF_QUEUE_SIZE.getDefaultValue();
       env.put(JPPFJMXProperties.NOTIF_QUEUE_SIZE.getName(), queueSize);

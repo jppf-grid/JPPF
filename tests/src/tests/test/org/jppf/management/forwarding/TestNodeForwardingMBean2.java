@@ -40,12 +40,12 @@ import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit tests for {@link JPPFNodeForwardingMBean}.
- * In this class, we test that the notifications mechanism provided by <code>JPPFNodeForwardingMBean</code>.
+ * In this class, we test that the notifications mechanism provided by {@code JPPFNodeForwardingMBean}.
  * @author Laurent Cohen
  */
 public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
   /**
-   * Test getting notifications with an <code>AllNodesSelector</code> selector.
+   * Test getting notifications with an {@code AllNodesSelector} selector.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
@@ -54,7 +54,7 @@ public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
   }
 
   /**
-   * Test getting notifications with an <code>ExecutionPolicySelector</code> selector.
+   * Test getting notifications with an {@code ExecutionPolicySelector} selector.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
@@ -63,7 +63,7 @@ public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
   }
 
   /**
-   * Test getting notifications with an <code>UuidSelector</code> selector.
+   * Test getting notifications with an {@code UuidSelector} selector.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
@@ -84,11 +84,16 @@ public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
     String listenerID = null;
     try {
       listener = new NotifyingTaskListener();
+      print("registering notification listener with selector = %s", selector);
       listenerID = driverJmx.registerForwardingNotificationListener(selector, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
+      //listenerID = driverJmx.registerForwardingNotificationListener(selector, JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
+      print("registered notification listener with listenerID = %s", listenerID);
       final String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
       final JPPFJob job = BaseTestHelper.createJob(jobName, false, nbTasks, NotifyingTask.class, 100L);
+      print("submitting job");
       client.submit(job);
       Thread.sleep(1500L);
+      print("checking notifications");
       checkNotifs(listener.notifs, nbTasks, expectedNodes);
     } finally {
       nodeForwarder.resetTaskCounter(selector);
@@ -97,7 +102,7 @@ public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
   }
 
   /**
-   * Test that no notifications are received after unregistering a notification listener with a <code>AllNodesSelector</code> selector.
+   * Test that no notifications are received after unregistering a notification listener with a {@code AllNodesSelector} selector.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
@@ -106,7 +111,7 @@ public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
   }
 
   /**
-   * Test that no notifications are received after unregistering a notification listener with a <code>ExecutionPolicySelector</code> selector.
+   * Test that no notifications are received after unregistering a notification listener with a {@code ExecutionPolicySelector} selector.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
@@ -115,7 +120,7 @@ public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
   }
 
   /**
-   * Test that no notifications are received after unregistering a notification listener with a <code>UuidSelector</code> selector.
+   * Test that no notifications are received after unregistering a notification listener with a {@code UuidSelector} selector.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
@@ -205,6 +210,10 @@ public class TestNodeForwardingMBean2 extends AbstractTestNodeForwardingMBean {
     final Set<String> expectedNodesSet = CollectionUtils.set(expectedNodes);
     assertNotNull(notifs);
     final int nbNotifsPerNode = nbTasks / allNodes.size();
+    final StringBuilder sb = new StringBuilder("notifications: {\n");
+    notifs.forEach(notif -> sb.append("  ").append(notif).append('\n'));
+    sb.append('}');
+    print(sb.toString());
     assertEquals(expectedNodes.length * nbNotifsPerNode, notifs.size());
     final Map<String, AtomicInteger> notifCounts = new HashMap<>();
     for (final String uuid: expectedNodes) notifCounts.put(uuid, new AtomicInteger(0));

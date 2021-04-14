@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 
 import javax.management.*;
 
+import org.apache.log4j.Level;
 import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.NodeForwardingMBean;
@@ -54,6 +55,8 @@ public class TestNodeRestart extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
+    ConfigurationHelper.setLoggerLevel(Level.DEBUG, "org.jppf.node", "org.jppf.server.node");
+    ConfigurationHelper.setLoggerLevel(Level.INFO, "org.jppf.client");
     final TestConfiguration config = BaseSetup.DEFAULT_CONFIG.copy();
     config.driver.log4j = "classes/tests/config/log4j-driver.TestNodeRestart.properties";
     config.node.log4j = "classes/tests/config/log4j-node.TestNodeRestart.properties";
@@ -132,14 +135,14 @@ public class TestNodeRestart extends BaseTest {
      * Wait for the node to be connected to the driver.
      * @throws Exception if any error occurs.
      */
-    synchronized void await() throws Exception {
+    private synchronized void await() throws Exception {
       while (!JPPFNodeConnectionNotifierMBean.CONNECTED.equals(state)) wait();
     }
 
     /**
      * Reset this listener's state.
      */
-    synchronized void reset() {
+    private synchronized void reset() {
       state = JPPFNodeConnectionNotifierMBean.DISCONNECTED;
       connectedCount = 0;
       disconnectedCount = 0;

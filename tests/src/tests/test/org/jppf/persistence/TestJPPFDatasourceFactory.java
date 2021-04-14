@@ -36,6 +36,7 @@ import org.junit.*;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
@@ -43,6 +44,7 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * Unit test {@link JPPFDatasourceFactory}.
  * @author Laurent Cohen
  */
+@IgnoreForEmbeddedGrid
 public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
   /**
    * Starts the DB server and create the database with a test table.
@@ -63,11 +65,13 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
   @Test(timeout = 10000)
   public void testSimpleDataSourcePrefixedDefinition() throws Exception {
     final TypedProperties props = configureDataSource(new TypedProperties(), "testDS", "myConfigId", "local");
+    print("datasource config:\n  %s", props.asString("\n  "));
     final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
     factory.configure(props, JPPFDatasourceFactory.Scope.LOCAL);
     final DataSource ds = factory.getDataSource("testDS");
     checkHikariProperties("testDS", ds);
     List<String> names = factory.getDataSourceNames();
+    print("datasource names: %s", names);
     assertNotNull(names);
     assertEquals(1, names.size());
     assertEquals("testDS", names.get(0));
@@ -179,7 +183,6 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
     checkHikariProperties("testDS", ds);
     final DBTask task = new DBTask(dsName, "h2dump_" + ReflectionUtils.getCurrentMethodName() + ".log");
     task.run();
-    throwUnknown(task.getThrowable());
     assertNull(task.getThrowable());
     assertNotNull(task.getResult());
     assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());

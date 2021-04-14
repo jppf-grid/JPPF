@@ -18,7 +18,7 @@
 
 package org.jppf.management;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.*;
 
 import javax.management.*;
 
@@ -77,7 +77,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    * 
    */
   final QueueHandler<NotificationSender> notificationHandler;
-  
 
   /**
    * Default constructor.
@@ -168,6 +167,24 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     this.taskSuccessfulCount = 0;
     this.totalCpuTime = 0L;
     this.totalElapsedTime = 0L;
+  }
+
+  @Override
+  public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
+    super.addNotificationListener(listener, filter, handback);
+    if (debugEnabled) log.debug("registered notification listener = {}, filter = {}, handback = {}", listener, filter, handback);
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener) throws ListenerNotFoundException {
+    super.removeNotificationListener(listener);
+    if (debugEnabled) log.debug("un registered notification listener = {}", listener);
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) throws ListenerNotFoundException {
+    super.removeNotificationListener(listener, filter, handback);
+    if (debugEnabled) log.debug("un registered notification listener = {}, filter = {}, handback = {}", listener, filter, handback);
   }
 
   /**

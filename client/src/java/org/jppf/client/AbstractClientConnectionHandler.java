@@ -104,7 +104,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * @throws Exception if any error occurs.
    */
   protected void createSSLConnection() throws Exception {
-    socketClient = SSLHelper.createSSLClientConnection(socketClient);
+    socketClient = new SSLHelper(owner.getConnectionPool().getClient().getConfig()).createSSLClientConnection(socketClient);
   }
 
   @Override

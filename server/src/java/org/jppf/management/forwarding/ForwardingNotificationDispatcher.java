@@ -97,9 +97,10 @@ class ForwardingNotificationDispatcher {
       if (jmx != null) {
         final ForwardingNotificationHandler handler = new ForwardingNotificationHandler(mBeanName);
         try {
-          if (debugEnabled) log.debug("mBeanName={}, nodeUuid={}, threadId={}", mBeanName, nodeUuid, Thread.currentThread().getId());
+          if (debugEnabled) log.debug("mBeanName={}, nodeUuid={}, threadId={}, jmx={}", mBeanName, nodeUuid, Thread.currentThread().getId(), jmx);
           jmx.addNotificationListener(mBeanName, handler);
           handlerMap.put(mBeanName, handler);
+          if (debugEnabled) log.debug("succesfully added notification listener for mBeanName={}", mBeanName);
           return true;
         } catch (final Exception e) {
           final String format = "failed to add notification listener for node={} : exception={}";

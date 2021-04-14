@@ -21,7 +21,7 @@ package org.jppf.server.node.remote;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
-import org.jppf.node.AbstractNodeConnection;
+import org.jppf.node.*;
 import org.jppf.node.connection.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.ssl.SSLHelper;
@@ -54,15 +54,21 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper> 
    * Server connection information.
    */
   private final DriverConnectionInfo connectionInfo;
+  /**
+   * The JPPF node.
+   */
+  private final Node node;
 
   /**
    * Initialize this connection with the specified serializer.
    * @param connectionInfo the server connection information.
    * @param serializer the serializer to use.
+   * @param node the JPPF node.
    */
-  public RemoteNodeConnection(final DriverConnectionInfo connectionInfo, final ObjectSerializer serializer) {
+  public RemoteNodeConnection(final DriverConnectionInfo connectionInfo, final ObjectSerializer serializer, final Node node) {
     this.connectionInfo = connectionInfo;
     this.serializer = serializer;
+    this.node = node;
   }
 
   @Override
@@ -85,7 +91,7 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper> 
       System.out.println("Reconnected to the node server");
       if (debugEnabled) log.debug("sending channel identifier");
       channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
-      if (connectionInfo.isSecure()) channel = SSLHelper.createSSLClientConnection(channel);
+      if (connectionInfo.isSecure()) channel = new SSLHelper(node.getConfiguration()).createSSLClientConnection(channel);
       if (debugEnabled) log.debug("end socket initializer");
     } finally {
       lock.unlock();

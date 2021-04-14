@@ -423,7 +423,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     public void run() {
       try {
         String name = filePath;
-        if (appendNodeSuffix) name = name + JPPFConfiguration.getProperties().getString("jppf.node.uuid");
+        if (appendNodeSuffix) name = name + getNode().getUuid();
         name = name + ".tmp";
         print(false, false, "creating file '%s'", name);
         final File f = new File(name);

@@ -117,7 +117,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool implements 
   void initHeartbeat() {
     if (heartbeatEnabled && (heartbeatConnection == null)) {
       if (debugEnabled) log.debug("Initializing recovery");
-      heartbeatConnection = new HeartbeatConnection(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, client.getUuid(), getDriverHost(), getDriverPort(), sslEnabled);
+      heartbeatConnection = new HeartbeatConnection(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, client.getUuid(), getDriverHost(), getDriverPort(), sslEnabled, client.getConfig());
       heartbeatConnection.addClientConnectionListener(this);
       ThreadUtils.startThread(heartbeatConnection, name + "-Heartbeat");
     }

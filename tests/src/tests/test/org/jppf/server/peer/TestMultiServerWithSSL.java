@@ -21,6 +21,7 @@ package test.org.jppf.server.peer;
 import org.jppf.node.policy.Equal;
 import org.junit.*;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
@@ -29,6 +30,7 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * all setup with SSL 2-way authentication.
  * @author Laurent Cohen
  */
+@IgnoreForEmbeddedGrid
 public class TestMultiServerWithSSL extends AbstractNonStandardSetup {
   /**
    * Launches a 2 drivers with 1 node attached to each and start the client,

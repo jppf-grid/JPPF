@@ -72,6 +72,10 @@ public abstract class NioServer extends Thread {
    */
   protected SSLContext sslContext;
   /**
+   * 
+   */
+  protected SSLHelper sslHelper;
+  /**
    * The channel identifier for channels handled by this server.
    */
   protected final int identifier;
@@ -165,7 +169,8 @@ public abstract class NioServer extends Thread {
    * @throws Exception if any error occurs during the SSL configuration.
    */
   protected void createSSLContext() throws Exception {
-    sslContext = SSLHelper.getSSLContext(identifier);
+    sslHelper = new SSLHelper(configuration);
+    sslContext = sslHelper.getSSLContext(identifier);
   }
 
   /**
@@ -175,7 +180,7 @@ public abstract class NioServer extends Thread {
    * @throws Exception if any error occurs during the SSL configuration.
    */
   protected void configureSSLEngine(final SSLEngine engine) throws Exception {
-    final SSLParameters params = SSLHelper.getSSLParameters();
+    final SSLParameters params = sslHelper.getSSLParameters();
     engine.setUseClientMode(false);
     engine.setSSLParameters(params);
   }
@@ -305,7 +310,7 @@ public abstract class NioServer extends Thread {
     final SocketChannel socketChannel = context.getSocketChannel();
     final Socket socket = socketChannel.socket();
     final SSLEngine engine = sslContext.createSSLEngine(socket.getInetAddress().getHostAddress(), socket.getPort());
-    final SSLParameters params = SSLHelper.getSSLParameters();
+    final SSLParameters params = sslHelper.getSSLParameters();
     engine.setUseClientMode(true);
     engine.setSSLParameters(params);
     final SSLHandler sslHandler = new SSLHandlerImpl(socketChannel, engine);

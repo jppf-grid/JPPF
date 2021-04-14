@@ -22,6 +22,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import org.apache.log4j.Level;
 import org.jppf.client.JPPFJob;
 import org.jppf.location.*;
 import org.jppf.management.*;
@@ -35,6 +36,7 @@ import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
@@ -58,6 +60,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
+    ConfigurationHelper.setLoggerLevel(Level.DEBUG, "org.jppf.node", "org.jppf.server.node");
     final TestConfiguration testConfig = createConfig("offline_node");
     final List<String> cp = testConfig.node.classpath;
     for (int i=0; i<cp.size(); i++) {
@@ -83,6 +86,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
    * @throws Exception if any error occurs
    */
   @Test(timeout = 10000)
+  @IgnoreForEmbeddedGrid
   public void testSimpleJobDeserializationError() throws Exception {
     final int nbTasks = 5;
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 10L);

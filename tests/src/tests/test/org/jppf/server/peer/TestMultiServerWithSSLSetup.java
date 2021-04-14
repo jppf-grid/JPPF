@@ -20,6 +20,7 @@ package test.org.jppf.server.peer;
 
 import org.junit.Test;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.*;
 
 /**
@@ -27,6 +28,7 @@ import test.org.jppf.test.setup.*;
  * all setup with SSL 2-way authentication.
  * @author Laurent Cohen
  */
+@IgnoreForEmbeddedGrid
 public class TestMultiServerWithSSLSetup extends AbstractNonStandardSetup {
   /**
    * Test timeout.

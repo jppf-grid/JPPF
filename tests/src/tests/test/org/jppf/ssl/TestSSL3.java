@@ -20,12 +20,14 @@ package test.org.jppf.ssl;
 
 import org.junit.*;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.*;
 
 /**
  * SSL Unit Tests with 1-way authentication.
  * @author Laurent Cohen
  */
+@IgnoreForEmbeddedGrid
 public class TestSSL3 extends AbstractNonStandardSetup {
   /**
    * Launches a driver and 1 node and start the client,

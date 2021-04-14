@@ -191,11 +191,16 @@ public class NodeRunner {
             if (node.isSlaveNode()) System.exit(0);
           }
         } finally {
-          if ((node != null) && (node.getShuttingDown().get() || embeddedShutdown.get())) {
-            if (debugEnabled) log.debug("exiting: node={}, shuttingDown={}, embeddedShutdown", node, (node == null) ? "n/a" :node.getShuttingDown().get(), embeddedShutdown.get());
+          if ((node != null) && ((node.getShuttingDown().get() && startedFromMain) || embeddedShutdown.get())) {
+            if (debugEnabled) log.debug("exiting: node={}, shuttingDown={}, embeddedShutdown={}, startedFromMain={}",
+              node, (node == null) ? "n/a" : node.getShuttingDown().get(), embeddedShutdown.get(), startedFromMain);
             break;
           }
           hookFactory.reset();
+          if (classLoader != null) {
+            classLoader.close();
+            classLoader = null;
+          }
         }
       }
     } catch(final Throwable e) {
@@ -253,7 +258,7 @@ public class NodeRunner {
     synchronized(JPPFClassLoader.class) {
       if (classLoader == null) {
         final PrivilegedAction<JPPFClassLoader> action =
-          () -> new JPPFClassLoader(offline ? null : new RemoteClassLoaderConnection(uuid, currentConnectionInfo), NodeRunner.class.getClassLoader(), null, hookFactory);
+          () -> new JPPFClassLoader(offline ? null : new RemoteClassLoaderConnection(uuid, currentConnectionInfo, configuration), NodeRunner.class.getClassLoader(), null, hookFactory);
         classLoader = AccessController.doPrivileged(action);
         if (debugEnabled) log.debug("created new class loader {}", classLoader);
         Thread.currentThread().setContextClassLoader(classLoader);

@@ -22,9 +22,12 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.Operator;
+import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -41,29 +44,21 @@ public class TestSSL extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    print(true, false, "trace 1");
+    ConfigurationHelper.setLoggerLevel(Level.DEBUG, "org.jppf.ssl");
+    print("setting up");
     client = BaseSetup.setup(1, 1, true, false, createConfig("ssl"));
     try {
-      print(true, false, "trace 2");
+      print("awaiting at least 1 working connection pool");
       final List<JPPFConnectionPool> pools = client.awaitConnectionPools(5000L, JPPFClientConnectionStatus.workingStatuses());
-      print(true, false, "trace 3");
       assertNotNull(pools);
       assertFalse(pools.isEmpty());
-      print(true, false, "trace 4");
+      print("awaiting at least 1 working jmx connection");
       final List<JMXDriverConnectionWrapper> drivers = pools.get(0).awaitJMXConnections(Operator.AT_LEAST, 1, 5000L, true);
-      print(true, false, "trace 5");
       assertNotNull(drivers);
       assertFalse(drivers.isEmpty());
       final JMXDriverConnectionWrapper driver = drivers.get(0);
-      final long start = System.nanoTime();
-      boolean ok = false;
-      print(true, false, "trace 6");
-      while (((System.nanoTime() - start) / 1_000_000L < 5000L) && !ok) {
-        if (driver.nbNodes() == 1) ok = true;
-        else Thread.sleep(10L);
-      }
-      print(true, false, "trace 7, ok = %b", ok);
-      assertTrue(ok);
+      print("awaiting 1 connected node");
+      assertTrue(ConcurrentUtils.awaitCondition(5000L, 100L, true, (ConditionFalseOnException) () -> driver.nbNodes() == 1));
     } catch(final AssertionError e) {
       e.printStackTrace();
       BaseSetup.cleanup();

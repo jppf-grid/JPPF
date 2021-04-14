@@ -26,7 +26,7 @@ import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
-import org.junit.Rule;
+import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
@@ -56,13 +56,13 @@ public class TestManyServers extends AbstractNonStandardSetup {
   public void setup() throws Exception {
     try {
       final int nbDrivers = 5;
-      print(false, false, ">>> creating test configuration");
+      print("creating test configuration");
       final TestConfiguration config = createConfig("p2p_many");
       config.driver.log4j = "classes/tests/config/p2p_many/log4j-driver.properties";
       config.node.log4j = "classes/tests/config/p2p_many/log4j-node.properties";
       print(false, false, ">>> starting grid");
       BaseSetup.setup(nbDrivers, nbDrivers, false, false, config);
-      print(false, false, ">>> updating  client configuration");
+      print("updating  client configuration");
       final String[] drivers = new String[nbDrivers];
       for (int i=0; i<nbDrivers; i++) {
         drivers[i] = "driver" + (i + 1);
@@ -72,12 +72,12 @@ public class TestManyServers extends AbstractNonStandardSetup {
           .set(JPPFProperties.PARAM_MAX_JOBS,              i, drivers[i]);
       }
       JPPFConfiguration.set(JPPFProperties.DRIVERS, drivers);
-      print(false, false, ">>> creating client");
+      print("creating client");
       client = BaseSetup.createClient(null, false, config);
-      print(false, false, ">>> client config:\n%s", client.getConfig());
-      print(false, false, ">>> checking drivers and nodes");
+      print("client config:\n%s", client.getConfig());
+      print("checking drivers and nodes");
       awaitPeersInitialized(15_000L, nbDrivers);
-      print(false, false, ">>> checking peers");
+      print("checking peers");
       checkPeers(nbDrivers, 15_000L, false, true);
     } catch (final Exception|Error e) {
       e.printStackTrace();
@@ -88,13 +88,15 @@ public class TestManyServers extends AbstractNonStandardSetup {
   /**
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = TIMEOUT)
+  @Test(timeout = TIMEOUT)
   @Override
   public void testMultipleJobs() throws Exception {
+    print("setting up");
     setup();
     final int nbTasks = 15;
     final int nbDrivers = BaseSetup.nbDrivers();
     final int nbJobs = 10;
+    print("awaiting at least %d pools with at least 1 connection each", nbDrivers);
     client.awaitConnectionPools(Operator.AT_LEAST, nbDrivers, Operator.AT_LEAST, 1, TIMEOUT, JPPFClientConnectionStatus.workingStatuses());
     final String name = ReflectionUtils.getCurrentClassAndMethod();
     final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
@@ -104,7 +106,9 @@ public class TestManyServers extends AbstractNonStandardSetup {
       jobs.add(job);
     }
     for (final JPPFJob job: jobs) client.submitAsync(job);
+    print("submitting %d jobs", jobs.size());
     for (final JPPFJob job: jobs) {
+      print("checking results for job %s", job.getName());
       final List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
       assertEquals(nbTasks, results.size());

@@ -223,7 +223,7 @@ public final class SSLHelper2 {
    * @param env the environment in which to add the SSL/TLS properties.
    * @throws Exception if any error occurs.
    */
-  public void configureJMXMPProperties(final Map<String, Object> env) throws Exception {
+  private void configureJMXMPProperties(final Map<String, Object> env) throws Exception {
     final Map<String, Object> newProps = new LinkedHashMap<>();
     final SSLContext sslContext = getSSLContext("jppf.ssl.client", "jppf.ssl");
     final SSLSocketFactory factory = sslContext.getSocketFactory();
@@ -243,7 +243,7 @@ public final class SSLHelper2 {
    * @param env the environment in which to add the SSL/TLS properties.
    * @throws Exception if any error occurs.
    */
-  public void configureJPPFJMXProperties(final Map<String, Object> env) throws Exception {
+  private void configureJPPFJMXProperties(final Map<String, Object> env) throws Exception {
     final Map<String, Object> newProps = new LinkedHashMap<>();
     final SSLContext sslContext = getSSLContext("jppf.ssl.client", "jppf.ssl");
     newProps.put("jppf.ssl", true);

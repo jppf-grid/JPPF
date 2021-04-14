@@ -160,7 +160,7 @@ public class PeerConnectionPool implements HeartbeatConnectionListener {
   void initHeartbeat() {
     if (recoveryConnection == null) {
       if (debugEnabled) log.debug("Initializing recovery");
-      recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, driver.getUuid(), connectionInfo.host, connectionInfo.getValidPort(secure), secure);
+      recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, driver.getUuid(), connectionInfo.host, connectionInfo.getValidPort(secure), secure, driver.getConfiguration());
       recoveryConnection.addClientConnectionListener(this);
       ThreadUtils.startThread(recoveryConnection, getPeerName() + "-Heartbeat");
     }

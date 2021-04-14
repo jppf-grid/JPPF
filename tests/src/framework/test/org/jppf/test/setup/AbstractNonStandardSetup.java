@@ -29,7 +29,6 @@ import org.jppf.management.*;
 import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.*;
@@ -68,7 +67,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if a process could not be started.
    */
   protected static TestConfiguration createConfig(final String prefix) throws Exception {
-    SSLHelper.resetConfig();
+    //SSLHelper.resetConfig();
     testConfig = new TestConfiguration();
     final List<String> commonCP = new ArrayList<>();
     commonCP.add("classes/addons");
@@ -105,8 +104,10 @@ public class AbstractNonStandardSetup extends BaseTest {
   @AfterClass
   public static void cleanup() throws Exception {
     try {
+      print("performing cleanup");
       BaseSetup.cleanup();
     } finally {
+      print("performing config reset");
       BaseSetup.resetClientConfig();
     }
   }
@@ -127,7 +128,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs
    */
   protected void testSimpleJob(final ExecutionPolicy policy, final String nodePrefix) throws Exception {
-    print(false, false, "driver load balancing config: %s", BaseSetup.getJMXConnection(client).loadBalancerInformation());
+    print("driver load balancing config: %s", BaseSetup.getJMXConnection(client).loadBalancerInformation());
     final int tasksPerNode = 5;
     final int nbNodes = getNbNodes();
     final int nbTasks = tasksPerNode * nbNodes;
@@ -165,17 +166,23 @@ public class AbstractNonStandardSetup extends BaseTest {
     final int nbNodes = getNbNodes();
     final int nbTasks = tasksPerNode * nbNodes;
     final int nbJobs = 3;
+    print("waiting for workking connection pool");
     final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
     try {
+      print("settting pool size to 2");
       pool.setSize(2);
+      print("waiting for 2 working connections in pool");
       pool.awaitConnections(Operator.EQUAL, 2, 5000L, JPPFClientConnectionStatus.workingStatuses());
       assertEquals(2, pool.getConnections(JPPFClientConnectionStatus.workingStatuses()).size()); 
       final String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
       final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
       for (int i=1; i<=nbJobs; i++) jobs.add(BaseTestHelper.createJob(name + '-' + i, false, nbTasks, LifeCycleTask.class, 10L));
+      print("submitting %d jobs", nbJobs);
       for (final JPPFJob job: jobs) client.submitAsync(job);
       for (final JPPFJob job: jobs) {
+        print("getitng results for job %s", job.getName());
         final List<Task<?>> results = job.awaitResults();
+        print("got results for job %s", job.getName());
         assertNotNull(results);
         assertEquals(nbTasks, results.size());
         for (final Task<?> task: results) {
@@ -187,9 +194,13 @@ public class AbstractNonStandardSetup extends BaseTest {
         }
       }
     } finally {
+      print("settting pool size to 2");
       pool.setSize(1);
+      print("waiting for 2 working connection in pool");
       pool.awaitConnections(Operator.EQUAL, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
-      assertEquals(1, pool.getConnections(JPPFClientConnectionStatus.workingStatuses()).size()); 
+      final int n = pool.getConnections(JPPFClientConnectionStatus.workingStatuses()).size();
+      print("got %d working connection(s) in pool", n);
+      assertEquals(1, n); 
     }
   }
 

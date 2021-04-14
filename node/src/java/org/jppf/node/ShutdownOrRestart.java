@@ -57,31 +57,30 @@ public class ShutdownOrRestart implements Runnable {
    */
   public ShutdownOrRestart(final boolean restart, final boolean exit, final NodeInternal node) {
     this.restart = restart;
-    this.exit = exit;
+    this.exit = !((JPPFNode) node).isStartedFromMain() ? false : exit;
     this.node = node;
   }
 
   @Override
   public void run() {
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      @Override
-      public Object run() {
-        if (debugEnabled) log.debug("stopping the node");
-        node.stopNode();
-        // close the JMX server connection to avoid request being sent again by the client.
-        if (debugEnabled) log.debug("stopping the JMX server");
-        try {
-          ((JPPFNode) node).stopJmxServer();
-          Thread.sleep(500L);
-        } catch(@SuppressWarnings("unused") final Exception ignore) {
-        }
-        if (exit) {
-          final int exitCode = restart ? 2 : 0;
-          log.info("exiting the node with exit code {}", exitCode);
-          System.exit(exitCode);
-        }
-        return null;
+    AccessController.doPrivileged((PrivilegedAction<?>) () -> {
+      if (debugEnabled) log.debug("stopping the node");
+      node.stopNode();
+      node.getClassLoaderManager().clearContainers();
+      // close the JMX server connection to avoid request being sent again by the client.
+      if (debugEnabled) log.debug("stopping the JMX server");
+      try {
+        ((JPPFNode) node).stopJmxServer();
+        Thread.sleep(500L);
+      } catch(final Exception e) {
+        log.error("error stopping jmx server", e);
       }
+      if (exit) {
+        final int exitCode = restart ? 2 : 0;
+        log.info("exiting the node with exit code {}", exitCode);
+        System.exit(exitCode);
+      }
+      return null;
     });
   }
 }

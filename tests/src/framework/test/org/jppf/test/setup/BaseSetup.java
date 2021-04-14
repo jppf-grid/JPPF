@@ -31,7 +31,6 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.NodeRunner;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
 import org.junit.Assert;
@@ -200,7 +199,7 @@ public class BaseSetup {
   public static JPPFClient createClient(final String uuid, final boolean reset, final TestConfiguration config, final ConnectionPoolListener... listeners) throws Exception {
     TestConfigSource.setClientConfig(config.clientConfig);
     if (reset) JPPFConfiguration.reset();
-    else SSLHelper.resetConfig();
+    //else SSLHelper.resetConfig();
     if ((listeners == null) || (listeners.length <= 0)) client = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
     else client = (uuid == null) ? new JPPFClient(listeners) : new JPPFClient(uuid, listeners);
     while (!client.hasAvailableConnection()) Thread.sleep(10L);
@@ -234,7 +233,7 @@ public class BaseSetup {
     try {
       BaseTestHelper.generateClientThreadDump();
       if ((client != null) && !client.isClosed()) {
-        BaseTestHelper.generateDriverThreadDump(client);
+        if (!isTestWithEmbeddedGrid()) BaseTestHelper.generateDriverThreadDump(client);
         client.close();
         client = null;
       }
@@ -276,15 +275,21 @@ public class BaseSetup {
       if (embeddedNodes != null) {
         int i = 0;
         for (final NodeRunner runner: embeddedNodes) {
-          BaseTest.print(false, false, "<<< stoping the JPPF node " + (++i));
-          runner.shutdown();
+          if (runner == null) BaseTest.print("<<< node runner %d is null!", ++i);
+          else {
+            BaseTest.print(false, false, "<<< stoping the JPPF node " + (++i));
+            runner.shutdown();
+          }
         }
       }
       if (embeddedDrivers != null) {
         int i = 0;
         for (final JPPFDriver driver: embeddedDrivers) {
-          BaseTest.print(false, false, "<<< shutting down driver" + (++i));
-          driver.shutdown();
+          if (driver == null) BaseTest.print("<<< driver%d is null!", ++i);
+          else {
+            BaseTest.print(false, false, "<<< shutting down driver" + (++i));
+            driver.shutdown();
+          }
         }
       }
     } catch(final Throwable t) {
