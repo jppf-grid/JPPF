@@ -37,6 +37,7 @@ import org.junit.runner.Description;
 import test.org.jppf.client.CommonClientTests;
 import test.org.jppf.management.CommonDriverAdminTests;
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Tests for a simple embedded grid.
@@ -96,6 +97,7 @@ public class TestSimpleEmbeddedGrid extends BaseTest {
       final NodeRunner runner = runners[i];
       new Thread(() -> runner.start(), String.format("[node-%03d]", i + 1)).start();
     }
+
     final TypedProperties clientConfig = getClientConfig();
     clientConfig.remove("jppf.node.uuid");
     client = new JPPFClient(clientConfig);
@@ -127,7 +129,7 @@ public class TestSimpleEmbeddedGrid extends BaseTest {
         driver.shutdown();;
       }
     } finally {
-      BaseSetup.generateClientThreadDump();
+      BaseTestHelper.generateClientThreadDump();
     }
   }
 

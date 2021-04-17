@@ -18,17 +18,22 @@
 
 package org.jppf.test.addons.mbeans;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.*;
 
 import javax.management.*;
 
 import org.jppf.utils.concurrent.DeadlockDetector;
+import org.slf4j.*;
 
 /**
  * Implementation of {@link NodeTestMBean}.
  * @author Laurent Cohen
  */
 public class NodeTest extends NotificationBroadcasterSupport implements NodeTestMBean {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(NodeTest.class);
   /**
    * Explicit serialVersionUID.
    */
@@ -37,6 +42,10 @@ public class NodeTest extends NotificationBroadcasterSupport implements NodeTest
    * Notification sequence number.
    */
   private static AtomicLong sequence = new AtomicLong(0L);
+  /**
+   * Counts the number of registered listeners.
+   */
+  final AtomicInteger nbListeners = new AtomicInteger(0);
 
   /**
    * Default constructor.
@@ -59,8 +68,28 @@ public class NodeTest extends NotificationBroadcasterSupport implements NodeTest
   }
 
   @Override
-  public synchronized void sendNotification(final Notification notification) {
-    System.out.printf("sending notification: type=%s, sequence=%d, userData=%s%n", notification.getType(), notification.getSequenceNumber(), notification.getUserData());
-    super.sendNotification(notification);
+  public synchronized void sendNotification(final Notification notif) {
+    final String message = String.format("sending notification to %d listeners: type=%s, sequence=%d, userData=%s", nbListeners.get(), notif.getType(), notif.getSequenceNumber(), notif.getUserData());
+    System.out.println(message);
+    log.info(message);
+    super.sendNotification(notif);
+  }
+
+  @Override
+  public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
+    super.addNotificationListener(listener, filter, handback);
+    log.info("registered notification listener = {}, filter = {}, handback = {}, nbListeners = {}", listener, filter, handback, nbListeners.incrementAndGet());
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener) throws ListenerNotFoundException {
+    super.removeNotificationListener(listener);
+    log.info("unregistered notification listener = {}, nbListeners = {}", listener, nbListeners.decrementAndGet());
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) throws ListenerNotFoundException {
+    super.removeNotificationListener(listener, filter, handback);
+    log.info("unregistered notification listener = {}, filter = {}, handback = {}, nbListeners = {}", listener, filter, handback, nbListeners.decrementAndGet());
   }
 }

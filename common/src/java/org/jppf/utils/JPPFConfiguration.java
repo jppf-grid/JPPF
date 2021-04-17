@@ -21,7 +21,6 @@ import java.io.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.serialization.JPPFSerialization;
-import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
 
@@ -175,7 +174,7 @@ public final class JPPFConfiguration {
   public static void reset() {
     propertiesLock.lock();
     try {
-      SSLHelper.resetConfig();
+      //SSLHelper.resetConfig();
       loadProperties();
       JPPFSerialization.Factory.reset();
     } finally {
@@ -191,7 +190,7 @@ public final class JPPFConfiguration {
   public static void reset(final TypedProperties newConfig) {
     propertiesLock.lock();
     try {
-      SSLHelper.resetConfig();
+      //SSLHelper.resetConfig();
       loadProperties(newConfig);
       JPPFSerialization.Factory.reset();
     } finally {

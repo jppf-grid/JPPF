@@ -186,7 +186,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   public void testJobInNodeExecutionPolicyClient() throws Exception {
     try {
       configure(true, true, 1);
-      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
+      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1, false);
       final int nbTasks = 10;
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class);
       job.getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", false));
@@ -212,7 +212,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   public void testJobLocalExecutionPolicyClient() throws Exception {
     try {
       configure(true, true, 1);
-      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
+      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1, false);
       final int nbTasks = 10;
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class);
       job.getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
@@ -238,7 +238,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   public void testJobMaxChannelsClient() throws Exception {
     try {
       configure(true, true, 1);
-      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
+      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1, false);
       final int nbTasks = 10;
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 100L);
       job.getClientSLA().setMaxChannels(1);
@@ -270,7 +270,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   public void testJobMaxChannels2Client() throws Exception {
     try {
       configure(true, true, 1);
-      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
+      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1, false);
       jppfClient.awaitActiveConnectionPool().setMaxJobs(1);
       final int nbTasks = Math.max(2*Runtime.getRuntime().availableProcessors(), 10);
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class, 100L);
@@ -311,7 +311,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
     try {
       configure(true, true, 1);
       jppfClient.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 15));
-      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
+      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1, false);
       final int nbTasks = 100, maxDispatchSize = 6;
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, LifeCycleTask.class);
       job.getClientSLA().setMaxDispatchSize(maxDispatchSize);
@@ -335,7 +335,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
     try {
       configure(true, false, 1);
       jppfClient.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 15));
-      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
+      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1, false);
       final JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
       pool.setMaxJobs(100);
       print(false, false, "got pool %s", pool);
@@ -362,7 +362,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
     try {
       configure(true, false, 1);
       jppfClient.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 15));
-      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
+      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1, false);
       final JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
       pool.setMaxJobs(100);
       print(false, false, "got pool %s", pool);

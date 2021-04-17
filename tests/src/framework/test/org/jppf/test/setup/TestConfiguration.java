@@ -56,6 +56,43 @@ public class TestConfiguration {
   }
 
   /**
+   * Create the default configuratin used when none is specified.
+   * @return a {@link TestConfiguration} instance.
+   */
+  public static TestConfiguration newDefault() {
+    final TestConfiguration config = new TestConfiguration();
+    final List<String> commonCP = new ArrayList<>();
+    final String dir = "classes/tests/config";
+    commonCP.add("classes/addons");
+    commonCP.add(dir);
+    commonCP.add("../node/classes");
+    commonCP.add("../common/classes");
+    commonCP.add("../jmxremote-nio/classes");
+    commonCP.add("../JPPF/lib/slf4j/slf4j-api-" + BaseSetup.SLF4J_VERSION + ".jar");
+    commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-" + BaseSetup.SLF4J_VERSION + ".jar");
+    commonCP.add("../JPPF/lib/log4j/*");
+    commonCP.add("../JPPF/lib/LZ4/*");
+    commonCP.add("../JPPF/lib/ApacheCommons/*");
+    commonCP.add("../JPPF/lib/JNA/*");
+    commonCP.add("../JPPF/lib/oshi/*");
+    commonCP.add("lib/xstream.jar");
+    commonCP.add("lib/xpp3_min.jar");
+    commonCP.add("lib/xmlpull.jar");
+  
+    final List<String> driverCP = new ArrayList<>(commonCP);
+    driverCP.add("../server/classes");
+    driverCP.add("../JPPF/lib/Groovy/*");
+    config.driver.jppf = dir + "/driver.template.properties";
+    config.driver.log4j = dir + "/log4j-driver.template.properties";
+    config.driver.classpath = driverCP;
+    config.node.jppf = dir + "/node.template.properties";
+    config.node.log4j = dir + "/log4j-node.template.properties";
+    config.node.classpath = commonCP;
+    config.clientConfig = dir + "/client.properties";
+    return config;
+  }
+
+  /**
    * Config for the drivers or nodes.
    */
   public static class ProcessConfig {

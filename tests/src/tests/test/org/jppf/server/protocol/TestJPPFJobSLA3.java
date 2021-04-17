@@ -27,6 +27,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.*;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
@@ -44,7 +45,7 @@ public class TestJPPFJobSLA3 extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    final TestConfiguration config = BaseSetup.createDefaultConfiguration();
+    final TestConfiguration config = TestConfiguration.newDefault();
     final List<String> cp = new ArrayList<>();
     cp.add("../common/classes");
     cp.add("../server/classes");
@@ -70,6 +71,7 @@ public class TestJPPFJobSLA3 extends BaseTest {
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
+  @IgnoreForEmbeddedGrid
   public void testOfflineJob() throws Exception {
     final int nbTasks = 1;
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, nbTasks, LifeCycleTask.class, 1L);

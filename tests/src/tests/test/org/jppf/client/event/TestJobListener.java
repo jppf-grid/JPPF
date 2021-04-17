@@ -77,7 +77,7 @@ public class TestJobListener extends BaseTest {
   @AfterClass
   public static void cleanup() throws Exception {
     try {
-      if ((jmx != null) && jmx.isConnected()) BaseSetup.generateDriverThreadDump(jmx);
+      if ((jmx != null) && jmx.isConnected()) BaseTestHelper.generateDriverThreadDump(jmx);
     } catch(final Exception e) {
       print(false, false, "error generating driver thread dump:\n%s", ExceptionUtils.getStackTrace(e));
       throw e;

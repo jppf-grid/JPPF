@@ -155,4 +155,15 @@ public class AcceptorContext extends AbstractNioContext {
   public boolean writeMessage() throws Exception {
     return false;
   }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("id=").append(JPPFIdentifiers.serverName(id))
+      .append(", closed=").append(isClosed())
+      .append(", ssl=").append(ssl)
+      .append(", socketChannel=").append(socketChannel)
+      .append(", serverSocketChannel=").append(serverSocketChannel)
+      .append(']').toString();
+  }
 }

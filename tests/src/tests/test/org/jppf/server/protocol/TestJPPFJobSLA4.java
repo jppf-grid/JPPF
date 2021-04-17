@@ -50,7 +50,7 @@ public class TestJPPFJobSLA4 extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    final TestConfiguration config = BaseSetup.createDefaultConfiguration();
+    final TestConfiguration config = TestConfiguration.newDefault();
     config.driver.jppf = "classes/tests/config/driver.TestJPPFJobSLA4.properties";
     client = BaseSetup.setup(1, 2, true, true, config);
   }

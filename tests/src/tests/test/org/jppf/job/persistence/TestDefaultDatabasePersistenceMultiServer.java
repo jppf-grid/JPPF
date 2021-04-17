@@ -85,8 +85,17 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
         final boolean b = jmx.isConnected();
         print(false, false, "tearDownInstance() for driver %d : jmx connected = %b", i, b);
         if (b) {
-          final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-          mgr.deleteJobs(JobSelector.ALL_JOBS);
+          try {
+            final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
+            mgr.deleteJobs(JobSelector.ALL_JOBS);
+          } catch (final Exception e) {
+            if (!BaseSetup.isTestWithEmbeddedGrid()) {
+              print(false, false, "--- error in test:\n%s", ExceptionUtils.getStackTrace(e));
+              throw e;
+            } else {
+              print(false, false, "--- expected error in embedded grid: %s", ExceptionUtils.getMessage(e));
+            }
+          }
         }
       }
     }
@@ -98,6 +107,7 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
    */
   @Test(timeout = 10000)
   public void testJobPersistedInAllDrivers() throws Exception {
+    print("waiting for 2 pools with 1 connection each");
     final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
     final List<Integer> maxJobs = new ArrayList<>(pools.size()); 
     try {
@@ -110,7 +120,9 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
       final JPPFJob job = BaseTestHelper.createJob(method, false, nbTasks, LifeCycleTask.class, 0L);
       job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
       job.getClientSLA().setMaxChannels(2);
+      print("submitting job");
       final List<Task<?>> results = client.submit(job);
+      print("checking job results");
       checkJobResults(nbTasks, results, false);
       // check that tasks were dispatched to both drivers and attached nodes
       final Set<String> set = new HashSet<>();
@@ -120,12 +132,13 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
         if (!set.contains(lct.getNodeUuid())) set.add(lct.getNodeUuid());
       }
       assertEquals(2, set.size());
+      print("checking number of persisted jobs in the DB");
       final ConcurrentUtils.Condition cond = (ConcurrentUtils.ConditionFalseOnException) () -> nbTasks == queryNbResults(job.getUuid());
       ConcurrentUtils.awaitCondition(cond, 5000L, 500L, true);
-      print(false, false, "before job check, number of results = %d", queryNbResults(job.getUuid()));
+      print("before job check, number of results = %d", queryNbResults(job.getUuid()));
       for (int i=1; i<=2; i++) {
         try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + i)) {
-          print(false, false, "testing driver %d", i);
+          print("testing driver %d", i);
           jmx.connectAndWait(5000L);
           assertTrue(jmx.isConnected());
           final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
@@ -138,11 +151,14 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
           compareJobs(job, job2, true);
           checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
           if (i == 2) {
-            print(false, false, "after job check, number of results = %d", queryNbResults(job.getUuid()));
+            print("after job check, number of results = %d", queryNbResults(job.getUuid()));
             assertTrue(mgr.deleteJob(job.getUuid()));
           }
         }
       }
+    } catch(final Exception e) {
+      print("error in test:\n%s", ExceptionUtils.getStackTrace(e));
+      throw e;
     } finally {
       for (int i=0; i<pools.size(); i++) pools.get(i).setMaxJobs(maxJobs.get(i));
     }

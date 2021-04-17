@@ -34,7 +34,7 @@ public class MyComputeCallableTask extends AbstractTask<Object> {
   /**
    * The uuid of the node obtained via {@code Task.getNode().getUuid()}.
    */
-  public String uuidFromNode = null, nodeUuid = null;
+  public String uuidFromNode, nodeUuid;
 
   /** */
   public MyComputeCallableTask() {

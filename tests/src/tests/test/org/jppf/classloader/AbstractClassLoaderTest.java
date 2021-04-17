@@ -34,6 +34,7 @@ import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
 import org.junit.*;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.AbstractNonStandardSetup;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
@@ -41,6 +42,7 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * Unit tests for {@link org.jppf.classloader.AbstractJPPFClassLoader}.
  * @author Laurent Cohen
  */
+@IgnoreForEmbeddedGrid
 public abstract class AbstractClassLoaderTest extends AbstractNonStandardSetup {
   /**
    * Test timeout.

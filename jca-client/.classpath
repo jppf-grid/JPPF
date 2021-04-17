@@ -15,8 +15,8 @@
 			<attribute name="javadoc_location" value="http://docs.oracle.com/javaee/5/api/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/junit-4.10.jar"/>
 	<classpathentry kind="lib" path="lib/geronimo-servlet_2.5_spec-1.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/tests"/>
+	<classpathentry kind="lib" path="lib/junit-4.13.2.jar"/>
 	<classpathentry kind="output" path="classes/jca"/>
 </classpath>

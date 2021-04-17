@@ -44,7 +44,6 @@ import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
-import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
@@ -224,13 +223,12 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
    * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  private static void configureSSL(final AsyncNodeContext context) throws Exception {
+  private void configureSSL(final AsyncNodeContext context) throws Exception {
     if (debugEnabled) log.debug("configuring SSL for {}", context);
     final SocketChannel channel = context.getSocketChannel();
-    final SSLContext sslContext = SSLHelper.getSSLContext(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
     final InetSocketAddress addr = (InetSocketAddress) channel.getRemoteAddress();
     final SSLEngine engine = sslContext.createSSLEngine(addr.getHostString(), addr.getPort());
-    final SSLParameters params = SSLHelper.getSSLParameters();
+    final SSLParameters params = sslHelper.getSSLParameters();
     engine.setUseClientMode(false);
     engine.setSSLParameters(params);
     if (debugEnabled) log.debug("created SSLEngine: useClientMode = {}, parameters = {}", engine.getUseClientMode(), engine.getSSLParameters());

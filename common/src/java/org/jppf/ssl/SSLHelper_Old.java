@@ -38,11 +38,11 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public final class SSLHelper {
+public final class SSLHelper_Old {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(SSLHelper.class);
+  private static final Logger log = LoggerFactory.getLogger(SSLHelper_Old.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
@@ -50,26 +50,12 @@ public final class SSLHelper {
   /**
    * The SSL configuration properties.
    */
-  private SSLHelper2 helper;
-  /**
-   * 
-   */
-  private final TypedProperties config;
+  private static SSLHelper2 helper;
 
   /**
-   * Instantiate this class with the default configuration.
+   * Instantiating this class is not permitted.
    */
-  public SSLHelper() throws Exception {
-    this(JPPFConfiguration.getProperties());
-  }
-
-  /**
-   * Instantiate this class.
-   * @param config the configuration which contains the location or source of the SSL config.
-   */
-  public SSLHelper(final TypedProperties config) throws Exception {
-    this.config = config;
-    loadSSLProperties();
+  private SSLHelper_Old() {
   }
 
   /**
@@ -78,7 +64,8 @@ public final class SSLHelper {
    * @return a {@link SSLContext} instance.
    * @throws Exception if any error occurs.
    */
-  public SSLContext getSSLContext(final int identifier) throws Exception {
+  public static SSLContext getSSLContext(final int identifier) throws Exception {
+    checkSSLProperties();
     return helper.getSSLContext(identifier);
   }
 
@@ -87,7 +74,8 @@ public final class SSLHelper {
    * @return a {@link SSLParameters} instance.
    * @throws Exception if any error occurs.
    */
-  public SSLParameters getSSLParameters() throws Exception {
+  public static SSLParameters getSSLParameters() throws Exception {
+    checkSSLProperties();
     return helper.getSSLParameters();
   }
 
@@ -97,7 +85,8 @@ public final class SSLHelper {
    * @return a {@link SocketWrapper} whose socket is an {@link SSLSocket} wrapping the {@link Socket} of the plain connection.
    * @throws Exception if an error occurs while configuring the SSL parameters.
    */
-  public SocketWrapper createSSLClientConnection(final SocketWrapper socketClient) throws Exception {
+  public static SocketWrapper createSSLClientConnection(final SocketWrapper socketClient) throws Exception {
+    checkSSLProperties();
     return helper.createSSLClientConnection(socketClient);
   }
 
@@ -107,7 +96,8 @@ public final class SSLHelper {
    * @param env the environment in which to add the SSL/TLS properties.
    * @throws Exception if any error occurs.
    */
-  public void configureJMXProperties(final String protocol, final Map<String, Object> env) throws Exception {
+  public static void configureJMXProperties(final String protocol, final Map<String, Object> env) throws Exception {
+    checkSSLProperties();
     helper.configureJMXProperties(protocol, env);
   }
 
@@ -115,11 +105,12 @@ public final class SSLHelper {
    * Load the SSL properties form the source specified in the JPPF configuration.
    * @throws Exception if any error occurs.
    */
-  private void loadSSLProperties() throws Exception {
+  private static synchronized void checkSSLProperties() throws Exception {
     if (helper == null) {
       String source = null;
       final TypedProperties sslConfig = new TypedProperties();
       InputStream is = null;
+      final TypedProperties config = JPPFConfiguration.getProperties();
       source = config.get(JPPFProperties.SSL_CONFIGURATION_SOURCE);
       if (source != null) is = SSLHelper2.callSource(source);
       else {
@@ -139,7 +130,7 @@ public final class SSLHelper {
   /**
    * Reset the SSL configuration.
    */
-  public void resetConfig() {
+  public static void resetConfig() {
     if (helper != null) helper = null;
   }
 

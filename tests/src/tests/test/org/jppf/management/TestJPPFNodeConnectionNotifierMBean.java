@@ -24,6 +24,7 @@ import java.util.*;
 
 import javax.management.*;
 
+import org.apache.log4j.Level;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.NodeForwardingMBean;
 import org.jppf.node.policy.IsMasterNode;
@@ -48,6 +49,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
    */
   @BeforeClass
   public static void setup() throws Exception {
+    ConfigurationHelper.setLoggerLevel(Level.DEBUG, "org.jppf.node.provisioning");
     client = BaseSetup.setup(1, 1, true, true, createConfig("provisioning"));
   }
 
@@ -57,33 +59,31 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
    */
   @Test(timeout = 15000)
   public void testConnectionNotifications() throws Exception {
+    final long waitTime = 50L;
     final int nbSlaves = 2;
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    print(false, false, "waiting for master node");
-    while (driver.nbIdleNodes() < 1) Thread.sleep(10L);
+    print("waiting for master node");
+    while (driver.nbIdleNodes() < 1) Thread.sleep(waitTime);
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
     final NodeForwardingMBean forwarder = driver.getForwarder();
     final NodeSelector selector = new ExecutionPolicySelector(new IsMasterNode());
+    print("provisioning %d slave nodes", nbSlaves);
     forwarder.provisionSlaveNodes(selector, nbSlaves);
-    print(false, false, "waiting for %d slave nodes", nbSlaves);
-    while (driver.nbIdleNodes() < nbSlaves + 1) Thread.sleep(10L);
-    print(false, false, "waiting for %d connected notifications", nbSlaves);
-    synchronized(notifList) {
-      while (notifList.size() < nbSlaves) notifList.wait(10L);
-    }
-    print(false, false, "terminating slave nodes");
+    print("waiting for %d slave nodes", nbSlaves);
+    while (driver.nbIdleNodes() < nbSlaves + 1) Thread.sleep(waitTime);
+    print("waiting for %d connected notifications", nbSlaves);
+    while (getNotifListSize() < nbSlaves) Thread.sleep(waitTime);
+    print("terminating slave nodes");
     forwarder.provisionSlaveNodes(selector, 0);
-    print(false, false, "waiting for slave nodes termination");
-    while (driver.nbIdleNodes() > 1) Thread.sleep(10L);
-    print(false, false, "waiting for %d notifications", 2 * nbSlaves);
-    synchronized(notifList) {
-      while (notifList.size() < 2 * nbSlaves) notifList.wait(10L);
-    }
+    print("waiting for slave nodes termination");
+    while (driver.nbIdleNodes() > 1) Thread.sleep(waitTime);
+    print("waiting for %d notifications", 2 * nbSlaves);
+    while (getNotifListSize() < 2 * nbSlaves) Thread.sleep(waitTime);
     driver.removeNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
     int connectedCount = 0;
     int disconnectedCount = 0;
-    for (Notification notif: notifList) {
-      print(false, false, "notifList[%d] = %s, %s", (connectedCount + disconnectedCount), notif.getType(), notif.getUserData());
+    for (final Notification notif: notifList) {
+      print("notifList[%d] = %s, %s", (connectedCount + disconnectedCount), notif.getType(), notif.getUserData());
       assertEquals(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, notif.getSource());
       switch(notif.getType()) {
         case JPPFNodeConnectionNotifierMBean.CONNECTED:
@@ -93,7 +93,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
           disconnectedCount++;
           break;
         default:
-          throw new IllegalStateException(String.format("notification has an invalid type: %s", notif));
+          throw new IllegalStateException("notification has an invalid type: " + notif);
       }
       assertTrue(notif.getUserData() instanceof JPPFManagementInfo);
     }
@@ -104,10 +104,19 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
     final JPPFManagementInfo info = (JPPFManagementInfo) notification.getUserData();
-    print(false, false, "received '%s' notification for %s", notification.getType(), info);
+    print("received '%s' notification for %s", notification.getType(), info);
     if (info.isMasterNode()) return;
     synchronized(notifList) {
       notifList.add(notification);
+    }
+  }
+
+  /**
+   * @return the number of notifications received.
+   */
+  private int getNotifListSize() {
+    synchronized(notifList) {
+      return notifList.size();
     }
   }
 }

@@ -26,8 +26,7 @@ import javax.net.ssl.*;
 
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -119,13 +118,12 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
    * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  private static void configureSSL(final HeartbeatContext context) throws Exception {
+  private void configureSSL(final HeartbeatContext context) throws Exception {
     if (debugEnabled) log.debug("configuring SSL for {}", context);
     final SocketChannel channel = context.getSocketChannel();
-    final SSLContext sslContext = SSLHelper.getSSLContext(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL);
     final InetSocketAddress addr = (InetSocketAddress) channel.getRemoteAddress();
     final SSLEngine engine = sslContext.createSSLEngine(addr.getHostString(), addr.getPort());
-    final SSLParameters params = SSLHelper.getSSLParameters();
+    final SSLParameters params = sslHelper.getSSLParameters();
     engine.setUseClientMode(false);
     engine.setSSLParameters(params);
     if (debugEnabled) log.debug("created SSLEngine: useClientMode = {}, parameters = {}", engine.getUseClientMode(), engine.getSSLParameters());

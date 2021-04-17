@@ -70,12 +70,12 @@ public abstract class AbstractRemoteNode extends JPPFNode implements HeartbeatCo
 
   @Override
   public void initDataChannel() throws Exception {
-    (nodeConnection = new RemoteNodeConnection(connectionInfo, serializer)).init();
+    (nodeConnection = new RemoteNodeConnection(connectionInfo, serializer, this)).init();
     if (nodeIO == null) nodeIO = new RemoteNodeIO(this);
     if (configuration.get(JPPFProperties.RECOVERY_ENABLED)) {
       if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
-        recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, uuid, connectionInfo.getHost(), connectionInfo.getPort(), connectionInfo.isSecure());
+        recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, uuid, connectionInfo.getHost(), connectionInfo.getPort(), connectionInfo.isSecure(), configuration);
         recoveryConnection.addClientConnectionListener(this);
         ThreadUtils.startThread(recoveryConnection, "HeartbeatConnection");
       }

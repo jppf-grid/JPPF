@@ -308,12 +308,13 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
    * @return an eventual exception to use in job results processing.
    */
   private Exception handleThrowable(final ClientTaskBundle clientBundle, final Throwable t, final boolean fromSender) {
-    if (debugEnabled) log.debug("handling throwable from {} for {}:\nchannel = {}", fromSender ? "sender" : "receiver", clientBundle, this, t);
+    final String from = fromSender ? "sender" : "receiver";
+    if (debugEnabled) log.debug("handling throwable from {} for {}:\nchannel = {}", from, clientBundle, this, t);
     final boolean channelClosed = channel.isClosed();
-    if (debugEnabled) log.debug("channelClosed={}, resetting={}", channelClosed, resetting);
+    if (debugEnabled) log.debug("from {}, channelClosed={}, resetting={}", from, channelClosed, resetting);
     if (!channelClosed) {
       final String jobMsg = (clientBundle == null) ? "" : " while handling job " + clientBundle;
-      log.warn("Throwable was raised{} on channel {}\n{}", jobMsg, this, ExceptionUtils.getStackTrace(t));
+      log.warn("from {}, throwable was raised{} on channel {}: {}", from, jobMsg, this, ExceptionUtils.getMessage(t));
     }
     final Exception exception = (t == null) ? null : ((t instanceof Exception) ? (Exception) t : new JPPFException(t));
     try {
@@ -322,7 +323,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
       } else {
         reconnect();
         if (clientBundle != null) {
-          if (debugEnabled) log.debug("resubmitting {}", clientBundle);
+          if (debugEnabled) log.debug("from {}, resubmitting {}", from, clientBundle);
           resubmitBundle(clientBundle, null);
         }
         resubmitQueueBundles();

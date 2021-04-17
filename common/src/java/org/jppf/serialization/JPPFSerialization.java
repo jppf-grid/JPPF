@@ -66,7 +66,7 @@ public interface JPPFSerialization {
     /**
      * The class of the serialization to use.
      */
-    private static Class<? extends JPPFSerialization> serializationClass = null;
+    private static Class<? extends JPPFSerialization> serializationClass;
     /**
      * The class of the composite to use on top of the serialization.
      */

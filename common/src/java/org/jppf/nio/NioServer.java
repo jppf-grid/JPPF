@@ -72,6 +72,10 @@ public abstract class NioServer extends Thread {
    */
   protected SSLContext sslContext;
   /**
+   * 
+   */
+  protected SSLHelper sslHelper;
+  /**
    * The channel identifier for channels handled by this server.
    */
   protected final int identifier;
@@ -165,7 +169,8 @@ public abstract class NioServer extends Thread {
    * @throws Exception if any error occurs during the SSL configuration.
    */
   protected void createSSLContext() throws Exception {
-    sslContext = SSLHelper.getSSLContext(identifier);
+    sslHelper = new SSLHelper(configuration);
+    sslContext = sslHelper.getSSLContext(identifier);
   }
 
   /**
@@ -175,7 +180,7 @@ public abstract class NioServer extends Thread {
    * @throws Exception if any error occurs during the SSL configuration.
    */
   protected void configureSSLEngine(final SSLEngine engine) throws Exception {
-    final SSLParameters params = SSLHelper.getSSLParameters();
+    final SSLParameters params = sslHelper.getSSLParameters();
     engine.setUseClientMode(false);
     engine.setSSLParameters(params);
   }
@@ -257,12 +262,24 @@ public abstract class NioServer extends Thread {
    */
   public void removeAllConnections() {
     if (debugEnabled) log.debug("removing all connections of {}", this);
-    if (!isStopped()) return;
+    //if (!isStopped()) return;
     sync.wakeUpAndSetOrIncrement();
     try {
-      selector.close();
+      if ((selector != null) && selector.isOpen()) {
+        final Set<SelectionKey> keys = new HashSet<>(selector.keys());
+        for (final SelectionKey key: keys) {
+          if (debugEnabled) log.debug("closing {}", toString(key));
+          try {
+            final SelectableChannel channel = key.channel();
+            if ((channel != null) && channel.isOpen()) channel.close();
+          } catch (final Exception e) {
+            log.error("error closing {}", toString(key), e);
+          }
+        }
+        selector.close();
+      }
     } catch (final Exception e) {
-      log.error(e.getMessage(), e);
+      log.error("error while removing all connections from {}", this, e);
     } finally {
       sync.decrement();
     }
@@ -293,7 +310,7 @@ public abstract class NioServer extends Thread {
     final SocketChannel socketChannel = context.getSocketChannel();
     final Socket socket = socketChannel.socket();
     final SSLEngine engine = sslContext.createSSLEngine(socket.getInetAddress().getHostAddress(), socket.getPort());
-    final SSLParameters params = SSLHelper.getSSLParameters();
+    final SSLParameters params = sslHelper.getSSLParameters();
     engine.setUseClientMode(true);
     engine.setSSLParameters(params);
     final SSLHandler sslHandler = new SSLHandlerImpl(socketChannel, engine);
@@ -328,5 +345,13 @@ public abstract class NioServer extends Thread {
    */
   public void setConfiguration(final TypedProperties configuration) {
     this.configuration = configuration;
+  }
+
+  public static String toString(final SelectionKey key) {
+    if (key == null) return "null";
+    return new StringBuilder("SelectionKey[")
+      .append("channel=").append(key.channel())
+      .append(", attachment=").append(key.attachment())
+      .append('[').toString();
   }
 }

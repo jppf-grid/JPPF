@@ -89,7 +89,8 @@ public class TestPrintStream extends PrintStream {
    * @return the header as a string.
    */
   private static String getHeader() {
-    return CLIENT + "["  + BaseTest.getFormattedTimestamp() + "] ";
+    final String s = "["  + BaseTest.getFormattedTimestamp() + "] ";
+    return BaseSetup.isTestWithEmbeddedGrid() ? s : CLIENT + s;
   }
 
   /**

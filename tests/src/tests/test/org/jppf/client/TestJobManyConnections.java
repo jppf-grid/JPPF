@@ -73,7 +73,7 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
     for (int i=1; i<=BaseSetup.nbDrivers(); i++) {
       try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11100 + i)) {
         assertTrue(jmx.connectAndWait(5000L));
-        if (i > 2) BaseSetup.generateDriverThreadDump(jmx);
+        if (i > 2) BaseTestHelper.generateDriverThreadDump(jmx);
       }
     }
   }

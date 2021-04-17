@@ -105,6 +105,22 @@ public final class ConcurrentUtils {
   }
 
   /**
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
+   * The specified monitor may be notified at any time during the execution of this method, at which time it will check the condition again.
+   * @param condition the condition to check.
+   * @param millis the milliseconds part of the timeout. A value of zero means an infinite timeout.
+   * @param sleepInterval how long to wait between evaluations of the condition, in millis.
+   * @param throwExceptionOnTImeout whether to raise an exception if the timeout expires.
+   * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
+   * @throws IllegalArgumentException if the millis or nanos are negative, or if the nanos are greater than 999999.
+   * @throws JPPFTimeoutException if the timeout expires and {@code throwExceptionOnTImeout} is {@code true}.
+   */
+  public static boolean awaitCondition(final long millis, final long sleepInterval, final boolean throwExceptionOnTImeout, final Condition condition)
+    throws IllegalArgumentException, JPPFTimeoutException {
+    return awaitCondition(condition, millis, sleepInterval, throwExceptionOnTImeout);
+  }
+
+  /**
    * Wait on the specified monitor for at most the specified tiemout or until the specified condition is fulfilled, waiting by increment of the specified wait time.
    * @param monitor the monitor to wait on.
    * @param condition the condition to check.

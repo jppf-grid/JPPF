@@ -19,7 +19,7 @@ package org.jppf.server;
 
 import java.util.TimerTask;
 
-import org.jppf.JPPFError;
+import org.jppf.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -89,6 +89,18 @@ class ShutdownRestartTask extends TimerTask {
           } catch (final Exception e) {
             log.error(e.getMessage(), e);
             throw new JPPFError("Could not restart the JPPFDriver");
+          }
+        }
+      } else {
+        if (restart) {
+          lock.goToSleep(restartDelay);
+          log.info("Initiating restart");
+          try {
+            driver.start();
+          } catch (final RuntimeException e) {
+            throw e;
+          } catch (final Exception e) {
+            throw new JPPFRuntimeException(e);
           }
         }
       }

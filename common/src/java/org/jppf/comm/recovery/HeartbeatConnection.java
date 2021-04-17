@@ -65,6 +65,10 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
    * Identifies this channel with the server.
    */
   private final int channelIdentifier;
+  /**
+   * Contains the location or source of the SSL configuration.
+   */
+  private final TypedProperties config;
 
   /**
    * Initialize this client connection with the specified uuid.
@@ -73,13 +77,15 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
    * @param port the port number to connect to on the host.
    * @param sslEnabled whether secure connectivity is enabled.
    * @param channelIdentifier identifies this channel with the server.
+   * @param config contains the location or source of the SSL configuration.
    */
-  public HeartbeatConnection(final int channelIdentifier, final String uuid, final String host, final int port, final boolean sslEnabled) {
+  public HeartbeatConnection(final int channelIdentifier, final String uuid, final String host, final int port, final boolean sslEnabled, final TypedProperties config) {
     this.channelIdentifier = channelIdentifier;
     this.uuid = uuid;
     this.host = host;
     this.port = port;
     this.sslEnabled = sslEnabled;
+    this.config = config;
   }
 
   @Override
@@ -102,7 +108,7 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
       if (debugEnabled) log.debug("sending channel identifier {}", JPPFIdentifiers.asString(channelIdentifier));
       socketWrapper.writeInt(channelIdentifier);
       socketWrapper.flush();
-      if (sslEnabled) socketWrapper = SSLHelper.createSSLClientConnection(socketWrapper);
+      if (sslEnabled) socketWrapper = new SSLHelper(config).createSSLClientConnection(socketWrapper);
       while (!isStopped()) {
         final HeartbeatMessage message = receiveMessage(maxRetries, socketReadTimeout);
         if (debugEnabled) log.debug("received {}", message);

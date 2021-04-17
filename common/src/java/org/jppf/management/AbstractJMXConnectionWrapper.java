@@ -167,7 +167,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
       this.displayName = this.idString;
       //url = new JMXServiceURL("service:jmx:jmxmp://" + idString);
       url = new JMXServiceURL(protocol, host, port);
-      if (sslEnabled) SSLHelper.configureJMXProperties(protocol, env);
+      if (sslEnabled) new SSLHelper().configureJMXProperties(protocol, env);
       if (JMXHelper.JMXMP_PROTOCOL.equals(protocol)) initJMXMP();
       else initJPPF();
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -175,8 +175,10 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
       env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, cl);
       env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, cl);
       if (debugEnabled) log.debug("created {} with sslEnabled={}, url={}, env={}", getClass().getSimpleName(), this.sslEnabled, url, env);
+    } catch(final RuntimeException e) {
+      throw e;
     } catch(final Exception e) {
-      log.error(e.getMessage(), e);
+      throw new IllegalStateException(e);
     }
     local = false;
   }

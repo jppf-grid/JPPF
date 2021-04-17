@@ -18,9 +18,17 @@
 
 package test.org.jppf.serialization;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
-import test.org.jppf.test.setup.AbstractNonStandardSetup;
+import java.util.*;
+
+import org.jppf.serialization.*;
+import org.jppf.serialization.kryo.KryoSerialization;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.configuration.JPPFProperties;
+import org.junit.*;
+
+import test.org.jppf.test.setup.*;
 
 /**
  * Unit tests for the JPPF serialization scheme.
@@ -35,6 +43,40 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Whether the serialization scheme allows non-serializable classes.
    */
   static boolean allowsNonSerializable = true;
+  /**
+   * 
+   */
+  final static Map<String, String> serializationMap = new HashMap<String, String>() {{
+    put("TestJava", DefaultJavaSerialization.class.getName());
+    put("TestJavaWithLZ4", "LZ4 " + DefaultJavaSerialization.class.getName());
+    put("TestJavaWithZLIB", "ZLIB " + DefaultJavaSerialization.class.getName());
+    put("TestJPPF", DefaultJPPFSerialization.class.getName());
+    put("TestJPPFWithLZ4", "LZ4 " + DefaultJPPFSerialization.class.getName());
+    put("TestJPPFWithZLIB", "ZLIB " + DefaultJPPFSerialization.class.getName());
+    put("TestKryo", KryoSerialization.class.getName());
+    put("TestKryoWithLZ4", "LZ4 " + KryoSerialization.class.getName());
+    put("TestKryoWithZLIB", "ZLIB " + KryoSerialization.class.getName());
+    put("TestXStream", XstreamSerialization.class.getName());
+    put("TestXStreamWithLZ4", "LZ4 " + XstreamSerialization.class.getName());
+    put("TestXStreamWithZLIB", "ZLIB " + XstreamSerialization.class.getName());
+  }};
+
+  /**
+   * @throws Exception if any error occurs could not be started.
+   */
+  static void resetSerialization() throws Exception {
+    if (BaseSetup.isTestWithEmbeddedGrid()) {
+      final StackTraceElement elt = new Throwable().getStackTrace()[1];
+      final String fqn = elt.getClassName();
+      final int idx = fqn.lastIndexOf('.');
+      assertTrue(idx > 0);
+      final String simpleName = fqn.substring(idx + 1);
+      final String value = serializationMap.get(simpleName);
+      if (value == null) throw new IllegalStateException(simpleName + " is not a recognized serialization test class");
+      JPPFConfiguration.set(JPPFProperties.OBJECT_SERIALIZATION_CLASS, value);
+      JPPFSerialization.Factory.reset();
+    }
+  }
 
   /**
    * Test a simple job.

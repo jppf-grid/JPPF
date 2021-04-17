@@ -18,7 +18,7 @@
 
 package test.org.jppf.utils;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.util.*;
 import java.util.concurrent.Callable;

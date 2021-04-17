@@ -29,8 +29,7 @@ import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.ClassCache;
 import org.jppf.server.nio.client.AsyncClientNioServer;
-import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -140,13 +139,12 @@ public final class AsyncClientClassNioServer extends StatelessNioServer<AsyncCli
    * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  private static void configureSSL(final AsyncClientClassContext context) throws Exception {
+  private void configureSSL(final AsyncClientClassContext context) throws Exception {
     if (debugEnabled) log.debug("configuring SSL for {}", context);
     final SocketChannel channel = context.getSocketChannel();
-    final SSLContext sslContext = SSLHelper.getSSLContext(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
     final InetSocketAddress addr = (InetSocketAddress) channel.getRemoteAddress();
     final SSLEngine engine = sslContext.createSSLEngine(addr.getHostString(), addr.getPort());
-    final SSLParameters params = SSLHelper.getSSLParameters();
+    final SSLParameters params = sslHelper.getSSLParameters();
     engine.setUseClientMode(false);
     engine.setSSLParameters(params);
     if (debugEnabled) log.debug("created SSLEngine: useClientMode = {}, parameters = {}", engine.getUseClientMode(), engine.getSSLParameters());

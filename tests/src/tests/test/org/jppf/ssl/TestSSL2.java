@@ -18,24 +18,26 @@
 
 package test.org.jppf.ssl;
 
+import org.apache.log4j.Level;
 import org.junit.*;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.*;
 
 /**
- * SSL Unit Tests with 1-way authentication.
+ * SSL Unit Tests with mutual authentication.
  * @author Laurent Cohen
  */
-public class TestSSL2 extends AbstractNonStandardSetup
-{
+@IgnoreForEmbeddedGrid
+public class TestSSL2 extends AbstractNonStandardSetup {
   /**
    * Launches a driver and 1 node and start the client,
    * all setup with 1-way SSL authentication.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
+  public static void setup() throws Exception {
+    ConfigurationHelper.setLoggerLevel(Level.DEBUG, "org.jppf.ssl");
     client = BaseSetup.setup(1, 1, true, true, createConfig("ssl2"));
   }
 
@@ -44,36 +46,31 @@ public class TestSSL2 extends AbstractNonStandardSetup
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
-  public void testSimpleJob() throws Exception
-  {
+  public void testSimpleJob() throws Exception {
     super.testSimpleJob(null);
   }
 
   @Override
   @Test(timeout=15000)
-  public void testMultipleJobs() throws Exception
-  {
+  public void testMultipleJobs() throws Exception {
     super.testMultipleJobs();
   }
 
   @Override
   @Test(timeout=10000)
-  public void testCancelJob() throws Exception
-  {
+  public void testCancelJob() throws Exception {
     super.testCancelJob();
   }
 
   @Override
   @Test(timeout=5000)
-  public void testNotSerializableExceptionFromNode() throws Exception
-  {
+  public void testNotSerializableExceptionFromNode() throws Exception {
     super.testNotSerializableExceptionFromNode();
   }
 
   @Override
   @Test(timeout=8000)
-  public void testForwardingMBean() throws Exception
-  {
+  public void testForwardingMBean() throws Exception {
     super.testForwardingMBean();
   }
 }

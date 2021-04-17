@@ -37,6 +37,7 @@ public class TestJPPFWithLZ4 extends AbstractTestSerialization {
   @BeforeClass
   public static void setup() throws Exception {
     allowsNonSerializable = true;
+    resetSerialization();
     System.out.println("main class loader = " + TestJPPFWithLZ4.class.getClassLoader());
     //JPPFSerialization.Factory.reset();
     client = BaseSetup.setup(1, 1, true, true, createConfig("serialization/jppf_lz4"));

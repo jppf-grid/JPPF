@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.util.function.Predicate;
 
+import org.apache.log4j.Level;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.NodeForwardingMBean;
@@ -73,6 +74,8 @@ public abstract class AbstractTestNodeForwardingMBean extends AbstractNonStandar
    */
   @BeforeClass
   public static void setup() throws Exception {
+    ConfigurationHelper.setLoggerLevel(Level.DEBUG, "org.jppf.management.forwarding", "org.jppf.node", "org.jppf.server.node", "org.jppf.management.JPPFNodeTaskMonitor");
+    ConfigurationHelper.setLoggerLevel(Level.TRACE, "org.jppf.management.NodeSelectionHelper");
     final int nbNodes = 2;
     final TestConfiguration config = createConfig(null);
     config.driver.log4j = "classes/tests/config/log4j-driver.NodeForwarding.properties";

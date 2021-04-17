@@ -108,7 +108,7 @@ public class TestConnectionPool extends Setup1D1N {
   public void testNumberOfPools() throws Exception {
     BaseSetup.resetClientConfig();
     client = BaseSetup.createClient(null, false, BaseSetup.DEFAULT_CONFIG);
-    BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
+    BaseSetup.checkDriverAndNodesInitialized(client, 1, 1, false);
     final List<JPPFConnectionPool> pools = client.getConnectionPools();
     assertNotNull(pools);
     assertEquals(1, pools.size());

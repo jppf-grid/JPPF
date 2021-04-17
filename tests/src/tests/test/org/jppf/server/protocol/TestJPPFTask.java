@@ -33,6 +33,7 @@ import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
 import org.junit.Test;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
@@ -127,6 +128,7 @@ public class TestJPPFTask extends Setup1D1N1C {
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
+  @IgnoreForEmbeddedGrid
   public void testComputeCallable() throws Exception {
     final int nbTasks = 1;
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, MyComputeCallableTask.class, MyComputeCallable.class.getName());
@@ -144,6 +146,7 @@ public class TestJPPFTask extends Setup1D1N1C {
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
+  @IgnoreForEmbeddedGrid
   public void testComputeCallableThrowingException() throws Exception {
     final int nbTasks = 1;
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, nbTasks, MyComputeCallableTask.class, MyExceptionalCallable.class.getName());

@@ -270,7 +270,9 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     final String suffix = "node-";
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, 1, FileTask.class, suffix, true);
     job.getSLA().setMaxNodes(2);
-    client.submit(job);
+    final List<Task<?>> result = client.submit(job);
+    print(false, false, "initial tasks:        %s", job.getJobTasks());
+    print(false, false, "broacast job results: %s", result);
     for (int i=1; i<=2; i++) {
       final File file = new File("node-n" + i + ".tmp");
       try {
@@ -421,7 +423,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     public void run() {
       try {
         String name = filePath;
-        if (appendNodeSuffix) name = name + JPPFConfiguration.getProperties().getString("jppf.node.uuid");
+        if (appendNodeSuffix) name = name + getNode().getUuid();
         name = name + ".tmp";
         print(false, false, "creating file '%s'", name);
         final File f = new File(name);

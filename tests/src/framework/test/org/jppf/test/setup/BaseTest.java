@@ -30,13 +30,16 @@ import org.jppf.utils.configuration.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import org.junit.runner.*;
 import org.slf4j.*;
+
+import test.org.jppf.test.runner.EmbeddedGridRunner;
 
 /**
  * Base class for JPPF automated tests.
  * @author Laurent Cohen
  */
+@RunWith(EmbeddedGridRunner.class)
 public class BaseTest {
   static {
     Locale.setDefault(Locale.US);
@@ -54,7 +57,7 @@ public class BaseTest {
   /** */
   protected static final int NODE_MANAGEMENT_PORT_BASE = 12300;
   /** */
-  protected static final JPPFProperty<Boolean> DEADLOCK_DETECTOR_ENABLED = new BooleanProperty("jppf.deadlock.detector.enabled", false);
+  public static final JPPFProperty<Boolean> DEADLOCK_DETECTOR_ENABLED = new BooleanProperty("jppf.deadlock.detector.enabled", false);
   /** */
   private static PrintStream stdOut, stdErr;
   /** */
@@ -95,6 +98,15 @@ public class BaseTest {
     final String[] logPaths = new String[logFiles.length];
     for (int i=0; i<logFiles.length; i++) logPaths[i] = logFiles[i].getPath();
     ZipUtils.zipFile(outZip.getPath(), logPaths);
+  }
+
+  /**
+   * Print a formatted message to the shell output and to the log file.
+   * @param format the format.
+   * @param parameters the parameter values.
+   */
+  protected static void print(final String format, final Object...parameters) {
+    print(false, false, ">>> " + format, parameters);
   }
 
   /**

@@ -85,7 +85,7 @@ public class Setup1D2N extends BaseTest {
   public static void cleanup() throws Exception {
     try {
       if (jmx.isConnected()) {
-        BaseSetup.generateDriverThreadDump(jmx);
+        BaseTestHelper.generateDriverThreadDump(jmx);
         BaseTestHelper.printToAll(jmx, false, false, true, true, true, "ending test of class %s", ReflectionUtils.getCurrentClassName());
         jmx.close();
       }

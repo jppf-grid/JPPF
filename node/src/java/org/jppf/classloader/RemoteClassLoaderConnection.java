@@ -59,15 +59,21 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
    * The server conenction information.
    */
   private final DriverConnectionInfo connectionInfo;
+  /**
+   * The node configuration.
+   */
+  private final TypedProperties config;
 
   /**
    * Initialize with the required information to connect to the server.
    * @param uuid this node's uuid.
    * @param connectionInfo he server conenction information.
+   * @param config the node configuration
    */
-  public RemoteClassLoaderConnection(final String uuid, final DriverConnectionInfo connectionInfo) {
+  public RemoteClassLoaderConnection(final String uuid, final DriverConnectionInfo connectionInfo, final TypedProperties config) {
     super(uuid);
     this.connectionInfo = connectionInfo;
+    this.config = config;
   }
 
   @Override
@@ -106,7 +112,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
    */
   private void createSSLConnection() {
     try {
-      channel = SSLHelper.createSSLClientConnection(channel);
+      channel = new SSLHelper(config).createSSLClientConnection(channel);
     } catch(final Exception e) {
       throw new RuntimeException(e);
     }

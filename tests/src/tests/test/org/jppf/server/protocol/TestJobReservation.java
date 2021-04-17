@@ -38,6 +38,7 @@ import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
+import test.org.jppf.test.runner.IgnoreForEmbeddedGrid;
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
@@ -130,6 +131,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * @throws Exception if any error occurs.
    */
   @Test(timeout = TEST_TIMEOUT)
+  @IgnoreForEmbeddedGrid
   public void testJobReservationSingleNodeWithRestart() throws Exception {
     final  int nbTasks = 5 * BaseSetup.nbNodes();
     print(false, false, ">>> creating job");
@@ -164,6 +166,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * @throws Exception if any error occurs.
    */
   @Test(timeout = TEST_TIMEOUT)
+  @IgnoreForEmbeddedGrid
   public void testCancelledJobReservationSingleNodeWithRestart() throws Exception {
     final int nbTasksPerNode = 5;
     final int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
@@ -302,6 +305,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * @throws Exception if any error occurs.
    */
   @Test(timeout = TEST_TIMEOUT)
+  @IgnoreForEmbeddedGrid
   public void testJobReservationSingleNodeNoRestart() throws Exception {
     print(false, false, ">>> creating job");
     final int nbTasks = 5 * BaseSetup.nbNodes();

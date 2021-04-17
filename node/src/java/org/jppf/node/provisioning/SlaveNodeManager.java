@@ -56,12 +56,12 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * Path prefix used for the root directory of each slave node.
    * The provisioning facility will then add a sequence number as suffix, to distinguish between slave nodes.
    */
-  private static final String SLAVE_PATH_PREFIX = JPPFConfiguration.get(JPPFProperties.PROVISIONING_SLAVE_PATH_PREFIX);
+  private final String slavePathPrefix;
   /**
    * Directory where configuration files, other than the jppf configuration, are located.
    * The files in this folder will be copied into each slave node's 'config' directory.
    */
-  private static final String SLAVE_CONFIG_PATH = JPPFConfiguration.get(JPPFProperties.PROVISIONING_SLAVE_CONFIG_PATH);
+  private final String slaveConfigPath;
   /**
    * The directory where the slave's config files are located, relative to its root folder.
    */
@@ -73,7 +73,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
   /**
    * Max timeout in millis for checking the fulfillment of a provisioning request.
    */
-  static final long REQUEST_CHECK_TIMEOUT = JPPFConfiguration.get(JPPFProperties.PROVISIONING_REQUEST_CHECK_TIMEOUT);
+  private final long requestCheckTimeout;
   /**
    * A mapping of the slave processes to their internal name.
    */
@@ -122,10 +122,14 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    */
   public SlaveNodeManager(final Node node) {
     this.node = node;
+    final TypedProperties config = node.getConfiguration();
+    slavePathPrefix = config.get(JPPFProperties.PROVISIONING_SLAVE_PATH_PREFIX);
+    slaveConfigPath = config.get(JPPFProperties.PROVISIONING_SLAVE_CONFIG_PATH);
+    requestCheckTimeout = config.get(JPPFProperties.PROVISIONING_REQUEST_CHECK_TIMEOUT);
     masterDir = new File(System.getProperty("user.dir"));
     final long n = node.getConfiguration().getLong("jppf.node.provisioning.slave.start.delay.increment", 0L);
     startDelayIncrement = (n >= 0L) ? n : 0L;
-    if (debugEnabled) log.debug("masterDir = {}, request check timeout = {} ms, slave start delay increment = {}", masterDir, REQUEST_CHECK_TIMEOUT, startDelayIncrement);
+    if (debugEnabled) log.debug("masterDir = {}, request check timeout = {} ms, slave start delay increment = {}", masterDir, requestCheckTimeout, startDelayIncrement);
     computeSlaveClasspath();
   }
 
@@ -200,7 +204,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
       if (debugEnabled) log.debug("starting " + -diff + " processes");
       for (int i=size, count=0; i<requestedSlaves; i++, count++) {
         id = reserveNextAvailableId();
-        final String slaveDirPath = SLAVE_PATH_PREFIX + id;
+        final String slaveDirPath = slavePathPrefix + id;
         try {
           log.debug("starting slave at {}", slaveDirPath);
           setupSlaveNodeFiles(slaveDirPath, this.configOverrides, id);
@@ -213,9 +217,9 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
         }
       }
     }
-    if (REQUEST_CHECK_TIMEOUT > 0) {
+    if (requestCheckTimeout > 0) {
       final long start = System.nanoTime();
-      final boolean check = ConcurrentUtils.awaitCondition(() -> nbSlaves() == requestedSlaves, REQUEST_CHECK_TIMEOUT, 50L, false);
+      final boolean check = ConcurrentUtils.awaitCondition(() -> nbSlaves() == requestedSlaves, requestCheckTimeout, 50L, false);
       final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       if (debugEnabled) log.debug(String.format("fullfilment check for provisioning request for %d slaves %s after %,d ms", requestedSlaves, (check ? "succeeded" : "timed out"), elapsed));
     }
@@ -242,7 +246,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
   private void setupSlaveNodeFiles(final String slaveDirPath, final TypedProperties configOverrides, final int id) throws Exception {
     final File slaveDir = new File(slaveDirPath);
     if (!slaveDir.exists()) slaveDir.mkdirs();
-    final File slaveConfigSrc = new File(SLAVE_CONFIG_PATH);
+    final File slaveConfigSrc = new File(slaveConfigPath);
     final File slaveConfigDest = new File(slaveDir, SLAVE_LOCAL_CONFIG_DIR);
     if (!slaveConfigDest.exists()) slaveConfigDest.mkdirs();
     if (slaveConfigSrc.exists()) {
