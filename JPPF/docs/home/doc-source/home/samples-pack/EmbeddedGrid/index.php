@@ -6,47 +6,81 @@ This sample demonstrates how to start and use an embedded JPPF <a href="https://
 <h3>How do I run it?</h3>
 From a command prompt, type the following:
 <ul class="samplesList">
-  <li>On a Linux/Unix/MacOS system: <b>./run.sh &lt;n&gt;</b></li>
-  <li>On a Windows system: <b>run.bat &lt;n&gt;</b></li>
+  <li>On a Linux/Unix/MacOS system: <b><tt>./run.sh &lt;nbDrivers&gt; &lt;nbNodes&gt;</tt></b></li>
+  <li>On a Windows system: <b><tt>run.bat &lt;nbDrivers&gt; &lt;nbNodes&gt;</tt></b></li>
 </ul>
-Where <b><i>n</i></b> is an optional argument specifying the number of embedded nodes that you want in the grid. If unspecified, it defaults to 2 nodes.
+Where the following positional arguments are applied:.
+<ul class="samplesList">
+  <li><i>nbDrivers</i> is the noumber of drivers to start in the embedded grid.
+  If there is more than one, every driver will be connected to each of the others
+  in a P2P topology. If not specified, it default to one driver</li>
+  <li><i>nbNodes</i> is the total number of nodes to start in the embedded grid.
+  The nodes are assigned to the drivers in round-robin fashion, to make their
+  distributio as even as possible. If not specified, it default to twwo nodes</li>
+</ul>
 
 <p>The demo produces an output put that looks like this, where messages from the demo itself are prefixed with `>>>`:
-<pre class="samples" style="white-space: pre-wrap">
->>> starting the JPPF driver
-driver process id: 4444, uuid: 2C901290-ADAA-4D96-8B73-224B8594DB2B
+<pre class="samples" style="white-space: pre-wrap; font-size: 80%">
+>>> starting 2 drivers
+>>> starting driver 1
+driver process id: 8104, uuid: d1
 ClientClassServer initialized
 NodeClassServer initialized
 ClientJobServer initialized
 NodeJobServer initialized
 management initialized and listening on port 11111
 Acceptor initialized
--  accepting plain connections on port 11111
 JPPF Driver initialization complete
->>> starting the JPPF node
+>>> starting driver 2
+driver process id: 8104, uuid: d2
+ClientClassServer initialized
+NodeClassServer initialized
+ClientJobServer initialized
+NodeJobServer initialized
+management initialized and listening on port 11112
+JPPF Driver initialization complete
+>>> starting 2 nodes
+>>> starting the JPPF node 1
+>>> starting the JPPF node 2
 >>> starting the JPPF client
-client process id: 4444, uuid: B6CDC36A-F4CA-4D1B-A693-396E926A3F93
-node process id: 4444, uuid: 1624196C-E0CB-4FD0-8A90-78C9FE1BA6DC
-[client: driver1-1 - ClassServer] Attempting connection to the class server at localhost:11111
-[client: driver1-1 - ClassServer] Reconnected to the class server
-[client: driver1-1 - TasksServer] Attempting connection to the task server at localhost:11111
-[client: driver1-1 - TasksServer] Reconnected to the JPPF task server
->>> client connected, now submitting a job
-Attempting connection to the class server at 192.168.1.24:11111
+Attempting connection to remote peer peer-d1-1@localhost:11111
+Reconnected to remote peer peer-d1-1@localhost:11111
+client process id: 8104, uuid: C81D5441-D7E3-4DB8-A397-C26C87B68907
+node process id: 8104, uuid: 6137686B-A94E-44FB-A571-96D0B12AE08D
+node process id: 8104, uuid: 1EA8343C-B7EC-4630-9B9D-004C90F6CAEF
+Attempting connection to the class server at localhost:11112
 RemoteClassLoaderConnection: Reconnected to the class server
-JPPF Node management initialized on port 11111
-Attempting connection to the node server at 192.168.1.24:11111
+Attempting connection to the class server at localhost:11111
+RemoteClassLoaderConnection: Reconnected to the class server
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at localhost:11111
+[client: driver-2-1 - ClassServer] Attempting connection to the class server at localhost:11112
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-2-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the task server at localhost:11111
+[client: driver-2-1 - TasksServer] Attempting connection to the task server at localhost:11112
+JPPF Node management initialized on port 11198
+JPPF Node management initialized on port 11199
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+Attempting connection to the node server at localhost:11112
 Reconnected to the node server
-Node successfully initialized
-Hello! from the node
->>> execution result for job 'embedded grid': Hello!
->>> connecting to local driver JMX server
->>> nb nodes in server: 1
->>> connecting to local node JMX server
->>> node state: JPPFNodeState[threadPoolSize=8, threadPriority=5, nbTasksExecuted=1, executionStatus=IDLE, connectionStatus=CONNECTED, cpuTime=0, pendingAction=NONE]
->>> shutting down node
->>> nb nodes in server: 0
->>> shutting down driver
+Attempting connection to the node server at localhost:11111
+Reconnected to the node server
+node successfully initialized
+node successfully initialized
+[client: driver-2-1 - TasksServer] Reconnected to the JPPF task server
+Attempting connection to remote peer peer-d2-1@localhost:11112
+Reconnected to remote peer peer-d2-1@localhost:11112
+>>> There are now 2 drivers and 2 nodes active in the embedded grid
+>>> client connected, now submitting a job with 20 tasks
+>>> task-10 says Hello! from Node-1 <<<
+>>> task-4 says Hello! from Node-2 <<<
+.....
+>>> task-6 says Hello! from Node-2 <<<
+>>> execution result for job 'embedded grid': 20 successful tasks, 0 in error
+>>> shutting down node 1
+>>> shutting down node 2
+>>> shutting down driver 1
+>>> shutting down driver 2
 >>> done, exiting program
 </pre>
 
