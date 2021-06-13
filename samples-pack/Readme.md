@@ -32,7 +32,6 @@ The current applications in the samples pack are:
 * [Dynamically adapting the grid topology based on the current workload](AdaptiveGrid)
 * [A demonstration of the patterns for submitting multiple jobs in parallel](ConcurrentJobs)
 * [A demonstration of a custom view integrated in the JPPF administration console](PluggableView)
-* [Packaging tasks for execution on an Android device](AndroidDemo)
 * [Managing dependencies between jobs](JobDependencies)
 * [Using network interceptors to implement a simple auhentication protocol](NetworkInterceptor)
 * [Using the configurtion API to generate the documentation of all predefined JPPF properties](ConfigurationProperties)

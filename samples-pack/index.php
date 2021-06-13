@@ -31,7 +31,6 @@ $template{name="sample-readme-html-header" title="JPPF Samples Pack"}$
   <li><a href="AdaptiveGrid">Dynamically adapting the grid topology based on the current workload</a></li>
   <li><a href="ConcurrentJobs">A demonstration of the patterns for submitting multiple jobs in parallel</a></li>
   <li><a href="PluggableView">A demonstration of a custom view integrated in the JPPF administration console</a></li>
-  <li><a href="AndroidDemo">Packaging tasks for execution on an Android device</a></li>
   <li><a href="JobDependencies">How to manage dependencies between jobs</a></li>
   <li><a href="NetworkInterceptor">Using network interceptors to implement a simple auhentication protocol</a></li>
   <li><a href="ConfigurationProperties">Using the configurtion API to generate the documentation of all predefined JPPF properties</a></li>

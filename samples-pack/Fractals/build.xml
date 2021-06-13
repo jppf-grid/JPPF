@@ -87,14 +87,9 @@
   <!-- ========================================================================= -->
   
   <target name="jar" depends="compile" description="build the demo jar">
-    <jar jarfile="jppf-fractals-android.jar" index="false">
-      <fileset dir="${classes.dir}">
-        <include name="**/common/*.class"/>
-        <include name="**/mandelbrot/*.class"/>
-      </fileset>
-    </jar>
+    <jar jarfile="jppf-fractals.jar" index="false" basdir="${classes.dir}"/>
     <echo/>
-    <echo message="*** The file jppf-fractals-android.jar is now ready to be deployed ***"/>
+    <echo message="*** The file jppf-fractals.jar is now ready to be deployed ***"/>
     <echo/>
   </target>
   

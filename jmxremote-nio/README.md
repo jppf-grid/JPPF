@@ -1,6 +1,5 @@
 # JPPF JMX remote connector.
 
-
 This is a full-fledged, fast and scalable implementation of a JMX remote connector, with Java NIO-based networking on both client and server sides.
 
 JMX service URLs are in the form `service:jmx:jppf://<host>:<port>`
@@ -11,13 +10,13 @@ JMX service URLs are in the form `service:jmx:jppf://<host>:<port>`
 
 **Maven Central**: [groupId: org.jppf, artifactId: jppf-jmxremote-nio](https://search.maven.org/search?q=g:org.jppf%20AND%20a:jppf-jmxremote-nio&core=gav)
 
-~~~xml
+```xml
 <dependency>
   <groupId>org.jppf</groupId>
   <artifactId>jppf-jmxremote-nio</artifactId>
-  <version>6.2-beta</version>
+  <version>6.2</version>
 </dependency>
-~~~
+```
 
 ## Environment properties
 
