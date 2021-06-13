@@ -28,7 +28,6 @@
 	<property name="config"             value="${basedir}/config"/>
 	<property name="classes"            value="${basedir}/classes"/>	
 	<property name="src"                value="${basedir}/src"/>
-  <property name="android.tools.home" value="C:/Tools/Android/sdk/build-tools/22.0.1"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->
@@ -87,49 +86,5 @@
   <target name="clean">
     <delete dir="${classes}" quiet="true" includes="**/*.*"/>
   </target>               
-
-  <!-- ========================================================================= -->
-  <!-- Dex Jar                                                                   -->
-  <!-- ========================================================================= -->
-  
-  <!-- create a jar in dex format from the previously generated Java jar file -->
-  <target name="dex.jar" depends="jar">
-    <delete file="dx-demo.jar" quiet="true"/>
-    <dex in="demo.jar" out="dx-demo.jar"/>
-    <delete file="demo.jar" quiet="true"/>
-    <echo message="The file dx-demo.jar is now ready to be deployed"/>
-  </target>
-  
-  <!-- ========================================================================= -->
-  <!-- Macrodefs                                                                 -->
-  <!-- ========================================================================= -->
-  
-  <!--
-    Convert a list of Java jar files to a jar file in dex format.
-    Attributes:
-    - "in": the input file(s) to convert
-    - "out": path to the output dexed jar file
-    - "toolsDir": path to the Android tools folder: ANDROID_SDK_HOME/build-tools/<android_version>
-      optional when "android.tools.home" is defined in the build.properties file
-  -->
-  
-  <macrodef name="dex">
-    <attribute name="in"/>
-    <attribute name="out"/>
-    <attribute name="toolsDir" default="${android.tools.home}"/>
-    <sequential>
-      <!-- compute the name of the dex command based on the OS -->
-      <local name="cmd"/>
-      <condition property="cmd" value="dx.bat" else="dx">
-        <os family="windows"/>
-      </condition>
-      <!-- execute the dex command -->
-      <exec executable="@{toolsDir}/${cmd}" failonerror="true" searchpath="true">
-        <arg value="--dex"/>
-        <arg value="--output=@{out}"/>
-        <arg value="@{in}"/>
-      </exec>
-    </sequential>
-  </macrodef>
 
 </project> 

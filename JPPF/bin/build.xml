@@ -28,7 +28,6 @@
   <property name="admin-web"             value="${basedir}/../admin-web"/>
   <property name="client"                value="${basedir}/../client"/>
   <property name="node"                  value="${basedir}/../node"/>
-  <property name="node-android"          value="${basedir}/../node-android"/>
   <property name="server"                value="${basedir}/../server"/>
   <property name="demo"                  value="${basedir}/../demo"/>
   <property name="jca-client"            value="${basedir}/../jca-client"/>
@@ -42,8 +41,6 @@
   <property environment="env"/>
   <property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${build.properties.file}"/>
-  <property name="jmx.build.properties.file" value="${jmxremote}/build.properties"/>
-  <property file="${jmx.build.properties.file}"/>
   <property name="build.number.file"     value="${basedir}/bin/build.number"/>
   <property name="bin"                   value="${basedir}/bin"/>  
   <property name="installer"             value="${bin}/installer"/>
@@ -73,7 +70,6 @@
   <!-- ========================================================================= -->
 
   <path id="project.classpath">
-    <pathelement location="${jmxremote}/classes"/>
     <pathelement location="${common}/classes"/>
     <pathelement location="${node}/classes"/>
     <pathelement location="${admin}/classes"/>
@@ -87,7 +83,6 @@
 
   <path id="javadoc.classpath">
     <pathelement location="${bin}"/>
-    <pathelement location="${env.ANDROID_HOME}/platforms/android-19/android.jar"/>
     <path refid="project.classpath"/>  
   </path>
 
@@ -267,7 +262,6 @@ build.date = ${readable.now}</echo>
         <exclude name="**/*.zip"/>
         <exclude name="lib/**/*.*"/>
       </zipfileset>
-      <zipfileset dir="${jmxremote}" prefix="${zip.prefix}/jmxremote" excludes="**/*.zip,**/*.jar"/>
       <zipfileset dir="${node}" prefix="${zip.prefix}/node"/>
       <zipfileset dir="${common}" prefix="${zip.prefix}/common"/>
       <zipfileset dir="${jmxremote-nio}" prefix="${zip.prefix}/jmxremote-nio"/>

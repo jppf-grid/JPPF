@@ -57,7 +57,6 @@
     <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
     <!-- Convert sources to HTML and include them in the designated samples -->
     <include.code sample="AdaptiveGrid" include="**/*.java"/>
-    <include.code sample="AndroidDemo" include="**/*.java,build.xml"/>
     <include.code sample="ConcurrentJobs" include="**/*.java"/>
     <include.code sample="ConfigurationProperties" include="**/*.java"/>
     <include.code sample="CustomLoadBalancer" include="**/*.java"/>

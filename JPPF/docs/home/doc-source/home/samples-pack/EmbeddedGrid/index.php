@@ -13,10 +13,10 @@ Where the following positional arguments are applied:.
 <ul class="samplesList">
   <li><i>nbDrivers</i> is the noumber of drivers to start in the embedded grid.
   If there is more than one, every driver will be connected to each of the others
-  in a P2P topology. If not specified, it default to one driver</li>
+  in a P2P topology. If not specified, it defaults to one driver</li>
   <li><i>nbNodes</i> is the total number of nodes to start in the embedded grid.
   The nodes are assigned to the drivers in round-robin fashion, to make their
-  distributio as even as possible. If not specified, it default to twwo nodes</li>
+  distributio as even as possible. If not specified, it defaults to twwo nodes</li>
 </ul>
 
 <p>The demo produces an output put that looks like this, where messages from the demo itself are prefixed with `>>>`:
