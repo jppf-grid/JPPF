@@ -139,6 +139,7 @@
 
   <target name="init" depends="dependencies">
     <mkdir dir="${build}"/>
+    <echo message="izpack.home = ${izpack.home}"/>
     <available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
     <!-- Format the build number to a 4 figures integer with leading zeroes if required -->
     <!-- The build number is also incremented by 1                                      -->
