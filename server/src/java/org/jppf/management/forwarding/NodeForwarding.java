@@ -221,6 +221,7 @@ public class NodeForwarding extends AbstractNodeForwarding implements NodeForwar
       final ForwardCallbackImpl<E> callback = new ForwardCallbackImpl<>(size);
       AbstractForwardingTask<E> task;
       for (final BaseNodeContext node: nodes) {
+        if (debugEnabled) log.debug("forwarding to node {}\nwith type={}, mbeanNaem={}, memberName={}, params={}", node, JMXHelper.name(type), mbeanName, memberName, Arrays.deepToString(params));
         final JMXConnectionWrapper jmx = node.getJmxConnection();
         switch(type) {
           case JMXHelper.INVOKE:
