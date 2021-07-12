@@ -259,6 +259,7 @@ public class BaseSetup {
    * @throws Exception if any error occurs.
    */
   public static void generateClientThreadDump() throws Exception {
+    BaseTest.print(false, false, "generating client thread dump");
     try (final Diagnostics diag = new Diagnostics("client")) {
       final String text = TextThreadDumpWriter.printToString(diag.threadDump(), "client thread dump");
       FileUtils.writeTextFile("client_thread_dump.log", text);
@@ -272,9 +273,15 @@ public class BaseSetup {
    */
   public static void generateDriverThreadDump(final JPPFClient client) throws Exception {
     if (client == null) return;
+    BaseTest.print(false, false, "generating driver and nodes thread dumps");
     final List<JPPFConnectionPool> pools = client.awaitWorkingConnectionPools(1000L);
+    BaseTest.print(false, false, "found %d pools", pools.size());
     final JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[pools.size()];
-    for (int i=0; i<pools.size(); i++) jmxArray[i] = pools.get(i).awaitWorkingJMXConnection();
+    for (int i=0; i<pools.size(); i++) {
+      final JPPFConnectionPool pool = pools.get(i);
+      BaseTest.print(false, false, "getting JMX connection for %s", pool);
+      jmxArray[i] = pool.awaitWorkingJMXConnection();
+    }
     generateDriverThreadDump(jmxArray);
   }
 
@@ -284,7 +291,9 @@ public class BaseSetup {
    * @throws Exception if any error occurs.
    */
   public static void generateDriverThreadDump(final JMXDriverConnectionWrapper... jmxConnections) throws Exception {
+    BaseTest.print(false, false, "generating thread dumps for %d drivers", jmxConnections.length);
     for (final JMXDriverConnectionWrapper jmx: jmxConnections) {
+      BaseTest.print(false, false, "generating driver thread dump for %s", jmx);
       if ((jmx != null) && jmx.isConnected()) {
         try {
           final DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
@@ -296,11 +305,13 @@ public class BaseSetup {
         try {
           final String dump = (String) jmx.invoke("org.jppf:name=debug,type=driver", "all");
           FileUtils.writeTextFile("server_debug_" + jmx.getPort() + ".log", dump);
+          BaseTest.print(false, false, "wrote driver thread dump for %s", jmx);
         } catch (@SuppressWarnings("unused") final Exception e) {
           log.error("failed to get debug dump for {} : {}", jmx, ExceptionUtils.getStackTrace(e));
         }
       }
       try {
+        BaseTest.print(false, false, "generating nodes thread dumps for %s", jmx);
         final Collection<JPPFManagementInfo> infos = jmx.nodesInformation();
         final Map<String, JPPFManagementInfo> infoMap = new HashMap<>(infos.size());
         for (final JPPFManagementInfo info: infos) infoMap.put(info.getUuid(), info);
@@ -314,6 +325,7 @@ public class BaseSetup {
             final JPPFManagementInfo info = infoMap.get(uuid);
             final String text = TextThreadDumpWriter.printToString(dump, "node thread dump for " + (info == null ? uuid : info.getHost() + ":" + info.getPort()));
             FileUtils.writeTextFile("node_thread_dump_" + (info == null ? uuid : info.getPort()) + ".log", text);
+            BaseTest.print(false, false, "wrote node thread dump for %s", info);
           }
         }
       } catch (final Exception e) {
