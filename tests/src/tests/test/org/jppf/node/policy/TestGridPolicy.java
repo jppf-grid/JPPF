@@ -203,6 +203,7 @@ public class TestGridPolicy extends Setup1D2N1C {
    */
   @Test(timeout=TEST_TIMEOUT)
   public void testWorkingFalseJavaPolicy() throws Exception {
+    final NodeSelector masterNodeSelector = new ExecutionPolicySelector(new IsMasterNode());
     final int nbTasks = 5;
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     // more than 4 nodes with at least 1 processing thread
@@ -219,7 +220,7 @@ public class TestGridPolicy extends Setup1D2N1C {
       overrides.setString("jppf.node.uuid", "$script{ java.util.UUID.randomUUID().toString(); }$");
       // start 1 slave node for each master
       BaseTestHelper.printToAll(client, true, true, true, true, false, "provisioning slave nodes");
-      jmx.getForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 1, overrides);
+      jmx.getForwarder().provisionSlaveNodes(masterNodeSelector, 1, overrides);
       BaseTestHelper.printToAll(client, true, true, true, true, false, "awaiting job results");
       final List<Task<?>> results = job.awaitResults();
       BaseTestHelper.printToAll(client, true, true, true, true, false, "got job results");
@@ -233,8 +234,10 @@ public class TestGridPolicy extends Setup1D2N1C {
     } finally {
       // terminate the slave nodes
       BaseTestHelper.printToAll(client, true, true, true, true, false, "stopping slave nodes");
-      jmx.getForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
+      jmx.getForwarder().provisionSlaveNodes(masterNodeSelector, 0);
+      print(false, false, "slave nodes shutdown requested");
       ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() == 2, 5000L, 250L, true);
+      print(false, false, "all slave nodes have stopped");
     }
   }
 }
