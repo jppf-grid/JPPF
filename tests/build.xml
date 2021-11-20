@@ -23,8 +23,11 @@
   <!-- ========================================================================= -->
 
   <property name="build.sysclasspath" value="last"/>
+  <!--
+  <property name="build.compiler"     value="extJavac"/>
+  -->
   <property name="jppf"               value="${basedir}/../JPPF"/>
-  <property name="lib"                value="${jppf}/lib"/>
+  <property name="lib"                value="${basedir}/target/lib"/>
   <property name="src"                value="${basedir}/src"/>
   <property name="framework.src"      value="${src}/framework"/>
   <property name="tests.src"          value="${src}/tests"/>
@@ -41,7 +44,7 @@
   <property name="client"             value="${basedir}/../client"/>
   <property name="common"             value="${basedir}/../common"/>
   <property name="jmxremote-nio"      value="${basedir}/../jmxremote-nio"/>
-  <property name="server"               value="${basedir}/../server"/>
+  <property name="server"             value="${basedir}/../server"/>
   <property name="node"               value="${basedir}/../node"/>
   <property name="samples-pack"       value="${basedir}/../samples-pack"/>
 
@@ -51,7 +54,7 @@
   <!-- ========================================================================= -->
   <!-- Classpath definitions                                                     -->
   <!-- ========================================================================= -->
-
+  <!--
   <path id="tests.classpath">
     <pathelement location="${tests.classes}/config"/>
     <pathelement location="${basedir}/test-resources/client1"/>
@@ -77,6 +80,20 @@
     <fileset dir="${samples-pack}/KryoSerializer/lib" includes="*.jar"/>
     <fileset dir="${basedir}/lib" includes="*.jar"/>
   </path>
+  -->
+
+  <path id="tests.classpath">
+    <pathelement location="${tests.classes}/config"/>
+    <pathelement location="${basedir}/test-resources/client1"/>
+    <pathelement location="${framework.classes}"/>
+    <pathelement location="${tests.classes}"/>
+    <pathelement location="${addons.classes}"/>
+    <fileset dir="${lib}" includes="*.jar"/>
+    <pathelement location="${samples-pack}/KryoSerializer/classes"/>
+    <fileset dir="${samples-pack}/KryoSerializer/lib" includes="*.jar"/>
+    <fileset dir="${basedir}/lib" includes="*.jar"/>
+  </path>
+
 
   <!-- ========================================================================= -->
   <!-- Build and run the JUnit tests                                             -->
@@ -92,7 +109,10 @@
     <path id="checkstyle.path">
       <fileset dir="${lib}/Checkstyle" includes="*.jar"/>
     </path>
+    <!--
     <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpathref="checkstyle.path"/>
+    -->
+    <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpathref="tests.classpath"/>
     <checkstyle config="${jppf}/CheckStyle_JPPF_config.xml" if:true="run.checkstyle">
       <fileset dir="${framework.src}" includes="**/*.java"/>
       <fileset dir="${addons.src}" includes="**/*.java"/>
@@ -174,7 +194,8 @@
   <target name="run.nogenerate" depends="compile,                      runtests" description=""/>
   <target name="run.junit"      depends="compile, run.junit.tests"               description=""/>
   <target name="run.junit.lite" depends="compile, run.junit.tests.lite"          description=""/>
-  <target name="run.junit.min" depends="compile, run.junit.tests.min"          description=""/>
+  <target name="run.junit.min"  depends="compile, run.junit.tests.min"           description=""/>
+  <target name="run.junit.one"  depends="compile, run.junit.tests.one"           description=""/>
 
   <!-- Run the tests with a custom JUnit runner -->
   <target name="runtests">
@@ -201,7 +222,7 @@
       </fileset-elements>
     </test>
   </target>
-  
+
   <target name="run.junit.tests.lite">
     <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
     <test>
@@ -277,6 +298,15 @@
         <include name="**/test/org/jppf/server/protocol/TestLocation.java"/>
         <include name="**/test/org/jppf/utils/Test*.java"/>
         <include name="**/test/org/jppf/utils/stats/TestJPPFStatisticsListener.java"/>
+      </fileset-elements>
+    </test>
+  </target>
+  
+  <target name="run.junit.tests.one">
+    <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
+    <test>
+      <fileset-elements>
+        <include name="**/test/org/jppf/comm/interceptor/Test*.java"/>
       </fileset-elements>
     </test>
   </target>

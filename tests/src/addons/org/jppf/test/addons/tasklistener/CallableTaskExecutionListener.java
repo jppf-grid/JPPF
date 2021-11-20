@@ -26,11 +26,16 @@ import org.jppf.node.protocol.Task;
 
 /**
  * This task listener checks whether the user object in each notification is an instance
- * of Callable and, if it is checks whether the task result is a list. If the result is a list
+ * of Callable and, if it is checks, whether the task result is a list. If the result is a list
  * the callable is executed and its result added to the list.
  * @author Laurent Cohen
  */
 public class CallableTaskExecutionListener implements TaskExecutionListener {
+  /** */
+  public CallableTaskExecutionListener() {
+    System.out.println("Initializing " + getClass().getSimpleName());
+  }
+
   @Override
   public void taskExecuted(final TaskExecutionEvent event) {
     //process(event);

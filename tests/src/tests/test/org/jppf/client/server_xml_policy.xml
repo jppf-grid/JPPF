@@ -1,6 +1,0 @@
-<jppf:ExecutionPolicy>
-  <Equal valueType="string" ignoreCase="false">
-    <Property>jppf.node.uuid</Property>
-    <Value>n2</Value>
-  </Equal>
-</jppf:ExecutionPolicy>

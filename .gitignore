@@ -6,3 +6,4 @@
 /.recommenders/
 /logs/
 /**/*.log
+**/target/
