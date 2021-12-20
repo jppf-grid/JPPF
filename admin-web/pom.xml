@@ -18,7 +18,6 @@
     <dependency>
       <groupId>org.jppf</groupId>
       <artifactId>jppf-admin</artifactId>
-      <version>${project.version}</version>
       <exclusions>
         <exclusion>
           <groupId>net.sf.jung</groupId>
@@ -53,12 +52,10 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
-      <version>${slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>com.puppycrawl.tools</groupId>
       <artifactId>checkstyle</artifactId>
-      <version>6.19</version>
       <scope>test</scope>
     </dependency>
     <dependency>
