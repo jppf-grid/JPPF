@@ -3,16 +3,17 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- iiuiufi -->
+
   <parent>
-    <groupId>org.jppf</groupId>
-    <artifactId>jppf-parent</artifactId>
+    <groupId>org.jppf.samples</groupId>
+    <artifactId>samples-pack</artifactId>
     <version>6.3-alpha</version>
   </parent>
 
   <groupId>org.jppf.samples</groupId>
-  <artifactId>kryo-serializer</artifactId>
+  <artifactId>sample-kryo-serializer</artifactId>
   <packaging>jar</packaging>
-  <name>kryo-serializer</name>
 
   <dependencies>
     <dependency>
@@ -30,27 +31,4 @@
       <version>4.0.2</version>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>src</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

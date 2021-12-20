@@ -53,7 +53,7 @@
     <module>admin</module>
     <module>application-template</module>
     <module>admin-web</module>
-    <module>samples-pack/KryoSerializer</module>
+    <module>samples-pack</module>
     <module>tests</module>
     <!--
     <module>jca-client</module>
@@ -118,6 +118,11 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-jdk14</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
       <dependency>
