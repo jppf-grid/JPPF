@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/common/src/java/org/jppf/doc/HtmlDocGenerator.java"/>
+<listEntry value="/common/src/main/java/org/jppf/doc/HtmlDocGenerator.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
@@ -9,6 +9,7 @@
 <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.doc.HtmlDocGenerator"/>
+<stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="common"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-s C:/Workspaces/temp/home/doc-source -d C:/Workspaces/temp/home -t C:/Workspaces/temp/home/templates -r"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="common"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>

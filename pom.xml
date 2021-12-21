@@ -55,10 +55,10 @@
     <module>admin-web</module>
     <module>samples-pack</module>
     <module>tests</module>
+    <module>demo</module>
     <!--
     <module>jca-client</module>
     <module>stress-test</module>
-    <module>demo</module>
     -->
   </modules>
 
