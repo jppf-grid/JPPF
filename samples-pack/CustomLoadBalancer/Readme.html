@@ -60,8 +60,8 @@ Once you have installed a server and node, perform the following steps:
     </ul>
   </li>
   <li>open a command prompt in <b>JPPF-x.y-samples-pack/CustomLoadBalancer</b></li>
-  <li>build the sample: type "<b>ant jar</b>"; this will create a file named <b>CustomLoadBalancer.jar</b></li>
-  <li>copy <b>CustomLoadBalancer.jar in</b> the "<b>lib</b>" folder of the JPPF driver installation, to add it to the driver's classpath. This will effectively install the new load-balancer.</li>
+  <li>build the sample: type "<b>mvn clean instakk</b>"; this will create a file named <b>CustomLoadBalancer.jar</b> in the <b>target</b> folder</li>
+  <li>copy <b>target/CustomLoadBalancer.jar</b> in the "<b>lib</b>" folder of the JPPF driver installation, to add it to the driver's classpath. This will effectively install the new load-balancer.</li>
   <li>in the server's installation config/jppf-driver.properties file, replace the property "<b>jppf.load.balancing.algorithm = xxxxx</b>" with "<b>jppf.load.balancing.algorithm = customLoadBalancer</b>",
   to let the server know it must use the new load-balancer</li>
   <li>start the JPPF server and each of the 2 nodes</li>

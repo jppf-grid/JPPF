@@ -9,24 +9,18 @@
     <version>6.3-alpha</version>
   </parent>
 
-  <artifactId>sample-kryo-serializer</artifactId>
-  <name>KryoSerializer</name>
+  <artifactId>sample-concurrent-jobs</artifactId>
+  <name>ConcurrentJobs</name>
   <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
       <groupId>org.jppf</groupId>
-      <artifactId>jppf-common</artifactId>
+      <artifactId>jppf-client</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.javakaffee</groupId>
-      <artifactId>kryo-serializers</artifactId>
-      <version>0.42</version>
-    </dependency>
-    <dependency>
-      <groupId>com.esotericsoftware</groupId>
-      <artifactId>kryo-shaded</artifactId>
-      <version>4.0.2</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
     </dependency>
   </dependencies>
 </project>
