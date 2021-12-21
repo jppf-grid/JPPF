@@ -54,7 +54,7 @@
     </dependency>
     <dependency>
       <groupId>org.jppf.samples</groupId>
-      <artifactId>kryo-serializer</artifactId>
+      <artifactId>sample-kryo-serializer</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
