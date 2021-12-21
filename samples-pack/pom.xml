@@ -19,6 +19,7 @@
     <module>ConcurrentJobs</module>
     <module>ConfigurationProperties</module>
     <module>CustomLoadBalancer</module>
+    <module>CustomMBeans</module>
     <module>KryoSerializer</module>
   </modules>
 
