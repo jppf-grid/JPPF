@@ -16,9 +16,7 @@ before_script:
   - env -u _JAVA_OPTIONS
 
 script:
-  - ant build
-#  - ant docker
-  - ant test.min
+  - mvn clean install
 
 jdk:
   - openjdk8
