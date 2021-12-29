@@ -1,0 +1,63 @@
+<html>
+  <head>
+    <title>dependency_graph.txt</title>
+    <meta name="description" content="The open source grid computing solution">
+    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source">
+    <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="http://localhost:8880/images/jppf-icon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="http://localhost:8880/jppf.css" title="Style">
+  </head>
+  <body>
+    <script src="http://localhost:8880/scripts/code-prettify/run_prettify.js?skin=java_light_bkg"></script>
+    <script src="http://localhost:8880/scripts/code-prettify/lang-conf.js"></script>
+    <h2>dependency_graph.txt</h2>
+<pre class="prettyprint lang-txt" style="font-size: 11pt">
+<xmp>#-----------------------------------------------------------------------------#
+# This file is the definition of the dependency graph used in the demo        #
+# It is expressed as a sequence of lines, where each line defines a job       #
+# dependency id, along with the dependency ids of the other jobs it depends   #
+# on, in this format:                                                         #
+#                                                                             #
+#    jobId ==> dependencyId_1, ..., dependencyId_N | root                     #
+#                                                                             #
+# '==>' means 'depends on' and the list of dependencies is comma-separated    #
+# and may be empty (i.e. no dependency)                                       #
+#                                                                             #
+# The optional '| root' means that the job is a dependency graph root, and it #
+# and all its dependencies will be recursively removed from the graph upon    #
+# completion                                                                  #
+#                                                                             #
+# The jobs are submitted in the same order as they are defined in this file   #
+#-----------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------------#
+# Here we define the jobs deliberately in reverse order                       #
+# of the dependencies to better illustrate how dependencies are resolved      #
+#-----------------------------------------------------------------------------#
+
+Job F ==> Job A, Job B, Job E | root
+Job E ==> Job C, Job D
+Job D ==> Job B, Job C
+Job C ==> Job A
+Job B ==> Job A
+Job A ==>
+
+#-----------------------------------------------------------------------------#
+# example graph with cycle                                                    #
+# in the server output, a message similar to this will be printed:            #
+# cycle detected while adding dependency 'Job C' to 'Job A' :                 #
+# Job A ==> Job C ==> Job B ==> Job A                                         #
+#-----------------------------------------------------------------------------#
+
+#Job C ==> Job B
+#Job B ==> Job A
+#Job A ==> Job C
+
+#-----------------------------------------------------------------------------#
+# feel free to define your own dependency graph, you can make it as complex   #
+# as you wish                                                                 #
+#-----------------------------------------------------------------------------#
+</xmp>
+</pre>
+  </body>
+</html>

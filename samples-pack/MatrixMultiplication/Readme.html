@@ -3,13 +3,16 @@ $template{name="sample-readme-html-header" title="Dense Matrix Multiplication de
 This sample performs the multplication of 2 square dense matrices by dividing the operation into as many JPPF tasks as there are rows in each matrix. Each task multiplies a row of the first matrix by the second matrix.
 
 <h3>How do I run it?</h3>
-Before running this sample application, you must have a JPPF server and at least one node running.<br>
-For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.2">JPPF documentation</a>.<br>
-Once you have a server and node, from a command prompt, type: <b>&quot;ant run&quot;</b>
+<ol class="samplesList">
+  <li>the first step is to build the sample: type "<b>mvn clean install</b>" in a command prompt in the "<b>MatrixMultiplication</b>" folder</li>
+  <li>Before running this sample application, you must have a JPPF server and at least one node running.<br>
+  For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3">JPPF documentation</a>.<br></li>
+  <li>Once you have a server and node, from a command prompt, type: "<b>./run.sh</b>" on Linux/Unix/Mac or "<b>run.bat</b>" on Windows</li>
+</ol>
 
 <h3>How do I use it?</h3>
 <p>This sample doesn't have a graphical user interface, however you can modify some of the parameters in the JPPF configuration file:
-<ol>
+<ol class="samplesList">
   <li>open the file "<b>config/jppf-client.properties</b>" in a text editor</li>
   <li>at the end of the file, you will see the following properties:
 <pre class="prettyprint lang-conf">
@@ -34,8 +37,8 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 <p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
 <a href="javadoc/index.html">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
-<ul>
+<ul class="samplesList">
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
-  <li><a href="https://www.jppf.org/doc/6.2">The JPPF documentation</a></li>
+  <li><a href="https://www.jppf.org/doc/6.3">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

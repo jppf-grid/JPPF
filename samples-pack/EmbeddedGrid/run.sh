@@ -12,4 +12,4 @@ else
   NB_NODES=$2
 fi
 
-java -cp config:classes:../shared/lib/* -Xmx512m -Dlog4j.configuration=log4j.properties org.jppf.example.embedded.EmbeddedGrid $NB_DRIVERS $NB_NODES
+java -cp config:target/classes:target/lib/* -Xmx512m -Dlog4j.configuration=log4j.properties org.jppf.example.embedded.EmbeddedGrid $NB_DRIVERS $NB_NODES

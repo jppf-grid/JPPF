@@ -55,7 +55,6 @@ public class InterceptorHandler {
    * @return a list of {@link NetworkConnectionInterceptor} instances, possibly empty.
    */
   private static List<NetworkConnectionInterceptor> loadInterceptors() {
-    System.out.println("loading network interceptors");
     if (debugEnabled) log.debug("loading network interceptors");
     log.warn("loading network interceptors");
     final ServiceFinder sf = new ServiceFinder();

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jppf.samples</groupId>
+    <artifactId>samples-pack</artifactId>
+    <version>6.3-alpha</version>
+  </parent>
+
+  <artifactId>sample-network-interceptor</artifactId>
+  <name>NetworkInterceptor</name>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-client</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>${project.name}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <configuration>
+              <target>
+                <echo message="generating keystore with password = ${password}" level="info"/>
+                <property name="compile_classpath" refid="maven.compile.classpath"/>
+                <path id="ks.classpath">
+                  <pathelement path="${compile_classpath}"/>
+                </path>
+                <java fork="yes" classname="org.jppf.example.interceptor.CryptoHelper" classpathref="ks.classpath">
+                  <arg value="${password}"/>
+                </java>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jppf.samples</groupId>
+    <artifactId>samples-pack</artifactId>
+    <version>6.3-alpha</version>
+  </parent>
+
+  <artifactId>sample-extended-classloading</artifactId>
+  <name>ExtendedClassLoading</name>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-server</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <jar jarfile="${project.build.directory}/NodeListener.jar" index="true">
+                  <fileset dir="${project.build.directory}/classes">
+                    <include name="META-INF/services/*.*"/>
+                    <include name="**/extendedclassloading/*.*"/>
+                    <include name="**/extendedclassloading/node/*.*"/>
+                  </fileset>
+                </jar>
+                <echo message="*** The file NodeListener.jar is now ready to be deployed ***" level="info"/>
+                <property name="dynamic.libs.dir" value="${project.build.directory}/dynamicLibs"/>
+                <jar jarfile="${dynamic.libs.dir}/ClientLib1.jar" index="true">
+                  <fileset dir="${project.build.directory}/classes" includes="**/extendedclassloading/clientlib1/*.*"/>
+                </jar>
+                <echo message="*** The file dynamicLibs/ClientLib1.jar is now deployed ***" level="info"/>
+                <jar jarfile="${dynamic.libs.dir}/ClientLib2.jar" index="true">
+                  <fileset dir="${project.build.directory}/classes" includes="**/extendedclassloading/clientlib2/*.*"/>
+                </jar>
+                <echo message="*** The file dynamicLibs/ClientLib2.jar is now deployed ***" level="info"/>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

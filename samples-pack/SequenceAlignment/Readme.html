@@ -11,32 +11,31 @@ Escherichia coli</a> bacteria.
 Sequence alignments are performed using the <a href="http://jaligner.sourceforge.net/">JAligner project</a>.
 
 <h3>How do I run it?</h3>
-Before running this sample application, you must have a JPPF server and at least one node running.<br>
-For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.2">JPPF documentation</a>.<br>
-Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix) or, from a command prompt, type: <b>&quot;ant run&quot;</b>.
+Please follow these steps:
+<ol class="samplesList">
+  <li>build the sample: open a command prompt in the <b>SequenceAlignment</b> folder and type "<b>mvn clean install</b>"</li>
+  <li>Before running this sample application, you must also have a JPPF server and at least one node running.
+  For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3">JPPF documentation</a>.</li>
+  <li>Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix)</li>
+</ol>
 
 <h3>How do I use it?</h3>
 <p>The GUI is separated in two main parts, top and bottom.
 <p>The &quot;Compute&quot; button submits the sequence database search for processing by JPPF.
 <p>The &quot;Reset defaults&quot; button restores the target sequence, database location and substitution matrix to their original values
 <p>The database search relies on 3 parameters:
-<ul>
+<ul class="samplesList">
   <li>target sequence: the sequence to compare with those in the database; you can either type it, copy/paste it or load it from a file</li>
   <li>substitution matrix: it is used by the sequence alignment algorithm to compute the score</li>
   <li>database location: the location, in the file system of the file containing the sequences in FASTA format</li>
 </ul>
 When the search is over, the results, score and closest matching sequence, are displayed in the bottom panel.
 
-<h3>How can I build the sample?</h3>
-To compile the source code, from a command prompt, type: <b>&quot;ant compile&quot;</b><br>
-To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;</b>
-
 <h3>I have additional questions and comments, where can I go?</h3>
-<p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
-<a href="javadoc/index.html">API documentation</a>.
+<p>If you need more insight into the code of this demo, you can consult the source.
 <p>In addition, There are 2 privileged places you can go to:
-<ul>
+<ul class="samplesList">
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
-  <li><a href="https://www.jppf.org/doc/6.2">The JPPF documentation</a></li>
+  <li><a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction#Running_the_standalone_modules">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

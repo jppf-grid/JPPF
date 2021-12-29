@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+  xmlns:if="ant:if" xmlns:unless="ant:unless">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -20,7 +21,32 @@
     <module>ConfigurationProperties</module>
     <module>CustomLoadBalancer</module>
     <module>CustomMBeans</module>
+    <module>DataDependency</module>
+    <module>DataEncryption</module>
+    <module>EmbeddedGrid</module>
+    <module>ExtendedClassLoading</module>
+    <module>ForkJoinNodeExecutor</module>
+    <module>Fractals</module>
+    <module>FractalMovieGenerator</module>
+    <module>FTPServer</module>
+    <module>GPU</module>
+    <module>GridFailover</module>
+    <module>InitializationHook</module>
+    <module>JobDependencies</module>
+    <module>JobRecovery</module>
     <module>KryoSerializer</module>
+    <module>MatrixMultiplication</module>
+    <module>Nbody</module>
+    <module>NetworkInterceptor</module>
+    <module>NodeConnectionEvents</module>
+    <module>NodeLifeCycle</module>
+    <module>NodeTray</module>
+    <module>PluggableView</module>
+    <module>SequenceAlignment</module>
+    <module>StartupClasses</module>
+    <module>TomcatPort</module>
+    <module>WebSearchEngine</module>
+    <module>WordCount</module>
   </modules>
 
   <build>
@@ -44,6 +70,37 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <!-- samples are not deployed to central -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <condition property="parent.path" value="." else="..">
+                  <equals arg1="${project.name}" arg2="samples-pack"/>
+                </condition>
+                <ant antfile="${parent.path}/shared/build-tohtml.xml" target="convert.to.html" dir="." output="${project.build.directory}/build-tohtml.log"/>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+        </dependencies>
       </plugin>
     </plugins>
   </build>

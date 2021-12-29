@@ -132,7 +132,9 @@
         <include name="slf4j-log4j12-1.7.25.jar"/>
     	</zipfileset>
       <zipfileset dir="${basedir}" includes="MandelbrotMovieGenerator.jar" prefix="${prefix}/lib"/>
+      <!--
       <zipfileset dir="${idle.sample}/lib" includes="*.jar" prefix="${prefix}/lib"/>
+      -->
       <zipfileset dir="${config.dir}/node" includes="*.properties" prefix="${prefix}/config"/>
       <zipfileset dir="${config.dir}/node" includes="startNode.bat" prefix="${prefix}"/>
       <zipfileset dir="${config.dir}/node" includes="startNode.sh" filemode="755" prefix="${prefix}"/>
