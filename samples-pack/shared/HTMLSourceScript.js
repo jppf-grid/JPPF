@@ -27,16 +27,23 @@ for (i=0; i<n; i++) {
   var file = new java.io.File(dir, name);
   var lang = langFromExtension(name);
   self.log("converting " + file + " to html with lang=" + lang);
-  var task = project.createTask("tohtml");
-  var path = file.getCanonicalPath().replaceAll("\\\\", "/")
-    .replace("src/main/java/", "target/tohtml/src/")
-    .replace("src/main/resources/", "target/tohtml/src/")
-    .replace(projectName + "/config/", projectName + "/target/tohtml/config/")
-    .replace(projectName + "/data/", projectName + "/target/tohtml/data/")
-    .replace(projectName + "/db/", projectName + "/target/tohtml/db/")
-    ;
+  var path = file.getCanonicalPath().replaceAll("\\\\", "/");
+  if (file.getParentFile().getName().equals(projectName)) {
+    path = path.replace(projectName + "/", projectName + "/target/tohtml/");
+    self.log("converting file in sample root: " + file + ", out = " + path);
+  } else {
+    path = path
+      .replace("src/main/java/", "target/tohtml/src/")
+      .replace("src/main/resources/", "target/tohtml/src/")
+      .replace(projectName + "/config/", projectName + "/target/tohtml/config/")
+      .replace(projectName + "/data/", projectName + "/target/tohtml/data/")
+      .replace(projectName + "/db/", projectName + "/target/tohtml/db/")
+      ;
+  }
   var idx = path.lastIndexOf("/");
   new java.io.File(path.substring(0, idx)).mkdirs();
+
+  var task = project.createTask("tohtml");
   task.setDynamicAttribute("in", file.getCanonicalPath());
   task.setDynamicAttribute("out", path + ".html");
   task.setDynamicAttribute("lang", lang);
