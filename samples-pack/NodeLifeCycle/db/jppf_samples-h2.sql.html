@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>web.xml</title>
+    <title>jppf_samples-h2.sql</title>
     <meta name="description" content="The open source grid computing solution">
     <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source">
     <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
@@ -10,26 +10,27 @@
   <body>
     <script src="http://localhost:8880/scripts/code-prettify/run_prettify.js?skin=java_light_bkg"></script>
     <script src="http://localhost:8880/scripts/code-prettify/lang-conf.js"></script>
-    <h2>web.xml</h2>
-<pre class="prettyprint lang-xml" style="font-size: 11pt">
-<xmp><?xml version="1.0" encoding="ISO-8859-1"?>
+    <h2>jppf_samples-h2.sql</h2>
+<pre class="prettyprint lang-sql" style="font-size: 11pt">
+<xmp>-- --------------------------------------------------------
+-- Database: 'jppf_samples'
 
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-     "http://java.sun.com/dtd/web-app_2_3.dtd">
+-- --------------------------------------------------------
+-- Create user jppf with admin role
+-- --------------------------------------------------------
 
-<!-- ============================================================= -->
-<!-- Deployement descriptor for the "jppftest" Web Application.    -->
-<!-- ============================================================= -->
+CREATE USER IF NOT EXISTS jppf PASSWORD 'jppf' ADMIN;
 
-<web-app>
-  <display-name>jppftest</display-name>
-  <description>jppftest</description>
+-- --------------------------------------------------------
+-- Table structure for table 'task_result'
+-- --------------------------------------------------------
 
-  <!-- Establish the default list of welcome files -->
-  <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-  </welcome-file-list>
-</web-app>
+CREATE TABLE IF NOT EXISTS task_result (
+  id IDENTITY,
+  task_id varchar(45) NOT NULL,
+  message varchar(255) default NULL,
+  PRIMARY KEY  (id)
+);
 </xmp>
 </pre>
   </body>
