@@ -99,9 +99,6 @@
 
     <profile>
       <id>no-samples</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <modules>
         <module>build-tools</module>
         <module>common</module>
