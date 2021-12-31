@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  JPPF
+  Copyright (C) 2005-2019 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jppf</groupId>
+    <artifactId>jppf-parent</artifactId>
+    <version>6.3-alpha</version>
+  </parent>
+
+  <artifactId>jppf-jppf</artifactId>
+  <name>JPPF</name>
+  <description>JPPF assemblies and documentation</description>
+  <packaging>pom</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-admin</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-server</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <property name="dest.dir" value="${project.build.directory}/build"/>
+                <delete dir="${dest.dir}" quiet="true"/>
+                <mkdir dir="${dest.dir}"/>
+                <macrodef name="copy.zip">
+                  <attribute name="module"/>
+                  <sequential>
+                    <copy todir="${dest.dir}">
+                      <fileset dir="../@{module}/target" includes="*.zip"/> 
+                    </copy>
+                  </sequential>
+                </macrodef>
+                <copy.zip module="application-template"/>
+                <copy.zip module="server"/>
+                <copy.zip module="node"/>
+                <copy.zip module="admin"/>
+                <copy.zip module="admin-web"/>
+                <copy.zip module="jmxremote-nio"/>
+                <copy file="${project.basedir}/docs/manual/JPPF-User-Guide.pdf" tofile="${dest.dir}/JPPF-${project.version}-User-Guide.pdf" quiet="true"/>
+                <zip destfile="${dest.dir}/JPPF-${project.version}-User-Guide.zip">
+                  <zipfileset dir="${dest.dir}" includes="*.pdf"/>
+                </zip>
+                <delete file="${dest.dir}/JPPF-${project.version}-User-Guide.pdf" quiet="true"/>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
