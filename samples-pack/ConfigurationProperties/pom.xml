@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.jppf.samples</groupId>
     <artifactId>samples-pack</artifactId>
-    <version>6.3-alpha</version>
+    <version>6.3-alpaha-2-SNAPSHOT</version>
   </parent>
 
   <artifactId>sample-configuration-properties</artifactId>
