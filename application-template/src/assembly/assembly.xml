@@ -37,6 +37,20 @@
       <directory>${project.basedir}/src/assembly/dist/</directory>
       <outputDirectory>${project.build.finalName}</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/src</directory>
+      <outputDirectory>${project.build.finalName}/src</outputDirectory>
+      <excludes>
+        <exclude>assembly/</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/target</directory>
+      <outputDirectory>${project.build.finalName}/target</outputDirectory>
+      <includes>
+        <include>classes/</include>
+      </includes>
+    </fileSet>
   </fileSets>
 
   <files>

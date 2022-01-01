@@ -9,4 +9,7 @@ then
   JAVA_PATH="java"
 fi
 
-$JAVA_PATH -cp config:classes:lib/* -Xmx64m -Dlog4j.configuration=log4j.properties -Djppf.config=jppf.properties -Djava.util.logging.config.file=config/logging.properties org.jppf.application.template.TemplateApplicationRunner
+set JAVA_CLASSPATH=config:target/classes:lib/*
+set JVM_OPTIONS=-Xmx64m -Dlog4j.configuration=log4j.properties -Djppf.config=jppf.properties -Djava.util.logging.config.file=config/logging.properties
+
+$JAVA_PATH -cp $JAVA_CLASSPATH $JVM_OPTIONS org.jppf.application.template.TemplateApplicationRunner
