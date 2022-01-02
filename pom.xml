@@ -31,7 +31,7 @@
 
   <groupId>org.jppf</groupId>
   <artifactId>jppf-parent</artifactId>
-  <version>6.3-alpaha-2-SNAPSHOT</version>
+  <version>6.3-alpha-2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <description>JPPF, the open source grid computing solution</description>
@@ -356,7 +356,7 @@
           <bottom><![CDATA[<font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2019 JPPF Team.</i></font>]]></bottom>
           <level>protected</level>
           <stylesheetfile>${project.basedir}/JPPF/bin/stylesheet.css</stylesheetfile>
-          <skippedModules>jppf-demo,jppf-tests,samples-pack,jppf-admin,jppf-admin-web</skippedModules>
+          <skippedModules>jppf-demo,jppf-tests,samples-pack,jppf-admin,jppf-admin-web,jppf-build-tools</skippedModules>
           <doclet>org.jppf.javadoc.ExcludeDoclet</doclet>
           <docletArtifact>
             <groupId>org.jppf</groupId>
