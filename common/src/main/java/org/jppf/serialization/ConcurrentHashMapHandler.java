@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A specfic serialization handler for {@link ConcurrentHashMap}.
  * @author Laurent Cohen
+ * @exclude
  */
 public class ConcurrentHashMapHandler extends AbstractSerializationHandler {
   @Override

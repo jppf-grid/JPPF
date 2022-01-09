@@ -21,6 +21,7 @@ package org.jppf.serialization;
 /**
  *
  * @author Laurent Cohen
+ * @exclude
  */
 public interface SerializationHandler {
   /**

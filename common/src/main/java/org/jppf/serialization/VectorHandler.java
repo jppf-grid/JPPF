@@ -25,6 +25,7 @@ import org.slf4j.*;
 /**
  * A specfic serialization handler for {@link Vector}.
  * @author Laurent Cohen
+ * @exclude
  */
 public class VectorHandler extends AbstractSerializationHandler {
   /**
