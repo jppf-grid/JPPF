@@ -11,9 +11,7 @@ before_script:
   - env -u _JAVA_OPTIONS
 
 script:
-  - mvn clean install
-  - mvn javadoc:aggregate -DskipTests -Pno-samples
-  - mvn package -DskiptTests -Pjppf-release
+  - mvn clean install && mvn javadoc:aggregate -DskipTests -Pno-samples && mvn package -DskiptTests -Pjppf-release
 
 jdk:
   - openjdk8
