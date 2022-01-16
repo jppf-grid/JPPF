@@ -43,7 +43,7 @@ jppf.admin.console.view.MyView.autoselect = true
 </ol>
 
 <h3>Related source files</h3>
-<a href="target/tohtml/src/org/jppf/example/pluggableview/MyView.java">MyView.java</a> : this is the implementation of our pluggable view.</li>
+<a href="src/main/java/org/jppf/example/pluggableview/MyView.java">MyView.java</a> : this is the implementation of our pluggable view.</li>
 
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>There are 2 privileged places you can go to:

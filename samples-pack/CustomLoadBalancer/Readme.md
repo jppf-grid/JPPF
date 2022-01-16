@@ -40,11 +40,11 @@ d) Furthermore, additional node filtering will be applied before the load-balanc
 </ul>
 Here is a set of links to the source of each Java class in this sample:
 <ul>
-  <li><a href="target/tohtml/src/org/jppf/example/loadbalancer/server/CustomLoadBalancer.java">CustomLoadBalancer</a>: load-balancer implementation</li>
-  <li><a href="target/tohtml/src/org/jppf/example/loadbalancer/server/CustomLoadBalancerProvider.java">CustomLoadBalancerProvider</a>: the provider class that plugs our load balancer into the JPPF server</li>
-  <li><a href="target/tohtml/src/org/jppf/example/loadbalancer/client/CustomLoadBalancerRunner.java">CustomLoadBalancerRunner</a>: the client side application that executes the jobs on the grid</li>
-  <li><a href="target/tohtml/src/org/jppf/example/loadbalancer/client/CustomLoadBalancerTask.java">CustomLoadBalancerTask</a>: the JPPF tasks enclosed in the jobs</li>
-  <li><a href="target/tohtml/src/org/jppf/example/loadbalancer/common/MyCustomPolicy.java">MyCustomPolicy</a>: the custom execution policy used for "heavy" jobs</li>
+  <li><a href="src/main/java/org/jppf/example/loadbalancer/server/CustomLoadBalancer.java">CustomLoadBalancer</a>: load-balancer implementation</li>
+  <li><a href="src/main/java/org/jppf/example/loadbalancer/server/CustomLoadBalancerProvider.java">CustomLoadBalancerProvider</a>: the provider class that plugs our load balancer into the JPPF server</li>
+  <li><a href="src/main/java/org/jppf/example/loadbalancer/client/CustomLoadBalancerRunner.java">CustomLoadBalancerRunner</a>: the client side application that executes the jobs on the grid</li>
+  <li><a href="src/main/java/org/jppf/example/loadbalancer/client/CustomLoadBalancerTask.java">CustomLoadBalancerTask</a>: the JPPF tasks enclosed in the jobs</li>
+  <li><a href="src/main/java/org/jppf/example/loadbalancer/common/MyCustomPolicy.java">MyCustomPolicy</a>: the custom execution policy used for "heavy" jobs</li>
 </ul>
 
 <h3>How do I run it?</h3>

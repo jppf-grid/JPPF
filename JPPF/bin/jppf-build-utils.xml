@@ -92,16 +92,20 @@
         <fileset dir="${samples-pack}" includes="@{samples}/Readme.html"/>
         <globmapper from="*.html" to="*.md"/>
       </copy>
-  
-      <replaceregexp match="\$template\{name=&quot;sample-readme-html-header&quot; title=&quot;(.*)&quot;\}\$" replace="# \1${line.separator}" flags="g">
-        <fileset dir="${samples-pack}" includes="@{samples}/*.md"/>
+        <replaceregexp match="\$template\{name=&quot;sample-readme-html-header&quot; title=&quot;(.*)&quot;\}\$" replace="# \1${line.separator}" flags="g">
+        <fileset id="samples.md.fileset" dir="${samples-pack}" includes="@{samples}/*.md"/>
       </replaceregexp>
       <replace token="$template{name=&quot;sample-readme-html-footer&quot;}$" value="" dir="${samples-pack}" includes="@{samples}/*.md"/>
-      <replace token=".java.html"       value=".java"       dir="${samples-pack}" includes="@{samples}/*.md"/>
-      <replace token=".properties.html" value=".properties" dir="${samples-pack}" includes="@{samples}/*.md"/>
-      <replace token=".xml.html"        value=".xml"        dir="${samples-pack}" includes="@{samples}/*.md"/>
-      <replace token=".c.html"          value=".c"          dir="${samples-pack}" includes="@{samples}/*.md"/>
-      <replace token=".yaml.html"       value=".yaml"       dir="${samples-pack}" includes="@{samples}/*.md"/>
+      <replaceregexp match="(\.[^\.]*)\.html" replace="\1" flags="g">
+        <fileset refid="samples.md.fileset" />
+      </replaceregexp>
+      <replace dir="${samples-pack}" includes="@{samples}/*.md" >
+        <replacefilter token="target/tohtml/src/"    value="src/main/java/"/>
+        <replacefilter token="target/tohtml/config/" value="config/"/>
+        <replacefilter token="target/tohtml/data/"   value="data/"/>
+        <replacefilter token="target/tohtml/db/"     value="db/"/>
+        <replacefilter token="target/tohtml/"        value=""/>
+      </replace>
     </sequential>
   </macrodef>
   

@@ -36,7 +36,7 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
-<a href="javadoc/index.html">API documentation</a>.
+<a href="javadoc/index">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>

@@ -66,4 +66,19 @@
     <sample.md samples="**"/>
   </target>
 
+  <!-- ========================================================================= -->
+  <!-- Ssamples generate readme.php files based on the correspondng Readme.html  -->
+  <!-- in the samples sources.                                                   -->
+  <!-- ========================================================================= -->
+
+  <target name="samples.php.doc">
+    <java fork="yes" classname="org.jppf.doc.SamplesPHPReadmeProcessor" classpathref="run.classpath">
+      <jvmarg value="-Xmx128m" />
+      <arg value="${samples-pack}"/>
+      <arg value="${home}/doc-source/home/samples-pack"/>
+      <arg value="${home}/doc-source/templates/sample-readme.html"/>
+    </java>
+    <copy file="${samples-pack}/index.php" toDir="${home}/doc-source/home/samples-pack"/>
+  </target>
+
 </project> 

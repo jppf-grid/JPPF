@@ -36,8 +36,8 @@ loaded job 'the_job_uuid' from persistence store ...
 
 <h3>Related source files</h3>
 <ul class="samplesList">
-  <li><a href="target/tohtml/src/org/jppf/example/jobrecovery/Runner.java">Runner.java</a> : this is the application that submits a job, simulates a crash, and performs the job recovery</li>
-  <li><a href="target/tohtml/src/org/jppf/example/jobrecovery/MyTask.java">MyTask.java</a> : a JPPF task that simply waits for one second before completing</li>
+  <li><a href="src/main/java/org/jppf/example/jobrecovery/Runner.java">Runner.java</a> : this is the application that submits a job, simulates a crash, and performs the job recovery</li>
+  <li><a href="src/main/java/org/jppf/example/jobrecovery/MyTask.java">MyTask.java</a> : a JPPF task that simply waits for one second before completing</li>
 </ul>
 
 <h3>How can I build the sample?</h3>
@@ -46,7 +46,7 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
-<a href="javadoc/index.html">API documentation</a>.
+<a href="javadoc/index">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>

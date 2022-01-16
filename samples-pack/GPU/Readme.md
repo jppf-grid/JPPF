@@ -6,7 +6,7 @@ The GPU computation is handled thanks to the <a href="http://code.google.com/p/a
 
 <h3>How does it work?</h3>
 This sample submits a JPPF job with one or more tasks to be executed on a GPU.
-The tasks contain APARAPI-conformant code, whose bytecode is introspected at runtime to generate OpenCL code (see example <a href="target/tohtml/src/org/jppf/example/aparapi/GeneratedOpenCL.c">here</a>).
+The tasks contain APARAPI-conformant code, whose bytecode is introspected at runtime to generate OpenCL code (see example <a href="src/main/java/org/jppf/example/aparapi/GeneratedOpenCL.c">here</a>).
 This generated code is then compiled and executed on an OpenCL device if any is available.
 
 <h3>How do I run it?</h3>
@@ -64,11 +64,11 @@ execMode = GPU
 
 <h3>Sample's source files</h3>
 <ul class="samplesList">
-  <li><a href="target/tohtml/src/org/jppf/example/aparapi/MatrixKernel.java">MatrixKernel.java</a>: this is the class that will be translated into OpenCL code</li>
-  <li><a href="target/tohtml/src/org/jppf/example/aparapi/GeneratedOpenCL.c ">GeneratedOpenCL.c</a>: the OpenCL code generated from MatrixKernel which will be actually executed on the GPU</li>
-  <li><a href="target/tohtml/src/org/jppf/example/aparapi/AparapiTask.java">AparapiTask.java</a>: the JPPF task which invokes the GPU bindings API</li>
-  <li><a href="target/tohtml/src/org/jppf/example/aparapi/AparapiRunner.java">AparapiRunner.java</a>: the JPPF client application which submits the jobs to the grid</li>
-  <li><a href="target/tohtml/src/org/jppf/example/aparapi/SquareMatrix.java">SquareMatrix.java</a>: a simple representation of a square dense matrix,
+  <li><a href="src/main/java/org/jppf/example/aparapi/MatrixKernel.java">MatrixKernel.java</a>: this is the class that will be translated into OpenCL code</li>
+  <li><a href="src/main/java/org/jppf/example/aparapi/GeneratedOpenCL.c ">GeneratedOpenCL.c</a>: the OpenCL code generated from MatrixKernel which will be actually executed on the GPU</li>
+  <li><a href="src/main/java/org/jppf/example/aparapi/AparapiTask.java">AparapiTask.java</a>: the JPPF task which invokes the GPU bindings API</li>
+  <li><a href="src/main/java/org/jppf/example/aparapi/AparapiRunner.java">AparapiRunner.java</a>: the JPPF client application which submits the jobs to the grid</li>
+  <li><a href="src/main/java/org/jppf/example/aparapi/SquareMatrix.java">SquareMatrix.java</a>: a simple representation of a square dense matrix,
   whose values are stored in a one-dimensional float array</li>
 </ul>
 
@@ -78,7 +78,7 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
-<a href="javadoc/index.html">API documentation</a>.
+<a href="javadoc/index">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>

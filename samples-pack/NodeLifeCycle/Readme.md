@@ -19,9 +19,9 @@ This information will be provided by a listener that receives notifications of t
 <p>Some constraints are imposed by the transaction management mechanism and the JTA specfications:
 due to the association of each transaction with a single thread, all database-related operations must be performed in the same thread as the transaction's.
 This means that we will need to sequentialize and synchronize these operations in order to achieve our goals. To do this, we use a simple worker thread
-(see <a href="http://download.oracle.com/javase/7/docs/api/java/util/concurrent/Executors.html#newSingleThreadExecutor()">Executors.newSingleThreadExecutor()</a>),
+(see <a href="http://download.oracle.com/javase/7/docs/api/java/util/concurrent/Executors#newSingleThreadExecutor()">Executors.newSingleThreadExecutor()</a>),
 and each database or transaction related operation will be submitted
-as a <a href="http://download.oracle.com/javase/7/docs/api/index.html?java/util/concurrent/Callable.html">Callable</a> task to this worker thread.<br/>
+as a <a href="http://download.oracle.com/javase/7/docs/api/index?java/util/concurrent/Callable.html">Callable</a> task to this worker thread.<br/>
 A consequence of this is that we will lose some degree of parallelism, since it will limit the node's ability to execute multiple tasks in parallel.
 <p>For this demonstration's purpose, we chose to use the following components:
 <ul class="samplesList">
@@ -32,14 +32,14 @@ A consequence of this is that we will lose some degree of parallelism, since it 
 
 <h3>Related source files</h3>
 <ul class="samplesList">
-  <li><a href="target/tohtml/src/org/jppf/example/nodelifecycle/node/NodeListener.java">NodeListener.java</a> : A listener to the node's life cycle events,
+  <li><a href="src/main/java/org/jppf/example/nodelifecycle/node/NodeListener.java">NodeListener.java</a> : A listener to the node's life cycle events,
   provides transaction management for the JPPF tasks</li>
-  <li><a href="target/tohtml/src/org/jppf/example/nodelifecycle/client/DBTask.java">DBTask.java</a> : this is the code for the tasks.
+  <li><a href="src/main/java/org/jppf/example/nodelifecycle/client/DBTask.java">DBTask.java</a> : this is the code for the tasks.
   Each task waits for a configurable time after inserting a database row, to give the applicatione enough time to simulate a node crash and restart.</li>
-  <li><a href="target/tohtml/src/org/jppf/example/nodelifecycle/client/DBRunner.java">DBRunner.java</a> : this is the code for the client application.
+  <li><a href="src/main/java/org/jppf/example/nodelifecycle/client/DBRunner.java">DBRunner.java</a> : this is the code for the client application.
   It submits a job with a configurable number of tasks, waits for a configurable delay, then restarts the node,
   and finally gets the execution results and displays the rows inserted in the database</li>
-  <li><a href="target/tohtml/config/jppf-client.properties">jppf-client.properties</a> : the jppf configuration files, which also allows you to modify some parameters of the sample application</li>
+  <li><a href="config/jppf-client.properties">jppf-client.properties</a> : the jppf configuration files, which also allows you to modify some parameters of the sample application</li>
 </ul>
 
 <h3>Sample directory structure</h3>

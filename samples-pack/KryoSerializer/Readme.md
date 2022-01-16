@@ -20,7 +20,7 @@ jppf.object.serialization.class = org.jppf.serialization.kryo.KryoSerialization
 
 <h3>Sample's source files</h3>
 <ul class="samplesList">
-  <li><a href="target/tohtml/src/org/jppf/serialization/kryo/KryoSerialization.java">KryoSerialization.java</a>: this is our implementation of the serialization scheme using Kryo</li>
+  <li><a href="src/main/java/org/jppf/serialization/kryo/KryoSerialization.java">KryoSerialization.java</a>: this is our implementation of the serialization scheme using Kryo</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>

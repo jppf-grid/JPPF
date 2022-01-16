@@ -3,7 +3,7 @@
 <h3>What does the sample do?</h3>
 <p>This sample is a parallel implementation of the <a href="http://en.wikipedia.org/wiki/N-body_problem" alt="N_body on Wikipedia">N-body problem</a> for simulating the motion of anti-protons trapped in a magnetic field.<br>
 It displays a real-time graphical simulation of the movement of the anti-protons, based on the parameters specified in the configuration file.<br/>
-<p>The source in this sample is based on the <a href="http://www.cs.rit.edu/~ark/pj/doc/index.html?edu/rit/clu/antimatter/package-summary.html">examples</a> provided in the <a href="http://www.cs.rit.edu/~ark/pj.shtml">Java Parallel Library</a>.
+<p>The source in this sample is based on the <a href="http://www.cs.rit.edu/~ark/pj/doc/index?edu/rit/clu/antimatter/package-summary.html">examples</a> provided in the <a href="http://www.cs.rit.edu/~ark/pj.shtml">Java Parallel Library</a>.
 <p>Here's a screenshot of the simulation in action:
 <p><img src="images/Nbody.gif" border="0">
 

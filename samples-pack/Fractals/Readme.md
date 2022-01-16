@@ -44,7 +44,7 @@ image.height = 600
 </pre>
 <h4 style="font-style: italic; font-weight: bolder">Recording and replaying parameters sets</h4>
 The sample allows recording multiple sets of parameters (x, y, diameter and iterations) so they can be replayed later, and eventually saved and loaded as CSV files.
-The saved files can also be reused by the <a href="../FractalMovieGenerator/Readme.html">Mandelbrot movie generator sample</a>.
+The saved files can also be reused by the <a href="../FractalMovieGenerator/Readme">Mandelbrot movie generator sample</a>.
 <p>The possible actions are:
 <ul class="samplesList">
   <li><img src="src/icons/record.gif" border="0" alt="record"/> toggle recording: this switches from recording mode "off" to "on" and vice versa.
@@ -61,7 +61,7 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
-<a href="javadoc/index.html">API documentation</a>.
+<a href="javadoc/index">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>

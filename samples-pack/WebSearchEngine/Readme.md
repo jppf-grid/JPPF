@@ -24,7 +24,7 @@ Please follow these steps:
 <ul class="samplesList">
   <li>start URL: this is the URL of the web page from which links will be followed recursively. To limit the scope (and length) of the search,
   a filter is set so only links to the same server will be followed</li>
-  <li>search query: this is what to search on the visited pages; interpreted as <a href="https://lucene.apache.org/core/2_9_4/queryparsersyntax.html">Lucene query syntax</a></li>
+  <li>search query: this is what to search on the visited pages; interpreted as <a href="https://lucene.apache.org/core/2_9_4/queryparsersyntax">Lucene query syntax</a></li>
   <li>search depth: this parameter also limits the scope of the search, by restricting the depth of the chains of links that can be followed.
   For example: if the depth is set to 1, only the links found on the start page will be followed. If it is set to 2, the links found in the
   pages specified by the links in the start page will also be followed</li>
@@ -54,7 +54,7 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
-<a href="javadoc/index.html">API documentation</a>.
+<a href="javadoc/index">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>

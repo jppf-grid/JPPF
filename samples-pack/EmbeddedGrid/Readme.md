@@ -87,7 +87,7 @@ Reconnected to remote peer peer-d2-1@localhost:11112
 
 <h3>Demo source code</h3>
 <ul class="samplesList">
-  <li><a href="target/tohtml/src/org/jppf/example/embedded/EmbeddedGrid.java">EmbeddedGrid.java</a>: fully commented source code for this demo</li>
+  <li><a href="src/main/java/org/jppf/example/embedded/EmbeddedGrid.java">EmbeddedGrid.java</a>: fully commented source code for this demo</li>
 </ul>
 
 <h3>Documentation references</h3>

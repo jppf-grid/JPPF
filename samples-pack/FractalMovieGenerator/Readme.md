@@ -2,8 +2,8 @@
 
 <h3>What does the sample do?</h3>
 This sample demonstrates a JPPF grid based on a volunteer computing model.
-Its goal is to generate AVI movies made of fractal images (Mandelbrot set) individually computed as in the <a href="../Fractals/Readme.html">Fractals</a> sample.
-<p>For this, we will reuse the code and artifacts of the <a href="../Fractals/Readme.html">Fractals</a> sample, since it already implements JPPF tasks for the Mandelbrot computations,
+Its goal is to generate AVI movies made of fractal images (Mandelbrot set) individually computed as in the <a href="../Fractals/Readme">Fractals</a> sample.
+<p>For this, we will reuse the code and artifacts of the <a href="../Fractals/Readme">Fractals</a> sample, since it already implements JPPF tasks for the Mandelbrot computations,
 along with the code to submit the corresponding JPPF jobs.
 The movie file itself is created using the <a href="http://www.randelshofer.ch/monte/">Monte Media Library</a>.
 <p>Additionally, we will also generate a specific node distribution, with the following extensions and customizations:
@@ -83,7 +83,7 @@ Note that uploading it to Youtube required an additonal encoding step using the 
 <p><iframe width="640" height="360" src="http://www.youtube.com/embed/JDVBQHkEsMM?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
 
 <h3>I have additional questions and comments, where can I go?</h3>
-<p>If you need more insight into the code of this demo, you can consult the source, or have a look at the <a href="javadoc/index.html">API documentation</a>.
+<p>If you need more insight into the code of this demo, you can consult the source, or have a look at the <a href="javadoc/index">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>

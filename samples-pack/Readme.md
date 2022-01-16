@@ -28,7 +28,7 @@ The current applications in the samples pack are:
 * [A JPPF serialization scheme using Kryo](KryoSerializer)
 * [A Fibonacci computation demo using fork/join thread pools in the nodes](ForkJoinNodeExecutor)
 * [A word count demo on the Wikipedia database](WordCount)
-* [Generating AVI movies](FractalMovieGenerator) from images produced by the [Mandelbrot fractals sample](Fractals/Readme.html)
+* [Generating AVI movies](FractalMovieGenerator) from images produced by the [Mandelbrot fractals sample](Fractals/Readme)
 * [Dynamically adapting the grid topology based on the current workload](AdaptiveGrid)
 * [A demonstration of the patterns for submitting multiple jobs in parallel](ConcurrentJobs)
 * [A demonstration of a custom view integrated in the JPPF administration console](PluggableView)
