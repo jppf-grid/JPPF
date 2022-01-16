@@ -21,9 +21,8 @@ For information on how to set up a node and server, please refer to the <a href=
 Once you have installed a server and node, perform the following steps:
 <ol>
   <li>open a command prompt in JPPF-x.y-samples-pack/NodeTray</li>
-  <li><b>important</b>: to build this sample you need a <b>JDK 1.6 or later</b>, as the system tray APIs are not available in prior Java versions</li>
-  <li>build the sample: type "<b>ant jar</b>" or simply "<b>ant</b>"; this will create a file named <b>NodeTray.jar</b></li>
-  <li>copy NodeTray.jar in the "lib" folder of the JPPF node installation, to add it to the node's classpath. This is enough to deploy the add-on.</li>
+  <li>build the sample: type "<b>mwn clean install</b>"; this will create a file named <b>NodeTray.jar</b> in the <b>target</b> folder</li>
+  <li>copy <b>NodeTray.jar</b> in the "<b>lib</B>" folder of the JPPF node installation, to add it to the node's classpath. This is enough to deploy the add-on.</li>
   <li>start the server and node</li>
   <li>you should see the new system tray icon</li>
 </ol>

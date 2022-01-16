@@ -63,7 +63,7 @@
         </concat>
       </sequential>
     </macrodef>
-    <include.code sample="${project.name}" include="**/*.java,**/*.properties,**/*.xml,**/*.txt,**/*.yaml,**/*.sql"/>
+    <include.code sample="${project.name}" include="**/*.java,**/*.properties,**/*.xml,**/*.txt,**/*.yaml,**/*.sql,**/*.c"/>
   </target>
 
 </project>

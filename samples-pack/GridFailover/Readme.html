@@ -37,7 +37,7 @@ The failover mechanism relies on two main components:
 <ul class="samplesList">
   <li>Before running this sample application, you must have at least two JPPF servers running.<br>
   For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.</li>
-  <li>Update the <a href="drivers.yaml.html">drivers definition file</a> to reflect the information on your JPPF servers</li>
+  <li>Update the <a href="target/tohtml/drivers.yaml.html">drivers definition file</a> to reflect the information on your JPPF servers</li>
   <li>build the sample with this command: <b><tt class="samples">mvn clean install</tt></b>.
   This will create a file named <b>GridFailover.zip</b> in the <b>target</b> folder</li>
   <li>configure a node to use the driver discovery:
@@ -95,13 +95,13 @@ discovered new driver: ClientConnectionPoolInfo[name=backup, secure=false, host=
 
 <h3>Related source files</h3>
 <ul class="samplesList">
-  <li><a href="src/main/java/org/jppf/example/gridfailover/NodeSideDiscovery.java.html">NodeSideDiscovery.java</a> : the node connection strategy</li>
-  <li><a href="src/main/java/org/jppf/example/gridfailover/ClientSideDiscovery.java.html">ClientSideDiscovery.java</a> : the client-side driver discovery plugin</li>
-  <li><a href="src/main/java/org/jppf/example/gridfailover/ConnectionListener.java.html">ConnectionListener.java</a> : the grid topology monitor and controller, which detects when
+  <li><a href="target/tohtml/src/org/jppf/example/gridfailover/NodeSideDiscovery.java.html">NodeSideDiscovery.java</a> : the node connection strategy</li>
+  <li><a href="target/tohtml/src/org/jppf/example/gridfailover/ClientSideDiscovery.java.html">ClientSideDiscovery.java</a> : the client-side driver discovery plugin</li>
+  <li><a href="target/tohtml/src/org/jppf/example/gridfailover/ConnectionListener.java.html">ConnectionListener.java</a> : the grid topology monitor and controller, which detects when
     a primary driver comes back online and forces the node to reconnect to this driver</li>
-  <li><a href="src/main/java/org/jppf/example/gridfailover/Utils.java.html">Utils.java</a> : utilities to parse the YAML drivers definition file</li>
-  <li><a href="drivers.yaml.html">drivers.yaml</a> : the jppf drivers defintion file, in YAML format</li>
-  <li><a href="config/jppf.properties.html">jppf.properties</a> : the jppf client configuration file</li>
+  <li><a href="target/tohtml/src/org/jppf/example/gridfailover/Utils.java.html">Utils.java</a> : utilities to parse the YAML drivers definition file</li>
+  <li><a href="target/tohtml/drivers.yaml.html">drivers.yaml</a> : the jppf drivers defintion file, in YAML format</li>
+  <li><a href="target/tohtml/config/jppf.properties.html">jppf.properties</a> : the jppf client configuration file</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>

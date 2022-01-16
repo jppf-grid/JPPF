@@ -7,7 +7,11 @@ to a JPPF grid.
 <h3>How do I run it?</h3>
 Before running this sample application, you must have a JPPF server and at least one node running.<br>
 For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.<br>
-Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix) or, from a command prompt, type: <b>&quot;ant run&quot;</b>.
+Once you have a server and node:
+<ol class="samplesList">
+  <li>build the sample, by typing the following command in a shell prompt in the <b>"Fractals"</b> folder: <b>"mvn clean install"</b></li>
+  <li>you can either run the "<b>run.bat</b>" script (on Windows) or "<b>./run.sh</b>" script (on Linux/Unix)</b>.</li>
+</ol>
 
 <h3>How do I use it?</h3>
 <p>The GUI provides many options and a lot of interactivity.
@@ -43,7 +47,8 @@ The sample allows recording multiple sets of parameters (x, y, diameter and iter
 The saved files can also be reused by the <a href="../FractalMovieGenerator/Readme.html">Mandelbrot movie generator sample</a>.
 <p>The possible actions are:
 <ul class="samplesList">
-  <li><img src="src/icons/record.gif" border="0" alt="record"/> toggle recording: this switches from recording mode "off" to "on" and vice versa. When recording is on, any newly generated image will have its parameters added to the record set</li>
+  <li><img src="src/icons/record.gif" border="0" alt="record"/> toggle recording: this switches from recording mode "off" to "on" and vice versa.
+  When recording is on, any newly generated image will have its parameters added to the record set</li>
   <li><img src="src/icons/start.gif" border="0" alt="replay"/> replay: replays the current set of records as a slide show, with 2 seconds between images</li>
   <li><img src="src/icons/trash.gif" border="0" alt="clear"/> clear: this removes all records from the current set, which therefore becomes empty</li>
   <li><img src="src/icons/open.gif" border="0" alt="open"/> open: open a previously saved CSV file containng a set of records</li>

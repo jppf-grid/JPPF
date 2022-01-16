@@ -21,11 +21,15 @@ The failover mechanism relies on two main components:
   This client is used as follows:
     <ul class="samplesList">
       <li>it is <a href="https://www.jppf.org/doc/6.3/index.php?title=Client_and_administration_console_configuration#Manual_network_configuration">configured</a>
-      to connect to the same drivers as provided to the nodes. Each configured driver has a <a href="https://www.jppf.org/doc/6.3/index.php?title=Client_and_administration_console_configuration#Priority">priority</a>
+      to connect to the same drivers as provided to the nodes. Each configured driver has a
+      <a href="https://www.jppf.org/doc/6.3/index.php?title=Client_and_administration_console_configuration#Priority">priority</a>
       in descending order of the list given to the nodes</li>
-      <li>for each driver connection, a <a href="https://www.jppf.org/doc/6.3/index.php?title=Connection_pools#Status_notifications_for_existing_connections">connection status listener</a> is registered </li>
+      <li>for each driver connection, a
+      <a href="https://www.jppf.org/doc/6.3/index.php?title=Connection_pools#Status_notifications_for_existing_connections">connection status listener</a> is registered </li>
       <li>the listener detects situations when the primary driver goes down or gets back up and determines which dfriver is the current primary</li>
-      <li>when a new primary driver goes back up, the listener issues a management request to <a href="http://localhost:8880/doc/6.3/index.php?title=Node_management_and_monitoring#Shutting_down.2C_restarting_and_reconnecting_the_node">force the nodes to reconnect</a>, once they complete their remaining tasks</li>
+      <li>when a new primary driver goes back up, the listener issues a management request to
+      <a href="http://localhost:8880/doc/6.3/index.php?title=Node_management_and_monitoring#Shutting_down.2C_restarting_and_reconnecting_the_node">
+      force the nodes to reconnect</a>, once they complete their remaining tasks</li>
     </ul>
   </li>
 </ul>
@@ -34,11 +38,12 @@ The failover mechanism relies on two main components:
 <ul class="samplesList">
   <li>Before running this sample application, you must have at least two JPPF servers running.<br>
   For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.</li>
-  <li>Update the <a href="drivers.yaml">drivers definition file</a> to reflect the information on your JPPF servers</li>
-  <li>build the sample with this command: <b><tt class="samples">ant zip</tt></b>. This will create a file named <b>jppf-grid-failover.zip</b></li>
+  <li>Update the <a href="target/tohtml/drivers.yaml">drivers definition file</a> to reflect the information on your JPPF servers</li>
+  <li>build the sample with this command: <b><tt class="samples">mvn clean install</tt></b>.
+  This will create a file named <b>GridFailover.zip</b> in the <b>target</b> folder</li>
   <li>configure a node to use the driver discovery:
     <ul class="samplesList">
-      <li>unzip the <b>jppf-grid-failover.zip</b> file into the root installation directory of a node. It will copy the required libraries into the node's <b>/lib</b> directory,
+      <li>unzip the <b>GridFailover.zip</b> file into the root installation directory of a node. It will copy the required libraries into the node's <b>/lib</b> directory,
       and the <b>drivers.yaml</b> file in the node's root installation directory.</li>
       <li>in a text editor, open the node's configuration file located at <b>&lt;node_install_root&gt;/config/jppf-node.properties</b> and add this line:<br>
         <tt class="samples">jppf.server.connection.strategy = org.jppf.example.gridfailover.NodeSideDiscovery</tt></li>
@@ -47,7 +52,7 @@ The failover mechanism relies on two main components:
   </li>
   <li>configure an administration console to use the driver discovery:
     <ul class="samplesList">
-      <li>unzip the <b>jppf-grid-failover.zip</b> file into the root installation directory of an adminsitration console. It will copy the required libraries into the console's <b>/lib</b> directory,
+      <li>unzip the <b>GridFailover.zip</b> file into the root installation directory of an adminsitration console. It will copy the required libraries into the console's <b>/lib</b> directory,
       and the <b>drivers.yaml</b> file in the console's root installation directory.</li>
       <li>in a text editor, open the admin console's configuration file located at <b>&lt;console_install_root&gt;/config/jppf-gui.properties</b> and add this line:
         <tt class="samples">jppf.remote.execution.enabled = false</tt><br>
@@ -57,7 +62,8 @@ The failover mechanism relies on two main components:
       <li>once started, the admin console should show the drivers defined in the drivers.yaml file, along with a node connected to the first driver in the list</li>
     </ul>
   </li>
-  <li>from this sample's root directory, start the sample grid controller: <tt class="samples">./run.sh</tt> or <tt class="samples">run.bat</tt>. The console output will show something similar to this:
+  <li>from this sample's root directory, start the sample grid controller: <tt class="samples">./run.sh</tt> or <tt class="samples">run.bat</tt>.
+  The console output will show something similar to this:
 <pre class="samples" style="text-align: left; padding-left: 5px; font-size: 0.95em; color: #A0FFA0; background-color: black">
 client process id: 37556, uuid: A9619789-6E4B-4DA9-B267-FC014A811275
 press [Enter] to exit
@@ -90,13 +96,13 @@ discovered new driver: ClientConnectionPoolInfo[name=backup, secure=false, host=
 
 <h3>Related source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/gridfailover/NodeSideDiscovery.java">NodeSideDiscovery.java</a> : the node connection strategy</li>
-  <li><a href="src/org/jppf/example/gridfailover/ClientSideDiscovery.java">ClientSideDiscovery.java</a> : the client-side driver discovery plugin</li>
-  <li><a href="src/org/jppf/example/gridfailover/ConnectionListener.java">ConnectionListener.java</a> : the grid topology monitor and controller, which detects when
+  <li><a href="target/tohtml/src/org/jppf/example/gridfailover/NodeSideDiscovery.java">NodeSideDiscovery.java</a> : the node connection strategy</li>
+  <li><a href="target/tohtml/src/org/jppf/example/gridfailover/ClientSideDiscovery.java">ClientSideDiscovery.java</a> : the client-side driver discovery plugin</li>
+  <li><a href="target/tohtml/src/org/jppf/example/gridfailover/ConnectionListener.java">ConnectionListener.java</a> : the grid topology monitor and controller, which detects when
     a primary driver comes back online and forces the node to reconnect to this driver</li>
-  <li><a href="src/org/jppf/example/gridfailover/Utils.java">Utils.java</a> : utilities to parse the YAML drivers definition file</li>
-  <li><a href="drivers.yaml">drivers.yaml</a> : the jppf drivers defintion file, in YAML format</li>
-  <li><a href="config/jppf.properties">jppf.properties</a> : the jppf client configuration file</li>
+  <li><a href="target/tohtml/src/org/jppf/example/gridfailover/Utils.java">Utils.java</a> : utilities to parse the YAML drivers definition file</li>
+  <li><a href="target/tohtml/drivers.yaml">drivers.yaml</a> : the jppf drivers defintion file, in YAML format</li>
+  <li><a href="target/tohtml/config/jppf.properties">jppf.properties</a> : the jppf client configuration file</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>

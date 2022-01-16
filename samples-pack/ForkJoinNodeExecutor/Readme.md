@@ -1,7 +1,8 @@
 # Fibonacci Fork/Join demo
 
 <h3>What does the sample do?</h3>
-This demo demonstrates a node add-on which replaces the standard node processing thread pool with a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinPool.html">fork/join thread pool</a>.
+This demo demonstrates a node add-on which replaces the standard node processing thread pool with a
+<a href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinPool.html">fork/join thread pool</a>.
 This allows JPPF tasks to locally (in the node) spawn ForkJoinTask (or any of its subclasses) instances and have them processed as expected for a ForkJoinPool.
 The use of this fork/join executor is illustrated with a Fibonacci computation demo.
 
@@ -9,6 +10,7 @@ The use of this fork/join executor is illustrated with a Fibonacci computation d
 Before running this sample application, you must have a JPPF server and at least one node running.<br>
 For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/wiki">JPPF documentation</a>.<br>
 <ol class="samplesList">
+  <li>Build the sample, by typing the following command from a shell prompt in the <b>ForkJoinNodeExecutor</b> folder: <b>"mvn clean install"</b></li>
   <li>For a node to use the fork/join executor add-on, you need to add the following property to its configuration file:
 <pre class="prettyprint lang-conf">
 jppf.thread.manager.class = org.jppf.execute.ThreadManagerForkJoin

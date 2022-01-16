@@ -9,7 +9,8 @@ Only the part of the job that hadn't completed will be executed.
 <h3>How do I run it?</h3>
 <ol class="samplesList">
   <li>Before running this sample application, you must have a JPPF server and one node running. For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.2">JPPF documentation</a>.</li>
-  <li>Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix) or, from a command prompt, type: <b>&quot;ant run&quot;</b>.</li>
+  <li>the next step is to build the sample: type "<b>mvn clean install</b>" in a command prompt in the "<b>JobRecovery</b>" folder</li>
+  <li>Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows) or "<b>./run.sh</b>" script (on Linux/Unix/Mac)</li>
   <li>A the first execution, the application will show that no job exists in the job perisstence store, with a message similar to this:
 <pre class="samples">
 no job found in persistence store, creating a new job with 10 tasks
@@ -35,8 +36,8 @@ loaded job 'the_job_uuid' from persistence store ...
 
 <h3>Related source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/jobrecovery/Runner.java">Runner.java</a> : this is the application that submits a job, simulates a crash, and performs the job recovery</li>
-  <li><a href="src/org/jppf/example/jobrecovery/MyTask.java">MyTask.java</a> : a JPPF task that simply waits for one second before completing</li>
+  <li><a href="target/tohtml/src/org/jppf/example/jobrecovery/Runner.java">Runner.java</a> : this is the application that submits a job, simulates a crash, and performs the job recovery</li>
+  <li><a href="target/tohtml/src/org/jppf/example/jobrecovery/MyTask.java">MyTask.java</a> : a JPPF task that simply waits for one second before completing</li>
 </ul>
 
 <h3>How can I build the sample?</h3>

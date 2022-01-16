@@ -10,8 +10,9 @@ For information on how to set up a node and server, please refer to the <a href=
 Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
   <li>open a command prompt in JPPF-x.y-samples-pack/StartupClasses</li>
-  <li>build the sample: type "<b>ant jar</b>"; this will create a file named <b>StartupClasses.jar</b></li>
-  <li>copy StartupClasses.jar in the "lib" folder of the JPPF driver installation, to add it to the driver's classpath. This is enough, as the node will download the startup classes code from the server.</li>
+  <li>build the sample: type "<b>mvn clean install</b>"; this will create a file named <b>StartupClasses.jar</b> in the <b>target</b> folder</li>
+  <li>copy StartupClasses.jar in the "lib" folder of the JPPF driver installation, to add it to the driver's classpath.
+  This is enough, as the node will download the startup classes code from the server.</li>
   <li>start the driver, in the driver console, you should see the following message:<br/><tt>  [java] I'm a driver startup class</tt></li>
   <li>start the node, in the node console, you should see the following message:<br/> <tt>  [java] I'm a node startup class</tt></li>
 </ol>

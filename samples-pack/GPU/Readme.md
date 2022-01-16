@@ -6,14 +6,16 @@ The GPU computation is handled thanks to the <a href="http://code.google.com/p/a
 
 <h3>How does it work?</h3>
 This sample submits a JPPF job with one or more tasks to be executed on a GPU.
-The tasks contain APARAPI-conformant code, whose bytecode is introspected at runtime to generate OpenCL code (see example <a href="src/org/jppf/example/aparapi/GeneratedOpenCL.c">here</a>).
+The tasks contain APARAPI-conformant code, whose bytecode is introspected at runtime to generate OpenCL code (see example <a href="target/tohtml/src/org/jppf/example/aparapi/GeneratedOpenCL.c">here</a>).
 This generated code is then compiled and executed on an OpenCL device if any is available.
 
 <h3>How do I run it?</h3>
 Before running this sample application, you must have a JPPF server and at least one node running.<br>
-For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.2">JPPF documentation</a>.<br>
+For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3">JPPF documentation</a>.<br>
 
-<p>The node will require some additional configuration. In effect, since the APARAPI library load a native library, the file "aparapi.jar" must be added directly to the node's classpath.
+<p>In the next step, you build the sample: "<b>mvn clean install</b>"
+
+<p>The node will require some additional configuration. In effect, since the APARAPI library loads a native library, the file "aparapi.jar" must be added directly to the node's classpath.
 If you simply keep it in the client's classpath, the node will attempt to load it for each distinct client. This will only work the first time, and fail on subsequent attempts.<br/>
 
 <p>For your convenience, we have included a set of files that will take care of this:
@@ -29,13 +31,20 @@ If you simply keep it in the client's classpath, the node will attempt to load i
     </ul>
   </li>
   <li>Once this is done, you can start the server and node, then run the sample by typing "run.bat" on Windows or "./run.sh" on Linux/Unix</li>
-  <li>During the execution, the node will print out a message indicating whether the task was actually executed on a GPU, plus additional information on the OpenCL devices available to the platform</li>
+  <li>During the execution, the node will print out a message indicating whether the task was actually executed on a GPU,
+  plus additional information on the OpenCL devices available to the platform</li>
   <li>if the task cannot be executed on a GPU, if will fall back to executing in a Java thread pool (i.e. CPU-bound)
+</ul>
+
+<p>Finally, to run the sample, use one of the dedicated scripts:
+<ul class="samplesList">
+  <li>"<b>./run.sh</b>" on Linux/Unix/Mac</li>
+  <li>"<b>run.bat</b>" on Windows</li>
 </ul>
 
 <h3>How do I use it?</h3>
 <p>This sample doesn't have a graphical user interface, however you can modify some of the parameters in the JPPF configuration file:
-<ol>
+<ol class="samplesList">
   <li>open the file "<b>config/jppf-client.properties</b>" in a text editor</li>
   <li>at the end of the file, you will see the following properties:
 <pre class="prettyprint lang-conf">
@@ -55,11 +64,12 @@ execMode = GPU
 
 <h3>Sample's source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/aparapi/MatrixKernel.java">MatrixKernel.java</a>: this is the class that will be translated into OpenCL code</li>
-  <li><a href="src/org/jppf/example/aparapi/GeneratedOpenCL.c">GeneratedOpenCL.c</a>: the OpenCL code generated from MatrixKernel which will be actually executed on the GPU</li>
-  <li><a href="src/org/jppf/example/aparapi/AparapiTask.java">AparapiTask.java</a>: the JPPF task which invokes the GPU bindings API</li>
-  <li><a href="src/org/jppf/example/aparapi/AparapiRunner.java">AparapiRunner.java</a>: the JPPF client application which submits the jobs to the grid</li>
-  <li><a href="src/org/jppf/example/aparapi/SquareMatrix.java">SquareMatrix.java</a>: a simple representation of a square dense matrix, whose values are stored in a one-dimensional float array</li>
+  <li><a href="target/tohtml/src/org/jppf/example/aparapi/MatrixKernel.java">MatrixKernel.java</a>: this is the class that will be translated into OpenCL code</li>
+  <li><a href="target/tohtml/src/org/jppf/example/aparapi/GeneratedOpenCL.c ">GeneratedOpenCL.c</a>: the OpenCL code generated from MatrixKernel which will be actually executed on the GPU</li>
+  <li><a href="target/tohtml/src/org/jppf/example/aparapi/AparapiTask.java">AparapiTask.java</a>: the JPPF task which invokes the GPU bindings API</li>
+  <li><a href="target/tohtml/src/org/jppf/example/aparapi/AparapiRunner.java">AparapiRunner.java</a>: the JPPF client application which submits the jobs to the grid</li>
+  <li><a href="target/tohtml/src/org/jppf/example/aparapi/SquareMatrix.java">SquareMatrix.java</a>: a simple representation of a square dense matrix,
+  whose values are stored in a one-dimensional float array</li>
 </ul>
 
 <h3>How can I build the sample?</h3>
@@ -72,6 +82,6 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
-  <li><a href="https://www.jppf.org/doc/6.2">The JPPF documentation</a></li>
+  <li><a href="https://www.jppf.org/doc/6.3">The JPPF documentation</a></li>
 </ul>
 

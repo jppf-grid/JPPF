@@ -5,6 +5,7 @@ function langFromExtension(name) {
   else if (name.endsWith(".yaml")) lang = "yaml";
   else if (name.endsWith(".xml")) lang = "xml";
   else if (name.endsWith(".sql")) lang = "sql";
+  else if (name.endsWith(".c")) lang = "c";
   return lang;
 }
 
@@ -14,7 +15,7 @@ var dir = new java.io.File(project.getProperty("basedir"));
 self.log("dir = " + dir);
 fs.setDir(dir);
 var includes = attributes.get("include");
-if (includes == null) includes = "**/*.java,**/*.properties,**/*.xml,**/*.txt,**/*.yaml,**/*.sql";
+if (includes == null) includes = "**/*.java,**/*.properties,**/*.xml,**/*.txt,**/*.yaml,**/*.sql,**/*.c";
 fs.setIncludes(includes);
 fs.setExcludes("**/package-info.java,pom.xml,build.xml,target/**/*.*");
 self.log("converting files from " + dir.getCanonicalPath());
