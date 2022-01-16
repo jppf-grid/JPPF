@@ -4,11 +4,6 @@ language: java
 
 install: true
 
-# ant-optional is needed for ant junit
-#before_install:
-#- sudo apt-get -qq update
-#- sudo apt-get install ant-optional
-
 services:
   - docker
 
