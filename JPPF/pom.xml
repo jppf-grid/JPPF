@@ -37,11 +37,14 @@
   <dependencies>
     <dependency>
       <groupId>org.jppf</groupId>
-      <artifactId>jppf-admin</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jppf</groupId>
-      <artifactId>jppf-server</artifactId>
+      <artifactId>jppf-common</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.github.oshi</groupId>
+          <artifactId>oshi-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
@@ -50,6 +53,26 @@
       <id>jppf-release</id>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+              <execution>
+                <id>copy-dependencies</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>copy-dependencies</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                  <overWriteReleases>false</overWriteReleases>
+                  <overWriteSnapshots>false</overWriteSnapshots>
+                  <overWriteIfNewer>true</overWriteIfNewer>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
@@ -62,33 +85,10 @@
                 </goals>
                 <configuration>
                   <target>
-                    <property name="dest.dir" value="${project.build.directory}/build"/>
-                    <delete dir="${dest.dir}" quiet="true"/>
-                    <mkdir dir="${dest.dir}"/>
-                    <macrodef name="copy.zip">
-                      <attribute name="module"/>
-                      <sequential>
-                        <copy todir="${dest.dir}">
-                          <fileset dir="../@{module}/target" includes="*.zip"/> 
-                        </copy>
-                      </sequential>
-                    </macrodef>
-                    <copy.zip module="application-template"/>
-                    <copy.zip module="server"/>
-                    <copy.zip module="node"/>
-                    <copy.zip module="admin"/>
-                    <copy.zip module="admin-web"/>
-                    <copy.zip module="jmxremote-nio"/>
-                    <copy file="${project.basedir}/docs/manual/JPPF-User-Guide.pdf" tofile="${dest.dir}/JPPF-${project.version}-User-Guide.pdf" quiet="true"/>
-                    <zip destfile="${dest.dir}/JPPF-${project.version}-User-Guide.zip">
-                      <zipfileset dir="${dest.dir}" includes="*.pdf"/>
-                    </zip>
-                    <delete file="${dest.dir}/JPPF-${project.version}-User-Guide.pdf" quiet="true"/>
-    
-                    <move file="${project.basedir}/docs/home/javadoc/apidocs" tofile="${project.basedir}/docs/home/javadoc/${jppf.base.version}" quiet="true"/>
-                    <zip destfile="${dest.dir}/JPPF-${project.version}-api.zip">
-                      <zipfileset dir="${project.basedir}/docs/home/javadoc/${jppf.base.version}"/>
-                    </zip>
+                    <ant antfile="${project.basedir}/bin/jppf-build-release.xml"
+                      target="jppf.release" dir="." output="${project.build.directory}/jppf-build-release.log"/>
+                    <ant antfile="${project.basedir}/bin/jppf-build-samples.xml"
+                      target="samples.pack" dir="." output="${project.build.directory}/jppf-build-samples.log"/>
                   </target>
                 </configuration>
               </execution>

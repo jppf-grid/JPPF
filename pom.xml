@@ -309,10 +309,9 @@
         </dependencies>
         <configuration>
           <failOnError>false</failOnError>
-          <!--
-          <outputDirectory>${project.basedir}/JPPF/docs/home/javadoc/${jppf.base.version}</outputDirectory>
-          -->
+          <quiet>true</quiet>
           <reportOutputDirectory>${project.basedir}/JPPF/docs/home/javadoc</reportOutputDirectory>
+          <windowtitle>JPPF API</windowtitle>
           <doctitle><![CDATA[JPPF v${project.version}]]></doctitle>
           <top><![CDATA[
             <div class="aboutLanguage">
@@ -400,7 +399,6 @@
         -->
       </modules>
     </profile>
-
     <profile>
       <id>no-samples</id>
       <modules>
@@ -418,7 +416,6 @@
         <module>JPPF</module>
       </modules>
     </profile>
-
     <profile>
       <id>jppf-release</id>
       <modules>
