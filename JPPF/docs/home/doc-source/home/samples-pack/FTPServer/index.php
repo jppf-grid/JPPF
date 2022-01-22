@@ -5,11 +5,11 @@ The FTP server implementation is <a href="http://mina.apache.org/ftpserver/">Apa
 
 <h3>Related source files</h3>
 <ul>
-  <li><a href="src/org/jppf/example/ftp/service/FTPServerStartup.java.html">FTPServerStartup.java</a> : This is a <a href="https://www.jppf.org/doc/6.3/index.php?title=JPPF_startup_classes#Server_startup_classes">JPPF driver startup class</a>, which starts an Apache Mina FTPd server instance at driver startup time</li>
-  <li><a href="src/org/jppf/example/ftp/service/CommandLineExt.java.html">CommandLineExt.java</a> : a utility class that reads the FTP server's configuration file and launches it</li>
-  <li><a href="src/org/jppf/example/ftp/service/FTPClientWrapper.java.html">FTPClientWrapper.java</a> : a wrapper around the Apache Commons-Net FTP client, as a convenience to easily upload and download files</li>
-  <li><a href="src/org/jppf/example/ftp/runner/FTPTask.java.html">FTPTask.java</a> : a JPPF task which downloads a file from the driver, processes it, then uploads a transformed file back to the server</li>
-  <li><a href="src/org/jppf/example/ftp/runner/FTPRunner.java.html">FTPRunner.java</a> : the client application that submits the task to the JPPF grid</li>
+  <li><a href="target/tohtml/src/org/jppf/example/ftp/service/FTPServerStartup.java.html">FTPServerStartup.java</a> : This is a <a href="https://www.jppf.org/doc/6.3/index.php?title=JPPF_startup_classes#Server_startup_classes">JPPF driver startup class</a>, which starts an Apache Mina FTPd server instance at driver startup time</li>
+  <li><a href="target/tohtml/src/org/jppf/example/ftp/service/CommandLineExt.java.html">CommandLineExt.java</a> : a utility class that reads the FTP server's configuration file and launches it</li>
+  <li><a href="target/tohtml/src/org/jppf/example/ftp/service/FTPClientWrapper.java.html">FTPClientWrapper.java</a> : a wrapper around the Apache Commons-Net FTP client, as a convenience to easily upload and download files</li>
+  <li><a href="target/tohtml/src/org/jppf/example/ftp/runner/FTPTask.java.html">FTPTask.java</a> : a JPPF task which downloads a file from the driver, processes it, then uploads a transformed file back to the server</li>
+  <li><a href="target/tohtml/src/org/jppf/example/ftp/runner/FTPRunner.java.html">FTPRunner.java</a> : the client application that submits the task to the JPPF grid</li>
 </ul>
 
 <h3>How do I run the sample?</h3>
@@ -18,9 +18,9 @@ For information on how to set up a node and server, please refer to the <a href=
 Once you have installed a server and node, perform the following steps:
 <ol>
   <li>open a command prompt in JPPF-x.y-samples-pack/FTPServer</li>
-  <li>to build a deployment archive, type:<br/>
-  - "<b>ant zip</b>"; this will generate a zip file with all required libraries and configuration files<br/>
-  - "<b>ant tar.gz</b>"; this will generate an equivalent tar.gz</li>
+  <li>to build the deployment archives, type "<b>mvn clean install</b>" in a shell prompt in the "<b>FTPServer</b>" folder
+  <li>this will generate a the "<b>FTPServer.zip</b>" and "<b>FTPServer.tar.gz</b>" files in the "<b>target</b>" folder, containing all required libraries and configuration files.
+  You can use the archive file that is most appropriate for your platform</li>
   <li>the next step is to extract the archive file into the JPPF driver root installation folder</li>
   <li>you can then start the driver and nodes</li>
   <li>to run the demo application, you can either use the batch script "run.bat" (on Windows) or "run.sh" (on Linux), or the Ant script: "ant run"</li>

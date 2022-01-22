@@ -7,9 +7,13 @@ The visiting of the pages is realized through the integration of JPPF with the <
 The search and page indexing are implemented thanks to the <a href="http://lucene.apache.org/">Lucene</a> project from the Apache Foundation.
 
 <h3>How do I run it?</h3>
-Before running this sample application, you must have a JPPF server and at least one node running.<br>
-For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.<br>
-Once you have a server and node, from a command prompt, type: <b>&quot;ant run&quot;</b>
+Please follow these steps:
+<ol class="samplesList">
+  <li>Build the sample: open a command prompt in the <b>WebSearchEngine</b> folder and type "<b>mvn clean install</b>"</li>
+  <li>Before running this sample application, you must have a JPPF server and at least one node running.
+  For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.</li>
+  <li>Once you have a server and node, from the command prompt, type: <b>"./run.sh"</b> on Linux/Unix/Mac, or <b>"run.bat"</b> on Windows</li>
+</ol>
 
 <h3>How do I use it?</h3>
 <p>The GUI is separated in two main parts, the search parameters at the top and the search results at the bottom.
@@ -19,7 +23,7 @@ Once you have a server and node, from a command prompt, type: <b>&quot;ant run&q
 <ul class="samplesList">
   <li>start URL: this is the URL of the web page from which links will be followed recursively. To limit the scope (and length) of the search,
   a filter is set so only links to the same server will be followed</li>
-  <li>search query: this is what to search on the visited pages; interpreted as <a href="http://lucene.apache.org/java/docs/queryparsersyntax.html">Lucene query syntax</a></li>
+  <li>search query: this is what to search on the visited pages; interpreted as <a href="https://lucene.apache.org/core/2_9_4/queryparsersyntax.html">Lucene query syntax</a></li>
   <li>search depth: this parameter also limits the scope of the search, by restricting the depth of the chains of links that can be followed.
   For example: if the depth is set to 1, only the links found on the start page will be followed. If it is set to 2, the links found in the
   pages specified by the links in the start page will also be followed</li>

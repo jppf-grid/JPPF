@@ -20,16 +20,17 @@
 
   <import file="jppf-build-utils.xml"/>
 
+  <property name="samples.pack.prefix" value="JPPF-${project.version}-samples-pack"/>
+  <property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
+
   <!-- ========================================================================= -->
   <!--                         Generate the samples pack                         -->
   <!-- ========================================================================= -->
 
-  <target name="samples.pack" depends="samples.html.readme,samples.generate.md,samples.zip" />
+  <target name="samples.pack" depends="samples.html.readme,samples.generate.md,samples.zip,samples.php.doc,doc.home" />
 
   <target name="samples.zip" >
     <!-- Generate the samples pack zip file -->
-    <property name="samples.pack.prefix" value="JPPF-${project.version}-samples-pack"/>
-    <property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
     <delete file="samples.pack.file" quiet="true"/>
     <zip destfile="${samples.pack.file}">
       <zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}">
@@ -72,6 +73,8 @@
   <!-- ========================================================================= -->
 
   <target name="samples.php.doc">
+    <delete dir="${home}/samples-pack" quiet="true"/>
+    <mkdir dir="${home}/samples-pack"/>
     <java fork="yes" classname="org.jppf.doc.SamplesPHPReadmeProcessor" classpathref="run.classpath">
       <jvmarg value="-Xmx128m" />
       <arg value="${samples-pack}"/>
@@ -79,6 +82,31 @@
       <arg value="${home}/doc-source/templates/sample-readme.html"/>
     </java>
     <copy file="${samples-pack}/index.php" toDir="${home}/doc-source/home/samples-pack"/>
+
+    <!-- Clean up and add the samples pack sources to the proper web site folder -->
+    <delete dir="${home}/samples-pack" quiet="true"/>
+    <mkdir dir="${home}/samples-pack"/>
+    <copy todir="${home}/samples-pack">
+      <fileset dir="${samples-pack}">
+        <exclude name="**/*.jar"/>
+        <exclude name="**/src/**/*"/>
+        <exclude name="**/.project"/>
+        <exclude name="**/.classpath"/>
+        <exclude name="**/.settings/"/>
+        <exclude name="**/target/**"/>
+        <exclude name="**/pom.xml/"/>
+        <exclude name="**/Readme.*/"/>
+        <exclude name="**/*.bat/"/>
+        <exclude name="**/*.sh/"/>
+      </fileset>
+      <fileset dir="${samples-pack}">
+        <include name="**/target/tohtml/**"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="doc.home">
+    <doc.gen source="${home}/doc-source/home" dest="${home}/" templates="${home}/doc-source/templates/"/>
   </target>
 
 </project> 

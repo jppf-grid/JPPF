@@ -61,7 +61,7 @@
       <replacefilter token="@version@" value="${jppf.base.version}"/>
     </replace>
     <zip destfile="${dest.dir}/JPPF-${project.version}-api.zip">
-      <zipfileset dir="${javadoc.dest.dir}"/>
+      <zipfileset dir="${javadoc.dest.dir}" prefix="JPPF-${project.version}-api"/>
     </zip>
   </target>
 
