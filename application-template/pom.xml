@@ -74,6 +74,7 @@
               <goal>single</goal>
             </goals>
             <configuration>
+              <attach>false</attach>
               <appendAssemblyId>false</appendAssemblyId>
               <descriptors>
                 <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>

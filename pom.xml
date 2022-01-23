@@ -418,8 +418,8 @@
         <module>server</module>
         <module>client</module>
         <module>admin</module>
-        <module>application-template</module>
         <module>admin-web</module>
+        <module>application-template</module>
         <module>tests</module>
         <module>demo</module>
         <module>JPPF</module>
@@ -430,6 +430,83 @@
       <modules>
         <module>JPPF</module>
       </modules>
+    </profile>
+    <profile>
+      <id>deployment</id>
+      <modules>
+        <module>build-tools</module>
+        <module>common</module>
+        <module>jmxremote-nio</module>
+        <module>node</module>
+        <module>server</module>
+        <module>client</module>
+        <module>admin</module>
+        <module>admin-web</module>
+        <module>application-template</module>
+      </modules>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>sonatype-nexus-snapshots</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+          <!--
+          <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+          -->
+        </snapshotRepository>
+        <repository>
+          <id>sonatype-nexus-staging</id>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+          <!--
+          <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+          -->
+        </repository>
+      </distributionManagement>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <configuration>
+                  <passphrase>${env.JPPF_GPG_PASS}</passphrase>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
