@@ -65,32 +65,6 @@
   </dependencies>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.0.0-M5</version>
-          <configuration>
-            <trimStackTrace>false</trimStackTrace>
-            <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
-            <additionalClasspathElements>
-              <additionalClasspathElement>${project.build.directory}/test-classes/config</additionalClasspathElement>
-              <additionalClasspathElement>${project.build.directory}/test-classes/test-resources/client1</additionalClasspathElement>
-            </additionalClasspathElements>
-            <systemPropertyVariables>
-              <user.dir>${project.directory}</user.dir>
-              <jppf.config.plugin>test.org.jppf.test.setup.TestConfigSource</jppf.config.plugin>
-              <log4j.configuration>config/log4j-client.properties</log4j.configuration>
-              <java.util.logging.config.file>${project.build.directory}/test-classes/config/logging-client.properties</java.util.logging.config.file>
-            </systemPropertyVariables>
-            <environmentVariables>
-              <JPPF_TEST_EMBEDDED_GRID>false</JPPF_TEST_EMBEDDED_GRID>
-            </environmentVariables>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <resources>
       <resource>
         <filtering>false</filtering>
@@ -125,6 +99,28 @@
       </testResource>
     </testResources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M5</version>
+        <configuration>
+          <trimStackTrace>false</trimStackTrace>
+          <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+          <additionalClasspathElements>
+            <additionalClasspathElement>${project.build.directory}/test-classes/config</additionalClasspathElement>
+            <additionalClasspathElement>${project.build.directory}/test-classes/test-resources/client1</additionalClasspathElement>
+          </additionalClasspathElements>
+          <systemPropertyVariables>
+            <user.dir>${project.directory}</user.dir>
+            <jppf.config.plugin>test.org.jppf.test.setup.TestConfigSource</jppf.config.plugin>
+            <log4j.configuration>config/log4j-client.properties</log4j.configuration>
+            <java.util.logging.config.file>${project.build.directory}/test-classes/config/logging-client.properties</java.util.logging.config.file>
+          </systemPropertyVariables>
+          <environmentVariables>
+            <JPPF_TEST_EMBEDDED_GRID>false</JPPF_TEST_EMBEDDED_GRID>
+          </environmentVariables>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
@@ -167,6 +163,33 @@
               <sources>
                 <source>src/addons</source>
               </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Generate JUnit HTML report -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <property name="report.dir" value="${project.build.directory}/junit-report" />
+                <delete dir="${report.dir}" quiet="true" />
+                <mkdir dir="${report.dir}"/>
+                <junitreport todir="${report.dir}">
+                  <fileset dir="${project.build.directory}/surefire-reports">
+                    <include name="TEST-*.xml"/>
+                  </fileset>
+                  <report format="frames" todir="${report.dir}" styledir="${project.build.directory}/test-classes" />
+                </junitreport>
+              </target>
             </configuration>
           </execution>
         </executions>
