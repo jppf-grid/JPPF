@@ -180,19 +180,16 @@
             </goals>
             <configuration>
               <target>
-                <property name="report.dir" value="${project.build.directory}/junit-report" />
-                <delete dir="${report.dir}" quiet="true" />
-                <mkdir dir="${report.dir}"/>
-                <junitreport todir="${report.dir}">
-                  <fileset dir="${project.build.directory}/surefire-reports">
-                    <include name="TEST-*.xml"/>
-                  </fileset>
-                  <report format="frames" todir="${report.dir}" styledir="${project.build.directory}/test-classes" />
-                </junitreport>
+                <ant antfile="${project.basedir}/bin/build-junit-report.xml"
+                  target="junit.report" dir="." output="${project.build.directory}/build-junit-report.log"/>
               </target>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
