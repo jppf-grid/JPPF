@@ -277,6 +277,37 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.3.1</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.1.2</version>
+          <configuration>
+            <includes>src/**/*.java</includes>
+            <excludes>target/**/*.java</excludes>
+            <configLocation>../JPPF/CheckStyle_JPPF_config.xml</configLocation>
+            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+            <includeResources>false</includeResources>
+            <includeTestResources>false</includeTestResources>
+            <failOnViolation>true</failOnViolation>
+            <logViolationsToConsole>true</logViolationsToConsole>
+          </configuration>
+          <executions>
+            <execution>
+              <id>jppf-checkstyle</id>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <phase>compile</phase>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>8.35</version>
+            </dependency>
+          </dependencies>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
