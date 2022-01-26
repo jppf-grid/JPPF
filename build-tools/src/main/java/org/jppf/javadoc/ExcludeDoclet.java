@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2018 JPPF Team.
+ * Copyright (C) 2005-2019 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ public class ExcludeDoclet {
    * @param args the command line options.
    */
   public static void main(final String[] args) {
-    String name = ExcludeDoclet.class.getName();
+    final String name = ExcludeDoclet.class.getName();
     Main.execute(name, name, args);
   }
 
@@ -112,7 +112,7 @@ public class ExcludeDoclet {
     try {
       System.out.println("root doc = " + root.name());
       return Standard.start((RootDoc) process(root, RootDoc.class));
-    } catch (IllegalArgumentException e) {
+    } catch (final IllegalArgumentException e) {
       System.out.println("IllegalArgumentException for root doc = " + root);
       throw e;
     }
@@ -147,26 +147,25 @@ public class ExcludeDoclet {
    */
   private static Object process(final Object obj, final Class<?> expect) {
     if (obj == null) return null;
-    Class<?> cls = obj.getClass();
+    final Class<?> cls = obj.getClass();
     if (cls.getName().startsWith("com.sun.")) {
       return Proxy.newProxyInstance(cls.getClassLoader(), cls.getInterfaces(), new ExcludeHandler(obj));
     } else if (cls.isArray()) {
-      Object[] array = (Object[]) obj;
+      final Object[] array = (Object[]) obj;
       if (array.length > 0) {
-        Class<?> componentType = expect.getComponentType();
+        final Class<?> componentType = expect.getComponentType();
         if (componentType != null) {
-          List<Object> list = new ArrayList<>(array.length);
+          final List<Object> list = new ArrayList<>(array.length);
           for (int i = 0; i < array.length; i++) {
-            Object entry = array[i];
+            final Object entry = array[i];
             if ((entry instanceof Doc) && exclude((Doc) entry)) continue;
             list.add(process(entry, componentType));
           }
           try {
             return list.toArray((Object[]) Array.newInstance(componentType, list.size()));
-          } catch (Exception e) {
+          } catch (final Exception e) {
             System.out.println(e.getClass().getName() + (e.getMessage() == null ? "" : ": " + e.getMessage()) + " for obj=" + obj
               + ", expect=" + expect + ", cls=" + cls + ", componentType=" + componentType + ", list=" + list);
-            //e.printStackTrace(System.out);
             return null;
           }
         }
@@ -195,14 +194,14 @@ public class ExcludeDoclet {
     @Override
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
       if (args != null) {
-        String methodName = method.getName();
+        final String methodName = method.getName();
         if (methodName.equals("compareTo") || methodName.equals("equals") || methodName.equals("overrides") || methodName.equals("subclassOf")) {
           args[0] = unwrap(args[0]);
         }
       }
       try {
         return process(method.invoke(target, args), method.getReturnType());
-      } catch (InvocationTargetException e) {
+      } catch (final InvocationTargetException e) {
         throw e.getTargetException();
       }
     }
