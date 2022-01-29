@@ -37,7 +37,6 @@
     <dependency>
       <groupId>org.jppf</groupId>
       <artifactId>jppf-node</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

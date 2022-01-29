@@ -38,7 +38,6 @@
     <dependency>
       <groupId>org.jppf</groupId>
       <artifactId>jppf-common</artifactId>
-      <version>${project.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.github.oshi</groupId>
