@@ -56,7 +56,6 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
-      <version>1.6.5</version>
       <exclusions>
         <exclusion>
           <groupId>junit</groupId>
