@@ -40,14 +40,13 @@ This is the home for the JPPF source code. Other services can be found at the fo
 ***Requirements***
 
 * **Java 8** or later
-* **[Apache Ant 1.9.1](https://ant.apache.org)** or later
+* **[Apache Maven 3.6.0](https://maven.apache.org)** or later
 
 ***Steps***
 
 * clone the repository:<br> `git clone git@github.com:jppf-grid/JPPF.git` or `git clone https://github.com/jppf-grid/JPPF.git`
-* from the repository root: `ant build`
-* to run the tests: `ant test`
-* the test results are available in `<repo_root>/tests/report`, the logs are in `<repo_root>/tests/logs` (1 set of logs per test class)
+* from the repository root: `mvn clean install`
+* an HTML test report is available in `<repo_root>/tests/target/junit-report`, the test logs are in `<repo_root>/tests/target/logs` (one set of logs per test class)
 
 ## JPPF Maven artifacts
 
