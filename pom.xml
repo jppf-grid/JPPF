@@ -362,7 +362,7 @@
               </a>
             </div>
           ]]></top>
-          <bottom><![CDATA[<font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2019 JPPF Team.</i></font>]]></bottom>
+          <bottom><![CDATA[<font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2022 JPPF Team.</i></font>]]></bottom>
           <skippedModules>jppf-demo,jppf-tests,samples-pack,jppf-admin,jppf-admin-web,jppf-build-tools,JPPF</skippedModules>
           <doclet>org.jppf.javadoc.ExcludeDoclet</doclet>
           <docletArtifact>
