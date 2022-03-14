@@ -2,11 +2,11 @@
 
 set -e
 
-OPTS=-DskipTests
-
 # build and tests
-call mvn clean install $OPTS
-# aggregted javadoc
-mvn javadoc:aggregate $OPTS -Pno-samples
+mvn clean install $JPPF_BUILD_OPTS
+
+# aggregated javadoc
+mvn javadoc:aggregate $JPPF_BUILD_OPTS -Pno-samples
+
 # package redistributable zips
-mvn package $OPTS -Pjppf-release
+mvn package $JPPF_BUILD_OPTS -Pjppf-release
