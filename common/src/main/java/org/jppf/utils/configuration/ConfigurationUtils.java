@@ -33,6 +33,10 @@ public class ConfigurationUtils {
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ConfigurationUtils.class);
+  /**
+   * Property keys that might indicate a password.
+   */
+  private static final String[] passwordKeys = { "password", "pwd", "passw" };
 
   /**
    * Get the list of all predefined configuration properties in the specified class.
@@ -47,7 +51,8 @@ public class ConfigurationUtils {
       final Field[] fields = c.getDeclaredFields();
       for (Field field: fields) {
         final int mod = field.getModifiers();
-        if (Modifier.isStatic(mod) && Modifier.isPublic(mod) && Modifier.isFinal(mod) && JPPFProperty.class.isAssignableFrom(field.getType())) {
+        if (Modifier.isStatic(mod) && Modifier.isPublic(mod) && Modifier.isFinal(mod) &&
+          JPPFProperty.class.isAssignableFrom(field.getType())) {
           if (!field.isAccessible()) field.setAccessible(true);
           final JPPFProperty<?> prop = (JPPFProperty<?>) field.get(null);
           if (prop instanceof AbstractJPPFProperty) ((AbstractJPPFProperty<?>) prop).setI18nBase(i18nBase);
@@ -67,20 +72,17 @@ public class ConfigurationUtils {
   public static Properties hidePasswords(final Properties props) {
     if (props == null) return null;
     final Properties  result = new Properties();
-    final String[] keys = { "password", "pwd", "passw" };
-    for (final String name: props.stringPropertyNames()) {
-      if (StringUtils.hasOneOf(name, true, keys)) result.setProperty(name, "********");
-      else result.setProperty(name, props.getProperty(name));
-    }
+    for (final String name: props.stringPropertyNames())
+      result.setProperty(name, StringUtils.hasOneOf(name, true, passwordKeys) ? "********" : props.getProperty(name));
     return result;
   }
-
 
   /**
    * Parse a memory size value in format [size][unit] where:
    * <ul>
    * <li>size is a positive {@code long} value</li>
-   * <li>unit is one of 'g', 'm', 'k', 'b' or uppercase equivalents 'G', 'M', 'K', 'B'. If the unit string is anything else then it defaults to 'b'</li>
+   * <li>unit is one of 'g', 'm', 'k', 'b' or uppercase equivalents 'G', 'M', 'K', 'B'.
+   * If the unit string is anything else then it defaults to 'b'</li>
    * </ul>
    * Examples: 2g, 1536M, 123456k, 123456789b
    * @param source the string to parse.
@@ -97,7 +99,7 @@ public class ConfigurationUtils {
         break;
       }
     }
-    long threshold = 0;
+    long threshold;
     try {
       threshold = Long.valueOf(source.substring(0, i));
     } catch (@SuppressWarnings("unused") final Exception e) {
@@ -129,7 +131,8 @@ public class ConfigurationUtils {
   }
 
   /**
-   * Get a value from a first environment variable, or a second environment variable if the first is not set, or a default value if the variables are not set.
+   * Get a value from a first environment variable, or a second environment variable if the first is not set,
+   * or a default value if the variables are not set.
    * @param envVar1 the first environment variable name.
    * @param envVar2 the second environment variable name.
    * @param defaultValue the default value to use.
