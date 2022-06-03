@@ -4,7 +4,7 @@
 :: and stop at the first failure, if any
 ::
 :: Parameters:
-:: %1 is an Ant fileset pattern for the tests to execute
+:: %1 is a pattern supplied to maven as the value of the "-Dtest=..." property
 :: %2 is the number of repeats
 
 if "%1" == ""  goto missing_pattern

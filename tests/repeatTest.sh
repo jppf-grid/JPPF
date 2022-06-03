@@ -1,10 +1,12 @@
 #! /bin/sh
 
+set -e
+
 # Repeat the specified tests a specified number of times
 # and stop at the first failure, if any
 #
 # Parameters:
-# $1 is an pattern supplied to maven as the value of the -Dtest= property
+# $1 is a pattern supplied to maven as the value of the "-Dtest=..." property
 # $2 is the number of repeats
 
 
@@ -32,11 +34,7 @@ for i in `seq 1 $NB_REPEATS`; do
   echo ""
   echo "===== Test run $i ====="
   rm -f *.log > nul.tmp
-  mvn test -Dtest=$PATTERN
-  if [ -e failure.log ]; then
-    rm -f failure.log
-    break
-  fi
+  mvn test -Dtest=$PATTERN -q
 done
 
 echo -n "end time:   " >> time.tmp
