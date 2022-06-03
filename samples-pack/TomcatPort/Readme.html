@@ -8,8 +8,9 @@ Before running this sample application, you must have a JPPF server and at least
 For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have a server and node, from a command prompt, perform the following steps:
 <ul class="samplesList">
-  <li>configure the application settings, by editing the configuration files (JPPF and logging) in the <b>TomcatPort/src/java</b> folder</li>
-  <li>from a shell or command prompt, type: <b>&quot;ant build&quot;</b>. This will build a WAR file that embeds a JPPF client, in the <b>TomcatPort/build</b> folder.</li>
+  <li>configure the application settings, by editing the configuration files (JPPF and logging) in the <b>TomcatPort/src/main/resources</b> folder</li>
+  <li>from a shell or command prompt, type: <b>"mvn clean install"</b>. This will build a WAR file named <b>TomcatPort.war</b>,
+  which embeds a JPPF client, in the <b>TomcatPort/target</b> folder.</li>
   <li>deploy the WAR file to Tomcat (usually by copying it to TOMCAT_HOME/webapps)</li>
   <li>start Tomcat</li>
 </ul>

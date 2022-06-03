@@ -9,7 +9,7 @@ For information on how to set up a node and server, please refer to the <a href=
 Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
   <li>open a command prompt in JPPF-x.y-samples-pack/NodeConnectionEvents</li>
-  <li>build the sample: type "<b>ant jar</b>"; this will create a file named <b>NodeConnectionEvents.jar</b></li>
+  <li>build the sample: type "<b>mvn clean install</b>"; this will create a file named <b>NodeConnectionEvents.jar</b> in the <b>target</b> folder</li>
   <li>copy NodeConnectionEvents.jar in the "lib" folder of the JPPF driver installation, to add it to the driver's classpath.</li>
   <li>start the server, in its console you should see the following message:<br/><tt>  [java] *** MyNodeConnectionListener instance successfully loaded ***</tt></li>
   <li>start the node</li>

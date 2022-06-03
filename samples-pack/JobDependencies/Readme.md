@@ -17,7 +17,7 @@ It supports any non-cyclic dependency graph and will work even when the jobs in 
 </ul>
 <p><b>3. Defining your own dependency graph</b>
 <ul class="samplesList">
-  <li>The jobs graph is defined in the file <a href="dependency_graph.txt.html"><code>JobDependencies/dependency_graph.txt</code></a></li>
+  <li>The jobs graph is defined in the file <a href="dependency_graph.txt"><code>JobDependencies/dependency_graph.txt</code></a></li>
   <li>for example, the dependency graph defined in the vanilla version of this sample is defined as:<br>
     <table border="0" cellpadding="5" style="width: 100%">
     <tr>
@@ -74,10 +74,10 @@ Job A ==>
 
 <h3>Source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/job/dependencies/JobDependenciesRunner.java">JobDependenciesRunner.java</a>: the entry point for the demo, reads the dependency graph and submits multiple jobs accordingly</li>
-  <li><a href="src/org/jppf/example/job/dependencies/DependencyDescriptor.java">DependencyDescriptor.java</a>: represents information of a job and its dependencies, parsed from the dependency graph definition file</li>
-  <li><a href="src/org/jppf/example/job/dependencies/MyTask.java">MyTask.java</a>: a very simple JPPF task implementation, an instance of which is added to each job in the dependency graph</li>
-  <li><a href="src/org/jppf/example/job/dependencies/Utils.java">Utils.java</a>: utility methods to print messages and parse the graph definition file</li>
+  <li><a href="src/main/java/org/jppf/example/job/dependencies/JobDependenciesRunner.java">JobDependenciesRunner.java</a>: the entry point for the demo, reads the dependency graph and submits multiple jobs accordingly</li>
+  <li><a href="src/main/java/org/jppf/example/job/dependencies/DependencyDescriptor.java">DependencyDescriptor.java</a>: represents information of a job and its dependencies, parsed from the dependency graph definition file</li>
+  <li><a href="src/main/java/org/jppf/example/job/dependencies/MyTask.java">MyTask.java</a>: a very simple JPPF task implementation, an instance of which is added to each job in the dependency graph</li>
+  <li><a href="src/main/java/org/jppf/example/job/dependencies/Utils.java">Utils.java</a>: utility methods to print messages and parse the graph definition file</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>

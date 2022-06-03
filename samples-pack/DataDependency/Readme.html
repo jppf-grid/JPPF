@@ -54,8 +54,8 @@ Before running this sample application, you need to install a JPPF server and at
 For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have installed a server and one or multiple nodes, perform the following steps:
 <ol class="samplesList">
-  <li>build the archive that will contain the libraries to deploy in the JPPF driver's class path: run either the Ant target "<b>zip</b>" which will generate the file "<b>DataDependency.zip</b>",
-  or "<b>tar.gz</b>" which will generate the file "<b>DataDependency.tar.gz</b>"</li>
+  <li>build the archive that will contain the libraries to deploy in the JPPF driver's class path: "<b>mvn clean install</b>"; it will generate two archive files "<b>DataDependency.zip</b>"
+  and "<b>DataDependency.tar.gz</b>" in the "<b>target</b>" folder
   <li>extract the generated archive in the installation folder of the JPPF driver, this will add the files "DataDependency.jar" and "hazelcast-x.y.z.jar" in the "lib" directory. This ensures the nodes will download the startup class and Hazelcast APIs from the server's classpath.</li>
   <li>start the driver and the nodes</li>
   <li>from the sample's "config" folder, open the client configuration file "<b>jppf.properties</b>" in a text editor</li>

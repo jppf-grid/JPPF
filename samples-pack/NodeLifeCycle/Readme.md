@@ -3,34 +3,42 @@
 <h3>What does the sample do?</h3>
 This sample illustrates how node life cycle events can be used to control distributed transactions within a node.
 <p>Our goal is to handle the use case where each JPPF task in a job inserts a row in a database.
-In this scenario, we want to avoid the creation of duplicate records when the node crashes or is disconnected, due to the JPPF recovery mechanism that will cause the tasks to be resubmitted to another node.
+In this scenario, we want to avoid the creation of duplicate records when the node crashes or is disconnected,
+due to the JPPF recovery mechanism that will cause the tasks to be resubmitted to another node.
 <p>To achieve this, it is natural to use database transactions so we can roll back any database update when the node crashes.
 One requirement is to know when a transaction should be started and when it should be committed or rolled back.
 This information will be provided by a listener that receives notifications of the node's life cycle events, as follows:
 <ul class="samplesList">
-  <li>when the node is starting: this event triggers a recovery mechanism that rolls back any transaction that was active at the time of a previous node crash. If the node didn't crash, there is no need to recover anything</li>
-  <li>when the node is terminated: here we are talking about a "clean" termination of the node, via the management APIs or the JPPF admin console. In this case, any active transaction is immediately rolled back before the node terminates</li>
+  <li>when the node is starting: this event triggers a recovery mechanism that rolls back any transaction that was active at the time of a previous node crash.
+  If the node didn't crash, there is no need to recover anything</li>
+  <li>when the node is terminated: here we are talking about a "clean" termination of the node, via the management APIs or the JPPF admin console.
+  In this case, any active transaction is immediately rolled back before the node terminates</li>
   <li>when the node starts processing a job: this is when we start a new transaction</li>
   <li>when the node completes the processing of a job: this is when we commit the current transaction</li>
 </ul>
-<p>Some constraints are imposed by the transaction management mechanism and the JTA specfications: due to the association of each transaction with a single thread, all database-related operations must be performed in the same thread as the transaction's.
+<p>Some constraints are imposed by the transaction management mechanism and the JTA specfications:
+due to the association of each transaction with a single thread, all database-related operations must be performed in the same thread as the transaction's.
 This means that we will need to sequentialize and synchronize these operations in order to achieve our goals. To do this, we use a simple worker thread
-(see <a href="http://download.oracle.com/javase/7/docs/api/java/util/concurrent/Executors.html#newSingleThreadExecutor()">Executors.newSingleThreadExecutor()</a>), and each database or transaction related operation will be submitted
-as a <a href="http://download.oracle.com/javase/7/docs/api/index.html?java/util/concurrent/Callable.html">Callable</a> task to this worker thread.<br/>
+(see <a href="http://download.oracle.com/javase/7/docs/api/java/util/concurrent/Executors#newSingleThreadExecutor()">Executors.newSingleThreadExecutor()</a>),
+and each database or transaction related operation will be submitted
+as a <a href="http://download.oracle.com/javase/7/docs/api/index?java/util/concurrent/Callable.html">Callable</a> task to this worker thread.<br/>
 A consequence of this is that we will lose some degree of parallelism, since it will limit the node's ability to execute multiple tasks in parallel.
 <p>For this demonstration's purpose, we chose to use the following components:
 <ul class="samplesList">
   <li><a href="http://www.h2database.com/">H2 Database Engine</a>: a pure Java, open source, XA-compliant database with a very small footprint</li>
-  <li><a href="http://www.atomikos.com/Main/TransactionsEssentials">Atomikos TransactionsEssentials&reg;</a>: an open source transaction management system supporting JDBC/XA pools, JMS/XA pools and JTA-compliant transactions management</li>
+  <li><a href="http://www.atomikos.com/Main/TransactionsEssentials">Atomikos TransactionsEssentials&reg;</a>:
+  an open source transaction management system supporting JDBC/XA pools, JMS/XA pools and JTA-compliant transactions management</li>
 </ul>
 
 <h3>Related source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/nodelifecycle/node/NodeListener.java">NodeListener.java</a> : A listener to the node's life cycle events, provides transaction management for the JPPF tasks</li>
-  <li><a href="src/org/jppf/example/nodelifecycle/client/DBTask.java">DBTask.java</a> : this is the code for the tasks.
+  <li><a href="src/main/java/org/jppf/example/nodelifecycle/node/NodeListener.java">NodeListener.java</a> : A listener to the node's life cycle events,
+  provides transaction management for the JPPF tasks</li>
+  <li><a href="src/main/java/org/jppf/example/nodelifecycle/client/DBTask.java">DBTask.java</a> : this is the code for the tasks.
   Each task waits for a configurable time after inserting a database row, to give the applicatione enough time to simulate a node crash and restart.</li>
-  <li><a href="src/org/jppf/example/nodelifecycle/client/DBRunner.java">DBRunner.java</a> : this is the code for the client application.
-  It submits a job with a configurable number of tasks, waits for a configurable delay, then restarts the node, and finally gets the execution results and displays the rows inserted in the database</li>
+  <li><a href="src/main/java/org/jppf/example/nodelifecycle/client/DBRunner.java">DBRunner.java</a> : this is the code for the client application.
+  It submits a job with a configurable number of tasks, waits for a configurable delay, then restarts the node,
+  and finally gets the execution results and displays the rows inserted in the database</li>
   <li><a href="config/jppf-client.properties">jppf-client.properties</a> : the jppf configuration files, which also allows you to modify some parameters of the sample application</li>
 </ul>
 
@@ -41,7 +49,6 @@ A consequence of this is that we will lose some degree of parallelism, since it 
   <li><tt>/classes</tt>: contains the compiled java classes</li>
   <li><tt>/config</tt>: contains the JPPF and Log4j configuration files</li>
   <li><tt>/db</tt>: contains the database and the Windows and Linux scripts to start and stop the database server</li>
-  <li><tt>/lib</tt>: contains the Atomikos, H2 and JTA libraries</li>
   <li><tt>/src</tt>: this is where all the sources of this sample are</li>
 </ul>
 
@@ -50,16 +57,18 @@ Before running this sample application, you need to install a JPPF server and at
 For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
-  <li>open a command prompt in JPPF-x.y-samples-pack/NodeLifeCycle</li>
-  <li>build the sample: type "<b>ant jar</b>" or simply "<b>ant</b>"; this will create a file named <b>NodeLifeCycle.jar</b></li>
-  <li>copy NodeLifeCycle.jar in the "lib" folder of the JPPF driver installation, as well as all the *.jar files in <tt>NodeLifeCycle/lib</tt>, to add them to the driver's classpath. This is enough to deploy the add-on.</li>
-  <li>start the database server: open a command prompt in NodeNodeLifeCycle/db and type "<b>startH2.bat</b>" (on Windows) or "<b>./startH2.sh</b>" (on Linux). Alternatively you can run an Ant target instead: "<b>ant start.db.server</b>"</li>
-  <li>start the server and node</li>
-  <li>run the sample application: open a command prompt in JPPF-x.y-samples-pack/NodeNodeLifeCycle and type "<b>ant run</b>"</li>
+  <li>open a command prompt in <b>JPPF-x.y-samples-pack/NodeLifeCycle</b></li>
+  <li>build the sample: type "<b>mvn clean install</b>"; this will create 2 archive files in the <b>target</b> folder: <b>NodeLifeCycle.zip</b> and <b>NodeLifeCycle.tar.gz</b>.
+  You can use either, based on your platform or personal preference.</li>
+  <li>extract one of the generated archives in the JPPF driver installation. This is enough to deploy the add-on.</li>
+  <li>start the database server: open a command prompt in <b>NodeNodeLifeCycle/db</b> and type "<b>startH2.bat</b>" on Windows or "<b>./startH2.sh</b>" on Linux.</li>
+  <li>start the JPPF server and node</li>
+  <li>run the sample application: open a command prompt in <b>JPPF-x.y-samples-pack/NodeNodeLifeCycle</b> and type "<b>./run.sh</b>" on Linux/Unix/Mac or "<b>run.bat</b>" on Windows</li>
   <li>you should see a display of the tasks execution results, followed by a display of all the rows inserted in the database table.<br/>
-      Additionally, the node's console will show the sequence of events that took place, including the node shutdown and restart events</li>
-  <li>to stop the database server: open a command prompt in NodeNodeLifeCycle/db and type "<b>stopH2.bat</b>" (on Windows) or "<b>./stopH2.sh</b>" (on Linux). Alternatively you can run an Ant target instead: "<b>ant stop.db.server</b>"</li>
-  <li>to reset the database: open a command prompt in NodeNodeLifeCycle and run the Ant target: "<b>ant reset.db</b>". This will re-create the database with an empty table</li>
+  Additionally, the node's console will show the sequence of events that took place, including the node shutdown and restart events</li>
+  <li>to stop the database server: open a command prompt in <b>NodeNodeLifeCycle/db</b> and type "<b>stopH2.bat</b>" on Windows or "<b>./stopH2.sh</b>" on Linux.</li>
+  <li>to reset the database: open a command prompt in <b>NodeNodeLifeCycle/db</b> and run "<b>./resetH2.sh</b>" on Linux or "<b>resetH2.bat</b>" on Windows.
+  This will re-create the database with an empty table</li>
 </ol>
 
 <h3>What features of JPPF are demonstrated?</h3>

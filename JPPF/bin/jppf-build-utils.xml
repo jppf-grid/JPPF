@@ -1,0 +1,112 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2019 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="jppf-utils" basedir="..">
+
+  <!-- ========================================================================= -->
+  <!--                          Property definitions                             -->
+  <!-- ========================================================================= -->
+
+  <property name="common"                value="${basedir}/../common"/>
+  <property name="samples-pack"          value="${basedir}/../samples-pack"/>
+  <property name="build"                 value="${basedir}/target/build"/>  
+  <property name="docs"                  value="${basedir}/docs"/>
+  <property name="home"                  value="${docs}/home"/>
+  <property name="license.file"          value="LICENSE.txt"/>
+  <property name="build.sysclasspath"    value="last"/>
+  <property name="version.file"          value="${common}/src/resources/META-INF/jppf-version.properties"/>
+
+  <!-- ========================================================================= -->
+  <!--                           Classpath definitions                           -->
+  <!-- ========================================================================= -->
+
+  <path id="run.classpath">
+    <fileset dir="${basedir}/target/lib" includes="*.jar"/>
+  </path>
+
+  <!-- ========================================================================= -->
+  <!-- Macrodefs                                                                 -->
+  <!-- ========================================================================= -->
+
+  <!--
+    Generate web site pages based on templates.
+    Attributes:
+    - source:    the folder where the source documents to convert are located
+    - dest:      the destination folder where the generated php and html files are written
+    - templates: the folder where the templates are located
+  -->
+  <macrodef name="doc.gen">
+    <attribute name="source"/>
+    <attribute name="dest"/>
+    <attribute name="templates"/>
+    <attribute name="fi" default="html,php"/>
+    <attribute name="fe" default=""/>
+    <attribute name="di" default=""/>
+    <attribute name="de" default=""/>
+    <sequential>
+      <java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
+        <jvmarg value="-Xmx128m"/>
+        <arg value="-s"/>
+        <arg value="@{source}"/>
+        <arg value="-d"/>
+        <arg value="@{dest}"/>
+        <arg value="-t"/>
+        <arg value="@{templates}"/>
+        <arg value="-r"/>
+        <arg value="-fi"/>
+        <arg value="html,php"/>
+      </java>
+    </sequential>
+  </macrodef>
+
+  <!--
+    Create a sample's Readme.md by copying and converting its Readme.html.
+    Usage: <sample.md samples="samples_pattern"/>
+    Parameters/Attributes:
+      - samples: a pattern for the names of the samples whose Readme.md to (re)create.
+        examples: **, MySample, *Demo*
+  -->
+  <macrodef name="sample.md">
+    <attribute name="samples" default="**"/>
+    <sequential>
+      <delete dir="${samples-pack}" quiet="true" includes="@{samples}/*.md" excludes="Readme.md"/>
+      <resourcecount>
+        <fileset dir="${samples-pack}" includes="@{samples}/Readme.html"/>
+      </resourcecount>
+      <copy todir="${samples-pack}" enablemultiplemappings="true">
+        <fileset dir="${samples-pack}" includes="@{samples}/Readme.html"/>
+        <globmapper from="*.html" to="*.md"/>
+      </copy>
+        <replaceregexp match="\$template\{name=&quot;sample-readme-html-header&quot; title=&quot;(.*)&quot;\}\$" replace="# \1${line.separator}" flags="g">
+        <fileset id="samples.md.fileset" dir="${samples-pack}" includes="@{samples}/*.md"/>
+      </replaceregexp>
+      <replace token="$template{name=&quot;sample-readme-html-footer&quot;}$" value="" dir="${samples-pack}" includes="@{samples}/*.md"/>
+      <replaceregexp match="(\.[^\.]*)\.html" replace="\1" flags="g">
+        <fileset refid="samples.md.fileset" />
+      </replaceregexp>
+      <replace dir="${samples-pack}" includes="@{samples}/*.md" >
+        <replacefilter token="target/tohtml/src/"    value="src/main/java/"/>
+        <replacefilter token="target/tohtml/config/" value="config/"/>
+        <replacefilter token="target/tohtml/data/"   value="data/"/>
+        <replacefilter token="target/tohtml/db/"     value="db/"/>
+        <replacefilter token="target/tohtml/"        value=""/>
+      </replace>
+    </sequential>
+  </macrodef>
+  
+</project> 

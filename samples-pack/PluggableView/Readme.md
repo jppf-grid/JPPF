@@ -1,7 +1,8 @@
 # Pluggable View demo
 
 <h3>What does the sample do?</h3>
-This sample demonstrates a <a href="">pluggable view</a> integrated into the JPPF administration and monitoring tool. The view shows a log of grid topology and job monitoring events occurring in the JPPF grid.
+This sample demonstrates a <a href="">pluggable view</a> integrated into the JPPF administration and monitoring tool.
+The view shows a log of grid topology and job monitoring events occurring in the JPPF grid.
 Each log entry is timestamped and the view also has two action buttons to clear the log and copy the log to the clipboard.
 
 <p>The view looks like this:
@@ -12,9 +13,9 @@ Before running this sample, you need to install a JPPF server, at least one node
 For information on how to set the JPPF components, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have installed the console, a server and a node, perform the following steps:
 <ol class="samplesList">
-  <li>Open a command prompt in JPPF-x.y-samples-pack/PluggableView</li>
-  <li>Build the sample's jar file: type "<b>ant jar</b>". This will create a file named <b>PluggableView.jar</b>.
-  <li>Copy <b>PluggableView.jar</b> in the "<b>lib</b>" folder of the JPPF amdinistration console, to add it to the console's classpath.</li>
+  <li>Open a command prompt in <b>JPPF-x.y-samples-pack/PluggableView</b></li>
+  <li>Build the sample's jar file: type "<b>mvn clean install</b>". This will create a file named <b>PluggableView.jar</b> in the <b>target</b> folder.
+  <li>Copy <b>PluggableView.jar</b> in the "<b>lib</b>" folder of the JPPF administration console, to add it to the console's classpath.</li>
   <li>add the following configuration properties to the admin console's configuration file "<b>JPPF-x.y-admin/config/jppf-gui.properties</b>":
 <pre class="prettyprint lang-conf">
 # enable / disable the custom view; defaults to true (enabled)
@@ -42,7 +43,7 @@ jppf.admin.console.view.MyView.autoselect = true
 </ol>
 
 <h3>Related source files</h3>
-<a href="src/org/jppf/example/pluggableview/MyView.java">MyView.java</a> : this is the implementation of our pluggable view.</li>
+<a href="src/main/java/org/jppf/example/pluggableview/MyView.java">MyView.java</a> : this is the implementation of our pluggable view.</li>
 
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>There are 2 privileged places you can go to:

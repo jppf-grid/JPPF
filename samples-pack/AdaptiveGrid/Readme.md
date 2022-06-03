@@ -60,9 +60,9 @@ taskDuration = 1500
 
 <h3>Source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/adaptivegrid/AdaptiveGridDemo.java">AdaptiveGridDemo.java</a>: The entry point for the demo</li>
-  <li><a href="src/org/jppf/example/adaptivegrid/DriverConnectionManager.java">DriverConnectionManager.java</a>: encapsulates the fuctionality to update the connection pool size and number of slave nodes</li>
-  <li><a href="src/org/jppf/example/adaptivegrid/SimpleTask.java">SimpleTask.java</a>: a very simple JPPF task used in this demo</li>
+  <li><a href="src/main/java/org/jppf/example/adaptivegrid/AdaptiveGridDemo.java">AdaptiveGridDemo.java</a>: The entry point for the demo</li>
+  <li><a href="src/main/java/org/jppf/example/adaptivegrid/DriverConnectionManager.java">DriverConnectionManager.java</a>: encapsulates the fuctionality to update the connection pool size and number of slave nodes</li>
+  <li><a href="src/main/java/org/jppf/example/adaptivegrid/SimpleTask.java">SimpleTask.java</a>: a very simple JPPF task used in this demo</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>

@@ -1,0 +1,69 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2019 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="JPPF-samples" basedir=".." xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+  <!-- ========================================================================= -->
+  <!-- Convert source files to html                                              -->
+  <!-- ========================================================================= -->
+
+  <condition property="inParentPom">
+    <equals arg1="${project.name}" arg2="samples-pack"/>
+  </condition>
+
+  <target name="convert.to.html" unless="inParentPom">
+    <script language="javascript">project.getBuildListeners().firstElement().setMessageOutputLevel(0);</script>
+    <property name="shared.dir" value="../shared"/>
+    <echo message="shared.dir = ${shared.dir}, project.name = ${project.name}" level="info"/>
+    <scriptdef name="include.code" language="javascript" manager="javax" src="${shared.dir}/HTMLSourceScript.js">
+      <attribute name="sample"/>
+      <attribute name="include"/>
+    </scriptdef>
+    <macrodef name="tohtml">
+      <attribute name="in"/>
+      <attribute name="out" default="@{in}.html"/>
+      <attribute name="lang" default="java"/>
+      <attribute name="title" default="JPPF Samples Pack"/>
+      <sequential>
+        <echo message="in = @{in}, lang = @{lang}" level="info"/>
+        <delete file="@{in}.html" quiet="true"/>
+        <local name="src.lang"/>
+        <property name="src.lang" value="@{lang}"/>
+        <copy file="${shared.dir}/html_source_header.txt" toFile="${project.build.directory}/header.txt" quiet="true" overwrite="true" verbose="false"/>
+        <replace file="${project.build.directory}/header.txt" token="@lang@" value="@{lang}"/>
+        <replace file="${project.build.directory}/header.txt" token="@title@" value="@{title}"/>
+        <copy file="@{in}" toFile="${project.build.directory}/temp.java" quiet="true" overwrite="true" verbose="false"/>
+        <replace file="${project.build.directory}/temp.java">
+          <replacetoken>
+            <![CDATA[<]]>
+          </replacetoken>
+          <replacevalue>
+            <![CDATA[&lt;]]>
+          </replacevalue>
+        </replace>
+        <concat destfile="@{out}">
+          <header file="${project.build.directory}/header.txt"/>
+          <path location="${project.build.directory}/temp.java"/>
+          <footer file="${shared.dir}/html_source_footer.txt"/>
+        </concat>
+      </sequential>
+    </macrodef>
+    <include.code sample="${project.name}" include="**/*.java,**/*.properties,**/*.xml,**/*.txt,**/*.yaml,**/*.sql,**/*.c"/>
+  </target>
+
+</project>

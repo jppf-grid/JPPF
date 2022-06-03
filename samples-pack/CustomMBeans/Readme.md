@@ -10,10 +10,10 @@ For information on how to set up a node and server, please refer to the <a href=
 Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
   <li>open a command prompt in JPPF-x.y-samples-pack/CustomMBeans</li>
-  <li>build the sample: type "<b>ant jar</b>"; this will create a file named <b>CustomMBeans.jar</b></li>
+  <li>build the sample: type "<b>mvn clean install</b>"; this will create a file named <b>CustomMBeans.jar</b> in the <b>target</b> folder</li>
   <li>copy CustomMBeans.jar in the "lib" folder of the JPPF driver installation, to add it to the driver's classpath. This is enough, as the node will download the custom MBean code from the server.</li>
   <li>start the driver and node</li>
-  <li>in the sample's command prompt, type "<b>ant run</b>" to run the sample</li>
+  <li>in the sample's command prompt, type "<b>./run.sh</b>" (Linux/Mac) or "<b>run.bat</b>" (Windows) to run the sample</li>
   <li>you should see the following display:
 <pre class="samples">[echo] Testing the custom server MBean
 [java] The server has 8 available processors

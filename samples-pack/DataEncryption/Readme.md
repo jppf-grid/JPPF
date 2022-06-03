@@ -18,16 +18,16 @@ The obfuscated password is then stored in a file, which is also included in the 
 
 <h3>Related source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/dataencryption/CryptoSerialization.java">CryptoSerialization.java</a> : the data transformer that performs the encryption and decryption</li>
-  <li><a href="src/org/jppf/example/dataencryption/helper/Helper.java">Helper.java</a> : a set of utility methods to generate and retrieve passwords and secret keys, create and manipulate a keystore, and provide the encryption parameters</li>
+  <li><a href="src/main/java/org/jppf/example/dataencryption/CryptoSerialization.java">CryptoSerialization.java</a>: the data transformer that performs the encryption and decryption</li>
+  <li><a href="src/main/java/org/jppf/example/dataencryption/helper/Helper.java">Helper.java</a>: a set of utility methods to generate and retrieve passwords and secret keys, create and manipulate a keystore, and provide the encryption parameters</li>
 </ul>
 
 <h3>How do I use it?</h3>
 First you need to build the sample jar file. To do this, perform the following steps:
 <ol class="samplesList">
   <li>open a command prompt in JPPF-x.y.z-samples-pack/DataEncryption</li>
-  <li>open the file &quot;<b>build.xml</b>&quot; with a text editor, and set the value of the &quot;<b>password</b>&quot; property to the password you want to use for the keystore (it will not be included with the deployed jar file)</li>
-  <li>save the file you just edited and build the sample: type &quot;<b>ant jar</b>&quot;; this will create a file named <b>DataEncryption.jar</b></li>
+  <li>build the sample's jar file with a generated keystore with this command: <b>mvn clean install -Dpassword=&lt;keystore_password&gt;</b></li>
+  <li>this will create a file named <b>DataEncryption.jar</b> in the <b>target</b> folder</li>
 </ol>
 The next step is to deploy the jar file to <b><i>every component of the JPPF grid</i></b>, including servers, nodes, and client applications, and to hook it to the JPPF component:
 <ol class="samplesList">

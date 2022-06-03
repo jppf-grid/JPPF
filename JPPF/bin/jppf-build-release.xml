@@ -1,0 +1,68 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2019 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="jppf-release" basedir="..">
+
+  <!-- ========================================================================= -->
+  <!--                         Generate the release files                        -->
+  <!-- ========================================================================= -->
+
+  <target name="jppf.release">
+    <echo message="copying release zip files" level="info" />
+    <property name="dest.dir" value="${project.build.directory}/build"/>
+    <delete dir="${dest.dir}" quiet="true"/>
+    <mkdir dir="${dest.dir}"/>
+    <macrodef name="copy.zip">
+      <attribute name="module"/>
+      <sequential>
+        <copy todir="${dest.dir}">
+          <fileset dir="../@{module}/target" includes="*.zip"/> 
+        </copy>
+      </sequential>
+    </macrodef>
+    <copy.zip module="application-template"/>
+    <copy.zip module="server"/>
+    <copy.zip module="node"/>
+    <copy.zip module="admin"/>
+    <copy.zip module="admin-web"/>
+    <copy.zip module="jmxremote-nio"/>
+
+    <echo message="building user guide zip file" level="info" />
+    <copy file="${basedir}/docs/manual/JPPF-User-Guide.pdf" tofile="${dest.dir}/JPPF-${project.version}-User-Guide.pdf" quiet="true"/>
+    <zip destfile="${dest.dir}/JPPF-${project.version}-User-Guide.zip">
+      <zipfileset dir="${dest.dir}" includes="*.pdf"/>
+    </zip>
+    <delete file="${dest.dir}/JPPF-${project.version}-User-Guide.pdf" quiet="true"/>
+  
+    <echo message="building javadoc zip file" level="info" />
+    <property name="javadoc.dest.dir" value="${basedir}/docs/home/javadoc/${jppf.base.version}"/>
+    <move file="${basedir}/docs/home/javadoc/apidocs" tofile="${javadoc.dest.dir}" quiet="true" failonerror="false"/>
+    <replace dir="${javadoc.dest.dir}">
+      <include name="**/*.html"/>
+      <replacefilter>
+        <replacetoken><![CDATA[</head>]]></replacetoken>
+        <replacevalue><![CDATA[<link rel="shortcut icon" href="https://www.jppf.org/images/jppf-icon.ico" type="image/x-icon"></head>]]></replacevalue>
+      </replacefilter>
+      <replacefilter token="@version@" value="${jppf.base.version}"/>
+    </replace>
+    <zip destfile="${dest.dir}/JPPF-${project.version}-api.zip">
+      <zipfileset dir="${javadoc.dest.dir}" prefix="JPPF-${project.version}-api"/>
+    </zip>
+  </target>
+
+</project> 

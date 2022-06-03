@@ -12,10 +12,11 @@ For information on how to set up a node and server, please refer to the <a href=
 Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
   <li>open a command prompt in JPPF-x.y-samples-pack/Nbody</li>
-  <li>to build the sample: type "<b>ant compile</b>" or simply "<b>ant</b>"; this will compile all source files in the sample</li>
-  <li>to run the simulation, you can either use the batch script "run.bat" (on Windows) or "run.sh" (on Linux), or the Ant script: "ant run"</li>
+  <li>to build the sample: type "<b>mvn clean install</b>"; this will compile all source files in the sample</li>
+  <li>to run the simulation, you can either use the batch script "<b>run.bat</b>" on Windows, or "<b>./run.sh</b>" on Linux/Unix/Mac</li>
 </ol>
-<p>You might also want to play with the simulation parameters to see how they impact the motion of the simulated antiprotons. They are specified in the configuration file <b>config/jppf.properties</b> as follows:
+<p>You might also want to play with the simulation parameters to see how they impact the motion of the simulated antiprotons.
+They are specified in the configuration file <b>config/jppf.properties</b> as follows:
 <pre class="prettyprint lang-conf">
 # charge on an antiproton
 nbody.qp = 6

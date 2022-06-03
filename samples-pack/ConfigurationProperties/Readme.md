@@ -4,9 +4,9 @@
 <p>This sample demonstrates how to use the <a href="https://www.jppf.org/doc/6.3/index.php?title=The_JPPF_configuration_API"> JPPF configuration API</a> to generate the documentation of all predefined configuration properties.
 <h3>How do I run it?</h3>
 <p>To run the demo, in a command prompt or shell console, type "./run.sh" on Linux/Unix/Mac or "run.bat" on Windows.
-This will generate a <a href="JPPFConfiguration.html">JPPFConfiguration.html</a> file which shows the documentation of all predefined JPPF configuration properties, grouped by categories/tags</p>
+This will generate a <a href="JPPFConfiguration">JPPFConfiguration.html</a> file which shows the documentation of all predefined JPPF configuration properties, grouped by categories/tags</p>
 <h3>Source file</h3>
-<a href="src/org/jppf/example/configuration/ConfigurationHTMLPrinter.java">ConfigurationHTMLPrinter.java</a>: the source code of the HTML documentation generator
+<a href="src/main/java/org/jppf/example/configuration/ConfigurationHTMLPrinter.java">ConfigurationHTMLPrinter.java</a>: the source code of the HTML documentation generator
 <h3>Related</h3>
 <p>The <a href="https://www.jppf.org/doc/6.3/index.php?title=Configuration_properties_reference">configuration properties reference</a> section of the documentation is generated using the same API
 (<a href="https://github.com/jppf-grid/JPPF/blob/master/common/src/java/org/jppf/doc/WikiConfigurationPrinter.java">source code here</a>) and in a similar fashion.

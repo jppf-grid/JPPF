@@ -1,0 +1,6 @@
+<jppf:ExecutionPolicy>
+  <Equal valueType="boolean">
+    <Property>jppf.channel.local</Property>
+    <Value>true</Value>
+  </Equal>
+</jppf:ExecutionPolicy>

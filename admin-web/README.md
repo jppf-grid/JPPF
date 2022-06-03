@@ -4,7 +4,7 @@ A web-based administration and monitoring console for JPPF grids. It is function
 
 ## How to get it
 
-**Direct download**: from the [latest release](https://github.com/jppf-grid/JPPF/releases/tag/v_6_2_beta), look for JPPF-6.2-beta-admin-web.zip
+**Direct download**: from the [latest release](https://github.com/jppf-grid/JPPF/releases/tag/v_6_2), look for JPPF-6.2-admin-web.zip
 
 ### War file
 

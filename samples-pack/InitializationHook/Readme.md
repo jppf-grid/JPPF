@@ -19,7 +19,7 @@ Additionally, a node configuration is provided in <b>InitializationHook/config/n
 Once you have installed the 2 servers and at least one node, perform the following steps:
 <ol class="samplesList">
   <li>Open a command prompt in JPPF-x.y-samples-pack/InitializationHook</li>
-  <li>Build the sample: type "<b>ant jar</b>"; this will create a file named <b>InitializationHook.jar</b></li>
+  <li>Build the sample: type "<b>mvn clean install</b>"; this will create a file named <b>InitializationHook.jar</b> in the <b>target</b> directory</li>
   <li>Copy InitializationHook.jar in the "lib" folder of the JPPF node installation, to add it to the node's classpath.</li>
   <li>Replace the node's configuration with the one provided in this sample</li>
   <li>Replace the servers configurations with those provided in this sample</li>
@@ -63,7 +63,7 @@ Node successfully initialized
 
 <h3>Related source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/initializationhook/DiscoveryHook.java">DiscoveryHook.java</a> : this is the implementation of our connection failover mechanism, via a node initialization hook.</li>
+  <li><a href="src/main/java/org/jppf/example/initializationhook/DiscoveryHook.java">DiscoveryHook.java</a> : this is the implementation of our connection failover mechanism, via a node initialization hook.</li>
   <li><a href="config/driver1/jppf-driver.properties">driver1/jppf-driver.properties</a> : the configuration of the first driver</li>
   <li><a href="config/driver2/jppf-driver.properties">driver2/jppf-driver.properties</a> : the configuration of the second driver</li>
   <li><a href="config/node/jppf-node.properties">node/jppf-node.properties</a> : the configuration of the node</li>

@@ -4,3 +4,9 @@
 **/classes2/
 **/*.log
 **/JPPFConfiguration.html
+**/*.java.html
+**/*.xml.html
+**/*.properties.html
+**/*.yaml.html
+**/*.txt.html
+**/*.sql.html

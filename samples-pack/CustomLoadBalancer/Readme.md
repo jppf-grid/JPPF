@@ -19,7 +19,7 @@ We want the JPPF server to be able to dispatch the tasks to the apppropriate nod
   <li>"task.time": the maximum duration of each task in the job</li>
   <li>"allowed.time": the maximum allowed time for execution of a single set of tasks on a node</li>
   <li>"id": the job id (for debugging and logging purposes only)</li>
-  <li>for full details, please take a look at the <a href="src/org/jppf/example/loadbalancer/client/CustomLoadBalancerRunner.java">fully commented job runner source code</a></li>
+  <li>for full details, please take a look at the <a href="src/main/java/org/jppf/example/loadbalancer/client/CustomLoadBalancerRunner.java">fully commented job runner source code</a></li>
 </ul>
 b) Information provided by each node:
 <ul class="samplesList">
@@ -30,7 +30,7 @@ c) Our load-balancer will compute the maximum number of tasks in the job that ca
 <ul class="samplesList">
   <li>the estimated total memory footprint of the tasks, which must fit in the node's available memory.</li>
   <li>the estimated total execution time, that must be less than the allowed time</li>
-  <li>for full details, please take a look at the <a href="src/org/jppf/example/loadbalancer/server/CustomLoadBalancer.java">fully commented load-balancer source code</a></li>
+  <li>for full details, please take a look at the <a href="src/main/java/org/jppf/example/loadbalancer/server/CustomLoadBalancer.java">fully commented load-balancer source code</a></li>
 </ul>
 d) Furthermore, additional node filtering will be applied before the load-balancing comes into play, by the means of an execution policy for each job:
 <ul class="samplesList">
@@ -40,11 +40,11 @@ d) Furthermore, additional node filtering will be applied before the load-balanc
 </ul>
 Here is a set of links to the source of each Java class in this sample:
 <ul>
-  <li><a href="src/org/jppf/example/loadbalancer/server/CustomLoadBalancer.java">CustomLoadBalancer</a>: load-balancer implementation</li>
-  <li><a href="src/org/jppf/example/loadbalancer/server/CustomLoadBalancerProvider.java">CustomLoadBalancerProvider</a>: the provider class that plugs our load balancer into the JPPF server</li>
-  <li><a href="src/org/jppf/example/loadbalancer/client/CustomLoadBalancerRunner.java">CustomLoadBalancerRunner</a>: the client side application that executes the jobs on the grid</li>
-  <li><a href="src/org/jppf/example/loadbalancer/client/CustomLoadBalancerTask.java">CustomLoadBalancerTask</a>: the JPPF tasks enclosed in the jobs</li>
-  <li><a href="src/org/jppf/example/loadbalancer/common/MyCustomPolicy.java">MyCustomPolicy</a>: the custom execution policy used for "heavy" jobs</li>
+  <li><a href="src/main/java/org/jppf/example/loadbalancer/server/CustomLoadBalancer.java">CustomLoadBalancer</a>: load-balancer implementation</li>
+  <li><a href="src/main/java/org/jppf/example/loadbalancer/server/CustomLoadBalancerProvider.java">CustomLoadBalancerProvider</a>: the provider class that plugs our load balancer into the JPPF server</li>
+  <li><a href="src/main/java/org/jppf/example/loadbalancer/client/CustomLoadBalancerRunner.java">CustomLoadBalancerRunner</a>: the client side application that executes the jobs on the grid</li>
+  <li><a href="src/main/java/org/jppf/example/loadbalancer/client/CustomLoadBalancerTask.java">CustomLoadBalancerTask</a>: the JPPF tasks enclosed in the jobs</li>
+  <li><a href="src/main/java/org/jppf/example/loadbalancer/common/MyCustomPolicy.java">MyCustomPolicy</a>: the custom execution policy used for "heavy" jobs</li>
 </ul>
 
 <h3>How do I run it?</h3>
@@ -61,8 +61,8 @@ Once you have installed a server and node, perform the following steps:
     </ul>
   </li>
   <li>open a command prompt in <b>JPPF-x.y-samples-pack/CustomLoadBalancer</b></li>
-  <li>build the sample: type "<b>ant jar</b>"; this will create a file named <b>CustomLoadBalancer.jar</b></li>
-  <li>copy <b>CustomLoadBalancer.jar in</b> the "<b>lib</b>" folder of the JPPF driver installation, to add it to the driver's classpath. This will effectively install the new load-balancer.</li>
+  <li>build the sample: type "<b>mvn clean instakk</b>"; this will create a file named <b>CustomLoadBalancer.jar</b> in the <b>target</b> folder</li>
+  <li>copy <b>target/CustomLoadBalancer.jar</b> in the "<b>lib</b>" folder of the JPPF driver installation, to add it to the driver's classpath. This will effectively install the new load-balancer.</li>
   <li>in the server's installation config/jppf-driver.properties file, replace the property "<b>jppf.load.balancing.algorithm = xxxxx</b>" with "<b>jppf.load.balancing.algorithm = customLoadBalancer</b>",
   to let the server know it must use the new load-balancer</li>
   <li>start the JPPF server and each of the 2 nodes</li>

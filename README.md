@@ -25,11 +25,9 @@ This is the home for the JPPF source code. Other services can be found at the fo
 * **[common](common)**: utilities and classes common to the other modules
 * **[containers](containers)**: configuration files and scripts to build JPPF Docker images and deploy them in cluster environments
 * **[demo](demo)**: some demos and tests of JPPF features, which may be useful as code samples
-* **[dotnet-bridge](dotnet-bridge)**: source code and resources for the .Net bridge
 * **[jca-client](jca-client)**: source code for the J2EE connector
 * **[jmxremote-nio](jmxremote-nio)**: the JPPF JMX remote connector, based on NIO
 * **[node](node)**: source code for the nodes
-* **[node-android](node-android)**: source code for the Android node
 * **[samples-pack](samples-pack)**: source code and docs for the JPPF samples
 * **[server](server)**: source code for the JPPF driver/server
 * **[stress-tests](stress-tests)**: a framework for starting and using local JPPF grids with complex topologies
@@ -40,14 +38,13 @@ This is the home for the JPPF source code. Other services can be found at the fo
 ***Requirements***
 
 * **Java 8** or later
-* **[Apache Ant 1.9.1](https://ant.apache.org)** or later
+* **[Apache Maven 3.6.0](https://maven.apache.org)** or later
 
 ***Steps***
 
 * clone the repository:<br> `git clone git@github.com:jppf-grid/JPPF.git` or `git clone https://github.com/jppf-grid/JPPF.git`
-* from the repository root: `ant build`
-* to run the tests: `ant test`
-* the test results are available in `<repo_root>/tests/report`, the logs are in `<repo_root>/tests/logs` (1 set of logs per test class)
+* from the repository root: `mvn clean install`
+* an HTML test report is available in `<repo_root>/tests/target/junit-report`, the test logs are in `<repo_root>/tests/target/logs` (one set of logs per test class)
 
 ## JPPF Maven artifacts
 

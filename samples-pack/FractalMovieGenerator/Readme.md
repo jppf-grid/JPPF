@@ -2,26 +2,33 @@
 
 <h3>What does the sample do?</h3>
 This sample demonstrates a JPPF grid based on a volunteer computing model.
-Its goal is to generate AVI movies made of fractal images (Mandelbrot set) individually computed as in the <a href="../Fractals/Readme.html">Fractals</a> sample.
-<p>For this, we will reuse the code and artifacts of the <a href="../Fractals/Readme.html">Fractals</a> sample, since it already implements JPPF tasks for the Mandelbrot computations, along with the code to submit the corresponding JPPF jobs.
+Its goal is to generate AVI movies made of fractal images (Mandelbrot set) individually computed as in the <a href="../Fractals/Readme">Fractals</a> sample.
+<p>For this, we will reuse the code and artifacts of the <a href="../Fractals/Readme">Fractals</a> sample, since it already implements JPPF tasks for the Mandelbrot computations,
+along with the code to submit the corresponding JPPF jobs.
 The movie file itself is created using the <a href="http://www.randelshofer.ch/monte/">Monte Media Library</a>.
 <p>Additionally, we will also generate a specific node distribution, with the following extensions and customizations:
 <ul class="samplesList">
-  <li>the node will run in <a href="https://www.jppf.org/doc/6.3/index.php?title=Deployment_and_run_modes#Offline_nodes">offline mode</a>: it will disconnect from the server to execute the job, then reconnect to send the results back</li>
+  <li>the node will run in <a href="https://www.jppf.org/doc/6.3/index.php?title=Deployment_and_run_modes#Offline_nodes">offline mode</a>:
+  it will disconnect from the server to execute the job, then reconnect to send the results back</li>
   <li>the node will run in <a href="https://www.jppf.org/doc/6.3/index.php?title=Deployment_and_run_modes#JPPF_Node_in_.E2.80.9CIdle_Host.E2.80.9D_mode">idle mode</a>:
   it will start when the computer is idle (no user activity) and stop when the user wakes it up</li>
-  <li>it will embed a modified version of the <a href="https://www.jppf.org/doc/6.3/index.php?title=JPPF_node_screensaver#JPPF_built-in_screensaver">JPPF default screensaver</a>, which will display a preview of the image being computed by the node.
+  <li>it will embed a modified version of the <a href="https://www.jppf.org/doc/6.3/index.php?title=JPPF_node_screensaver#JPPF_built-in_screensaver">JPPF default screensaver</a>,
+  which will display a preview of the image being computed by the node.
   This relies on <a href="https://www.jppf.org/doc/6.3/index.php?title=Task_objects#Sending_notifications_from_a_task">task notifications emitted for each point of the image</a>.
   The screen saver will look like <a href="../shared/images/MandelbrotNode.gif" target="_blank">this screenshot</a>.</li>
   <li>Since the node is offline, and to reduce network traffic, all required libraries and classes will be part of the node's local classpath</li>
 </ul>
 
 <h3>How do I run it?</h3>
-Before running this sample application, you must have a JPPF server running.<br>
-For information on how to set up a server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.
-<p>Once you have a server running, you can build the node distribution by typing <b>ant build</b> from a command or shell prompt.
-This will produce two files "<b>JPPF-node.zip</b>" and "<b>JPPF-node.tar.gz</b>". Use the file appropriate for the platform where the node is deployed (the .tar.gz includes execute permission for the startNode.sh script).
+<p>First, to build the sample, type the following command in a shell prompt in the <b>"FractalMovieGenerator"</b> folder: <b>"mvn clean install"</b>
+This will also produce two files "<b>FractalMovieGenerator-node.zip</b>" and "<b>FractalMovieGenerator-node.tar.gz</b>".
+Use the file appropriate for the platform where the node is deployed (the .tar.gz includes execute permission for the startNode.sh script).
 If you wish to modify the node settings before this, you can edit the configuration files in <b>FractalMovieGenerator/config/node</b>.<br>
+
+<p>Before running this sample application, you must have a JPPF server running.<br>
+For information on how to set up a server, please refer to the <a href="https://www.jppf.org/doc/6.3/index.php?title=Introduction">JPPF documentation</a>.
+
+<p>Once the server is started and running, you can start the node from the node distribution zip or tar.gz file generated during the ubuild of the sample.
 
 <p>once you have a node running, you can launch the sample by typing:<br/>
 <code>&lt;run&gt; -i data/mandelbrot.csv -o data/mandelbrot.avi -f 30 -t 30</code><br/>
@@ -59,7 +66,8 @@ jppf.fractals.concurrent.jobs = 4
 jppf.pool.size = 4
 </pre>
 
-<p>Lastly, you can also configure a job <a href="https://www.jppf.org/doc/6.3/index.php?title=Job_Service_Level_Agreement#Expiration_of_job_dispatches">dispatch timeout and maximum allowed timeouts</a> in the client configuration.
+<p>Lastly, you can also configure a job <a href="https://www.jppf.org/doc/6.3/index.php?title=Job_Service_Level_Agreement#Expiration_of_job_dispatches">
+dispatch timeout and maximum allowed timeouts</a> in the client configuration.
 These 2 properties are used to prevent jobs from getting stuck forever, in case a node never completes the execution of a job. This is done as follows:
 <pre class="prettyprint lang-conf">
 # maximum allowed time for a job to execute in a node, before it is resubmitted
@@ -75,7 +83,7 @@ Note that uploading it to Youtube required an additonal encoding step using the 
 <p><iframe width="640" height="360" src="http://www.youtube.com/embed/JDVBQHkEsMM?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
 
 <h3>I have additional questions and comments, where can I go?</h3>
-<p>If you need more insight into the code of this demo, you can consult the source, or have a look at the <a href="javadoc/index.html">API documentation</a>.
+<p>If you need more insight into the code of this demo, you can consult the source, or have a look at the <a href="javadoc/index">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
