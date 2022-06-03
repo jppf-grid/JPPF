@@ -433,10 +433,6 @@
         <module>demo</module>
         <module>samples-pack</module>
         <module>JPPF</module>
-        <!--
-        <module>jca-client</module>
-        <module>stress-test</module>
-        -->
       </modules>
     </profile>
     <profile>
